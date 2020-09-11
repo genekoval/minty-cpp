@@ -17,6 +17,7 @@ db.drop ?= dropdb --username=$(db.superuser) --if-exists
 db.drop.user ?= dropuser --username=$(db.superuser) --if-exists
 
 db.root := db
+
 db.schemas.root := $(db.root)/schemas
 db.schemas := $(wildcard $(db.schemas.root)/*)
 db.schemas.checkpoints := $(addprefix .mkbuild/,$(db.schemas))
@@ -24,15 +25,22 @@ db.schemas.checkpoints := $(addprefix .mkbuild/,$(db.schemas))
 db.connect := $(db) --username=$(db.user) --dbname=$(db.name)
 db.command := $(db.connect) --echo-queries --command
 
+db.connect.super := $(db) --username=$(db.superuser) --dbname=$(db.name)
+
 CLEAN += .mkbuild
 
 .mkbuild/$(db.schemas.root)/%: $(db.schemas.root)/%
-	$(eval schema := $(notdir $(basename $<)))
+	@mkdir -p $(dir $@)
+	$(eval schema := $(notdir $<))
 	@$(db.command) "DROP SCHEMA IF EXISTS $(schema) CASCADE"
 	@$(db.command) "CREATE SCHEMA $(schema)"
-	@$(db.connect) --command "SET search_path = $(schema)" --file=$<
-	@mkdir -p $(dir $@)
-	@touch $@
+	@$(db.connect.super) --file=$</extensions.sql
+	@set -e; \
+		$(db.connect) \
+			--set=ON_ERROR_STOP=1 \
+			--command "SET search_path = $(schema)" \
+			--file=$</$(schema).sql; \
+		touch $@
 
 db: $(db.schemas.checkpoints)
 

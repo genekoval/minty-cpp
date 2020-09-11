@@ -1,0 +1,2 @@
+CREATE EXTENSION ltree
+    WITH SCHEMA minty;
