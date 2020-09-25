@@ -1,13 +1,13 @@
-#include "repo.h"
+#include "db.h"
 
 #include <minty/repo/db/model.h>
 
 namespace minty::repo::db {
     tag::tag(const pqxx::row& row) : model::tag {
-        parse_field<0, decltype(id)>(row),
-        parse_field<1, decltype(name)>(row),
-        parse_field<2, decltype(color)>(row),
-        parse_field<3, decltype(date_created)>(row),
+        parse_field<decltype(id)>(row, 0),
+        parse_field<decltype(name)>(row, 1),
+        parse_field<decltype(color)>(row, 2),
+        parse_field<decltype(date_created)>(row, 3),
     }
     {}
 }
