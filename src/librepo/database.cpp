@@ -13,7 +13,7 @@ namespace minty::repo::db {
         auto tx = pqxx::nontransaction(connection);
 
         return tag(tx.exec_params1(R"(
-            SELECT name, color, date_created
+            SELECT *
             FROM create_tag($1, $2)
         )",
             name,
