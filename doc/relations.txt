@@ -1,0 +1,64 @@
+post:
+    id
+    description
+    date created
+    date modified
+
+post object:
+    post id
+    object id
+    sequence
+    date added
+
+tag:
+    id
+    name
+    color
+    date created
+
+comment:
+    id
+    post id
+    parent comment id
+    content
+    date created
+
+creator:
+    id
+    date added
+    avatar (object id)
+    banner (object id)
+    bio
+
+site:
+    id
+    name
+    homepage
+    thumbnail (object id)
+
+source:
+    id
+    site id
+    url
+
+object source:
+    object id
+    source id
+
+creator source:
+    creator id
+    source id
+
+name:
+    id
+    creator id
+    value
+    main (boolean)
+
+creator post:
+    creator id
+    post id
+
+tag post:
+    tag id
+    post id

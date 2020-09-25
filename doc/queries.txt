@@ -1,0 +1,10 @@
+SELECT object_id
+FROM post_object
+WHERE id = post_id
+SORT BY sequence;
+
+SELECT
+    post_id,
+    array_agg(object_id ORDER BY sequence)
+FROM post_object
+GROUP BY post_id;
