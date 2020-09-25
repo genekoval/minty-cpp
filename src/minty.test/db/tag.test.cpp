@@ -1,6 +1,7 @@
+#include <minty/repo/db/database.h>
+
 #include <gtest/gtest.h>
 #include <sstream>
-#include <pqxx/pqxx>
 
 using namespace std::literals;
 
@@ -9,10 +10,15 @@ protected:
     static constexpr auto connection_string =
         "postgresql://minty@localhost/minty";
 
-    pqxx::connection db;
+    minty::repo::db::database db;
+    pqxx::connection con;
     pqxx::nontransaction tx;
 
-    DatabaseTagTest() : db(connection_string), tx(db) {
+    DatabaseTagTest() :
+        db(connection_string),
+        con(connection_string),
+        tx(con)
+    {
         truncate("tag");
     }
 
@@ -32,22 +38,8 @@ TEST_F(DatabaseTagTest, CreateTag) {
     constexpr auto name = "mytag";
     constexpr auto color = "0f0f0f";
 
-    auto row = tx.exec_params1(R"(
-        SELECT name, color
-        FROM create_tag($1, $2)
-    )",
-        name,
-        color
-    );
+    const auto tag = db.create_tag(name, color);
 
-    ASSERT_EQ(name, row[0].as<std::string>());
-    ASSERT_EQ(color, row[1].as<std::string>());
-
-    row = tx.exec1(R"(
-        SELECT name, color
-        FROM tag
-    )");
-
-    ASSERT_EQ(name, row[0].as<std::string>());
-    ASSERT_EQ(color, row[1].as<std::string>());
+    ASSERT_EQ(name, tag.name);
+    ASSERT_EQ(color, tag.color);
 }
