@@ -1,5 +1,6 @@
 #include "db.h"
 
+#include <minty/error.h>
 #include <minty/repo/db/database.h>
 #include <minty/repo/db/model.h>
 
@@ -18,6 +19,11 @@ namespace minty::repo::db {
     ) -> model::tag {
         auto tx = pqxx::nontransaction(connection);
 
-        return tag(tx.exec_prepared1("create_tag", name, color));
+        try {
+            return tag(tx.exec_prepared1("create_tag", name, color));
+        }
+        catch (const pqxx::unique_violation&) {
+            throw minty::unique_entity_violation("tag", name);
+        }
     }
 }

@@ -20,7 +20,7 @@ CREATE TABLE source (
 
 CREATE TABLE tag (
     id              SERIAL PRIMARY KEY,
-    name            text NOT NULL,
+    name            text UNIQUE NOT NULL,
     color           text NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW()
 );

@@ -16,6 +16,7 @@ targets := $(internal.libs)
 
 define core.libs
  $(internal)
+ ext++
  pqxx
  pq
 endef
