@@ -10,7 +10,28 @@ namespace minty::repo::db {
     {
         auto c = connection_initializer(connection);
 
+        c.prepare("create_site", 3);
         c.prepare("create_tag", 2);
+    }
+
+    auto database::create_site(
+        std::string_view name,
+        std::string_view homepage,
+        std::optional<std::string_view> thumbnail_id
+    ) -> model::site {
+        auto tx = pqxx::nontransaction(connection);
+
+        try {
+            return site(tx.exec_prepared1(
+                "create_site",
+                name,
+                homepage,
+                thumbnail_id
+            ));
+        }
+        catch (const pqxx::unique_violation& ex) {
+            throw unique_entity_violation(site::entity, ex);
+        }
     }
 
     auto database::create_tag(
