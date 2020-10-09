@@ -1,21 +1,22 @@
 --{{{( Tables )
 
-CREATE TABLE object (
-    id              uuid PRIMARY KEY,
-    preview_id      uuid REFERENCES object ON DELETE CASCADE
-);
-
 CREATE TABLE site (
     id              SERIAL PRIMARY KEY,
-    name            text NOT NULL,
-    homepage        text NOT NULL,
-    thumbnail       uuid REFERENCES object ON DELETE NO ACTION
+    name            text UNIQUE NOT NULL,
+    homepage        text UNIQUE NOT NULL,
+    thumbnail_id    uuid
 );
 
 CREATE TABLE source (
     id              SERIAL PRIMARY KEY,
     site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION,
     url             text NOT NULL
+);
+
+CREATE TABLE object (
+    id              uuid PRIMARY KEY,
+    preview_id      uuid,
+    source_id       integer NOT NULL REFERENCES source ON DELETE NO ACTION
 );
 
 CREATE TABLE tag (
@@ -61,8 +62,8 @@ CREATE TABLE post_tag (
 CREATE TABLE creator (
     id              SERIAL PRIMARY KEY,
     bio             text,
-    avatar          uuid REFERENCES object ON DELETE NO ACTION,
-    banner          uuid REFERENCES object ON DELETE NO ACTION,
+    avatar          uuid,
+    banner          uuid,
     date_added      timestamptz NOT NULL DEFAULT NOW()
 );
 
@@ -84,11 +85,6 @@ CREATE TABLE post_creator (
 CREATE TABLE creator_source (
     source_id       integer PRIMARY KEY REFERENCES source ON DELETE NO ACTION,
     creator_id      integer NOT NULL REFERENCES creator ON DELETE CASCADE
-);
-
-CREATE TABLE object_source (
-    object_id       uuid PRIMARY KEY REFERENCES object ON DELETE CASCADE,
-    source_id       integer NOT NULL REFERENCES source ON DELETE NO ACTION
 );
 
 --}}}
@@ -118,31 +114,15 @@ BEGIN
         FROM new_source;
     END IF;
 
-    IF preview_id IS NOT NULL THEN
-        INSERT INTO object (
-            id
-        ) VALUES (
-            preview_id
-        );
-    END IF;
-
     INSERT INTO object (
         id,
-        preview_id
+        preview_id,
+        source_id
     ) VALUES (
         object_id,
-        preview_id
+        preview_id,
+        source_id
     );
-
-    IF source_id IS NOT NULL THEN
-        INSERT INTO object_source (
-            object_id,
-            source_id
-        ) VALUES (
-            object_id,
-            source_id
-        );
-    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -257,25 +237,19 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_site(
     name            text,
     homepage        text,
-    thumbnail       uuid
+    thumbnail_id    uuid
 ) RETURNS SETOF site AS $$
 BEGIN
-    INSERT INTO object (
-        id
-    ) VALUES (
-        thumbnail
-    );
-
     RETURN QUERY
     INSERT INTO site (
         name,
         homepage,
-        thumbnail
+        thumbnail_id
     ) VALUES (
         name,
         homepage,
-        thumbnail
-    ) RETURNING id;
+        thumbnail_id
+    ) RETURNING *;
 END;
 $$ LANGUAGE plpgsql;
 --}}}
