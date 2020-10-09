@@ -22,8 +22,8 @@ namespace minty::repo::db {
         try {
             return tag(tx.exec_prepared1("create_tag", name, color));
         }
-        catch (const pqxx::unique_violation&) {
-            throw minty::unique_entity_violation("tag", name);
+        catch (const pqxx::unique_violation& ex) {
+            throw unique_entity_violation(tag::entity, ex);
         }
     }
 }

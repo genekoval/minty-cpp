@@ -17,8 +17,10 @@ targets := $(internal.libs)
 define core.libs
  $(internal)
  ext++
+ fmt
  pqxx
  pq
+ timber
 endef
 
 test.deps = $(internal.libs)

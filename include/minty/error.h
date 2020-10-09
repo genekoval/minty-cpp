@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ext/string.h>
-#include <sstream>
+#include <fmt/format.h>
 #include <stdexcept>
 
 namespace minty {
@@ -10,24 +10,26 @@ namespace minty {
     };
 
     class unique_entity_violation : public minty_error {
-        static auto create_message(
-            std::string_view entity,
-            std::string_view identifier
-        ) -> std::string {
-            auto os = std::ostringstream();
-
-            os << "cannot create "
-            << entity << " "
-            << ext::quote(identifier) << ": "
-            << entity << " exists";
-
-            return os.str();
-        }
     public:
+        const std::string entity;
+        const std::string key;
+        const std::string value;
+
         unique_entity_violation(
             std::string_view entity,
-            std::string_view identifier
-        ) : minty_error(create_message(entity, identifier))
+            std::string_view key,
+            std::string_view value
+        ) :
+            minty_error(fmt::format(
+                "{} with {} {} already exists",
+                entity,
+                key,
+                ext::quote(value)
+            )),
+            entity(entity),
+            key(key),
+            value(value)
         {}
+
     };
 }

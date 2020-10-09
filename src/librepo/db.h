@@ -1,10 +1,28 @@
 #pragma once
 
+#include <minty/error.h>
+
 #include <pqxx/pqxx>
 #include <sstream>
 #include <type_traits>
 
 namespace minty::repo::db {
+    class connection_initializer {
+        pqxx::connection* connection;
+    public:
+        connection_initializer(pqxx::connection& c);
+
+        auto prepare(const std::string& name, unsigned int argc) -> void;
+    };
+
+    struct sql_error {
+        const std::string context;
+        const std::string detail;
+        const std::string error;
+    };
+
+    auto parse_error(const pqxx::sql_error& error) -> sql_error;
+
     template <
         typename T,
         typename U = std::remove_const_t<T>
@@ -16,11 +34,24 @@ namespace minty::repo::db {
         return row[index].as<std::remove_const_t<T>>();
     }
 
-    class connection_initializer {
-        pqxx::connection* connection;
-    public:
-        connection_initializer(pqxx::connection& c);
+    class unique_entity_violation : public minty::unique_entity_violation {
+        static auto parse_error (
+            const sql_error& error
+        ) -> std::array<std::string, 2>;
 
-        auto prepare(const std::string& name, unsigned int argc) -> void;
+        unique_entity_violation(
+            std::string_view entity,
+            const std::array<std::string, 2> kv
+        );
+
+        unique_entity_violation(
+            std::string_view entity_name,
+            const sql_error& error
+        );
+    public:
+        unique_entity_violation(
+            std::string_view entity_name,
+            const pqxx::unique_violation& ex
+        );
     };
 }
