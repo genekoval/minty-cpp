@@ -1,33 +1,33 @@
 --{{{( Tables )
 
 CREATE TABLE site (
-    id              SERIAL PRIMARY KEY,
+    site_id         SERIAL PRIMARY KEY,
     name            text UNIQUE NOT NULL,
     homepage        text UNIQUE NOT NULL,
     thumbnail_id    uuid
 );
 
 CREATE TABLE source (
-    id              SERIAL PRIMARY KEY,
-    site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION,
-    url             text NOT NULL
+    source_id       SERIAL PRIMARY KEY,
+    url             text NOT NULL,
+    site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION
 );
 
 CREATE TABLE object (
-    id              uuid PRIMARY KEY,
+    object_id       uuid PRIMARY KEY,
     preview_id      uuid,
-    source_id       integer NOT NULL REFERENCES source ON DELETE NO ACTION
+    source_id       integer REFERENCES source ON DELETE NO ACTION
 );
 
 CREATE TABLE tag (
-    id              SERIAL PRIMARY KEY,
+    tag_id          SERIAL PRIMARY KEY,
     name            text UNIQUE NOT NULL,
     color           text NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE post (
-    id              SERIAL PRIMARY KEY,
+    post_id         SERIAL PRIMARY KEY,
     description     text,
     active          boolean NOT NULL DEFAULT true,
     date_created    timestamptz NOT NULL DEFAULT NOW(),
@@ -44,7 +44,7 @@ CREATE TABLE post_object (
 );
 
 CREATE TABLE post_comment (
-    id              SERIAL PRIMARY KEY,
+    comment_id      SERIAL PRIMARY KEY,
     post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
     parent_id       integer REFERENCES post_comment ON DELETE NO ACTION,
     parent_path     ltree NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE post_tag (
 );
 
 CREATE TABLE creator (
-    id              SERIAL PRIMARY KEY,
+    creator_id      SERIAL PRIMARY KEY,
     bio             text,
     avatar          uuid,
     banner          uuid,
@@ -89,13 +89,33 @@ CREATE TABLE creator_source (
 
 --}}}
 
+--{{{( Views )
+
+CREATE VIEW object_view AS
+SELECT
+    object_id,
+    preview_id,
+
+    source_id,
+    url,
+
+    site_id,
+    name,
+    homepage,
+    thumbnail_id
+FROM object
+    LEFT JOIN source USING (source_id)
+    LEFT JOIN site USING (site_id);
+
+--}}}
+
 --{{{( Functions )
 CREATE FUNCTION add_object(
     object_id       uuid,
     preview_id      uuid,
     site_id         integer,
     source_url      text
-) RETURNS VOID AS $$
+) RETURNS SETOF object_view AS $$
 DECLARE
     source_id       integer;
 BEGIN
@@ -110,12 +130,12 @@ BEGIN
             ) RETURNING *
         )
         SELECT INTO source_id
-            id
-        FROM new_source;
+            ns.source_id
+        FROM new_source ns;
     END IF;
 
     INSERT INTO object (
-        id,
+        object_id,
         preview_id,
         source_id
     ) VALUES (
@@ -123,6 +143,11 @@ BEGIN
         preview_id,
         source_id
     );
+
+    RETURN QUERY
+    SELECT *
+    FROM object_view ov
+    WHERE ov.object_id = add_object.object_id;
 END;
 $$ LANGUAGE plpgsql;
 

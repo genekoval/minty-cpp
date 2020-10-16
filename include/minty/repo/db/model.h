@@ -1,19 +1,39 @@
 #pragma once
 
-#include <minty/model.h>
-
-#include <pqxx/pqxx>
+#include <minty/repo/db/db.h>
 
 namespace minty::repo::db {
-    struct site : model::site {
-        static constexpr auto entity = "site";
+    struct site : entity<4> {
+        const std::string id;
+        const std::string name;
+        const std::string homepage;
+        const std::optional<std::string> thumbnail_id;
 
-        site(const pqxx::row& row);
+        site(row_iterator& it);
     };
 
-    struct tag : model::tag {
-        static constexpr auto entity = "tag";
+    struct source : entity<2 + site::column_count> {
+        const std::string id;
+        const std::string url;
+        const site website;
 
-        tag(const pqxx::row& row);
+        source(row_iterator& it);
+    };
+
+    struct object : entity<2 + source::column_count> {
+        const std::string id;
+        const std::optional<std::string> preview_id;
+        const std::optional<source> src;
+
+        object(row_iterator& it);
+    };
+
+    struct tag : entity<4> {
+        const std::string id;
+        const std::string name;
+        const std::string color;
+        const std::string date_created;
+
+        tag(row_iterator& it);
     };
 }
