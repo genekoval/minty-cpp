@@ -9,13 +9,21 @@ CREATE TABLE site (
 
 CREATE TABLE source (
     source_id       SERIAL PRIMARY KEY,
-    url             text NOT NULL,
+    url             text UNIQUE NOT NULL,
     site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION
 );
 
 CREATE TABLE object (
+    object_id       uuid PRIMARY KEY
+);
+
+CREATE TABLE object_preview (
     object_id       uuid PRIMARY KEY,
-    preview_id      uuid,
+    preview_id      uuid NOT NULL
+);
+
+CREATE TABLE object_source (
+    object_id       uuid PRIMARY KEY,
     source_id       integer REFERENCES source ON DELETE NO ACTION
 );
 
@@ -95,59 +103,31 @@ CREATE VIEW object_view AS
 SELECT
     object_id,
     preview_id,
-
     source_id,
     url,
-
     site_id,
     name,
     homepage,
     thumbnail_id
 FROM object
+    LEFT JOIN object_preview USING (object_id)
+    LEFT JOIN object_source USING (object_id)
     LEFT JOIN source USING (source_id)
     LEFT JOIN site USING (site_id);
 
 --}}}
 
 --{{{( Functions )
+
 CREATE FUNCTION add_object(
-    object_id       uuid,
-    preview_id      uuid,
-    site_id         integer,
-    source_url      text
-) RETURNS SETOF object_view AS $$
-DECLARE
-    source_id       integer;
+    object_id       uuid
+) RETURNS void AS $$
 BEGIN
-    IF site_id IS NOT NULL THEN
-        WITH new_source AS (
-            INSERT INTO source (
-                site_id,
-                url
-            ) VALUES (
-                site_id,
-                source_url
-            ) RETURNING *
-        )
-        SELECT INTO source_id
-            ns.source_id
-        FROM new_source ns;
-    END IF;
-
     INSERT INTO object (
-        object_id,
-        preview_id,
-        source_id
+        object_id
     ) VALUES (
-        object_id,
-        preview_id,
-        source_id
-    );
-
-    RETURN QUERY
-    SELECT *
-    FROM object_view ov
-    WHERE ov.object_id = add_object.object_id;
+        object_id
+    ) ON CONFLICT DO NOTHING;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -277,6 +257,74 @@ BEGIN
     ) RETURNING *;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE FUNCTION create_source(
+    site            integer,
+    source_url      text
+) RETURNS SETOF source AS $$
+BEGIN
+    INSERT INTO source (
+        site_id,
+        url
+    ) VALUES (
+        site,
+        source_url
+    ) ON CONFLICT (url) DO NOTHING;
+
+    RETURN QUERY
+    SELECT *
+    FROM source
+    WHERE url = source_url;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_object(
+    object          uuid
+) RETURNS SETOF object_view AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM object_view
+    WHERE object_id = object;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION update_object_preview(
+    object          uuid,
+    preview         uuid
+) RETURNS VOID AS $$
+BEGIN
+    INSERT INTO object_preview (
+        object_id,
+        preview_id
+    ) VALUES (
+        object,
+        preview
+    ) ON CONFLICT (object_id) DO UPDATE
+    SET preview_id = EXCLUDED.preview_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION update_object_source(
+    object          uuid,
+    site            integer,
+    source_url      text
+) RETURNS VOID AS $$
+BEGIN
+    INSERT INTO object_source (
+        object_id,
+        source_id
+    ) VALUES (
+        object,
+        (
+            SELECT source_id
+            FROM create_source(site, source_url)
+        )
+    ) ON CONFLICT (object_id) DO UPDATE
+    SET source_id = EXCLUDED.source_id;
+END;
+$$ LANGUAGE plpgsql;
+
 --}}}
 
 --{{{( Triggers )

@@ -9,29 +9,18 @@ namespace minty::repo::db {
     {
         auto c = connection_initializer(connection);
 
-        c.prepare("add_object", 4);
+        c.prepare("add_object", 1);
         c.prepare("create_site", 3);
         c.prepare("create_tag", 2);
+        c.prepare("read_object", 1);
+        c.prepare("update_object_preview", 2);
+        c.prepare("update_object_source", 3);
     }
 
-    auto database::add_object(
-        std::string_view object_id,
-        std::optional<std::string_view> preview_id,
-        std::optional<data::source> src
-    ) -> object {
-        auto tx = pqxx::nontransaction(connection);
-
-        return make_entity<object>(
-            tx,
+    auto database::add_object(std::string_view object_id) -> void {
+        pqxx::nontransaction(connection).exec_prepared(
             "add_object",
-            object_id,
-            preview_id,
-            src.has_value() ?
-                std::make_optional(src->website->id) :
-                std::optional<std::remove_const_t<decltype(site::id)>>(),
-            src.has_value() ?
-                std::make_optional(src->url) :
-                std::optional<decltype(source::url)>()
+            object_id
         );
     }
 
@@ -68,5 +57,36 @@ namespace minty::repo::db {
         catch (const pqxx::unique_violation& ex) {
             throw unique_entity_violation("tag", ex);
         }
+    }
+
+    auto database::read_object(
+        std::string_view object_id
+    ) -> object {
+        auto tx = pqxx::nontransaction(connection);
+        return make_entity<object>(tx, "read_object", object_id);
+    }
+
+    auto database::update_object_preview(
+        std::string_view object_id,
+        std::string_view preview_id
+    ) -> void {
+        pqxx::nontransaction(connection).exec_prepared(
+            "update_object_preview",
+            object_id,
+            preview_id
+        );
+    }
+
+    auto database::update_object_source(
+        std::string_view object_id,
+        const site& website,
+        std::string_view url
+    ) -> void {
+        pqxx::nontransaction(connection).exec_prepared(
+            "update_object_source",
+            object_id,
+            website.id,
+            url
+        );
     }
 }

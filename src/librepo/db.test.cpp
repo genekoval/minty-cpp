@@ -13,14 +13,14 @@ auto DatabaseTest::SetUp() ->  void { truncate_tables(); }
 
 auto DatabaseTest::TearDown() ->  void { truncate_tables(); }
 
+auto DatabaseTest::count(std::string_view table) -> int {
+    return exec1(fmt::format("SELECT count(*) FROM {}", table))[0].as<int>();
+}
+
 auto DatabaseTest::tables() -> std::vector<std::string> { return {}; }
 
 auto DatabaseTest::truncate(std::string_view table) -> void {
-    auto os = std::ostringstream();
-    os << "TRUNCATE " << table << " CASCADE";
-
-    auto tx = pqxx::nontransaction(connection);
-    tx.exec(os.str());
+    exec0("TRUNCATE {} cascade", table);
 }
 
 auto DatabaseTest::truncate_tables() -> void {
