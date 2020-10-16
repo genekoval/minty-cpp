@@ -49,7 +49,7 @@ namespace minty::repo::db {
 
     template <typename T>
     auto read_entity(row_iterator& it) -> std::enable_if_t<
-        !is_optional_v<T>,
+        not is_optional_v<std::remove_const_t<T>>,
         T
     > {
         return T(it);
@@ -57,7 +57,7 @@ namespace minty::repo::db {
 
     template <typename T>
     auto read_entity(row_iterator& it) -> std::enable_if_t<
-        is_optional_v<T>,
+        is_optional_v<std::remove_const_t<T>>,
         T
     > {
         if (it->is_null()) {
@@ -65,7 +65,7 @@ namespace minty::repo::db {
             return {};
         }
 
-        return read_entity<T::value_type>(it);
+        return read_entity<typename T::value_type>(it);
     }
 
     struct sql_error {
