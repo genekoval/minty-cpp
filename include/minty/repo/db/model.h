@@ -12,7 +12,7 @@ namespace minty::repo::db {
         site(row_iterator& it);
     };
 
-    struct source : entity<2 + site::column_count> {
+    struct source : entity<2, site> {
         const std::string id;
         const std::string url;
         const site website;
@@ -20,7 +20,7 @@ namespace minty::repo::db {
         source(row_iterator& it);
     };
 
-    struct object : entity<2 + source::column_count> {
+    struct object : entity<2, source> {
         const std::string id;
         const std::optional<std::string> preview_id;
         const std::optional<source> src;

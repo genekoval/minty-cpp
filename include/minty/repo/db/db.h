@@ -16,9 +16,10 @@ namespace minty::repo::db {
         auto prepare(const std::string& name, unsigned int argc) -> void;
     };
 
-    template <pqxx::row::size_type ColumnCount>
+    template <pqxx::row::size_type ColumnCount, typename ...Entities>
     struct entity {
-        static constexpr auto column_count = ColumnCount;
+        static constexpr auto column_count =
+            (ColumnCount + ... + Entities::column_count);
     };
 
     template <typename Entity, typename ...Args>
