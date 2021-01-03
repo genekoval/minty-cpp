@@ -37,7 +37,6 @@ CREATE TABLE tag (
 CREATE TABLE post (
     post_id         SERIAL PRIMARY KEY,
     description     text,
-    active          boolean NOT NULL DEFAULT true,
     date_created    timestamptz NOT NULL DEFAULT NOW(),
     date_modified   timestamptz NOT NULL DEFAULT NOW()
 );
@@ -91,13 +90,60 @@ CREATE TABLE post_creator (
 );
 
 CREATE TABLE creator_source (
-    source_id       integer PRIMARY KEY REFERENCES source ON DELETE NO ACTION,
-    creator_id      integer NOT NULL REFERENCES creator ON DELETE CASCADE
+    creator_id      integer NOT NULL REFERENCES creator ON DELETE CASCADE,
+    source_id       integer NOT NULL REFERENCES source ON DELETE NO ACTION,
+
+    PRIMARY KEY (creator_id, source_id)
 );
 
 --}}}
 
 --{{{( Views )
+
+CREATE VIEW source_view AS
+SELECT
+    source_id,
+    url,
+    site_id,
+    name,
+    homepage,
+    thumbnail_id
+FROM source
+JOIN site USING (site_id);
+
+CREATE VIEW creator_name_view AS
+SELECT
+    creator_id,
+    name,
+    aliases
+FROM (
+    SELECT creator_id,
+    value AS name
+    FROM creator_name
+    WHERE main = true
+) AS main
+LEFT JOIN (
+    SELECT creator_id,
+    array_agg(value ORDER BY value) AS aliases
+    FROM creator_name
+    WHERE main = false
+    GROUP BY creator_id
+) AS alias USING (creator_id);
+
+CREATE VIEW creator_view AS
+SELECT
+    creator_id,
+    name,
+    aliases,
+    bio,
+    avatar,
+    banner,
+    array_agg(source_id) AS sources,
+    date_added
+FROM creator
+LEFT JOIN creator_name_view USING (creator_id)
+LEFT JOIN creator_source USING (creator_id)
+GROUP BY creator_id, name, aliases;
 
 CREATE VIEW object_view AS
 SELECT
@@ -135,14 +181,14 @@ CREATE FUNCTION create_creator(
     name            text
 ) RETURNS integer AS $$
 DECLARE
-    creator_id      integer;
+    id              integer;
 BEGIN
     WITH new_creator AS (
         INSERT INTO creator DEFAULT VALUES
         RETURNING *
     )
-    SELECT INTO creator_id
-        id
+    SELECT INTO id
+        creator_id
     FROM new_creator;
 
     INSERT INTO creator_name (
@@ -150,12 +196,46 @@ BEGIN
         value,
         main
     ) VALUES (
-        creator_id,
+        id,
         name,
         true
     );
 
-    RETURN creator_id;
+    RETURN id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION create_creator_aliases(
+    a_creator       integer,
+    a_aliases       text[]
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO creator_name (
+        creator_id,
+        value
+    )
+    SELECT
+        a_creator,
+        unnest(a_aliases);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION create_creator_source(
+    a_creator_id    integer,
+    a_site_id       integer,
+    a_source_url    text
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO creator_source (
+        creator_id,
+        source_id
+    ) VALUES (
+        a_creator_id,
+        (
+            SELECT source_id
+            FROM create_source(a_site_id, a_source_url)
+        )
+    ) ON CONFLICT DO NOTHING;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -278,6 +358,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_creator(
+    a_creator_id    integer
+) RETURNS SETOF creator_view AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM
+    creator_view
+    WHERE creator_id = a_creator_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_object(
     object          uuid
 ) RETURNS SETOF object_view AS $$
@@ -286,6 +378,17 @@ BEGIN
     SELECT *
     FROM object_view
     WHERE object_id = object;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_sources(
+    a_sources       integer[]
+) RETURNS SETOF source_view AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM source_view
+    WHERE source_id = any(a_sources);
 END;
 $$ LANGUAGE plpgsql;
 

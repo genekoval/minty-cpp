@@ -5,9 +5,14 @@
 #include <optional>
 #include <pqxx/pqxx>
 #include <sstream>
+#include <timber/timber>
 #include <type_traits>
 
 namespace minty::repo::db {
+    using row_iterator = pqxx::row::const_iterator;
+
+    using transaction = pqxx::transaction_base;
+
     class connection_initializer {
         pqxx::connection* connection;
     public:
@@ -23,10 +28,25 @@ namespace minty::repo::db {
     };
 
     template <typename Entity, typename ...Args>
-    auto make_entity(pqxx::transaction_base& tx, Args&&... args) -> Entity {
+    auto make_entity(transaction& tx, Args&&... args) -> Entity {
         const auto row = tx.exec_prepared1(args...);
         auto it = row.begin();
-        return Entity(it);
+        return Entity(it, tx);
+    }
+
+    template <typename Collection, typename ...Args>
+    auto make_entities(transaction& tx, Args&&... args) -> Collection {
+        using Entity = typename Collection::value_type;
+
+        const auto rows = tx.exec_prepared(args...);
+        auto result = Collection();
+
+        for (const auto& row : rows) {
+            auto it = row.begin();
+            result.push_back(Entity(it, tx));
+        }
+
+        return result;
     }
 
     template <typename>
@@ -38,7 +58,36 @@ namespace minty::repo::db {
     template <typename T>
     inline constexpr auto is_optional_v = is_optional<T>::value;
 
-    using row_iterator = pqxx::row::const_iterator;
+    template <
+        typename T,
+        typename R = std::remove_const_t<T>
+    >
+    auto read_array(row_iterator& it) -> R {
+        using juncture = pqxx::array_parser::juncture;
+
+        auto array = (it++)->as_array();
+        auto result = R();
+
+        auto parsing = true;
+        while (parsing) {
+            auto [junct, value] = array.get_next();
+
+            switch (junct) {
+                case juncture::string_value:
+                    result.push_back(value);
+                    break;
+                case juncture::done:
+                    parsing = false;
+                    break;
+                default:
+                    WARN()
+                        << "Unhandled array parser juncture: "
+                        << static_cast<int>(junct);
+            }
+        }
+
+        return result;
+    }
 
     template <
         typename T,
@@ -49,15 +98,15 @@ namespace minty::repo::db {
     }
 
     template <typename T>
-    auto read_entity(row_iterator& it) -> std::enable_if_t<
+    auto read_entity(row_iterator& it, transaction& tx) -> std::enable_if_t<
         not is_optional_v<std::remove_const_t<T>>,
         T
     > {
-        return T(it);
+        return T(it, tx);
     }
 
     template <typename T>
-    auto read_entity(row_iterator& it) -> std::enable_if_t<
+    auto read_entity(row_iterator& it, transaction& tx) -> std::enable_if_t<
         is_optional_v<std::remove_const_t<T>>,
         T
     > {
@@ -66,7 +115,17 @@ namespace minty::repo::db {
             return {};
         }
 
-        return read_entity<typename T::value_type>(it);
+        return read_entity<typename T::value_type>(it, tx);
+    }
+
+    template <typename T>
+    auto read_entities(
+        row_iterator& it,
+        transaction& tx,
+        pqxx::zview function
+    ) -> T {
+        auto keys = read_field<std::string>(it);
+        return make_entities<T>(tx, function, keys);
     }
 
     struct sql_error {

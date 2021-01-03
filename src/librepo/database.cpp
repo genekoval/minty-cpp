@@ -10,9 +10,14 @@ namespace minty::repo::db {
         auto c = connection_initializer(connection);
 
         c.prepare("add_object", 1);
+        c.prepare("create_creator", 1);
+        c.prepare("create_creator_aliases", 2);
+        c.prepare("create_creator_source", 3);
         c.prepare("create_site", 3);
         c.prepare("create_tag", 2);
+        c.prepare("read_creator", 1);
         c.prepare("read_object", 1);
+        c.prepare("read_sources", 1);
         c.prepare("update_object_preview", 2);
         c.prepare("update_object_source", 3);
     }
@@ -22,6 +27,31 @@ namespace minty::repo::db {
             "add_object",
             object_id
         );
+    }
+
+    auto database::create_creator(
+        std::string_view name
+    ) -> std::string {
+        return pqxx::nontransaction(connection)
+            .exec_prepared1("create_creator", name)[0]
+            .as<std::string>();
+    }
+
+    auto database::create_creator_aliases(
+        std::string_view creator_id,
+        const std::vector<std::string>& aliases
+    ) -> void {
+        pqxx::nontransaction(connection)
+            .exec_prepared("create_creator_aliases", creator_id, aliases);
+    }
+
+    auto database::create_creator_source(
+        std::string_view creator_id,
+        std::string_view site_id,
+        std::string_view url
+    ) -> void {
+        pqxx::nontransaction(connection)
+            .exec_prepared("create_creator_source", creator_id, site_id, url);
     }
 
     auto database::create_site(
@@ -59,9 +89,12 @@ namespace minty::repo::db {
         }
     }
 
-    auto database::read_object(
-        std::string_view object_id
-    ) -> object {
+    auto database::read_creator(std::string_view creator_id) -> creator {
+        auto tx = pqxx::nontransaction(connection);
+        return make_entity<creator>(tx, "read_creator", creator_id);
+    }
+
+    auto database::read_object(std::string_view object_id) -> object {
         auto tx = pqxx::nontransaction(connection);
         return make_entity<object>(tx, "read_object", object_id);
     }
