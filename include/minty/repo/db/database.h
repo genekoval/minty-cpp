@@ -27,6 +27,13 @@ namespace minty::repo::db {
             std::string_view url
         ) -> void;
 
+        auto create_post(
+            std::string_view description,
+            const std::vector<std::string>& objects,
+            std::optional<std::string_view> creator_id,
+            const std::vector<std::string>& tags
+        ) -> std::string;
+
         auto create_site(
             std::string_view name,
             std::string_view homepage,
@@ -41,6 +48,8 @@ namespace minty::repo::db {
         auto read_creator(std::string_view creator_id) -> creator;
 
         auto read_object(std::string_view object_id) -> object;
+
+        auto read_post(std::string_view post_id) -> post;
 
         auto update_object_preview(
             std::string_view object_id,

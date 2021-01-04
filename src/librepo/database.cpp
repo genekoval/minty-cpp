@@ -15,9 +15,14 @@ namespace minty::repo::db {
         c.prepare("create_creator_source", 3);
         c.prepare("create_site", 3);
         c.prepare("create_tag", 2);
+        c.prepare("create_post", 4);
         c.prepare("read_creator", 1);
+        c.prepare("read_creator_previews", 1);
         c.prepare("read_object", 1);
+        c.prepare("read_objects", 1);
+        c.prepare("read_post", 1);
         c.prepare("read_sources", 1);
+        c.prepare("read_tags", 1);
         c.prepare("update_object_preview", 2);
         c.prepare("update_object_source", 3);
     }
@@ -52,6 +57,21 @@ namespace minty::repo::db {
     ) -> void {
         pqxx::nontransaction(connection)
             .exec_prepared("create_creator_source", creator_id, site_id, url);
+    }
+
+    auto database::create_post(
+        std::string_view description,
+        const std::vector<std::string>& objects,
+        std::optional<std::string_view> creator_id,
+        const std::vector<std::string>& tags
+    ) -> std::string {
+        return pqxx::nontransaction(connection).exec_prepared1(
+            "create_post",
+            description,
+            objects,
+            creator_id,
+            tags
+        )[0].as<std::string>();
     }
 
     auto database::create_site(
@@ -97,6 +117,11 @@ namespace minty::repo::db {
     auto database::read_object(std::string_view object_id) -> object {
         auto tx = pqxx::nontransaction(connection);
         return make_entity<object>(tx, "read_object", object_id);
+    }
+
+    auto database::read_post(std::string_view post_id) -> post {
+        auto tx = pqxx::nontransaction(connection);
+        return make_entity<post>(tx, "read_post", post_id);
     }
 
     auto database::update_object_preview(

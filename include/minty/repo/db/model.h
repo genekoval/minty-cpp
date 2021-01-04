@@ -52,7 +52,14 @@ namespace minty::repo::db {
         creator(row_iterator& it, transaction& tx);
     };
 
-/*
+    struct creator_preview : entity<3> {
+        const std::string id;
+        const std::string name;
+        const std::optional<std::string> avatar;
+
+        creator_preview(row_iterator& it, transaction& tx);
+    };
+
     struct post : entity<7> {
         const std::string id;
         const std::optional<std::string> description;
@@ -60,9 +67,8 @@ namespace minty::repo::db {
         const std::string date_modified;
         const std::vector<object> objects;
         const std::vector<tag> tags;
-        const std::vector<creator> creators;
+        const std::vector<creator_preview> creators;
 
         post(row_iterator& it, transaction& tx);
     };
-*/
 }

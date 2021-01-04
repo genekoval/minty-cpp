@@ -117,8 +117,9 @@ SELECT
     name,
     aliases
 FROM (
-    SELECT creator_id,
-    value AS name
+    SELECT
+        creator_id,
+        value AS name
     FROM creator_name
     WHERE main = true
 ) AS main
@@ -129,6 +130,20 @@ LEFT JOIN (
     WHERE main = false
     GROUP BY creator_id
 ) AS alias USING (creator_id);
+
+CREATE VIEW creator_preview AS
+SELECT
+    creator_id,
+    name,
+    avatar
+FROM creator
+LEFT JOIN (
+    SELECT
+        creator_id,
+        value AS name
+    FROM creator_name
+    WHERE main = true
+) AS main USING (creator_id);
 
 CREATE VIEW creator_view AS
 SELECT
@@ -161,19 +176,36 @@ FROM object
     LEFT JOIN source USING (source_id)
     LEFT JOIN site USING (site_id);
 
+CREATE VIEW post_view AS
+SELECT
+    post_id,
+    description,
+    date_created,
+    date_modified,
+    array_agg(object_id ORDER BY sequence) AS objects,
+    array_agg(tag_id) AS tags,
+    array_agg(creator_id) AS creators
+FROM post
+LEFT JOIN post_object USING (post_id)
+LEFT JOIN post_tag USING (post_id)
+LEFT JOIN post_creator USING (post_id)
+GROUP BY post_id;
+
 --}}}
 
 --{{{( Functions )
 
 CREATE FUNCTION add_object(
-    object_id       uuid
-) RETURNS void AS $$
+    a_object_id     uuid
+) RETURNS uuid AS $$
 BEGIN
     INSERT INTO object (
         object_id
     ) VALUES (
-        object_id
+        a_object_id
     ) ON CONFLICT DO NOTHING;
+
+    RETURN a_object_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -246,7 +278,7 @@ CREATE FUNCTION create_post(
     tags            integer[]
 ) RETURNS integer AS $$
 DECLARE
-    post_id         integer;
+    l_post_id       integer;
 BEGIN
     WITH new_post AS (
         INSERT INTO post (
@@ -255,8 +287,8 @@ BEGIN
             NULLIF(p_description, '')
         ) RETURNING *
     )
-    SELECT INTO post_id
-        id
+    SELECT INTO l_post_id
+        post_id
     FROM new_post;
 
     WITH object_table AS (
@@ -269,10 +301,9 @@ BEGIN
         post_id,
         object_id,
         sequence
-    )
-    SELECT
-        post_id,
-        object_table.obj,
+    ) SELECT
+        l_post_id,
+        add_object(object_table.obj),
         object_table.ordinality
     FROM object_table;
 
@@ -281,7 +312,7 @@ BEGIN
             post_id,
             creator_id
         ) VALUES (
-            post_id,
+            l_post_id,
             p_creator
         );
     END IF;
@@ -295,11 +326,11 @@ BEGIN
         tag_id
     )
     SELECT
-        post_id,
+        l_post_id,
         tag_table.tag
     FROM tag_table;
 
-    RETURN post_id;
+    RETURN l_post_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -370,6 +401,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_creator_previews(
+    a_creators      integer[]
+) RETURNS SETOF creator_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM creator_preview
+    WHERE creator_id = any(a_creators)
+    ORDER BY name;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_object(
     object          uuid
 ) RETURNS SETOF object_view AS $$
@@ -381,6 +424,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_objects(
+    objects         uuid[]
+) RETURNS SETOF object_view AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM object_view
+    WHERE object_id = any(objects);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_post(
+    a_post_id       integer
+) RETURNS SETOF post_view AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM post_view
+    WHERE post_id = a_post_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_sources(
     a_sources       integer[]
 ) RETURNS SETOF source_view AS $$
@@ -389,6 +454,18 @@ BEGIN
     SELECT *
     FROM source_view
     WHERE source_id = any(a_sources);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_tags(
+    a_tags          integer[]
+) RETURNS SETOF tag AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM tag
+    WHERE tag_id = any(a_tags)
+    ORDER BY name ASC;
 END;
 $$ LANGUAGE plpgsql;
 
