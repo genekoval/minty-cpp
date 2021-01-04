@@ -60,6 +60,17 @@ namespace minty::repo::db {
         creator_preview(row_iterator& it, transaction& tx);
     };
 
+    struct comment : entity<6> {
+        const std::string id;
+        const std::string post_id;
+        const std::optional<std::string> parent_id;
+        const std::string parent_path;
+        const std::string content;
+        const std::string date_created;
+
+        comment(row_iterator& it, transaction& tx);
+    };
+
     struct post : entity<7> {
         const std::string id;
         const std::optional<std::string> description;

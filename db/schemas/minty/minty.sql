@@ -334,6 +334,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_comment(
+    a_post_id       integer,
+    a_parent_id     integer,
+    a_content       text
+) RETURNS SETOF post_comment AS $$
+BEGIN
+    RETURN QUERY
+    INSERT INTO post_comment (
+        post_id,
+        parent_id,
+        content
+    ) VALUES (
+        a_post_id,
+        a_parent_id,
+        a_content
+    ) RETURNING *;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_tag(
     name            text,
     color           text
@@ -516,9 +535,9 @@ BEGIN
         NEW.parent_path = 'root'::ltree;
     ELSE
         SELECT INTO path
-            parent_path || id::text
+            parent_path || comment_id::text
         FROM post_comment
-        WHERE id = NEW.parent_id;
+        WHERE comment_id = NEW.parent_id;
 
         IF path IS NULL THEN
             RAISE EXCEPTION 'Invalid parent_id %', NEW.parent_id;

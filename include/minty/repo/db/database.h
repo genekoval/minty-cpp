@@ -12,6 +12,12 @@ namespace minty::repo::db {
 
         auto add_object(std::string_view object_id) -> void;
 
+        auto create_comment(
+            std::string_view post_id,
+            std::optional<std::string_view> parent_id,
+            std::string_view content
+        ) -> comment;
+
         auto create_creator(
             std::string_view name
         ) -> std::string;

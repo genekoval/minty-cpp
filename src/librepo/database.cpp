@@ -10,6 +10,7 @@ namespace minty::repo::db {
         auto c = connection_initializer(connection);
 
         c.prepare("add_object", 1);
+        c.prepare("create_comment", 3);
         c.prepare("create_creator", 1);
         c.prepare("create_creator_aliases", 2);
         c.prepare("create_creator_source", 3);
@@ -31,6 +32,21 @@ namespace minty::repo::db {
         pqxx::nontransaction(connection).exec_prepared(
             "add_object",
             object_id
+        );
+    }
+
+    auto database::create_comment(
+        std::string_view post_id,
+        std::optional<std::string_view> parent_id,
+        std::string_view content
+    ) -> comment {
+        auto tx = pqxx::nontransaction(connection);
+        return make_entity<comment>(
+            tx,
+            "create_comment",
+            post_id,
+            parent_id,
+            content
         );
     }
 

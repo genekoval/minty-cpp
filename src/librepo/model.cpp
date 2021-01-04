@@ -2,6 +2,15 @@
 #include <minty/repo/db/model.h>
 
 namespace minty::repo::db {
+    comment::comment(row_iterator& it, transaction& tx) :
+        id(read_field<decltype(id)>(it)),
+        post_id(read_field<decltype(post_id)>(it)),
+        parent_id(read_field<decltype(parent_id)>(it)),
+        parent_path(read_field<decltype(parent_path)>(it)),
+        content(read_field<decltype(content)>(it)),
+        date_created(read_field<decltype(date_created)>(it))
+    {}
+
     creator::creator(row_iterator& it, transaction& tx) :
         id(read_field<decltype(id)>(it)),
         name(read_field<decltype(name)>(it)),
