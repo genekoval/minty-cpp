@@ -54,7 +54,7 @@ CREATE TABLE post_comment (
     comment_id      SERIAL PRIMARY KEY,
     post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
     parent_id       integer REFERENCES post_comment ON DELETE NO ACTION,
-    parent_path     ltree NOT NULL,
+    indent          integer NOT NULL,
     content         text NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW()
 );
@@ -209,6 +209,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_comment(
+    a_post_id       integer,
+    a_parent_id     integer,
+    a_content       text
+) RETURNS SETOF post_comment AS $$
+BEGIN
+    RETURN QUERY
+    INSERT INTO post_comment (
+        post_id,
+        parent_id,
+        indent,
+        content
+    ) VALUES (
+        a_post_id,
+        a_parent_id,
+        (
+            SELECT coalesce((
+                SELECT indent + 1
+                FROM post_comment
+                WHERE comment_id = a_parent_id
+            ), 0)
+        ),
+        a_content
+    ) RETURNING *;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_creator(
     name            text
 ) RETURNS integer AS $$
@@ -331,25 +358,6 @@ BEGIN
     FROM tag_table;
 
     RETURN l_post_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION create_comment(
-    a_post_id       integer,
-    a_parent_id     integer,
-    a_content       text
-) RETURNS SETOF post_comment AS $$
-BEGIN
-    RETURN QUERY
-    INSERT INTO post_comment (
-        post_id,
-        parent_id,
-        content
-    ) VALUES (
-        a_post_id,
-        a_parent_id,
-        a_content
-    ) RETURNING *;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -484,7 +492,7 @@ BEGIN
     SELECT *
     FROM tag
     WHERE tag_id = any(a_tags)
-    ORDER BY name ASC;
+    ORDER BY name;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -524,33 +532,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
---}}}
-
---{{{( Triggers )
-CREATE FUNCTION create_comment_path() RETURNS TRIGGER AS $$
-DECLARE
-    path ltree;
-BEGIN
-    IF NEW.parent_id IS NULL THEN
-        NEW.parent_path = 'root'::ltree;
-    ELSE
-        SELECT INTO path
-            parent_path || comment_id::text
-        FROM post_comment
-        WHERE comment_id = NEW.parent_id;
-
-        IF path IS NULL THEN
-            RAISE EXCEPTION 'Invalid parent_id %', NEW.parent_id;
-        END IF;
-
-        NEW.parent_path = path;
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER comment_path_tgr
-    BEFORE INSERT ON post_comment
-    FOR EACH ROW EXECUTE PROCEDURE create_comment_path();
 --}}}

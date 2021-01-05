@@ -34,7 +34,6 @@ CLEAN += .mkbuild
 	$(eval schema := $(notdir $<))
 	@$(db.command) "DROP SCHEMA IF EXISTS $(schema) CASCADE"
 	@$(db.command) "CREATE SCHEMA $(schema)"
-	@$(db.connect.super) --file=$</extensions.sql
 	@set -e; \
 		$(db.connect) \
 			--set=ON_ERROR_STOP=1 \
