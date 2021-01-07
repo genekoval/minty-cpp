@@ -7,6 +7,7 @@
 namespace minty::repo::db {
     class database {
         pqxx::connection connection;
+        pqxx::nontransaction ntx;
     public:
         database(std::string_view connection_string);
 
