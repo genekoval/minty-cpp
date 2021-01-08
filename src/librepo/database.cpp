@@ -47,9 +47,7 @@ namespace minty::repo::db {
         );
     }
 
-    auto database::create_creator(
-        std::string_view name
-    ) -> std::string {
+    auto database::create_creator(std::string_view name) -> std::string {
         return ntx
             .exec_prepared1("create_creator", name)[0]
             .as<std::string>();

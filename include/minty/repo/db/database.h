@@ -11,6 +11,10 @@ namespace minty::repo::db {
     public:
         database(std::string_view connection_string);
 
+        database(const database&) = delete;
+
+        database(database&& other) = default;
+
         auto add_object(std::string_view object_id) -> void;
 
         auto create_comment(
@@ -19,9 +23,7 @@ namespace minty::repo::db {
             std::string_view content
         ) -> comment;
 
-        auto create_creator(
-            std::string_view name
-        ) -> std::string;
+        auto create_creator(std::string_view name) -> std::string;
 
         auto create_creator_aliases(
             std::string_view creator_id,

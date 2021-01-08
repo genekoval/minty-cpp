@@ -9,15 +9,21 @@ db.name := $(project)
 repo := librepo
 $(repo).type := static
 
-internal := repo
+core := libcore
+$(core).type := static
+$(core).deps := $(repo)
+
+internal := repo core
 internal.libs := $(addprefix lib,$(internal))
 
 targets := $(internal.libs)
 
-define core.libs
+define common.libs
  $(internal)
  ext++
  fmt
+ fstore
+ netcore
  pqxx
  pq
  timber
@@ -25,7 +31,7 @@ endef
 
 test.deps = $(internal.libs)
 define test.libs
- $(core.libs)
+ $(common.libs)
  gtest
  gtest_main
 endef
