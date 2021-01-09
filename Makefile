@@ -27,6 +27,7 @@ define common.libs
  pqxx
  pq
  timber
+ yaml-cpp
 endef
 
 test.deps = $(internal.libs)
