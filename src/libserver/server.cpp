@@ -1,5 +1,6 @@
 #include "endpoints/endpoints.h"
 
+#include <minty/net/protocol.h>
 #include <minty/server/server.h>
 
 #include <netcore/server.h>
@@ -7,7 +8,7 @@
 
 namespace minty::server {
     static inline auto router() {
-        return zipline::make_router<protocol, event_t>(
+        return zipline::make_router<protocol, net::event_t>(
             endpoint::add_creator
         );
     }

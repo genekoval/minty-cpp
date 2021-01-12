@@ -38,7 +38,25 @@ define $(daemon).libs
  commline
 endef
 
-install := $(daemon)
+client := lib$(project)
+$(client).type := shared
+define $(client).libs
+ netcore
+endef
+
+cli := $(project)
+$(cli).type := executable
+$(cli).deps := $(client) $(core)
+define $(cli).libs
+ $(project)
+ commline
+ core
+ netcore
+ timber
+ yaml-cpp
+endef
+
+install := $(cli) $(client) $(daemon)
 targets := $(install) $(internal.libs)
 
 test.deps = $(internal.libs)
@@ -51,8 +69,16 @@ endef
 include mk/db.mk
 include mkbuild/base.mk
 
+confdir = $(prefix)/etc/$(project)
+
+$(obj)/$(cli)/main.o: CXXFLAGS +=\
+ -DNAME='"$(cli)"'\
+ -DVERSION='"$(version)"'\
+ -DDESCRIPTION='"$(summary)"'\
+ -DCONFDIR='"$(confdir)"'
+
 $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DNAME='"$(daemon)"'\
  -DVERSION='"$(version)"'\
- -DDESCRIPTION='"$(summary)"'\
- -DCONFDIR='"$(prefix)/etc/minty"'
+ -DDESCRIPTION='"$(project) server"'\
+ -DCONFDIR='"$(confdir)"'
