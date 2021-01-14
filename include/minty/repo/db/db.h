@@ -75,6 +75,11 @@ namespace minty::repo::db {
                 case juncture::done:
                     parsing = false;
                     break;
+                case juncture::row_start:
+                case juncture::row_end:
+                    // Do nothing.
+                    // We currently do not use nested arrays.
+                    break;
                 default:
                     WARN()
                         << "Unhandled array parser juncture: "
