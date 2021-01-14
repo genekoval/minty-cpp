@@ -1,85 +1,75 @@
 #pragma once
 
-#include <minty/repo/db/db.h>
-
+#include <optional>
+#include <string>
 #include <vector>
 
 namespace minty::repo::db {
-    struct site : entity<4> {
-        const std::string id;
-        const std::string name;
-        const std::string homepage;
-        const std::optional<std::string> thumbnail_id;
+    template <int ColumnCount, typename ...Entities>
+    struct entity {
+        static constexpr auto column_count =
+            (ColumnCount + ... + Entities::column_count);
+    };
 
-        site(row_iterator& it, transaction& tx);
+    struct site : entity<4> {
+        std::string id;
+        std::string name;
+        std::string homepage;
+        std::optional<std::string> thumbnail_id;
     };
 
     struct source : entity<2, site> {
-        const std::string id;
-        const std::string url;
-        const site website;
-
-        source(row_iterator& it, transaction& tx);
+        std::string id;
+        std::string url;
+        site website;
     };
 
     struct object : entity<2, source> {
-        const std::string id;
-        const std::optional<std::string> preview_id;
-        const std::optional<source> src;
-
-        object(row_iterator& it, transaction& tx);
+        std::string id;
+        std::optional<std::string> preview_id;
+        std::optional<source> src;
     };
 
     struct tag : entity<4> {
-        const std::string id;
-        const std::string name;
-        const std::string color;
-        const std::string date_created;
-
-        tag(row_iterator& it, transaction& tx);
+        std::string id;
+        std::string name;
+        std::string color;
+        std::string date_created;
     };
 
     struct creator : entity<8> {
-        const std::string id;
-        const std::string name;
-        const std::vector<std::string> aliases;
-        const std::optional<std::string> bio;
-        const std::optional<std::string> avatar;
-        const std::optional<std::string> banner;
-        const std::vector<source> sources;
-        const std::string date_added;
-
-        creator(row_iterator& it, transaction& tx);
+        std::string id;
+        std::string name;
+        std::vector<std::string> aliases;
+        std::optional<std::string> bio;
+        std::optional<std::string> avatar;
+        std::optional<std::string> banner;
+        std::vector<source> sources;
+        std::string date_added;
     };
 
     struct creator_preview : entity<3> {
-        const std::string id;
-        const std::string name;
-        const std::optional<std::string> avatar;
-
-        creator_preview(row_iterator& it, transaction& tx);
+        std::string id;
+        std::string name;
+        std::optional<std::string> avatar;
     };
 
     struct comment : entity<6> {
-        const std::string id;
-        const std::string post_id;
-        const std::optional<std::string> parent_id;
-        const std::string parent_path;
-        const std::string content;
-        const std::string date_created;
-
-        comment(row_iterator& it, transaction& tx);
+        std::string id;
+        std::string post_id;
+        std::optional<std::string> parent_id;
+        std::string parent_path;
+        std::string content;
+        std::string date_created;
     };
 
     struct post : entity<7> {
-        const std::string id;
-        const std::optional<std::string> description;
-        const std::string date_created;
-        const std::string date_modified;
-        const std::vector<object> objects;
-        const std::vector<tag> tags;
-        const std::vector<creator_preview> creators;
-
-        post(row_iterator& it, transaction& tx);
+        std::string id;
+        std::optional<std::string> description;
+        std::string date_created;
+        std::string date_modified;
+        std::vector<object> objects;
+        std::vector<tag> tags;
+        std::vector<creator_preview> creators;
     };
 }

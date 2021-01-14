@@ -5,6 +5,7 @@
 namespace minty::core {
     using creator = repo::db::creator;
     using creator_preview = repo::db::creator_preview;
+    using site = repo::db::site;
     using source = repo::db::source;
     using tag = repo::db::tag;
 

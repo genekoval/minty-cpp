@@ -1,6 +1,7 @@
 #pragma once
 
-#include <minty/net/protocol.h>
+#include <minty/core/model.h>
+#include <minty/net/zipline/protocol.h>
 
 #include <netcore/socket.h>
 #include <zipline/zipline>
@@ -8,7 +9,8 @@
 namespace minty {
     class api {
         enum class event : net::event_t {
-            add_creator
+            add_creator,
+            get_creator
         };
 
         using protocol = zipline::protocol<netcore::socket>;
@@ -22,5 +24,7 @@ namespace minty {
         api(std::string_view endpoint);
 
         auto add_creator(std::string_view name) -> std::string;
+
+        auto get_creator(std::string_view id) -> core::creator;
     };
 }

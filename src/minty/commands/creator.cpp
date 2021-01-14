@@ -1,4 +1,6 @@
 #include "../client.h"
+#include "../output.h"
+
 #include "commands.h"
 
 #include <minty/minty>
@@ -8,7 +10,18 @@
 static auto $creator(
     const commline::app& app,
     const commline::argv& argv
-) -> void {}
+) -> void {
+    if (argv.empty()) {
+        return;
+    }
+
+    auto api = minty::cli::client();
+    const auto creator = api.get_creator(argv[0]);
+
+    auto out = YAML::Emitter();
+    out << creator;
+    std::cout << out.c_str() << std::endl;
+}
 
 static auto $add(
     const commline::app& app,

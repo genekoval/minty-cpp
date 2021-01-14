@@ -10,8 +10,10 @@
 
 namespace minty::repo::db {
     using row_iterator = pqxx::row::const_iterator;
-
     using transaction = pqxx::transaction_base;
+
+    template <typename Model>
+    struct parser {};
 
     class connection_initializer {
         pqxx::connection* connection;
@@ -21,17 +23,11 @@ namespace minty::repo::db {
         auto prepare(const std::string& name, unsigned int argc) -> void;
     };
 
-    template <pqxx::row::size_type ColumnCount, typename ...Entities>
-    struct entity {
-        static constexpr auto column_count =
-            (ColumnCount + ... + Entities::column_count);
-    };
-
     template <typename Entity, typename ...Args>
     auto make_entity(transaction& tx, Args&&... args) -> Entity {
         const auto row = tx.exec_prepared1(args...);
         auto it = row.begin();
-        return Entity(it, tx);
+        return parser<Entity>::read(it, tx);
     }
 
     template <typename Collection, typename ...Args>
@@ -43,7 +39,7 @@ namespace minty::repo::db {
 
         for (const auto& row : rows) {
             auto it = row.begin();
-            result.push_back(Entity(it, tx));
+            result.push_back(parser<Entity>::read(it, tx));
         }
 
         return result;
@@ -102,7 +98,7 @@ namespace minty::repo::db {
         not is_optional_v<std::remove_const_t<T>>,
         T
     > {
-        return T(it, tx);
+        return parser<T>::read(it, tx);
     }
 
     template <typename T>

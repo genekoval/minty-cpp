@@ -1,7 +1,6 @@
 #include <minty/error.h>
-#include <minty/repo/db/db.h>
 #include <minty/repo/db/database.h>
-#include <minty/repo/db/model.h>
+#include <minty/repo/db/parser.h>
 
 namespace minty::repo::db {
     database::database(std::string_view connection_string) :
