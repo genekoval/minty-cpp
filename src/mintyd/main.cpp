@@ -14,9 +14,10 @@ static auto $main(
     const commline::app& app,
     const commline::argv& argv
 ) -> void {
-    INFO() << app.name << " version " << app.version << " starting";
-
     const auto settings = minty::core::settings::load_file(default_config);
+    timber::reporting_level() = settings.log.level;
+
+    INFO() << app.name << " version " << app.version << " starting";
 
     auto database = minty::repo::db::database(settings.database.connection);
 
@@ -41,8 +42,6 @@ static auto $main(
 }
 
 auto main(int argc, const char** argv) -> int {
-    timber::reporting_level() = timber::level::info;
-
     auto app = commline::application(
         NAME,
         VERSION,

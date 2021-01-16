@@ -7,7 +7,7 @@
 namespace YAML {
     using settings = minty::core::settings;
 
-    template<>
+    template <>
     struct convert<settings::s_database> {
         static auto decode(
             const Node& node,
@@ -36,7 +36,7 @@ namespace YAML {
         }
     };
 
-    template<>
+    template <>
     struct convert<settings::s_fstore> {
         static auto decode(
             const Node& node,
@@ -51,7 +51,25 @@ namespace YAML {
         }
     };
 
-    template<>
+    template <>
+    struct convert<settings::s_log> {
+        static auto decode(const Node& node, settings::s_log& log) -> bool {
+            if (node["level"]) {
+                auto l = node["level"].as<std::string>();
+                auto level = timber::parse_level(l);
+
+                if (!level) {
+                    throw std::runtime_error("unknown log level: " + l);
+                }
+
+                log.level = *level;
+            }
+
+            return true;
+        }
+    };
+
+    template <>
     struct convert<settings> {
         static auto decode(const Node& node, settings& s) -> bool {
             s.connection = node["connection"]
@@ -60,6 +78,8 @@ namespace YAML {
                 .as<decltype(settings::database)>();
             s.fstore = node["fstore"]
                 .as<decltype(settings::fstore)>();
+            if (node["log"]) s.log = node["log"]
+                .as<decltype(settings::log)>();
 
             return true;
         }
