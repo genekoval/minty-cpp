@@ -6,7 +6,14 @@
 
 namespace minty {
     class minty_error : public std::runtime_error {
-        using std::runtime_error::runtime_error;
+    public:
+        template <typename... Args>
+        minty_error(std::string_view format_str, Args&&... args) :
+            std::runtime_error(fmt::format(
+                format_str,
+                std::forward<Args>(args)...
+            ))
+        {}
     };
 
     class unique_entity_violation : public minty_error {

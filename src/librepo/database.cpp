@@ -114,7 +114,15 @@ namespace minty::repo::db {
     }
 
     auto database::read_creator(std::string_view creator_id) -> creator {
-        return make_entity<creator>(ntx, "read_creator", creator_id);
+        try {
+            return make_entity<creator>(ntx, "read_creator", creator_id);
+        }
+        catch (const pqxx::unexpected_rows& ex) {
+            throw minty_error(
+                "Creator with ID ({}) does not exist",
+                creator_id
+            );
+        }
     }
 
     auto database::read_object(std::string_view object_id) -> object {
