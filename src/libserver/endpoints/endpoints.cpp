@@ -12,4 +12,8 @@ namespace minty::server::endpoint {
         const auto id = proto.read<std::string>();
         proto.reply(proto.api->get_creator(id));
     }
+
+    auto get_server_info(protocol& proto) -> void {
+        proto.reply(proto.info->version);
+    }
 }

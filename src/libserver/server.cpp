@@ -10,27 +10,34 @@ namespace minty::server {
     static inline auto router() {
         return zipline::make_router<protocol, net::event_t>(
             endpoint::add_creator,
-            endpoint::get_creator
+            endpoint::get_creator,
+            endpoint::get_server_info
         );
     }
 
-    protocol::protocol(const netcore::socket& sock, core::api& api) :
-        zipline::protocol<netcore::socket>(sock),
-        api(&api)
+    protocol::protocol(
+        const socket_t& sock,
+        const server_info& info,
+        core::api& api
+    ) :
+        zipline::protocol<socket_t>(sock),
+        api(&api),
+        info(&info)
     {}
 
     auto listen(
-        core::api& api,
         std::string_view endpoint,
+        const server_info& info,
+        core::api& api,
         const std::function<void()>& callback
     ) -> void {
         const auto routes = router();
 
-        auto server = netcore::server(
-            [&api, &routes](netcore::socket&& sock) {
-                routes.route(protocol(sock, api));
-            }
-        );
+        auto server = netcore::server([&api, &info, &routes](
+            netcore::socket&& sock
+        ) {
+            routes.route(protocol(sock, info, api));
+        });
 
         server.listen(endpoint, callback);
 

@@ -25,4 +25,8 @@ namespace minty {
             id
         );
     }
+
+    auto api::get_server_info() -> server::server_info {
+        return connect().send<server::server_info>(event::get_server_info);
+    }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <minty/core/model.h>
+#include <minty/server/server_info.h>
 
 #include <zipline/zipline>
 
@@ -71,6 +72,22 @@ namespace zipline {
                 sock,
                 creator.date_added
             );
+        }
+    };
+
+    template <typename Socket>
+    struct transfer<Socket, minty::server::server_info> {
+        using T = minty::server::server_info;
+        using version_t = std::remove_const_t<decltype(T::version)>;
+
+        static auto read(const Socket& sock) -> T {
+            return {
+                .version = transfer<Socket, version_t>::read(sock)
+            };
+        }
+
+        static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, version_t>::write(sock, t.version);
         }
     };
 

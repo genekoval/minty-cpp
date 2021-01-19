@@ -1,6 +1,7 @@
 #include <minty/core/api.h>
 #include <minty/core/settings.h>
 #include <minty/server/server.h>
+#include <minty/server/server_info.h>
 
 #include <commline/commline>
 #include <ext/data_size.h>
@@ -19,6 +20,10 @@ static auto $main(
 
     INFO() << app.name << " version " << app.version << " starting";
 
+    const auto server_info = minty::server::server_info {
+        .version = std::string(app.version)
+    };
+
     auto database = minty::repo::db::database(settings.database.connection);
 
     auto object_store = fstore::object_store(settings.fstore.connection);
@@ -36,7 +41,7 @@ static auto $main(
 
     auto api = minty::core::api(database, bucket);
 
-    minty::server::listen(api, settings.connection, []() {
+    minty::server::listen(settings.connection, server_info, api, []() {
         INFO() << "Server started. Listening for connections...";
     });
 }

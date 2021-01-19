@@ -19,18 +19,36 @@ namespace minty::cli {
 
 static auto $main(
     const commline::app& app,
-    const commline::argv& argv
+    const commline::argv& argv,
+    bool version
 ) -> void {
-    std::cout << app.name << ": " << app.description << std::endl;
+    if (!version) {
+        std::cout << app.name << ": " << app.description << std::endl;
+        return;
+    }
+
+    commline::print_version(std::cout, app);
+
+    auto api = minty::cli::client();
+    const auto server_info = api.get_server_info();
+    std::cout << "server version: " << server_info.version << std::endl;
 }
 
 auto main(int argc, const char** argv) -> int {
+    using namespace commline;
+
     timber::reporting_level() = timber::level::info;
 
-    auto app = commline::application(
+    auto app = application(
         NAME,
         VERSION,
         DESCRIPTION,
+        options(
+            flag(
+                {"version", "v"},
+                "Print version information."
+            )
+        ),
         $main
     );
 
