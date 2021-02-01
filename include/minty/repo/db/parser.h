@@ -31,6 +31,7 @@ namespace minty::repo::db {
                 .sources = read_entities<decltype(creator::sources)>(
                     it, tx, "read_sources"
                 ),
+                .post_count = read_field<decltype(creator::post_count)>(it),
                 .date_added = read_field<decltype(creator::date_added)>(it)
             };
         }

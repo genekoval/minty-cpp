@@ -154,10 +154,12 @@ SELECT
     avatar,
     banner,
     array_agg(source_id) AS sources,
+    count(post_id) AS post_count,
     date_added
 FROM creator
 LEFT JOIN creator_name_view USING (creator_id)
 LEFT JOIN creator_source USING (creator_id)
+LEFT JOIN post_creator USING (creator_id)
 GROUP BY creator_id, name, aliases;
 
 CREATE VIEW object_view AS

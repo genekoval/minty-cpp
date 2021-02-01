@@ -37,7 +37,7 @@ namespace minty::repo::db {
         std::string date_created;
     };
 
-    struct creator : entity<8> {
+    struct creator : entity<9> {
         std::string id;
         std::string name;
         std::vector<std::string> aliases;
@@ -45,6 +45,7 @@ namespace minty::repo::db {
         std::optional<std::string> avatar;
         std::optional<std::string> banner;
         std::vector<source> sources;
+        unsigned int post_count;
         std::string date_added;
     };
 

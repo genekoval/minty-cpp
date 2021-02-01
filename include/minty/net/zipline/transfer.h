@@ -8,70 +8,45 @@
 namespace zipline {
     template <typename Socket>
     struct transfer<Socket, minty::core::creator> {
+        using T = minty::core::creator;
+
+        using id_t = decltype(T::id);
+        using name_t = decltype(T::name);
+        using aliases_t = decltype(T::aliases);
+        using bio_t = decltype(T::bio);
+        using avatar_t = decltype(T::avatar);
+        using banner_t = decltype(T::banner);
+        using sources_t = decltype(T::sources);
+        using post_cout_t = decltype(T::post_count);
+        using date_added_t = decltype(T::date_added);
+
         static auto read(const Socket& sock) -> minty::core::creator {
             return {
-                .id = transfer<Socket,
-                    decltype(minty::core::creator::id)>::read(sock),
-                .name= transfer<Socket,
-                    decltype(minty::core::creator::name)>::read(sock),
-                .aliases = transfer<Socket,
-                    decltype(minty::core::creator::aliases)>::read(sock),
-                .bio = transfer<Socket,
-                    decltype(minty::core::creator::bio)>::read(sock),
-                .avatar = transfer<Socket,
-                    decltype(minty::core::creator::avatar)>::read(sock),
-                .banner = transfer<Socket,
-                    decltype(minty::core::creator::banner)>::read(sock),
-                .sources = transfer<Socket,
-                    decltype(minty::core::creator::sources)>::read(sock),
-                .date_added = transfer<Socket,
-                    decltype(minty::core::creator::date_added)>::read(sock)
+                .id = transfer<Socket, id_t>::read(sock),
+                .name= transfer<Socket, name_t>::read(sock),
+                .aliases = transfer<Socket, aliases_t>::read(sock),
+                .bio = transfer<Socket, bio_t>::read(sock),
+                .avatar = transfer<Socket, avatar_t>::read(sock),
+                .banner = transfer<Socket, banner_t>::read(sock),
+                .sources = transfer<Socket, sources_t>::read(sock),
+                .post_count = transfer<Socket, post_cout_t>::read(sock),
+                .date_added = transfer<Socket, date_added_t>::read(sock)
             };
         }
 
         static auto write(
             const Socket& sock,
-            const minty::core::creator& creator
+            const minty::core::creator& t
         ) -> void {
-            transfer<Socket, decltype(minty::core::creator::id)>::write(
-                sock,
-                creator.id
-            );
-
-            transfer<Socket, decltype(minty::core::creator::name)>::write(
-                sock,
-                creator.name
-            );
-
-            transfer<Socket, decltype(minty::core::creator::aliases)>::write(
-                sock,
-                creator.aliases
-            );
-
-            transfer<Socket, decltype(minty::core::creator::bio)>::write(
-                sock,
-                creator.bio
-            );
-
-            transfer<Socket, decltype(minty::core::creator::avatar)>::write(
-                sock,
-                creator.avatar
-            );
-
-            transfer<Socket, decltype(minty::core::creator::banner)>::write(
-                sock,
-                creator.banner
-            );
-
-            transfer<Socket, decltype(minty::core::creator::sources)>::write(
-                sock,
-                creator.sources
-            );
-
-            transfer<Socket, decltype(minty::core::creator::date_added)>::write(
-                sock,
-                creator.date_added
-            );
+            transfer<Socket, id_t>::write(sock, t.id);
+            transfer<Socket, name_t>::write(sock, t.name);
+            transfer<Socket, aliases_t>::write(sock, t.aliases);
+            transfer<Socket, bio_t>::write(sock, t.bio);
+            transfer<Socket, avatar_t>::write(sock, t.avatar);
+            transfer<Socket, banner_t>::write(sock, t.banner);
+            transfer<Socket, sources_t>::write(sock, t.sources);
+            transfer<Socket, post_cout_t>::write(sock, t.post_count);
+            transfer<Socket, date_added_t>::write(sock, t.date_added);
         }
     };
 
