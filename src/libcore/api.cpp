@@ -66,6 +66,10 @@ namespace minty::core {
         return db->read_creator(id);
     }
 
+    auto api::get_creator_previews() -> std::vector<creator_preview> {
+        return db->read_creator_previews_all();
+    }
+
     auto api::get_object_metadata(
         std::span<const repo::db::object> db_objects
     ) -> std::vector<object> {

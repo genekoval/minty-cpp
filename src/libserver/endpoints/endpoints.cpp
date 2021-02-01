@@ -13,6 +13,10 @@ namespace minty::server::endpoint {
         proto.reply(proto.api->get_creator(id));
     }
 
+    auto get_creator_previews(protocol& proto) -> void {
+        proto.reply(proto.api->get_creator_previews());
+    }
+
     auto get_server_info(protocol& proto) -> void {
         proto.reply(proto.info->version);
     }

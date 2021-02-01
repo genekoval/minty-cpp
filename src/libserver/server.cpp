@@ -11,6 +11,7 @@ namespace minty::server {
         return zipline::make_router<protocol, net::event_t>(
             endpoint::add_creator,
             endpoint::get_creator,
+            endpoint::get_creator_previews,
             endpoint::get_server_info
         );
     }

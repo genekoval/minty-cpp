@@ -5,5 +5,6 @@
 namespace minty::server::endpoint {
     auto add_creator(protocol&) -> void;
     auto get_creator(protocol&) -> void;
+    auto get_creator_previews(protocol&) -> void;
     auto get_server_info(protocol&) -> void;
 }

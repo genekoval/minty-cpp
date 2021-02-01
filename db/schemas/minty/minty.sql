@@ -428,6 +428,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_creator_previews_all()
+RETURNS SETOF creator_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM creator_preview
+    ORDER BY name;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_creator_previews(
     a_creators      integer[]
 ) RETURNS SETOF creator_preview AS $$

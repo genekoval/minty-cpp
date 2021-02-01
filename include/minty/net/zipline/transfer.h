@@ -76,6 +76,29 @@ namespace zipline {
     };
 
     template <typename Socket>
+    struct transfer<Socket, minty::core::creator_preview> {
+        using T = minty::core::creator_preview;
+
+        using id_t = decltype(T::id);
+        using name_t = decltype(T::name);
+        using avatar_t = decltype(T::avatar);
+
+        static auto read(const Socket& sock) -> T {
+            return {
+                .id = transfer<Socket, id_t>::read(sock),
+                .name = transfer<Socket, name_t>::read(sock),
+                .avatar = transfer<Socket, avatar_t>::read(sock)
+            };
+        }
+
+        static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, id_t>::write(sock, t.id);
+            transfer<Socket, name_t>::write(sock, t.name);
+            transfer<Socket, avatar_t>::write(sock, t.avatar);
+        }
+    };
+
+    template <typename Socket>
     struct transfer<Socket, minty::server::server_info> {
         using T = minty::server::server_info;
         using version_t = std::remove_const_t<decltype(T::version)>;
