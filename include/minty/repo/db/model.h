@@ -73,4 +73,11 @@ namespace minty::repo::db {
         std::vector<tag> tags;
         std::vector<creator_preview> creators;
     };
+
+    struct post_preview : entity<4> {
+        std::string id;
+        std::optional<std::string> description;
+        std::string date_created;
+        std::string date_modified;
+    };
 }

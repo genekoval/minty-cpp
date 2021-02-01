@@ -56,6 +56,10 @@ namespace minty::repo::db {
 
         auto read_creator(std::string_view creator_id) -> creator;
 
+        auto read_creator_posts(
+            std::string_view creator_id
+        ) -> std::vector<post_preview>;
+
         auto read_creator_previews_all() -> std::vector<creator_preview>;
 
         auto read_object(std::string_view object_id) -> object;

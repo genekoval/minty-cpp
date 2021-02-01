@@ -43,6 +43,10 @@ namespace minty::core {
 
         auto get_creator(std::string_view id) -> creator;
 
+        auto get_creator_posts(
+            std::string_view creator_id
+        ) -> std::vector<post_preview>;
+
         auto get_creator_previews() -> std::vector<creator_preview>;
 
         auto get_post(std::string_view id) -> post;

@@ -18,6 +18,7 @@ namespace minty::repo::db {
         ci.prepare("create_tag", 2);
         ci.prepare("create_post", 4);
         ci.prepare("read_creator", 1);
+        ci.prepare("read_creator_posts", 1);
         ci.prepare("read_creator_previews", 1);
         ci.prepare("read_creator_previews_all", 0);
         ci.prepare("read_object", 1);
@@ -124,6 +125,16 @@ namespace minty::repo::db {
                 creator_id
             );
         }
+    }
+
+    auto database::read_creator_posts(
+        std::string_view creator_id
+    ) -> std::vector<post_preview> {
+        return make_entities<std::vector<post_preview>>(
+            ntx,
+            "read_creator_posts",
+            creator_id
+        );
     }
 
     auto database::read_creator_previews_all() -> std::vector<creator_preview> {

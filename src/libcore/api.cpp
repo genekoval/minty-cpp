@@ -66,6 +66,12 @@ namespace minty::core {
         return db->read_creator(id);
     }
 
+    auto api::get_creator_posts(
+        std::string_view creator_id
+    ) -> std::vector<post_preview> {
+        return db->read_creator_posts(creator_id);
+    }
+
     auto api::get_creator_previews() -> std::vector<creator_preview> {
         return db->read_creator_previews_all();
     }

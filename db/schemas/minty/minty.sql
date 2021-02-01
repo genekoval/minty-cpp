@@ -440,6 +440,23 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_creator_posts(
+    a_creator       integer
+) RETURNS SETOF post AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        post_id,
+        description,
+        date_created,
+        date_modified
+    FROM post
+    JOIN post_creator USING (post_id)
+    WHERE creator_id = a_creator
+    ORDER BY date_created DESC;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_creator_previews(
     a_creators      integer[]
 ) RETURNS SETOF creator_preview AS $$
