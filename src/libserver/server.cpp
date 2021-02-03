@@ -13,6 +13,7 @@ namespace minty::server {
             endpoint::get_creator,
             endpoint::get_creator_posts,
             endpoint::get_creator_previews,
+            endpoint::get_post,
             endpoint::get_server_info
         );
     }

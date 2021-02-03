@@ -74,6 +74,76 @@ namespace zipline {
     };
 
     template <typename Socket>
+    struct transfer<Socket, minty::core::object> {
+        using T = minty::core::object;
+
+        using id_t = decltype(T::id);
+        using hash_t = decltype(T::hash);
+        using size_t = decltype(T::size);
+        using mime_type_t = decltype(T::mime_type);
+        using date_added_t = decltype(T::date_added);
+        using preview_id_t = decltype(T::preview_id);
+        using src_t = decltype(T::src);
+
+        static auto read(const Socket& sock) -> T {
+            return {
+                .id = transfer<Socket, id_t>::read(sock),
+                .hash = transfer<Socket, hash_t>::read(sock),
+                .size = transfer<Socket, size_t>::read(sock),
+                .mime_type = transfer<Socket, mime_type_t>::read(sock),
+                .date_added = transfer<Socket, date_added_t>::read(sock),
+                .preview_id = transfer<Socket, preview_id_t>::read(sock),
+                .src = transfer<Socket, src_t>::read(sock)
+            };
+        }
+
+        static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, id_t>::write(sock, t.id);
+            transfer<Socket, hash_t>::write(sock, t.hash);
+            transfer<Socket, size_t>::write(sock, t.size);
+            transfer<Socket, mime_type_t>::write(sock, t.mime_type);
+            transfer<Socket, date_added_t>::write(sock, t.date_added);
+            transfer<Socket, preview_id_t>::write(sock, t.preview_id);
+            transfer<Socket, src_t>::write(sock, t.src);
+        }
+    };
+
+    template <typename Socket>
+    struct transfer<Socket, minty::core::post> {
+        using T = minty::core::post;
+
+        using id_t = decltype(T::id);
+        using description_t = decltype(T::description);
+        using date_created_t = decltype(T::date_created);
+        using date_modified_t = decltype(T::date_modified);
+        using objects_t = decltype(T::objects);
+        using tags_t = decltype(T::tags);
+        using creators_t = decltype(T::creators);
+
+        static auto read(const Socket& sock) -> T {
+            return {
+                .id = transfer<Socket, id_t>::read(sock),
+                .description = transfer<Socket, description_t>::read(sock),
+                .date_created = transfer<Socket, date_created_t>::read(sock),
+                .date_modified = transfer<Socket, date_modified_t>::read(sock),
+                .objects = transfer<Socket, objects_t>::read(sock),
+                .tags = transfer<Socket, tags_t>::read(sock),
+                .creators = transfer<Socket, creators_t>::read(sock)
+            };
+        }
+
+        static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, id_t>::write(sock, t.id);
+            transfer<Socket, description_t>::write(sock, t.description);
+            transfer<Socket, date_created_t>::write(sock, t.date_created);
+            transfer<Socket, date_modified_t>::write(sock, t.date_modified);
+            transfer<Socket, objects_t>::write(sock, t.objects);
+            transfer<Socket, tags_t>::write(sock, t.tags);
+            transfer<Socket, creators_t>::write(sock, t.creators);
+        }
+    };
+
+    template <typename Socket>
     struct transfer<Socket, minty::core::post_preview> {
         using T = minty::core::post_preview;
 
@@ -187,6 +257,32 @@ namespace zipline {
                 sock,
                 source.website
             );
+        }
+    };
+
+    template <typename Socket>
+    struct transfer<Socket, minty::core::tag> {
+        using T = minty::core::tag;
+
+        using id_t = decltype(T::id);
+        using name_t = decltype(T::name);
+        using color_t = decltype(T::color);
+        using date_created_t = decltype(T::date_created);
+
+        static auto read(const Socket& sock) -> T {
+            return {
+                .id = transfer<Socket, id_t>::read(sock),
+                .name = transfer<Socket, name_t>::read(sock),
+                .color = transfer<Socket, color_t>::read(sock),
+                .date_created = transfer<Socket, date_created_t>::read(sock)
+            };
+        }
+
+        static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, id_t>::write(sock, t.id);
+            transfer<Socket, name_t>::write(sock, t.name);
+            transfer<Socket, color_t>::write(sock, t.color);
+            transfer<Socket, date_created_t>::write(sock, t.date_created);
         }
     };
 }
