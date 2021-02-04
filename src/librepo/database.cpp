@@ -70,7 +70,7 @@ namespace minty::repo::db {
     }
 
     auto database::create_post(
-        std::string_view description,
+        std::optional<std::string_view> description,
         const std::vector<std::string>& objects,
         std::optional<std::string_view> creator_id,
         const std::vector<std::string>& tags

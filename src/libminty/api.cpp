@@ -19,6 +19,21 @@ namespace minty {
         );
     }
 
+    auto api::add_post(
+        std::optional<std::string_view> description,
+        const std::vector<std::string>& files,
+        std::optional<std::string_view> creator_id,
+        const std::vector<std::string>& tags
+    ) -> std::string {
+        return connect().send<std::string>(
+            event::add_post,
+            description,
+            files,
+            creator_id,
+            tags
+        );
+    }
+
     auto api::get_creator(std::string_view id) -> core::creator {
         return connect().send<core::creator>(
             event::get_creator,

@@ -8,6 +8,20 @@ namespace minty::server::endpoint {
         proto.reply(proto.api->add_creator(name));
     }
 
+    auto add_post(protocol& proto) -> void {
+        auto description = proto.read<std::optional<std::string>>();
+        auto files = proto.read<std::vector<std::string>>();
+        auto creator = proto.read<std::optional<std::string>>();
+        auto tags = proto.read<std::vector<std::string>>();
+
+        proto.reply(proto.api->add_post(
+            description,
+            std::span<std::string>(files.begin(), files.end()),
+            creator,
+            tags
+        ));
+    }
+
     auto get_creator(protocol& proto) -> void {
         const auto id = proto.read<std::string>();
         proto.reply(proto.api->get_creator(id));

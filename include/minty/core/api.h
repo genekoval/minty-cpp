@@ -11,7 +11,7 @@ namespace minty::core {
         fstore::bucket* bucket;
 
         auto add_post(
-            std::string_view description,
+            std::optional<std::string_view> description,
             const std::vector<std::string>& objects,
             std::optional<std::string_view> creator_id,
             const std::vector<std::string>& tags
@@ -26,14 +26,14 @@ namespace minty::core {
         auto add_creator(std::string_view name) -> std::string;
 
         auto add_post(
-            std::string_view description,
+            std::optional<std::string_view> description,
             std::span<std::span<const std::byte>> data,
             std::optional<std::string_view> creator_id,
             const std::vector<std::string>& tags
         ) -> std::string;
 
         auto add_post(
-            std::string_view description,
+            std::optional<std::string_view> description,
             std::span<std::string> files,
             std::optional<std::string_view> creator_id,
             const std::vector<std::string>& tags

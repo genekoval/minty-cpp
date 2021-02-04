@@ -53,6 +53,7 @@ auto main(int argc, const char** argv) -> int {
     );
 
     app.subcommand(minty::commands::creator());
+    app.subcommand(minty::commands::post());
 
     return app.run(argc, argv);
 }

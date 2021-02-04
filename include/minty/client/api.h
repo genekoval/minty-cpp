@@ -11,7 +11,11 @@ namespace minty {
     class api {
         enum class event : net::event_t {
             add_creator,
+            add_post,
             get_creator,
+            get_creator_posts,
+            get_creator_previews,
+            get_post,
             get_server_info
         };
 
@@ -26,6 +30,13 @@ namespace minty {
         api(std::string_view endpoint);
 
         auto add_creator(std::string_view name) -> std::string;
+
+        auto add_post(
+            std::optional<std::string_view> description,
+            const std::vector<std::string>& files,
+            std::optional<std::string_view> creator_id,
+            const std::vector<std::string>& tags
+        ) -> std::string;
 
         auto get_creator(std::string_view id) -> core::creator;
 

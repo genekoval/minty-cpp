@@ -10,6 +10,7 @@ namespace minty::server {
     static inline auto router() {
         return zipline::make_router<protocol, net::event_t>(
             endpoint::add_creator,
+            endpoint::add_post,
             endpoint::get_creator,
             endpoint::get_creator_posts,
             endpoint::get_creator_previews,

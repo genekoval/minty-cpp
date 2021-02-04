@@ -13,13 +13,22 @@ namespace minty::core {
     }
 
     auto api::add_post(
-        std::string_view description,
+        std::optional<std::string_view> description,
         const std::vector<std::string>& objects,
         std::optional<std::string_view> creator_id,
         const std::vector<std::string>& tags
     ) -> std::string {
+        auto formatted = std::string();
+
+        if (description) {
+            formatted = ext::trim(std::string(*description));
+            // An empty string is equivalent to no value.
+            if (formatted.empty()) description.reset();
+            else description = formatted;
+        }
+
         return db->create_post(
-            ext::trim(std::string(description)),
+            description,
             objects,
             creator_id,
             tags
@@ -27,7 +36,7 @@ namespace minty::core {
     }
 
     auto api::add_post(
-        std::string_view description,
+        std::optional<std::string_view> description,
         std::span<std::span<const std::byte>> data,
         std::optional<std::string_view> creator_id,
         const std::vector<std::string>& tags
@@ -43,7 +52,7 @@ namespace minty::core {
     }
 
     auto api::add_post(
-        std::string_view description,
+        std::optional<std::string_view> description,
         std::span<std::string> files,
         std::optional<std::string_view> creator_id,
         const std::vector<std::string>& tags
