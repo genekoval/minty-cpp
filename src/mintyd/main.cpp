@@ -6,10 +6,41 @@
 #include <commline/commline>
 #include <ext/data_size.h>
 #include <filesystem>
+#include <fmt/format.h>
 #include <fstore/client.h>
 #include <timber/timber>
 
 const auto default_config = std::filesystem::path(CONFDIR) / "minty.yml";
+
+static auto build_server_info(
+    const minty::core::settings& settings,
+    std::string_view version,
+    std::string_view bucket_id
+) -> minty::server::server_info {
+    const auto host = [&]() -> std::string {
+        if (const auto& proxy = settings.fstore.proxy) {
+            return fmt::format(
+                "{}:{}",
+                proxy->host.value_or("0"),
+                proxy->port
+            );
+        }
+        else return settings.fstore.connection;
+    }();
+
+    const auto path = fmt::format(
+        "{}/{}",
+        static_cast<std::underlying_type_t<fstore::event>>(
+            fstore::event::get_object
+        ),
+        bucket_id
+    );
+
+    return {
+        .object_source = fmt::format("zipline://{}/{}", host, path),
+        .version = std::string(version)
+    };
+}
 
 static auto $main(
     const commline::app& app,
@@ -19,10 +50,6 @@ static auto $main(
     timber::reporting_level() = settings.log.level;
 
     INFO() << app.name << " version " << app.version << " starting";
-
-    const auto server_info = minty::server::server_info {
-        .version = std::string(app.version)
-    };
 
     auto database = minty::repo::db::database(settings.database.connection);
 
@@ -40,8 +67,11 @@ static auto $main(
         << ")";
 
     auto api = minty::core::api(database, bucket);
+    auto info = build_server_info(settings, app.version, bucket_info.id);
 
-    minty::server::listen(settings.connection, server_info, api, []() {
+    INFO() << "Object source: " << info.object_source;
+
+    minty::server::listen(settings.connection, info, api, []() {
         INFO() << "Server started. Listening for connections...";
     });
 }

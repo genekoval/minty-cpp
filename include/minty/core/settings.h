@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <timber/timber>
 
@@ -10,8 +11,14 @@ namespace minty::core {
         };
 
         struct s_fstore {
+            struct s_proxy {
+                std::optional<std::string> host;
+                unsigned short port;
+            };
+
             std::string bucket;
             std::string connection;
+            std::optional<s_proxy> proxy;
         };
 
         struct s_log {

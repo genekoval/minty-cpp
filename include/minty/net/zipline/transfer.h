@@ -172,15 +172,19 @@ namespace zipline {
     template <typename Socket>
     struct transfer<Socket, minty::server::server_info> {
         using T = minty::server::server_info;
+
+        using object_source_t = std::remove_const_t<decltype(T::object_source)>;
         using version_t = std::remove_const_t<decltype(T::version)>;
 
         static auto read(const Socket& sock) -> T {
             return {
+                .object_source = transfer<Socket, object_source_t>::read(sock),
                 .version = transfer<Socket, version_t>::read(sock)
             };
         }
 
         static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, object_source_t>::write(sock, t.object_source);
             transfer<Socket, version_t>::write(sock, t.version);
         }
     };

@@ -42,6 +42,6 @@ namespace minty::server::endpoint {
     }
 
     auto get_server_info(protocol& proto) -> void {
-        proto.reply(proto.info->version);
+        proto.reply(*(proto.info));
     }
 }

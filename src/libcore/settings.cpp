@@ -4,6 +4,18 @@
 #include <sstream>
 #include <yaml-cpp/yaml.h>
 
+template <typename Optional>
+static auto optional(
+    const YAML::Node& node,
+    const std::string& key
+) -> Optional {
+    if (auto value = node[key]) {
+        return value.as<typename Optional::value_type>();
+    }
+
+    return {};
+}
+
 namespace YAML {
     using settings = minty::core::settings;
 
@@ -38,14 +50,25 @@ namespace YAML {
 
     template <>
     struct convert<settings::s_fstore> {
-        static auto decode(
-            const Node& node,
-            settings::s_fstore& fstore
-        ) -> bool {
-            fstore.bucket = node["bucket"]
-                .as<decltype(settings::s_fstore::bucket)>();
-            fstore.connection = node["connection"]
-                .as<decltype(settings::s_fstore::connection)>();
+        using T = settings::s_fstore;
+
+        static auto decode(const Node& node, T& fstore) -> bool {
+            fstore.bucket = node["bucket"].as<decltype(T::bucket)>();
+            fstore.connection =
+                node["connection"].as<decltype(T::connection)>();
+            fstore.proxy = optional<decltype(T::proxy)>(node, "proxy");
+
+            return true;
+        }
+    };
+
+    template <>
+    struct convert<settings::s_fstore::s_proxy> {
+        using T = settings::s_fstore::s_proxy;
+
+        static auto decode(const Node& node, T& proxy) -> bool {
+            proxy.host = optional<decltype(T::host)>(node, "host");
+            proxy.port = node["port"].as<decltype(T::port)>();
 
             return true;
         }
