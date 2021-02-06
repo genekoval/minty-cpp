@@ -481,13 +481,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_objects(
-    objects         uuid[]
+    a_objects       uuid[]
 ) RETURNS SETOF object_view AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM object_view
-    WHERE object_id = any(objects);
+    FROM (SELECT unnest(a_objects) AS object_id) objects
+    JOIN object_view USING (object_id);
 END;
 $$ LANGUAGE plpgsql;
 
