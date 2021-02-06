@@ -24,7 +24,11 @@ static auto $add(
 
     for (const auto file : argv) {
         auto cwd = std::filesystem::current_path();
-        files.push_back(cwd / file);
+        auto path = cwd / file;
+
+        if (std::filesystem::is_regular_file(path)) {
+            files.push_back(path);
+        }
     }
 
     auto id = api.add_post(
