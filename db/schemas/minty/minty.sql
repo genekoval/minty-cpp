@@ -185,8 +185,8 @@ SELECT
     date_created,
     date_modified,
     array_agg(object_id ORDER BY sequence) AS objects,
-    array_agg(tag_id) AS tags,
-    array_agg(creator_id) AS creators
+    array_agg(DISTINCT tag_id) AS tags,
+    array_agg(DISTINCT creator_id) AS creators
 FROM post
 LEFT JOIN post_object USING (post_id)
 LEFT JOIN post_tag USING (post_id)
