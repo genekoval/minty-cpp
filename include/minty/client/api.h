@@ -23,7 +23,6 @@ namespace minty {
         using client = zipline::client<protocol, event>;
 
         const std::string endpoint;
-        netcore::socket socket;
 
         auto connect() -> client;
     public:
