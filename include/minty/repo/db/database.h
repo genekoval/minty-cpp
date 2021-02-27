@@ -54,6 +54,8 @@ namespace minty::repo::db {
             std::string_view color
         ) -> tag;
 
+        auto read_comments(std::string_view post_id) -> std::vector<comment>;
+
         auto read_creator(std::string_view creator_id) -> creator;
 
         auto read_creator_posts(

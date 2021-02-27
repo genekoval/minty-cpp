@@ -1,6 +1,7 @@
 #pragma once
 
 #include <minty/core/model.h>
+#include <minty/core/comment_tree.h>
 #include <minty/repo/db/database.h>
 
 #include <fstore/client.h>
@@ -23,6 +24,12 @@ namespace minty::core {
     public:
         api(repo::db::database& db, fstore::bucket& bucket);
 
+        auto add_comment(
+            std::string_view post_id,
+            std::optional<std::string_view> parent_id,
+            std::string_view content
+        ) -> comment;
+
         auto add_creator(std::string_view name) -> std::string;
 
         auto add_post(
@@ -40,6 +47,8 @@ namespace minty::core {
         ) -> std::string;
 
         auto add_tag(std::string_view name, std::string_view color) -> tag;
+
+        auto get_comments(std::string_view post_id) -> comment_tree;
 
         auto get_creator(std::string_view id) -> creator;
 

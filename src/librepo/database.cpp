@@ -17,6 +17,7 @@ namespace minty::repo::db {
         ci.prepare("create_site", 3);
         ci.prepare("create_tag", 2);
         ci.prepare("create_post", 4);
+        ci.prepare("read_comments", 1);
         ci.prepare("read_creator", 1);
         ci.prepare("read_creator_posts", 1);
         ci.prepare("read_creator_previews", 1);
@@ -113,6 +114,16 @@ namespace minty::repo::db {
         catch (const pqxx::unique_violation& ex) {
             throw unique_entity_violation("tag", ex);
         }
+    }
+
+    auto database::read_comments(
+        std::string_view post_id
+    ) -> std::vector<comment> {
+        return make_entities<std::vector<comment>>(
+            ntx,
+            "read_comments",
+            post_id
+        );
     }
 
     auto database::read_creator(std::string_view creator_id) -> creator {

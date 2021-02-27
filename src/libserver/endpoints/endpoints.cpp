@@ -3,6 +3,14 @@
 #include <minty/net/zipline/transfer.h>
 
 namespace minty::server::endpoint {
+    auto add_comment(protocol& proto) -> void {
+        const auto post_id = proto.read<std::string>();
+        const auto parent_id = proto.read<std::optional<std::string>>();
+        const auto content = proto.read<std::string>();
+
+        proto.reply(proto.api->add_comment(post_id, parent_id, content));
+    }
+
     auto add_creator(protocol& proto) -> void {
         const auto name = proto.read<std::string>();
         proto.reply(proto.api->add_creator(name));
@@ -20,6 +28,11 @@ namespace minty::server::endpoint {
             creator,
             tags
         ));
+    }
+
+    auto get_comments(protocol& proto) -> void {
+        const auto post_id = proto.read<std::string>();
+        proto.reply(proto.api->get_comments(post_id));
     }
 
     auto get_creator(protocol& proto) -> void {

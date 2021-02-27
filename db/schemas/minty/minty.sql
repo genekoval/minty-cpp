@@ -418,6 +418,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_comments(
+    a_post_id       integer
+) RETURNS SETOF post_comment AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM post_comment
+    WHERE post_id = a_post_id
+    ORDER BY
+        indent,
+        parent_id,
+        date_created DESC;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_creator(
     a_creator_id    integer
 ) RETURNS SETOF creator_view AS $$

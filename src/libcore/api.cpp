@@ -8,6 +8,20 @@ namespace minty::core {
         bucket(&bucket)
     {}
 
+    auto api::add_comment(
+        std::string_view post_id,
+        std::optional<std::string_view> parent_id,
+        std::string_view content
+    ) -> comment {
+        const auto comment = db->create_comment(post_id, parent_id, content);
+        return {
+            comment.id,
+            comment.content,
+            comment.indent,
+            comment.date_created
+        };
+    }
+
     auto api::add_creator(std::string_view name) -> std::string {
         return db->create_creator(ext::trim(std::string(name)));
     }
@@ -69,6 +83,14 @@ namespace minty::core {
 
     auto api::add_tag(std::string_view name, std::string_view color) -> tag {
         return db->create_tag(name, color);
+    }
+
+    auto api::get_comments(std::string_view post_id) -> comment_tree {
+        const auto entities = db->read_comments(post_id);
+        return comment_tree(std::span(
+            entities.begin(),
+            entities.end()
+        ));
     }
 
     auto api::get_creator(std::string_view id) -> creator {

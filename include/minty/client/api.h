@@ -10,8 +10,10 @@
 namespace minty {
     class api {
         enum class event : net::event_t {
+            add_comment,
             add_creator,
             add_post,
+            get_comments,
             get_creator,
             get_creator_posts,
             get_creator_previews,

@@ -11,7 +11,7 @@ namespace minty::repo::db {
                 .id = read_field<decltype(comment::id)>(it),
                 .post_id = read_field<decltype(comment::post_id)>(it),
                 .parent_id = read_field<decltype(comment::parent_id)>(it),
-                .parent_path = read_field<decltype(comment::parent_path)>(it),
+                .indent = read_field<decltype(comment::indent)>(it),
                 .content = read_field<decltype(comment::content)>(it),
                 .date_created = read_field<decltype(comment::date_created)>(it)
             };

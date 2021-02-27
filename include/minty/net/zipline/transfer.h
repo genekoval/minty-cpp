@@ -1,11 +1,64 @@
 #pragma once
 
 #include <minty/core/model.h>
+#include <minty/core/comment_tree.h>
 #include <minty/server/server_info.h>
 
 #include <zipline/zipline>
 
 namespace zipline {
+    template <typename Socket>
+    struct transfer<Socket, minty::core::comment> {
+        using T = minty::core::comment;
+
+        using id_t = decltype(T::id);
+        using content_t = decltype(T::content);
+        using indent_t = decltype(T::indent);
+        using date_created_t = decltype(T::date_created);
+
+        static auto read(const Socket& sock) -> T {
+            return {
+                .id = transfer<Socket, id_t>::read(sock),
+                .content = transfer<Socket, content_t>::read(sock),
+                .indent = transfer<Socket, indent_t>::read(sock),
+                .date_created = transfer<Socket, date_created_t>::read(sock)
+            };
+        }
+
+        static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, id_t>::write(sock, t.id);
+            transfer<Socket, content_t>::write(sock, t.content);
+            transfer<Socket, indent_t>::write(sock, t.indent);
+            transfer<Socket, date_created_t>::write(sock, t.date_created);
+        }
+    };
+
+    template <typename Socket>
+    auto write_tree(
+        const Socket& sock,
+        const minty::core::comment_node& root
+    ) -> void {
+        transfer<Socket, minty::core::comment>::write(sock, root.model);
+
+        for (const auto* child : root.children) {
+            write_tree(sock, *child);
+        }
+    }
+
+    template <typename Socket>
+    struct transfer<Socket, minty::core::comment_tree> {
+        using T = minty::core::comment_tree;
+
+        static auto write(const Socket& sock, const T& t) -> void {
+            transfer<Socket, std::size_t>::write(sock, t.size());
+            const auto roots = t.roots();
+
+            for (const auto* root : roots) {
+                write_tree(sock, *root);
+            }
+        }
+    };
+
     template <typename Socket>
     struct transfer<Socket, minty::core::creator> {
         using T = minty::core::creator;

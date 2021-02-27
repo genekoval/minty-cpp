@@ -9,6 +9,8 @@ namespace minty::repo::db {
     struct entity {
         static constexpr auto column_count =
             (ColumnCount + ... + Entities::column_count);
+
+        auto operator==(const entity&) const -> bool = default;
     };
 
     struct site : entity<4> {
@@ -59,9 +61,11 @@ namespace minty::repo::db {
         std::string id;
         std::string post_id;
         std::optional<std::string> parent_id;
-        std::string parent_path;
+        unsigned int indent;
         std::string content;
         std::string date_created;
+
+        auto operator==(const comment&) const -> bool = default;
     };
 
     struct post : entity<7> {

@@ -10,6 +10,13 @@ namespace minty::core {
     using source = repo::db::source;
     using tag = repo::db::tag;
 
+    struct comment {
+        std::string id;
+        std::string content;
+        unsigned int indent;
+        std::string date_created;
+    };
+
     struct object {
         std::string id;
         std::string hash;
