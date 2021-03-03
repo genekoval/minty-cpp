@@ -53,24 +53,24 @@ TEST_F(CoreCommentTest, ReadCommentChain) {
     const auto c7 = add_root_comment("c7");
 
     auto comments = api.get_comments(post_id);
-    const auto roots = comments.roots();
+    const auto& roots = comments.roots;
 
     ASSERT_EQ(3, roots.size());
 
-    ASSERT_EQ(c7.id, roots[0]->model.id);
+    ASSERT_EQ(c7.id, roots[0]->data.id);
     ASSERT_TRUE(roots[0]->children.empty());
 
-    ASSERT_EQ(c5.id, roots[1]->model.id);
+    ASSERT_EQ(c5.id, roots[1]->data.id);
     ASSERT_EQ(1, roots[1]->children.size());
-    ASSERT_EQ(c6.id, roots[1]->children[0]->model.id);
+    ASSERT_EQ(c6.id, roots[1]->children[0]->data.id);
     ASSERT_TRUE(roots[1]->children[0]->children.empty());
 
-    ASSERT_EQ(c1.id, roots[2]->model.id);
+    ASSERT_EQ(c1.id, roots[2]->data.id);
     ASSERT_EQ(2, roots[2]->children.size());
-    ASSERT_EQ(c4.id, roots[2]->children[0]->model.id);
+    ASSERT_EQ(c4.id, roots[2]->children[0]->data.id);
     ASSERT_TRUE(roots[2]->children[0]->children.empty());
-    ASSERT_EQ(c2.id, roots[2]->children[1]->model.id);
+    ASSERT_EQ(c2.id, roots[2]->children[1]->data.id);
     ASSERT_EQ(1, roots[2]->children[1]->children.size());
-    ASSERT_EQ(c3.id, roots[2]->children[1]->children[0]->model.id);
+    ASSERT_EQ(c3.id, roots[2]->children[1]->children[0]->data.id);
     ASSERT_TRUE(roots[2]->children[1]->children[0]->children.empty());
 }

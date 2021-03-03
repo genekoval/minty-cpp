@@ -4,7 +4,7 @@
 #include <string>
 #include <timber/timber>
 
-namespace minty::core {
+namespace minty::conf {
     struct settings {
         struct s_database {
             std::string connection;

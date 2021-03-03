@@ -1,10 +1,10 @@
-#include <minty/core/settings.h>
+#include <minty/conf/settings.h>
 
 #include <gtest/gtest.h>
 
-class CoreSettingsTest : public testing::Test {};
+class ConfSettingsTest : public testing::Test {};
 
-TEST_F(CoreSettingsTest, Decode) {
+TEST_F(ConfSettingsTest, Decode) {
     constexpr auto yaml = R"(
 connection: /run/minty/minty.sock
 
@@ -19,7 +19,7 @@ fstore:
     connection: /run/fstore/fstore.sock
 )";
 
-    const auto settings = minty::core::settings::load(yaml);
+    const auto settings = minty::conf::settings::load(yaml);
 
     ASSERT_EQ("/run/minty/minty.sock", settings.connection);
     ASSERT_EQ(
@@ -30,7 +30,7 @@ fstore:
     ASSERT_EQ("/run/fstore/fstore.sock", settings.fstore.connection);
 }
 
-TEST_F(CoreSettingsTest, Encode) {
+TEST_F(ConfSettingsTest, Encode) {
     constexpr auto yaml =
 R"(connection: localhost:1234
 
@@ -42,7 +42,7 @@ fstore:
   connection: /tmp/fstore.sock
 )";
 
-    const auto settings = minty::core::settings {
+    const auto settings = minty::conf::settings {
         .connection = "localhost:1234",
         .database = {
             .connection = "postgres://minty@localhost/minty"

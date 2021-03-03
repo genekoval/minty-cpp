@@ -2,7 +2,7 @@
 #include "commands/commands.h"
 
 #include <minty/minty>
-#include <minty/core/settings.h>
+#include <minty/conf/settings.h>
 
 #include <iostream>
 #include <filesystem>
@@ -12,7 +12,7 @@ const auto default_config = std::filesystem::path(CONFDIR) / "minty.yml";
 
 namespace minty::cli {
     auto client() -> api {
-        const auto settings = minty::core::settings::load_file(default_config);
+        const auto settings = minty::conf::settings::load_file(default_config);
         return api(settings.connection);
     }
 }

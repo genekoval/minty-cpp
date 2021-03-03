@@ -87,10 +87,7 @@ namespace minty::core {
 
     auto api::get_comments(std::string_view post_id) -> comment_tree {
         const auto entities = db->read_comments(post_id);
-        return comment_tree(std::span(
-            entities.begin(),
-            entities.end()
-        ));
+        return build_tree(entities);
     }
 
     auto api::get_creator(std::string_view id) -> creator {

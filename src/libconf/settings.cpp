@@ -1,4 +1,4 @@
-#include <minty/core/settings.h>
+#include <minty/conf/settings.h>
 #include <minty/error.h>
 
 #include <sstream>
@@ -17,7 +17,7 @@ static auto optional(
 }
 
 namespace YAML {
-    using settings = minty::core::settings;
+    using settings = minty::conf::settings;
 
     template <>
     struct convert<settings::s_database> {
@@ -109,7 +109,7 @@ namespace YAML {
     };
 }
 
-namespace minty::core {
+namespace minty::conf {
     auto settings::encode() const -> std::string {
         auto out = YAML::Emitter();
 

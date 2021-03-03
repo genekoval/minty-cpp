@@ -2,6 +2,8 @@
 
 #include <minty/repo/db/model.h>
 
+#include <memory>
+
 namespace minty::core {
     using creator = repo::db::creator;
     using creator_preview = repo::db::creator_preview;
@@ -15,6 +17,17 @@ namespace minty::core {
         std::string content;
         unsigned int indent;
         std::string date_created;
+    };
+
+    struct comment_node {
+        comment data;
+        std::vector<comment_node*> children;
+    };
+
+    struct comment_tree {
+        const std::size_t total;
+        std::unique_ptr<comment_node[]> comments;
+        std::vector<comment_node*> roots;
     };
 
     struct object {

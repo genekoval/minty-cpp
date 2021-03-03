@@ -1,5 +1,5 @@
 #include <minty/core/api.h>
-#include <minty/core/settings.h>
+#include <minty/conf/settings.h>
 #include <minty/server/server.h>
 #include <minty/server/server_info.h>
 
@@ -13,7 +13,7 @@
 const auto default_config = std::filesystem::path(CONFDIR) / "minty.yml";
 
 static auto build_server_info(
-    const minty::core::settings& settings,
+    const minty::conf::settings& settings,
     std::string_view version,
     std::string_view bucket_id
 ) -> minty::server::server_info {
@@ -46,7 +46,7 @@ static auto $main(
     const commline::app& app,
     const commline::argv& argv
 ) -> void {
-    const auto settings = minty::core::settings::load_file(default_config);
+    const auto settings = minty::conf::settings::load_file(default_config);
     timber::reporting_level() = settings.log.level;
 
     INFO() << app.name << " version " << app.version << " starting";

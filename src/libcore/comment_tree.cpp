@@ -3,49 +3,45 @@
 #include <unordered_map>
 
 namespace minty::core {
-    comment_tree::comment_tree (
+    auto build_tree(
         std::span<const repo::db::comment> entities
-    ) :
-        total(entities.size()),
-        comments(std::make_unique<comment_node[]>(total))
-    {
+    ) -> comment_tree {
+        auto tree = comment_tree {
+            .total = entities.size(),
+            .comments = std::make_unique<comment_node[]>(entities.size())
+        };
+
         auto map = std::unordered_map<std::string, comment_node*>();
+
         comment_node* parent = nullptr;
 
-        for (auto i = 0UL; i < entities.size(); ++i) {
+        for (auto i = 0UL; i < tree.total; ++i) {
             const auto& entity = entities[i];
-            comments[i] = {{
+
+            tree.comments[i] = {{
                 entity.id,
                 entity.content,
                 entity.indent,
                 entity.date_created
             }};
-            auto& comment = comments[i];
-            map[comment.model.id] = &comment;
+
+            auto& comment = tree.comments[i];
+            map[comment.data.id] = &comment;
 
             if (!entity.parent_id) {
-                m_roots.push_back(&comment);
+                tree.roots.push_back(&comment);
                 continue;
             }
 
             const auto& parent_id = entity.parent_id.value();
 
-            if (!parent || parent_id != parent->model.id) {
+            if (!parent || parent_id != parent->data.id) {
                 parent = map.at(parent_id);
             }
 
             parent->children.push_back(&comment);
         }
-    }
 
-    auto comment_tree::roots() const -> std::span<comment_node* const> {
-        return std::span(
-            m_roots.cbegin(),
-            m_roots.cend()
-        );
-    }
-
-    auto comment_tree::size() const -> std::size_t {
-        return total;
+        return tree;
     }
 }

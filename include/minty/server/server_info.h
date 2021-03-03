@@ -4,7 +4,7 @@
 
 namespace minty::server {
     struct server_info {
-        const std::string object_source;
-        const std::string version;
+        std::string object_source;
+        std::string version;
     };
 }
