@@ -159,6 +159,16 @@ namespace minty::repo::db {
         return make_entity<object>(ntx, "read_object", object_id);
     }
 
+    auto database::read_objects(
+        std::string_view post_id
+    ) -> std::vector<object> {
+        return make_entities<std::vector<object>>(
+            ntx,
+            "read_objects",
+            post_id
+        );
+    }
+
     auto database::read_post(std::string_view post_id) -> post {
         return make_entity<post>(ntx, "read_post", post_id);
     }

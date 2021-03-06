@@ -24,7 +24,6 @@ TEST_F(DatabasePostTest, Create) {
 
     ASSERT_EQ(id, post.id);
     ASSERT_FALSE(post.description.has_value());
-    ASSERT_TRUE(post.objects.empty());
     ASSERT_TRUE(post.creators.empty());
     ASSERT_TRUE(post.tags.empty());
 }
@@ -48,12 +47,12 @@ TEST_F(DatabasePostTest, CreateWithObjects) {
     };
 
     const auto id = database.create_post("", objects, {}, {});
-    const auto post = database.read_post(id);
+    const auto result = database.read_objects(id);
 
-    ASSERT_EQ(3, post.objects.size());
+    ASSERT_EQ(3, result.size());
 
-    for (auto i = 0u; i < post.objects.size(); i++) {
-        ASSERT_EQ(objects[i], post.objects[i].id);
+    for (auto i = 0u; i < result.size(); i++) {
+        ASSERT_EQ(objects[i], result[i].id);
     }
 }
 

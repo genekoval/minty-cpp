@@ -184,11 +184,9 @@ SELECT
     description,
     date_created,
     date_modified,
-    array_agg(object_id ORDER BY sequence) AS objects,
     array_agg(DISTINCT tag_id) AS tags,
     array_agg(DISTINCT creator_id) AS creators
 FROM post
-LEFT JOIN post_object USING (post_id)
 LEFT JOIN post_tag USING (post_id)
 LEFT JOIN post_creator USING (post_id)
 GROUP BY post_id;
@@ -499,13 +497,23 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_objects(
-    a_objects       uuid[]
+    a_post_id       integer
 ) RETURNS SETOF object_view AS $$
 BEGIN
     RETURN QUERY
-    SELECT *
-    FROM (SELECT unnest(a_objects) AS object_id) objects
-    JOIN object_view USING (object_id);
+    SELECT
+        object_id,
+        preview_id,
+        source_id,
+        url,
+        site_id,
+        name,
+        homepage,
+        thumbnail_id
+    FROM object_view
+    JOIN post_object USING (object_id)
+    WHERE post_id = a_post_id
+    ORDER BY sequence;
 END;
 $$ LANGUAGE plpgsql;
 

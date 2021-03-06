@@ -73,7 +73,6 @@ namespace minty::repo::db {
         std::optional<std::string> description;
         std::string date_created;
         std::string date_modified;
-        std::vector<object> objects;
         std::vector<tag> tags;
         std::vector<creator_preview> creators;
     };

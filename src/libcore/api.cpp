@@ -104,16 +104,14 @@ namespace minty::core {
 
     auto api::get_post(std::string_view id) -> post {
         auto data = db->read_post(id);
+        auto objects = db->read_objects(id);
 
         return post {
             .id = data.id,
             .description = data.description,
             .date_created = data.date_created,
             .date_modified = data.date_modified,
-            .objects = get_object_metadata(std::span<const repo::db::object>(
-                data.objects.data(),
-                data.objects.size()
-            )),
+            .objects = get_object_metadata(objects),
             .tags = data.tags,
             .creators = data.creators
         };

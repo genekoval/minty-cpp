@@ -67,9 +67,6 @@ namespace minty::repo::db {
                 .description = read_field<decltype(post::description)>(it),
                 .date_created = read_field<decltype(post::date_created)>(it),
                 .date_modified = read_field<decltype(post::date_modified)>(it),
-                .objects = read_entities<decltype(post::objects)>(
-                    it, tx, "read_objects"
-                ),
                 .tags = read_entities<decltype(post::tags)>(
                     it, tx, "read_tags"
                 ),
