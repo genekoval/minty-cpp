@@ -26,59 +26,36 @@ namespace minty::core {
         return db->create_creator(ext::trim(std::string(name)));
     }
 
-    auto api::add_post(
-        std::optional<std::string_view> description,
-        const std::vector<std::string>& objects,
-        std::optional<std::string_view> creator_id,
-        const std::vector<std::string>& tags
+    auto api::add_object_data(
+        std::size_t stream_size,
+        std::function<void(fstore::part&&)> pipe
     ) -> std::string {
-        auto formatted = std::string();
+        return bucket->add({}, stream_size, pipe).id;
+    }
 
-        if (description) {
-            formatted = ext::trim(std::string(*description));
+    auto api::add_object_local(std::string_view path) -> std::string {
+        return bucket->add(path).id;
+    }
+
+    auto api::add_object_url(std::string_view url) -> std::string {
+        // TODO: Use an external service to handle URLs.
+        throw std::runtime_error("Not implemented.");
+    }
+
+    auto api::add_post(post_parts parts) -> std::string {
+        if (parts.description) {
+            auto formatted = ext::trim(parts.description.value());
             // An empty string is equivalent to no value.
-            if (formatted.empty()) description.reset();
-            else description = formatted;
+            if (formatted.empty()) parts.description.reset();
+            else parts.description = formatted;
         }
 
         return db->create_post(
-            description,
-            objects,
-            creator_id,
-            tags
+            parts.description,
+            parts.objects,
+            parts.creators,
+            parts.tags
         );
-    }
-
-    auto api::add_post(
-        std::optional<std::string_view> description,
-        std::span<std::span<const std::byte>> data,
-        std::optional<std::string_view> creator_id,
-        const std::vector<std::string>& tags
-    ) -> std::string {
-        auto objects = std::vector<std::string>();
-
-        for (const auto& d : data) {
-            const auto metadata = bucket->add(d.data(), d.size());
-            objects.push_back(metadata.id);
-        }
-
-        return add_post(description, objects, creator_id, tags);
-    }
-
-    auto api::add_post(
-        std::optional<std::string_view> description,
-        std::span<std::string> files,
-        std::optional<std::string_view> creator_id,
-        const std::vector<std::string>& tags
-    ) -> std::string {
-        auto objects = std::vector<std::string>();
-
-        for (const auto& file : files) {
-            const auto metadata = bucket->add(file);
-            objects.push_back(metadata.id);
-        }
-
-        return add_post(description, objects, creator_id, tags);
     }
 
     auto api::add_tag(std::string_view name, std::string_view color) -> tag {

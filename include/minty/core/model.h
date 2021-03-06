@@ -49,4 +49,11 @@ namespace minty::core {
         std::vector<tag> tags;
         std::vector<creator_preview> creators;
     };
+
+    struct post_parts {
+        std::optional<std::string> description;
+        std::vector<std::string> objects;
+        std::vector<std::string> creators;
+        std::vector<std::string> tags;
+    };
 }

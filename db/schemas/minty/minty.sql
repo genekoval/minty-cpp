@@ -303,7 +303,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_post(
     p_description   text,
     objects         uuid[],
-    p_creator       integer,
+    creators        integer[],
     tags            integer[]
 ) RETURNS integer AS $$
 DECLARE
@@ -336,15 +336,18 @@ BEGIN
         object_table.ordinality
     FROM object_table;
 
-    IF p_creator IS NOT NULL THEN
-        INSERT INTO post_creator (
-            post_id,
-            creator_id
-        ) VALUES (
-            l_post_id,
-            p_creator
-        );
-    END IF;
+    WITH creator_table AS (
+        SELECT unnest AS creator_id
+        FROM unnest(creators)
+    )
+    INSERT INTO post_creator (
+        post_id,
+        creator_id
+    )
+    SELECT
+        l_post_id,
+        creator_table.creator_id
+    FROM creator_table;
 
     WITH tag_table AS (
         SELECT unnest AS tag

@@ -17,17 +17,39 @@ namespace minty::server::endpoint {
     }
 
     auto add_post(protocol& proto) -> void {
-        auto description = proto.read<std::optional<std::string>>();
-        auto files = proto.read<std::vector<std::string>>();
-        auto creator = proto.read<std::optional<std::string>>();
-        auto tags = proto.read<std::vector<std::string>>();
+        auto req = proto.read<net::post_parts>();
 
-        proto.reply(proto.api->add_post(
-            description,
-            std::span<std::string>(files.begin(), files.end()),
-            creator,
-            tags
-        ));
+        const auto object_total =
+            req.blobs.size() +
+            req.files.size() +
+            req.urls.size();
+
+        auto parts = core::post_parts {
+            .description = req.description,
+            .objects = std::vector<std::string>(object_total),
+            .creators = req.creators,
+            .tags = req.tags
+        };
+
+        for (const auto& [index, file] : req.files) {
+            parts.objects[index] = proto.api->add_object_local(file);
+        }
+
+        for (const auto& [index, url] : req.urls) {
+            parts.objects[index] = proto.api->add_object_url(url);
+        }
+
+        for (auto& [index, blob] : req.blobs) {
+            blob.prepare();
+            parts.objects[index] = proto.api->add_object_data(
+                blob.size(),
+                [&blob](auto&& part) {
+                    blob.read([&part](auto&& chunk) { part.write(chunk); });
+                }
+            );
+        }
+
+        proto.reply(proto.api->add_post(parts));
     }
 
     auto get_comments(protocol& proto) -> void {

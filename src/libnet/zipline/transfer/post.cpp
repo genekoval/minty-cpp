@@ -29,6 +29,17 @@ namespace zipline {
         n::xfr<creators_t>::write(sock, t.creators);
     }
 
+    auto n::xfr<n::post_parts>::read(const n::socket& sock) -> type {
+        return {
+            .description = n::xfr<description_t>::read(sock),
+            .creators = n::xfr<creators_t>::read(sock),
+            .tags = n::xfr<tags_t>::read(sock),
+            .files = n::xfr<files_t>::read(sock),
+            .urls = n::xfr<urls_t>::read(sock),
+            .blobs = n::xfr<blobs_t>::read(sock)
+        };
+    }
+
     auto n::xfr<c::post_preview>::read(const n::socket& sock) -> type {
         return {
             .id = n::xfr<id_t>::read(sock),
@@ -36,7 +47,6 @@ namespace zipline {
             .date_created = n::xfr<date_created_t>::read(sock),
             .date_modified = n::xfr<date_modified_t>::read(sock)
         };
-
     }
 
     auto n::xfr<c::post_preview>::write(

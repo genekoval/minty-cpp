@@ -61,7 +61,7 @@ TEST_F(DatabasePostTest, CreateWithCreator) {
     constexpr auto creator = "test";
 
     const auto post = database.read_post(
-        database.create_post("", {}, database.create_creator(creator), {})
+        database.create_post("", {}, {database.create_creator(creator)}, {})
     );
 
     ASSERT_EQ(1, post.creators.size());

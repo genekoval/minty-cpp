@@ -39,7 +39,7 @@ namespace minty::repo::db {
         auto create_post(
             std::optional<std::string_view> description,
             const std::vector<std::string>& objects,
-            std::optional<std::string_view> creator_id,
+            const std::vector<std::string>& creators,
             const std::vector<std::string>& tags
         ) -> std::string;
 

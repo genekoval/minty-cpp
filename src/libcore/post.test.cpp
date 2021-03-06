@@ -25,23 +25,17 @@ TEST_F(CorePostTest, CreateFromBytes) {
         "c0f5efbef0fe98aa90619444250b1a5e"
         "b23158d6686f0b190838f3d544ec85b9";
 
-    auto data_container = std::vector<std::span<const std::byte>> {
-        std::span<const std::byte>(
+    auto object = api.add_object_data(size, [data, size](auto&& part) {
+        part.write(std::span(
             reinterpret_cast<const std::byte*>(data),
             size
-        )
-    };
+        ));
+    });
 
-    const auto id = api.add_post(
-        description,
-        std::span<std::span<const std::byte>>(
-            data_container.data(),
-            data_container.size()
-        ),
-        {},
-        {}
-    );
-
+    const auto id = api.add_post({
+        .description = description,
+        .objects = {object}
+    });
     const auto post = api.get_post(id);
 
     ASSERT_EQ(id, post.id);
@@ -69,19 +63,21 @@ TEST_F(CorePostTest, CreateFromFiles) {
         "552565f5ec09c7674b1756d1a268c64b"
         "18b23467fbc52ad0c206028a0c214437";
 
-    std::string files[] {
+    auto files = std::vector<std::string>({
         write_file("one.txt", one_data),
         write_file("two.txt", two_data),
         write_file("three.txt", three_data)
-    };
+    });
 
-    const auto id = api.add_post(
-        description,
-        std::span { files },
-        {},
-        {}
-    );
+    auto objects = std::vector<std::string>();
+    for (const auto& file : files) {
+        objects.push_back(api.add_object_local(file));
+    }
 
+    const auto id = api.add_post({
+        .description = description,
+        .objects = objects
+    });
     const auto post = api.get_post(id);
 
     ASSERT_EQ(id, post.id);

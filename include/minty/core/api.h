@@ -11,13 +11,6 @@ namespace minty::core {
         repo::db::database* db;
         fstore::bucket* bucket;
 
-        auto add_post(
-            std::optional<std::string_view> description,
-            const std::vector<std::string>& objects,
-            std::optional<std::string_view> creator_id,
-            const std::vector<std::string>& tags
-        ) -> std::string;
-
         auto get_object_metadata(
             std::span<const repo::db::object> db_objects
         ) -> std::vector<object>;
@@ -32,19 +25,16 @@ namespace minty::core {
 
         auto add_creator(std::string_view name) -> std::string;
 
-        auto add_post(
-            std::optional<std::string_view> description,
-            std::span<std::span<const std::byte>> data,
-            std::optional<std::string_view> creator_id,
-            const std::vector<std::string>& tags
+        auto add_object_data(
+            std::size_t stream_size,
+            std::function<void(fstore::part&&)> pipe
         ) -> std::string;
 
-        auto add_post(
-            std::optional<std::string_view> description,
-            std::span<std::string> files,
-            std::optional<std::string_view> creator_id,
-            const std::vector<std::string>& tags
-        ) -> std::string;
+        auto add_object_local(std::string_view path) -> std::string;
+
+        auto add_object_url(std::string_view url) -> std::string;
+
+        auto add_post(post_parts parts) -> std::string;
 
         auto add_tag(std::string_view name, std::string_view color) -> tag;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <minty/core/model.h>
+#include <minty/net/zipline/post_parts.h>
 #include <minty/net/zipline/protocol.h>
 
 namespace zipline {
@@ -18,6 +19,20 @@ namespace zipline {
 
         static auto read(const minty::net::socket&) -> type;
         static auto write(const minty::net::socket&, const type&) -> void;
+    };
+
+    template <>
+    struct transfer<minty::net::socket, minty::net::post_parts> {
+        using type = minty::net::post_parts;
+
+        using description_t = decltype(type::description);
+        using creators_t = decltype(type::creators);
+        using tags_t = decltype(type::tags);
+        using files_t = decltype(type::files);
+        using urls_t = decltype(type::urls);
+        using blobs_t = decltype(type::blobs);
+
+        static auto read(const minty::net::socket&) -> type;
     };
 
     template <>

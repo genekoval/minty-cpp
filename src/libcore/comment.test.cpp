@@ -4,12 +4,9 @@ class CoreCommentTest : public CoreTest {
 protected:
     const std::string post_id;
 
-    CoreCommentTest() : post_id(api.add_post(
-            "Test post",
-            std::span<std::span<const std::byte>>(),
-            {},
-            {}
-    )) {}
+    CoreCommentTest() : post_id(api.add_post({
+        .description = "Test post"
+    })) {}
 
     auto add_root_comment(std::string_view content) -> minty::core::comment {
         return api.add_comment(post_id, {}, content);
