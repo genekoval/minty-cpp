@@ -14,16 +14,8 @@ CREATE TABLE source (
 );
 
 CREATE TABLE object (
-    object_id       uuid PRIMARY KEY
-);
-
-CREATE TABLE object_preview (
     object_id       uuid PRIMARY KEY,
-    preview_id      uuid NOT NULL
-);
-
-CREATE TABLE object_source (
-    object_id       uuid PRIMARY KEY,
+    preview_id      uuid,
     source_id       integer REFERENCES source ON DELETE NO ACTION
 );
 
@@ -173,8 +165,6 @@ SELECT
     homepage,
     thumbnail_id
 FROM object
-    LEFT JOIN object_preview USING (object_id)
-    LEFT JOIN object_source USING (object_id)
     LEFT JOIN source USING (source_id)
     LEFT JOIN site USING (site_id);
 
@@ -194,20 +184,6 @@ GROUP BY post_id;
 --}}}
 
 --{{{( Functions )
-
-CREATE FUNCTION add_object(
-    a_object_id     uuid
-) RETURNS uuid AS $$
-BEGIN
-    INSERT INTO object (
-        object_id
-    ) VALUES (
-        a_object_id
-    ) ON CONFLICT DO NOTHING;
-
-    RETURN a_object_id;
-END;
-$$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_comment(
     a_post_id       integer,
@@ -298,6 +274,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_object(
+    a_object_id     uuid,
+    a_preview_id    uuid,
+    a_source_id     integer
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO object (
+        object_id,
+        preview_id,
+        source_id
+    ) VALUES (
+        a_object_id,
+        a_preview_id,
+        a_source_id
+    ) ON CONFLICT DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_post(
     p_description   text,
     objects         uuid[],
@@ -330,7 +324,7 @@ BEGIN
         sequence
     ) SELECT
         l_post_id,
-        add_object(object_table.obj),
+        object_table.obj,
         object_table.ordinality
     FROM object_table;
 
@@ -548,42 +542,6 @@ BEGIN
     FROM tag
     WHERE tag_id = any(a_tags)
     ORDER BY name;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION update_object_preview(
-    object          uuid,
-    preview         uuid
-) RETURNS VOID AS $$
-BEGIN
-    INSERT INTO object_preview (
-        object_id,
-        preview_id
-    ) VALUES (
-        object,
-        preview
-    ) ON CONFLICT (object_id) DO UPDATE
-    SET preview_id = EXCLUDED.preview_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION update_object_source(
-    object          uuid,
-    site            integer,
-    source_url      text
-) RETURNS VOID AS $$
-BEGIN
-    INSERT INTO object_source (
-        object_id,
-        source_id
-    ) VALUES (
-        object,
-        (
-            SELECT source_id
-            FROM create_source(site, source_url)
-        )
-    ) ON CONFLICT (object_id) DO UPDATE
-    SET source_id = EXCLUDED.source_id;
 END;
 $$ LANGUAGE plpgsql;
 

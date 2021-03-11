@@ -30,11 +30,15 @@ namespace minty::core {
         std::size_t stream_size,
         std::function<void(fstore::part&&)> pipe
     ) -> std::string {
-        return bucket->add({}, stream_size, pipe).id;
+        const auto object = bucket->add({}, stream_size, pipe);
+        db->create_object(object.id, {}, {});
+        return object.id;
     }
 
     auto api::add_object_local(std::string_view path) -> std::string {
-        return bucket->add(path).id;
+        const auto object = bucket->add(path);
+        db->create_object(object.id, {}, {});
+        return object.id;
     }
 
     auto api::add_object_url(std::string_view url) -> std::string {

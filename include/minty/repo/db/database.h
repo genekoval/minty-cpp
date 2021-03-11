@@ -15,8 +15,6 @@ namespace minty::repo::db {
 
         database(database&& other) = default;
 
-        auto add_object(std::string_view object_id) -> void;
-
         auto create_comment(
             std::string_view post_id,
             std::optional<std::string_view> parent_id,
@@ -34,6 +32,12 @@ namespace minty::repo::db {
             std::string_view creator_id,
             std::string_view site_id,
             std::string_view url
+        ) -> void;
+
+        auto create_object(
+            std::string_view object_id,
+            std::optional<std::string_view> preview_id,
+            std::optional<std::string_view> source_id
         ) -> void;
 
         auto create_post(
@@ -69,16 +73,5 @@ namespace minty::repo::db {
         auto read_objects(std::string_view post_id) -> std::vector<object>;
 
         auto read_post(std::string_view post_id) -> post;
-
-        auto update_object_preview(
-            std::string_view object_id,
-            std::string_view preview_id
-        ) -> void;
-
-        auto update_object_source(
-            std::string_view object_id,
-            const site& website,
-            std::string_view url
-        ) -> void;
     };
 }

@@ -9,14 +9,14 @@ namespace minty::repo::db {
     {
         auto ci = connection_initializer(connection);
 
-        ci.prepare("add_object", 1);
         ci.prepare("create_comment", 3);
         ci.prepare("create_creator", 1);
         ci.prepare("create_creator_aliases", 2);
         ci.prepare("create_creator_source", 3);
+        ci.prepare("create_object", 3);
+        ci.prepare("create_post", 4);
         ci.prepare("create_site", 3);
         ci.prepare("create_tag", 2);
-        ci.prepare("create_post", 4);
         ci.prepare("read_comments", 1);
         ci.prepare("read_creator", 1);
         ci.prepare("read_creator_posts", 1);
@@ -27,12 +27,6 @@ namespace minty::repo::db {
         ci.prepare("read_post", 1);
         ci.prepare("read_sources", 1);
         ci.prepare("read_tags", 1);
-        ci.prepare("update_object_preview", 2);
-        ci.prepare("update_object_source", 3);
-    }
-
-    auto database::add_object(std::string_view object_id) -> void {
-        ntx.exec_prepared("add_object", object_id);
     }
 
     auto database::create_comment(
@@ -68,6 +62,14 @@ namespace minty::repo::db {
         std::string_view url
     ) -> void {
         ntx.exec_prepared("create_creator_source", creator_id, site_id, url);
+    }
+
+    auto database::create_object(
+        std::string_view object_id,
+        std::optional<std::string_view> preview_id,
+        std::optional<std::string_view> source_id
+    ) -> void {
+        ntx.exec_prepared("create_object", object_id, preview_id, source_id);
     }
 
     auto database::create_post(
@@ -171,20 +173,5 @@ namespace minty::repo::db {
 
     auto database::read_post(std::string_view post_id) -> post {
         return make_entity<post>(ntx, "read_post", post_id);
-    }
-
-    auto database::update_object_preview(
-        std::string_view object_id,
-        std::string_view preview_id
-    ) -> void {
-        ntx.exec_prepared("update_object_preview", object_id, preview_id);
-    }
-
-    auto database::update_object_source(
-        std::string_view object_id,
-        const site& website,
-        std::string_view url
-    ) -> void {
-        ntx.exec_prepared("update_object_source", object_id, website.id, url);
     }
 }

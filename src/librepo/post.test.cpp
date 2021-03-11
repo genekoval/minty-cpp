@@ -46,6 +46,10 @@ TEST_F(DatabasePostTest, CreateWithObjects) {
         "1f777563-dd79-490c-8022-0c2e9fb430a5"
     };
 
+    for (const auto& object : objects) {
+        database.create_object(object, {}, {});
+    }
+
     const auto id = database.create_post("", objects, {}, {});
     const auto result = database.read_objects(id);
 
