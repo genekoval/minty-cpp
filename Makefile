@@ -1,3 +1,5 @@
+include mk/graphics.mk
+
 project := minty
 summary := A repo of fun.
 
@@ -26,6 +28,7 @@ internal.libs := $(addprefix lib,$(internal))
 
 define common.libs
  $(internal)
+ $(graphics.libs)
  ext++
  fmt
  fstore
@@ -77,6 +80,8 @@ include mk/db.mk
 include mkbuild/base.mk
 
 confdir = $(prefix)/etc/$(project)
+
+$(obj)/$(core)/preview/image.o: CXXFLAGS += $(graphics.flags)
 
 $(obj)/$(cli)/main.o: CXXFLAGS +=\
  -DNAME='"$(cli)"'\

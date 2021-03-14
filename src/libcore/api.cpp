@@ -1,11 +1,13 @@
 #include <minty/core/api.h>
+#include <minty/core/preview.h>
 
 #include <ext/string.h>
 
 namespace minty::core {
     api::api(repo::db::database& db, fstore::bucket& bucket) :
         db(&db),
-        bucket(&bucket)
+        bucket(&bucket),
+        previews(bucket)
     {}
 
     auto api::add_comment(
@@ -31,13 +33,13 @@ namespace minty::core {
         std::function<void(fstore::part&&)> pipe
     ) -> std::string {
         const auto object = bucket->add({}, stream_size, pipe);
-        db->create_object(object.id, {}, {});
+        db->create_object(object.id, previews.generate_preview(object), {});
         return object.id;
     }
 
     auto api::add_object_local(std::string_view path) -> std::string {
         const auto object = bucket->add(path);
-        db->create_object(object.id, {}, {});
+        db->create_object(object.id, previews.generate_preview(object), {});
         return object.id;
     }
 

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <minty/core/model.h>
 #include <minty/core/comment_tree.h>
+#include <minty/core/model.h>
+#include <minty/core/preview.h>
 #include <minty/repo/db/database.h>
 
 #include <fstore/client.h>
@@ -10,6 +11,7 @@ namespace minty::core {
     class api {
         repo::db::database* db;
         fstore::bucket* bucket;
+        preview_service previews;
 
         auto get_object_metadata(
             std::span<const repo::db::object> db_objects
