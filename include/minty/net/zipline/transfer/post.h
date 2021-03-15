@@ -41,8 +41,10 @@ namespace zipline {
 
         using id_t = decltype(type::id);
         using description_t = decltype(type::description);
+        using preview_id_t = decltype(type::preview_id);
+        using comment_count_t = decltype(type::comment_count);
+        using object_count_t = decltype(type::object_count);
         using date_created_t = decltype(type::date_created);
-        using date_modified_t = decltype(type::date_modified);
 
         static auto read(const minty::net::socket&) -> type;
         static auto write(const minty::net::socket&, const type&) -> void;

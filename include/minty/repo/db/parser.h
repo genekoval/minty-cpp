@@ -85,8 +85,10 @@ namespace minty::repo::db {
             return {
                 .id = read_field<decltype(T::id)>(it),
                 .description = read_field<decltype(T::description)>(it),
-                .date_created = read_field<decltype(T::date_created)>(it),
-                .date_modified = read_field<decltype(T::date_modified)>(it)
+                .preview_id = read_field<decltype(T::preview_id)>(it),
+                .comment_count = read_field<decltype(T::comment_count)>(it),
+                .object_count = read_field<decltype(T::object_count)>(it),
+                .date_created = read_field<decltype(T::date_created)>(it)
             };
         }
     };

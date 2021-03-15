@@ -168,6 +168,28 @@ FROM object
     LEFT JOIN source USING (source_id)
     LEFT JOIN site USING (site_id);
 
+CREATE VIEW post_preview AS
+SELECT
+    post_id,
+    description,
+    preview_id,
+    count(comment_id) AS comment_count,
+    count(object_id) AS object_count,
+    post.date_created
+FROM post
+LEFT JOIN post_comment USING (post_id)
+LEFT JOIN post_object USING (post_id)
+LEFT JOIN (
+    SELECT DISTINCT ON (post_id)
+        post_id,
+        preview_id
+    FROM object
+    JOIN post_object USING (object_id)
+    WHERE preview_id IS NOT NULL
+    ORDER BY post_id, sequence
+) previews USING (post_id)
+GROUP BY post_id, preview_id;
+
 CREATE VIEW post_view AS
 SELECT
     post_id,
@@ -452,15 +474,17 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_creator_posts(
     a_creator       integer
-) RETURNS SETOF post AS $$
+) RETURNS SETOF post_preview AS $$
 BEGIN
     RETURN QUERY
     SELECT
         post_id,
         description,
-        date_created,
-        date_modified
-    FROM post
+        preview_id,
+        comment_count,
+        object_count,
+        date_created
+    FROM post_preview
     JOIN post_creator USING (post_id)
     WHERE creator_id = a_creator
     ORDER BY date_created DESC;

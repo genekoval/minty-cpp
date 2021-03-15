@@ -77,10 +77,12 @@ namespace minty::repo::db {
         std::vector<creator_preview> creators;
     };
 
-    struct post_preview : entity<4> {
+    struct post_preview : entity<6> {
         std::string id;
         std::optional<std::string> description;
+        std::optional<std::string> preview_id;
+        unsigned int comment_count;
+        unsigned int object_count;
         std::string date_created;
-        std::string date_modified;
     };
 }
