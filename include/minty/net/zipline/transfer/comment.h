@@ -13,22 +13,22 @@ namespace zipline {
         using indent_t = decltype(type::indent);
         using date_created_t = decltype(type::date_created);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 
     template <>
     struct transfer<minty::net::socket, minty::core::comment_node> {
         using type = minty::core::comment_node;
 
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 
     template <>
     struct transfer<minty::net::socket, minty::core::comment_tree> {
         using type = minty::core::comment_tree;
 
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 
 }

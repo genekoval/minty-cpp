@@ -17,8 +17,8 @@ namespace zipline {
         using tags_t = decltype(type::tags);
         using creators_t = decltype(type::creators);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 
     template <>
@@ -32,7 +32,7 @@ namespace zipline {
         using urls_t = decltype(type::urls);
         using blobs_t = decltype(type::blobs);
 
-        static auto read(const minty::net::socket&) -> type;
+        static auto read(minty::net::socket&) -> type;
     };
 
     template <>
@@ -46,7 +46,7 @@ namespace zipline {
         using object_count_t = decltype(type::object_count);
         using date_created_t = decltype(type::date_created);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 }

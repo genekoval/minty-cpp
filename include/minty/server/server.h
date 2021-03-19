@@ -12,7 +12,7 @@ namespace minty::server {
         core::api* api;
         const server_info* info;
 
-        protocol(const socket_t& sock, const server_info& info, core::api& api);
+        protocol(socket_t& sock, const server_info& info, core::api& api);
     };
 
     auto listen(

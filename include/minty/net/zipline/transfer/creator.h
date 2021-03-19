@@ -19,8 +19,8 @@ namespace zipline {
         using post_count_t = decltype(type::post_count);
         using date_added_t = decltype(type::date_added);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 
     template <>
@@ -31,7 +31,7 @@ namespace zipline {
         using name_t = decltype(type::name);
         using avatar_t = decltype(type::avatar);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 }

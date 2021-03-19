@@ -4,7 +4,7 @@ namespace c = minty::core;
 namespace n = minty::net;
 
 namespace zipline {
-    auto n::xfr<c::tag>::read(const n::socket& sock) -> type {
+    auto n::xfr<c::tag>::read(n::socket& sock) -> type {
         return {
             .id = n::xfr<id_t>::read(sock),
             .name = n::xfr<name_t>::read(sock),
@@ -14,7 +14,7 @@ namespace zipline {
     }
 
     auto n::xfr<c::tag>::write(
-        const n::socket& sock,
+        n::socket& sock,
         const type& t
     ) -> void {
         n::xfr<id_t>::write(sock, t.id);

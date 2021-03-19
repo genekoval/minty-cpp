@@ -11,7 +11,7 @@ namespace zipline {
         using object_source_t = decltype(type::object_source);
         using version_t = decltype(type::version);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 }

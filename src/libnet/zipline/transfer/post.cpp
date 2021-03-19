@@ -4,7 +4,7 @@ namespace c = minty::core;
 namespace n = minty::net;
 
 namespace zipline {
-    auto n::xfr<c::post>::read(const n::socket& sock) -> type {
+    auto n::xfr<c::post>::read(n::socket& sock) -> type {
         return {
             .id = n::xfr<id_t>::read(sock),
             .description = n::xfr<description_t>::read(sock),
@@ -17,7 +17,7 @@ namespace zipline {
     }
 
     auto n::xfr<c::post>::write(
-        const n::socket& sock,
+        n::socket& sock,
         const type& t
     ) -> void {
         n::xfr<id_t>::write(sock, t.id);
@@ -29,7 +29,7 @@ namespace zipline {
         n::xfr<creators_t>::write(sock, t.creators);
     }
 
-    auto n::xfr<n::post_parts>::read(const n::socket& sock) -> type {
+    auto n::xfr<n::post_parts>::read(n::socket& sock) -> type {
         return {
             .description = n::xfr<description_t>::read(sock),
             .creators = n::xfr<creators_t>::read(sock),
@@ -40,7 +40,7 @@ namespace zipline {
         };
     }
 
-    auto n::xfr<c::post_preview>::read(const n::socket& sock) -> type {
+    auto n::xfr<c::post_preview>::read(n::socket& sock) -> type {
         return {
             .id = n::xfr<id_t>::read(sock),
             .description = n::xfr<description_t>::read(sock),
@@ -52,7 +52,7 @@ namespace zipline {
     }
 
     auto n::xfr<c::post_preview>::write(
-        const n::socket& sock,
+        n::socket& sock,
         const type& t
     ) -> void {
         n::xfr<id_t>::write(sock, t.id);

@@ -13,7 +13,7 @@ namespace zipline {
         using color_t = decltype(type::color);
         using date_created_t = decltype(type::date_created);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 }

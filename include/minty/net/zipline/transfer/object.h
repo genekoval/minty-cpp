@@ -16,7 +16,7 @@ namespace zipline {
         using preview_id_t = decltype(type::preview_id);
         using src_t = decltype(type::src);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 }

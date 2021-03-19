@@ -13,8 +13,8 @@ namespace zipline {
         using homepage_t = decltype(type::homepage);
         using thumbnail_id_t = decltype(type::thumbnail_id);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 
     template <>
@@ -25,7 +25,7 @@ namespace zipline {
         using url_t = decltype(type::url);
         using website_t = decltype(type::website);
 
-        static auto read(const minty::net::socket&) -> type;
-        static auto write(const minty::net::socket&, const type&) -> void;
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
     };
 }

@@ -4,7 +4,7 @@ namespace c = minty::core;
 namespace n = minty::net;
 
 namespace zipline {
-    auto n::xfr<c::comment>::read(const n::socket& sock) -> type {
+    auto n::xfr<c::comment>::read(n::socket& sock) -> type {
         return {
             .id = n::xfr<id_t>::read(sock),
             .content = n::xfr<content_t>::read(sock),
@@ -14,7 +14,7 @@ namespace zipline {
     }
 
     auto n::xfr<c::comment>::write(
-        const n::socket& sock,
+        n::socket& sock,
         const type& t
     ) -> void {
         n::xfr<id_t>::write(sock, t.id);
@@ -24,7 +24,7 @@ namespace zipline {
     }
 
     auto n::xfr<c::comment_node>::write(
-        const n::socket& sock,
+        n::socket& sock,
         const type& t
     ) -> void {
         n::xfr<c::comment>::write(sock, t.data);
@@ -35,7 +35,7 @@ namespace zipline {
     }
 
     auto n::xfr<c::comment_tree>::write(
-        const n::socket& sock,
+        n::socket& sock,
         const type& t
     ) -> void {
         n::xfr<std::size_t>::write(sock, t.total);

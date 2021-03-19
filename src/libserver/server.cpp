@@ -22,7 +22,7 @@ namespace minty::server {
     }
 
     protocol::protocol(
-        const socket_t& sock,
+        socket_t& sock,
         const server_info& info,
         core::api& api
     ) :
