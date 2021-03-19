@@ -8,7 +8,7 @@ namespace minty {
     api::api(std::string_view endpoint) : endpoint(endpoint) {}
 
     auto api::connect() -> client {
-        return client(netcore::connect(endpoint));
+        return client(net::socket(netcore::connect(endpoint)));
     }
 
     auto api::add_creator(std::string_view name) -> std::string {

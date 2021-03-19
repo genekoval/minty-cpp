@@ -1,9 +1,7 @@
 #include "endpoints/endpoints.h"
 
-#include <minty/net/zipline/protocol.h>
 #include <minty/server/server.h>
 
-#include <netcore/server.h>
 #include <timber/timber>
 
 namespace minty::server {
@@ -22,11 +20,11 @@ namespace minty::server {
     }
 
     protocol::protocol(
-        socket_t& sock,
+        net::socket& sock,
         const server_info& info,
         core::api& api
     ) :
-        zipline::protocol<socket_t>(sock),
+        zipline::protocol<net::socket>(sock),
         api(&api),
         info(&info)
     {}
@@ -42,7 +40,8 @@ namespace minty::server {
         auto server = netcore::server([&api, &info, &routes](
             netcore::socket&& sock
         ) {
-            routes.route(protocol(sock, info, api));
+            auto socket = net::socket(std::move(sock));
+            routes.route(protocol(socket, info, api));
         });
 
         server.listen(endpoint, callback);

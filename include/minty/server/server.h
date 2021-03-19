@@ -1,18 +1,15 @@
 #pragma once
 
 #include <minty/core/api.h>
+#include <minty/net/zipline/protocol.h>
 #include <minty/server/server_info.h>
 
-#include <netcore/socket.h>
-
 namespace minty::server {
-    using socket_t = netcore::socket;
-
-    struct protocol : zipline::protocol<socket_t> {
+    struct protocol : zipline::protocol<net::socket> {
         core::api* api;
         const server_info* info;
 
-        protocol(socket_t& sock, const server_info& info, core::api& api);
+        protocol(net::socket& sock, const server_info& info, core::api& api);
     };
 
     auto listen(

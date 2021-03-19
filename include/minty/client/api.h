@@ -21,7 +21,7 @@ namespace minty {
             get_server_info
         };
 
-        using protocol = zipline::protocol<netcore::socket>;
+        using protocol = zipline::protocol<net::socket>;
         using client = zipline::client<protocol, event>;
 
         const std::string endpoint;

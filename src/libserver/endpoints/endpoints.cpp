@@ -40,7 +40,6 @@ namespace minty::server::endpoint {
         }
 
         for (auto& [index, blob] : req.blobs) {
-            blob.prepare();
             parts.objects[index] = proto.api->add_object_data(
                 blob.size(),
                 [&blob](auto&& part) {
