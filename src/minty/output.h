@@ -7,6 +7,11 @@
 namespace YAML {
     auto operator<<(
         Emitter& out,
+        const minty::core::comment& comment
+    ) -> Emitter&;
+
+    auto operator<<(
+        Emitter& out,
         const minty::core::creator& creator
     ) -> Emitter&;
 

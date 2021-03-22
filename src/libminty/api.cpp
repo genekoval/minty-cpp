@@ -33,6 +33,15 @@ namespace minty {
         );
     }
 
+    auto api::get_comments(
+        std::string_view post_id
+    ) -> std::vector<core::comment> {
+        return connect().send<std::vector<core::comment>>(
+            event::get_comments,
+            post_id
+        );
+    }
+
     auto api::get_creator(std::string_view id) -> core::creator {
         return connect().send<core::creator>(
             event::get_creator,

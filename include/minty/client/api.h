@@ -39,6 +39,10 @@ namespace minty {
             const std::vector<std::string>& tags
         ) -> std::string;
 
+        auto get_comments(
+            std::string_view post_id
+        ) -> std::vector<core::comment>;
+
         auto get_creator(std::string_view id) -> core::creator;
 
         auto get_post(std::string_view id) -> core::post;

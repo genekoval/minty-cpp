@@ -22,6 +22,20 @@ static auto $post(
 
     auto out = YAML::Emitter();
     out << post;
+
+    const auto comments = api.get_comments(post_id);
+
+    if (!comments.empty()) {
+        out << YAML::BeginMap
+            << YAML::Key << "comments" << YAML::BeginSeq;
+
+        for (const auto& comment : comments) {
+            out << comment;
+        }
+
+        out << YAML::EndSeq;
+    }
+
     std::cout << out.c_str() << std::endl;
 }
 

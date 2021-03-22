@@ -3,6 +3,20 @@
 namespace YAML {
     auto operator<<(
         Emitter& out,
+        const minty::core::comment& comment
+    ) -> Emitter& {
+        out
+            << BeginMap
+            << Key << "id" << Value << comment.id
+            << Key << "content" << Value << comment.content
+            << Key << "date posted" << Value << comment.date_created
+            << EndMap;
+
+        return out;
+    }
+
+    auto operator<<(
+        Emitter& out,
         const minty::core::creator& creator
     ) -> Emitter& {
         out << BeginMap;
