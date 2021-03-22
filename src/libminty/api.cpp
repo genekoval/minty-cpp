@@ -40,6 +40,13 @@ namespace minty {
         );
     }
 
+    auto api::get_post(std::string_view id) -> core::post {
+        return connect().send<core::post>(
+            event::get_post,
+            id
+        );
+    }
+
     auto api::get_server_info() -> server::server_info {
         return connect().send<server::server_info>(event::get_server_info);
     }

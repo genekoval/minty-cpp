@@ -41,6 +41,8 @@ namespace minty {
 
         auto get_creator(std::string_view id) -> core::creator;
 
+        auto get_post(std::string_view id) -> core::post;
+
         auto get_server_info() -> server::server_info;
     };
 }

@@ -1,4 +1,5 @@
 #include "../client.h"
+#include "../output.h"
 
 #include "commands.h"
 
@@ -10,7 +11,19 @@
 static auto $post(
     const commline::app& app,
     const commline::argv& argv
-) -> void {}
+) -> void {
+    if (argv.empty()) {
+        throw std::runtime_error("no post id given");
+    }
+
+    const auto& post_id = argv.front();
+    auto api = minty::cli::client();
+    const auto post = api.get_post(post_id);
+
+    auto out = YAML::Emitter();
+    out << post;
+    std::cout << out.c_str() << std::endl;
+}
 
 static auto $add(
     const commline::app& app,

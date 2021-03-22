@@ -8,43 +8,20 @@ namespace YAML {
     auto operator<<(
         Emitter& out,
         const minty::core::creator& creator
-    ) -> Emitter& {
-        out << BeginMap;
+    ) -> Emitter&;
 
-        out
-            << Key << "id"
-            << Value << creator.id
+    auto operator<<(
+        Emitter& out,
+        const minty::core::creator_preview& creator
+    ) -> Emitter&;
 
-            << Key << "name"
-            << Value << creator.name;
+    auto operator<<(
+        Emitter& out,
+        const minty::core::object& object
+    ) -> Emitter&;
 
-        if (!creator.aliases.empty()) {
-            out
-                << Key << "aliases"
-                << Value << creator.aliases;
-        }
-
-        if (creator.bio.has_value()) {
-            out
-                << Key << "bio"
-                << Value << creator.bio.value();
-        }
-
-        if (!creator.sources.empty()) {
-            out << Key << "links" << Value << BeginSeq;
-
-            for (const auto& source : creator.sources) {
-                out << source.url;
-            }
-
-            out << EndSeq;
-        }
-
-        out
-            << Key << "date added"
-            << Value << creator.date_added;
-
-        out << EndMap;
-        return out;
-    }
+    auto operator<<(
+        Emitter& out,
+        const minty::core::post& post
+    ) -> Emitter&;
 }
