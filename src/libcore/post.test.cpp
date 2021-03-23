@@ -15,7 +15,32 @@ protected:
 
         return path;
     }
+
+    auto add_post(minty::core::post_parts&& parts) -> minty::core::post {
+        const auto id = api.add_post(parts);
+        return api.get_post(id);
+    }
 };
+
+TEST_F(CorePostTest, CreateEmptyTitle) {
+    const auto post = add_post({.title = ""});
+    ASSERT_FALSE(post.title.has_value());
+}
+
+TEST_F(CorePostTest, CreateEmptyDescription) {
+    const auto post = add_post({.description = ""});
+    ASSERT_FALSE(post.description.has_value());
+}
+
+TEST_F(CorePostTest, CreateWhitespaceTitle) {
+    const auto post = add_post({.title = "   "});
+    ASSERT_FALSE(post.title.has_value());
+}
+
+TEST_F(CorePostTest, CreateWhitespaceDescription) {
+    const auto post = add_post({.description = "   "});
+    ASSERT_FALSE(post.description.has_value());
+}
 
 TEST_F(CorePostTest, CreateFromBytes) {
     constexpr auto data = "Test data\n";
@@ -31,12 +56,10 @@ TEST_F(CorePostTest, CreateFromBytes) {
         ));
     });
 
-    const auto id = api.add_post({
+    const auto post = add_post({
         .objects = {object}
     });
-    const auto post = api.get_post(id);
 
-    ASSERT_EQ(id, post.id);
     ASSERT_EQ(1, post.objects.size());
     ASSERT_EQ(hash, post.objects[0].hash);
 }
@@ -67,12 +90,10 @@ TEST_F(CorePostTest, CreateFromFiles) {
         objects.push_back(api.add_object_local(file));
     }
 
-    const auto id = api.add_post({
+    const auto post = add_post({
         .objects = objects
     });
-    const auto post = api.get_post(id);
 
-    ASSERT_EQ(id, post.id);
     ASSERT_EQ(3, post.objects.size());
     ASSERT_EQ(one_hash, post.objects[0].hash);
     ASSERT_EQ(two_hash, post.objects[1].hash);
