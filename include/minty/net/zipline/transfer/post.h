@@ -10,6 +10,7 @@ namespace zipline {
         using type = minty::core::post;
 
         using id_t = decltype(type::id);
+        using title_t = decltype(type::title);
         using description_t = decltype(type::description);
         using date_created_t = decltype(type::date_created);
         using date_modified_t = decltype(type::date_modified);
@@ -25,6 +26,7 @@ namespace zipline {
     struct transfer<minty::net::socket, minty::net::post_parts> {
         using type = minty::net::post_parts;
 
+        using title_t = decltype(type::title);
         using description_t = decltype(type::description);
         using creators_t = decltype(type::creators);
         using tags_t = decltype(type::tags);
@@ -40,7 +42,7 @@ namespace zipline {
         using type = minty::core::post_preview;
 
         using id_t = decltype(type::id);
-        using description_t = decltype(type::description);
+        using title_t = decltype(type::title);
         using preview_id_t = decltype(type::preview_id);
         using comment_count_t = decltype(type::comment_count);
         using object_count_t = decltype(type::object_count);

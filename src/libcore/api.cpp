@@ -49,6 +49,13 @@ namespace minty::core {
     }
 
     auto api::add_post(post_parts parts) -> std::string {
+        if (parts.title) {
+            auto formatted = ext::trim(parts.title.value());
+            // An empty string is equivalent to no value.
+            if (formatted.empty()) parts.title.reset();
+            else parts.title = formatted;
+        }
+
         if (parts.description) {
             auto formatted = ext::trim(parts.description.value());
             // An empty string is equivalent to no value.
@@ -57,6 +64,7 @@ namespace minty::core {
         }
 
         return db->create_post(
+            parts.title,
             parts.description,
             parts.objects,
             parts.creators,
@@ -114,6 +122,7 @@ namespace minty::core {
 
         return post {
             .id = data.id,
+            .title = data.title,
             .description = data.description,
             .date_created = data.date_created,
             .date_modified = data.date_modified,

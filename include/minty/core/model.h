@@ -42,6 +42,7 @@ namespace minty::core {
 
     struct post {
         std::string id;
+        std::optional<std::string> title;
         std::optional<std::string> description;
         std::string date_created;
         std::string date_modified;
@@ -51,6 +52,7 @@ namespace minty::core {
     };
 
     struct post_parts {
+        std::optional<std::string> title;
         std::optional<std::string> description;
         std::vector<std::string> objects;
         std::vector<std::string> creators;

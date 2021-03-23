@@ -14,7 +14,7 @@ namespace minty::repo::db {
         ci.prepare("create_creator_aliases", 2);
         ci.prepare("create_creator_source", 3);
         ci.prepare("create_object", 3);
-        ci.prepare("create_post", 4);
+        ci.prepare("create_post", 5);
         ci.prepare("create_site", 3);
         ci.prepare("create_tag", 2);
         ci.prepare("read_comments", 1);
@@ -73,6 +73,7 @@ namespace minty::repo::db {
     }
 
     auto database::create_post(
+        std::optional<std::string_view> title,
         std::optional<std::string_view> description,
         const std::vector<std::string>& objects,
         const std::vector<std::string>& creators,
@@ -80,6 +81,7 @@ namespace minty::repo::db {
     ) -> std::string {
         return ntx.exec_prepared1(
             "create_post",
+            title,
             description,
             objects,
             creators,

@@ -5,7 +5,7 @@
 class DatabasePostTest : public DatabaseTest {
 protected:
     auto create_post() -> std::string {
-        return database.create_post("", {}, {}, {});
+        return database.create_post("", "", {}, {}, {});
     }
 
     auto tables() -> std::vector<std::string> override {
@@ -28,15 +28,26 @@ TEST_F(DatabasePostTest, Create) {
     ASSERT_TRUE(post.tags.empty());
 }
 
+TEST_F(DatabasePostTest, CreateWithTitle) {
+    constexpr auto title = "Post Title";
+
+    const auto post = database.read_post(
+        database.create_post(title, "", {}, {}, {})
+    );
+
+    ASSERT_TRUE(post.title.has_value());
+    ASSERT_EQ(title, post.title);
+}
+
 TEST_F(DatabasePostTest, CreateWithDescription) {
     constexpr auto description = "This is a test description.";
 
     const auto post = database.read_post(
-        database.create_post(description, {}, {}, {})
+        database.create_post("", description, {}, {}, {})
     );
 
     ASSERT_TRUE(post.description.has_value());
-    ASSERT_EQ(description, post.description.value());
+    ASSERT_EQ(description, post.description);
 }
 
 TEST_F(DatabasePostTest, CreateWithObjects) {
@@ -50,7 +61,7 @@ TEST_F(DatabasePostTest, CreateWithObjects) {
         database.create_object(object, {}, {});
     }
 
-    const auto id = database.create_post("", objects, {}, {});
+    const auto id = database.create_post("", "", objects, {}, {});
     const auto result = database.read_objects(id);
 
     ASSERT_EQ(3, result.size());
@@ -64,7 +75,7 @@ TEST_F(DatabasePostTest, CreateWithCreator) {
     constexpr auto creator = "test";
 
     const auto post = database.read_post(
-        database.create_post("", {}, {database.create_creator(creator)}, {})
+        database.create_post("", "", {}, {database.create_creator(creator)}, {})
     );
 
     ASSERT_EQ(1, post.creators.size());
@@ -84,7 +95,7 @@ TEST_F(DatabasePostTest, CreateWithTags) {
     }
 
     const auto post = database.read_post(
-        database.create_post("", {}, {}, tags)
+        database.create_post("", "", {}, {}, tags)
     );
 
     ASSERT_EQ(3, post.tags.size());

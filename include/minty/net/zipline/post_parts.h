@@ -11,6 +11,7 @@ namespace minty::net {
     using object_source_list = std::vector<sequence_pair<T>>;
 
     struct post_parts {
+        decltype(core::post_parts::title) title;
         decltype(core::post_parts::description) description;
         decltype(core::post_parts::creators) creators;
         decltype(core::post_parts::tags) tags;

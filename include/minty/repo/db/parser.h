@@ -64,6 +64,7 @@ namespace minty::repo::db {
         static auto read(row_iterator& it, transaction& tx) -> post {
             return {
                 .id = read_field<decltype(post::id)>(it),
+                .title = read_field<decltype(post::title)>(it),
                 .description = read_field<decltype(post::description)>(it),
                 .date_created = read_field<decltype(post::date_created)>(it),
                 .date_modified = read_field<decltype(post::date_modified)>(it),
@@ -84,7 +85,7 @@ namespace minty::repo::db {
         static auto read(row_iterator& it, transaction& tx) -> T {
             return {
                 .id = read_field<decltype(T::id)>(it),
-                .description = read_field<decltype(T::description)>(it),
+                .title = read_field<decltype(post::title)>(it),
                 .preview_id = read_field<decltype(T::preview_id)>(it),
                 .comment_count = read_field<decltype(T::comment_count)>(it),
                 .object_count = read_field<decltype(T::object_count)>(it),

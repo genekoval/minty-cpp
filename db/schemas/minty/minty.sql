@@ -28,6 +28,7 @@ CREATE TABLE tag (
 
 CREATE TABLE post (
     post_id         SERIAL PRIMARY KEY,
+    title           text,
     description     text,
     date_created    timestamptz NOT NULL DEFAULT NOW(),
     date_modified   timestamptz NOT NULL DEFAULT NOW()
@@ -171,7 +172,7 @@ FROM object
 CREATE VIEW post_preview AS
 SELECT
     post_id,
-    description,
+    title,
     preview_id,
     coalesce(comment_count, 0) AS comment_count,
     coalesce(object_count, 0) AS object_count,
@@ -204,6 +205,7 @@ LEFT JOIN (
 CREATE VIEW post_view AS
 SELECT
     post_id,
+    title,
     description,
     date_created,
     date_modified,
@@ -326,7 +328,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_post(
-    p_description   text,
+    a_title         text,
+    a_description   text,
     objects         uuid[],
     creators        integer[],
     tags            integer[]
@@ -336,9 +339,11 @@ DECLARE
 BEGIN
     WITH new_post AS (
         INSERT INTO post (
+            title,
             description
         ) VALUES (
-            NULLIF(p_description, '')
+            NULLIF(a_title, ''),
+            NULLIF(a_description, '')
         ) RETURNING *
     )
     SELECT INTO l_post_id
@@ -490,7 +495,7 @@ BEGIN
     RETURN QUERY
     SELECT
         post_id,
-        description,
+        title,
         preview_id,
         comment_count,
         object_count,

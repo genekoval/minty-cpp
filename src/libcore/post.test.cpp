@@ -18,7 +18,6 @@ protected:
 };
 
 TEST_F(CorePostTest, CreateFromBytes) {
-    constexpr auto description = "A post made from uploaded data.";
     constexpr auto data = "Test data\n";
     constexpr auto size = 10;
     constexpr auto hash =
@@ -33,22 +32,16 @@ TEST_F(CorePostTest, CreateFromBytes) {
     });
 
     const auto id = api.add_post({
-        .description = description,
         .objects = {object}
     });
     const auto post = api.get_post(id);
 
     ASSERT_EQ(id, post.id);
-    ASSERT_TRUE(post.description.has_value());
-    ASSERT_EQ(description, post.description);
-
     ASSERT_EQ(1, post.objects.size());
     ASSERT_EQ(hash, post.objects[0].hash);
 }
 
 TEST_F(CorePostTest, CreateFromFiles) {
-    constexpr auto description = "A post made from files.";
-
     constexpr auto one_data = "First file.\n";
     constexpr auto two_data = "Second file.\n";
     constexpr auto three_data = "Third file.\n";
@@ -75,15 +68,11 @@ TEST_F(CorePostTest, CreateFromFiles) {
     }
 
     const auto id = api.add_post({
-        .description = description,
         .objects = objects
     });
     const auto post = api.get_post(id);
 
     ASSERT_EQ(id, post.id);
-    ASSERT_TRUE(post.description.has_value());
-    ASSERT_EQ(description, post.description.value());
-
     ASSERT_EQ(3, post.objects.size());
     ASSERT_EQ(one_hash, post.objects[0].hash);
     ASSERT_EQ(two_hash, post.objects[1].hash);

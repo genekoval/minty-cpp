@@ -41,6 +41,7 @@ namespace minty::repo::db {
         ) -> void;
 
         auto create_post(
+            std::optional<std::string_view> title,
             std::optional<std::string_view> description,
             const std::vector<std::string>& objects,
             const std::vector<std::string>& creators,

@@ -5,7 +5,7 @@
 class DatabaseCommentTest : public DatabaseTest {
 protected:
     auto create_post() -> std::string {
-        return database.create_post("", {}, {}, {});
+        return database.create_post("", "", {}, {}, {});
     }
 
     auto tables() -> std::vector<std::string> override {

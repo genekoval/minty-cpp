@@ -70,6 +70,7 @@ namespace minty::repo::db {
 
     struct post : entity<7> {
         std::string id;
+        std::optional<std::string> title;
         std::optional<std::string> description;
         std::string date_created;
         std::string date_modified;
@@ -79,7 +80,7 @@ namespace minty::repo::db {
 
     struct post_preview : entity<6> {
         std::string id;
-        std::optional<std::string> description;
+        std::optional<std::string> title;
         std::optional<std::string> preview_id;
         unsigned int comment_count;
         unsigned int object_count;

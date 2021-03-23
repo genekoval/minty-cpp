@@ -25,6 +25,7 @@ namespace minty::server::endpoint {
             req.urls.size();
 
         auto parts = core::post_parts {
+            .title = req.title,
             .description = req.description,
             .objects = std::vector<std::string>(object_total),
             .creators = req.creators,
