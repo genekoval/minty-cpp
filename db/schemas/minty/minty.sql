@@ -173,12 +173,24 @@ SELECT
     post_id,
     description,
     preview_id,
-    count(comment_id) AS comment_count,
-    count(object_id) AS object_count,
+    coalesce(comment_count, 0) AS comment_count,
+    coalesce(object_count, 0) AS object_count,
     post.date_created
 FROM post
-LEFT JOIN post_comment USING (post_id)
-LEFT JOIN post_object USING (post_id)
+LEFT JOIN (
+    SELECT
+        post_id,
+        count(comment_id) comment_count
+    FROM post_comment
+    GROUP BY post_id
+) comments USING (post_id)
+LEFT JOIN (
+    SELECT
+        post_id,
+        count(object_id) AS object_count
+    FROM post_object
+    GROUP BY post_id
+) objects USING (post_id)
 LEFT JOIN (
     SELECT DISTINCT ON (post_id)
         post_id,
@@ -187,8 +199,7 @@ LEFT JOIN (
     JOIN post_object USING (object_id)
     WHERE preview_id IS NOT NULL
     ORDER BY post_id, sequence
-) previews USING (post_id)
-GROUP BY post_id, preview_id;
+) previews USING (post_id);
 
 CREATE VIEW post_view AS
 SELECT
