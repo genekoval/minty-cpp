@@ -14,6 +14,10 @@ database:
         user: minty
         dbname: minty
 
+downloader:
+    host: 127.0.0.1
+    port: 3000
+
 fstore:
     bucket: minty
     connection: /run/fstore/fstore.sock
@@ -26,6 +30,8 @@ fstore:
         "host=localhost user=minty dbname=minty",
         settings.database.connection
     );
+    ASSERT_EQ("127.0.0.1", settings.downloader.host);
+    ASSERT_EQ("3000", settings.downloader.port);
     ASSERT_EQ("minty", settings.fstore.bucket);
     ASSERT_EQ("/run/fstore/fstore.sock", settings.fstore.connection);
 }
@@ -37,6 +43,10 @@ R"(connection: localhost:1234
 database:
   connection: postgres://minty@localhost/minty
 
+downloader:
+  host: 127.0.0.1
+  port: 3000
+
 fstore:
   bucket: world
   connection: /tmp/fstore.sock
@@ -46,6 +56,10 @@ fstore:
         .connection = "localhost:1234",
         .database = {
             .connection = "postgres://minty@localhost/minty"
+        },
+        .downloader = {
+            .host = "127.0.0.1",
+            .port = "3000"
         },
         .fstore = {
             .bucket = "world",

@@ -1,12 +1,18 @@
 #include <minty/core/api.h>
+#include <minty/core/downloader.h>
 #include <minty/core/preview.h>
 
 #include <ext/string.h>
 
 namespace minty::core {
-    api::api(repo::db::database& db, fstore::bucket& bucket) :
+    api::api(
+        repo::db::database& db,
+        fstore::bucket& bucket,
+        downloader& dl
+    ) :
         db(&db),
         bucket(&bucket),
+        dl(&dl),
         previews(bucket)
     {}
 
@@ -43,9 +49,20 @@ namespace minty::core {
         return object.id;
     }
 
-    auto api::add_object_url(std::string_view url) -> std::string {
-        // TODO: Use an external service to handle URLs.
-        throw std::runtime_error("Not implemented.");
+    auto api::add_object_url(std::string_view url) -> std::vector<std::string> {
+        auto objects = std::vector<std::string>();
+
+        dl->fetch(url, [&](auto& stream) {
+            objects.push_back(
+                add_object_data(stream.size(), [&stream](auto&& part) {
+                    stream.read([&part](auto&& chunk) {
+                        part.write(chunk);
+                    });
+                })
+            );
+        });
+
+        return objects;
     }
 
     auto api::add_post(post_parts parts) -> std::string {

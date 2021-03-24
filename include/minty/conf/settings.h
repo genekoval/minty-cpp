@@ -21,6 +21,11 @@ namespace minty::conf {
             std::optional<s_proxy> proxy;
         };
 
+        struct s_downloader {
+            std::string host;
+            std::string port;
+        };
+
         struct s_log {
             timber::level level = timber::level::info;
         };
@@ -31,6 +36,7 @@ namespace minty::conf {
 
         std::string connection;
         s_database database;
+        s_downloader downloader;
         s_fstore fstore;
         s_log log;
 

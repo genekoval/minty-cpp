@@ -8,16 +8,23 @@
 #include <fstore/client.h>
 
 namespace minty::core {
+    class downloader;
+
     class api {
         repo::db::database* db;
         fstore::bucket* bucket;
+        downloader* dl;
         preview_service previews;
 
         auto get_object_metadata(
             std::span<const repo::db::object> db_objects
         ) -> std::vector<object>;
     public:
-        api(repo::db::database& db, fstore::bucket& bucket);
+        api(
+            repo::db::database& db,
+            fstore::bucket& bucket,
+            downloader& dl
+        );
 
         auto add_comment(
             std::string_view post_id,
@@ -34,7 +41,7 @@ namespace minty::core {
 
         auto add_object_local(std::string_view path) -> std::string;
 
-        auto add_object_url(std::string_view url) -> std::string;
+        auto add_object_url(std::string_view url) -> std::vector<std::string>;
 
         auto add_post(post_parts parts) -> std::string;
 

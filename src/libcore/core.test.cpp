@@ -3,10 +3,13 @@
 constexpr auto db_connection = "postgresql://minty@localhost/minty";
 constexpr auto fstore_connection = "/tmp/fstore.sock";
 constexpr auto bucket_name = "minty";
+constexpr auto harvest_host = "192.168.8.2";
+constexpr auto harvest_port = "3000";
 
 CoreTest::CoreTest() :
     db(db_connection),
     object_store(fstore_connection),
     bucket(object_store.fetch_bucket(bucket_name).id, object_store),
-    api(db, bucket)
+    downloader(harvest_host, harvest_port),
+    api(db, bucket, downloader)
 {}

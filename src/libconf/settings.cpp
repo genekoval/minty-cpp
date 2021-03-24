@@ -75,6 +75,18 @@ namespace YAML {
     };
 
     template <>
+    struct convert<settings::s_downloader> {
+        using T = settings::s_downloader;
+
+        static auto decode(const Node& node, T& harvest) -> bool {
+            harvest.host = node["host"].as<decltype(T::host)>();
+            harvest.port = node["port"].as<decltype(T::port)>();
+
+            return true;
+        }
+    };
+
+    template <>
     struct convert<settings::s_log> {
         static auto decode(const Node& node, settings::s_log& log) -> bool {
             if (node["level"]) {
@@ -99,6 +111,8 @@ namespace YAML {
                 .as<decltype(settings::connection)>();
             s.database = node["database"]
                 .as<decltype(settings::database)>();
+            s.downloader= node["downloader"]
+                .as<decltype(settings::downloader)>();
             s.fstore = node["fstore"]
                 .as<decltype(settings::fstore)>();
             if (node["log"]) s.log = node["log"]
@@ -111,36 +125,38 @@ namespace YAML {
 
 namespace minty::conf {
     auto settings::encode() const -> std::string {
-        auto out = YAML::Emitter();
+        using namespace YAML;
+
+        auto out = Emitter();
 
         out
-            << YAML::BeginMap
-                << YAML::Key << "connection"
-                << YAML::Value << connection
-            << YAML::EndMap
-            << YAML::Newline
+            << BeginMap
+                << Key << "connection" << Value << connection
+            << EndMap
+            << Newline
 
-            << YAML::BeginMap
-                << YAML::Key << "database"
-                << YAML::Value
-                    << YAML::BeginMap
-                        << YAML::Key << "connection"
-                        << YAML::Value << database.connection
-                    << YAML::EndMap
-            << YAML::EndMap
-            << YAML::Newline
+            << BeginMap
+                << Key << "database" << Value << BeginMap
+                    << Key << "connection" << Value << database.connection
+                << EndMap
+            << EndMap
+            << Newline
 
-            << YAML::BeginMap
-                << YAML::Key << "fstore"
-                << YAML::Value
-                    << YAML::BeginMap
-                        << YAML::Key << "bucket"
-                        << YAML::Value << fstore.bucket
-                        << YAML::Key << "connection"
-                        << YAML::Value << fstore.connection
-                    << YAML::EndMap
-            << YAML::EndMap
-            << YAML::Newline;
+            << BeginMap
+                << Key << "downloader" << Value << BeginMap
+                    << Key << "host" << Value << downloader.host
+                    << Key << "port" << Value << downloader.port
+                << EndMap
+            << EndMap
+            << Newline
+
+            << BeginMap
+                << Key << "fstore" << Value << BeginMap
+                    << Key << "bucket" << Value << fstore.bucket
+                    << Key << "connection" << Value << fstore.connection
+                << EndMap
+            << EndMap
+            << Newline;
 
         return out.c_str();
     }

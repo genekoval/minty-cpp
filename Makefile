@@ -32,6 +32,7 @@ define common.libs
  ext++
  fmt
  fstore
+ harvest
  netcore
  pqxx
  pq

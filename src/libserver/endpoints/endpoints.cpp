@@ -18,35 +18,44 @@ namespace minty::server::endpoint {
 
     auto add_post(protocol& proto) -> void {
         auto req = proto.read<net::post_parts>();
+        auto objects = std::vector<std::pair<double, std::string>>();
 
-        const auto object_total =
-            req.blobs.size() +
-            req.files.size() +
-            req.urls.size();
+        for (auto& [index, blob] : req.blobs) {
+            const auto id = proto.api->add_object_data(
+                blob.size(),
+                [&blob](auto&& part) {
+                    blob.read([&part](auto&& chunk) { part.write(chunk); });
+                });
+
+            objects.push_back({index, id});
+        }
+
+        for (const auto& [index, file] : req.files) {
+            objects.push_back({index, proto.api->add_object_local(file)});
+        }
+
+        for (const auto& [index, url] : req.urls) {
+            const auto downloaded = proto.api->add_object_url(url);
+
+            auto i = 0.0;
+
+            for (const auto& obj : downloaded) {
+                objects.push_back({index + i, obj});
+                i += 0.1;
+            }
+        }
+
+        std::sort(objects.begin(), objects.end());
 
         auto parts = core::post_parts {
             .title = req.title,
             .description = req.description,
-            .objects = std::vector<std::string>(object_total),
             .creators = req.creators,
             .tags = req.tags
         };
 
-        for (const auto& [index, file] : req.files) {
-            parts.objects[index] = proto.api->add_object_local(file);
-        }
-
-        for (const auto& [index, url] : req.urls) {
-            parts.objects[index] = proto.api->add_object_url(url);
-        }
-
-        for (auto& [index, blob] : req.blobs) {
-            parts.objects[index] = proto.api->add_object_data(
-                blob.size(),
-                [&blob](auto&& part) {
-                    blob.read([&part](auto&& chunk) { part.write(chunk); });
-                }
-            );
+        for (const auto& obj : objects) {
+            parts.objects.push_back(std::move(obj.second));
         }
 
         proto.reply(proto.api->add_post(parts));
