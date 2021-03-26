@@ -11,11 +11,6 @@ namespace minty::server::endpoint {
         proto.reply(proto.api->add_comment(post_id, parent_id, content));
     }
 
-    auto add_creator(protocol& proto) -> void {
-        const auto name = proto.read<std::string>();
-        proto.reply(proto.api->add_creator(name));
-    }
-
     auto add_post(protocol& proto) -> void {
         auto req = proto.read<net::post_parts>();
         auto objects = std::vector<std::pair<double, std::string>>();
@@ -50,7 +45,6 @@ namespace minty::server::endpoint {
         auto parts = core::post_parts {
             .title = req.title,
             .description = req.description,
-            .creators = req.creators,
             .tags = req.tags
         };
 
@@ -61,23 +55,14 @@ namespace minty::server::endpoint {
         proto.reply(proto.api->add_post(parts));
     }
 
+    auto add_tag(protocol& proto) -> void {
+        const auto name = proto.read<std::string>();
+        proto.reply(proto.api->add_tag(name));
+    }
+
     auto get_comments(protocol& proto) -> void {
         const auto post_id = proto.read<std::string>();
         proto.reply(proto.api->get_comments(post_id));
-    }
-
-    auto get_creator(protocol& proto) -> void {
-        const auto id = proto.read<std::string>();
-        proto.reply(proto.api->get_creator(id));
-    }
-
-    auto get_creator_posts(protocol& proto) -> void {
-        const auto id = proto.read<std::string>();
-        proto.reply(proto.api->get_creator_posts(id));
-    }
-
-    auto get_creator_previews(protocol& proto) -> void {
-        proto.reply(proto.api->get_creator_previews());
     }
 
     auto get_post(protocol& proto) -> void {
@@ -87,5 +72,19 @@ namespace minty::server::endpoint {
 
     auto get_server_info(protocol& proto) -> void {
         proto.reply(*(proto.info));
+    }
+
+    auto get_tag(protocol& proto) -> void {
+        const auto id = proto.read<std::string>();
+        proto.reply(proto.api->get_tag(id));
+    }
+
+    auto get_tag_posts(protocol& proto) -> void {
+        const auto id = proto.read<std::string>();
+        proto.reply(proto.api->get_tag_posts(id));
+    }
+
+    auto get_tag_previews(protocol& proto) -> void {
+        proto.reply(proto.api->get_tag_previews());
     }
 }

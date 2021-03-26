@@ -17,33 +17,33 @@ namespace YAML {
 
     auto operator<<(
         Emitter& out,
-        const minty::core::creator& creator
+        const minty::core::tag& tag
     ) -> Emitter& {
         out << BeginMap;
 
         out
             << Key << "id"
-            << Value << creator.id
+            << Value << tag.id
 
             << Key << "name"
-            << Value << creator.name;
+            << Value << tag.name;
 
-        if (!creator.aliases.empty()) {
+        if (!tag.aliases.empty()) {
             out
                 << Key << "aliases"
-                << Value << creator.aliases;
+                << Value << tag.aliases;
         }
 
-        if (creator.bio.has_value()) {
+        if (tag.description.has_value()) {
             out
                 << Key << "bio"
-                << Value << creator.bio.value();
+                << Value << tag.description.value();
         }
 
-        if (!creator.sources.empty()) {
+        if (!tag.sources.empty()) {
             out << Key << "links" << Value << BeginSeq;
 
-            for (const auto& source : creator.sources) {
+            for (const auto& source : tag.sources) {
                 out << source.url;
             }
 
@@ -52,7 +52,7 @@ namespace YAML {
 
         out
             << Key << "date added"
-            << Value << creator.date_added;
+            << Value << tag.date_created;
 
         out << EndMap;
         return out;
@@ -60,12 +60,12 @@ namespace YAML {
 
     auto operator<<(
         Emitter& out,
-        const minty::core::creator_preview& creator
+        const minty::core::tag_preview& tag
     ) -> Emitter& {
         out
             << BeginMap
-            << Key << "id" << Value << creator.id
-            << Key << "name" << Value << creator.name
+            << Key << "id" << Value << tag.id
+            << Key << "name" << Value << tag.name
             << EndMap;
 
         return out;
@@ -107,9 +107,9 @@ namespace YAML {
             out << Key << "date modified" << Value << post.date_modified;
         }
 
-        out << Key << "creators" << Value << BeginSeq;
-        for (const auto& creator : post.creators) {
-            out << creator;
+        out << Key << "tags" << Value << BeginSeq;
+        for (const auto& tag : post.tags) {
+            out << tag;
         }
         out << EndSeq;
 

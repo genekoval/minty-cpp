@@ -19,13 +19,6 @@ CREATE TABLE object (
     source_id       integer REFERENCES source ON DELETE NO ACTION
 );
 
-CREATE TABLE tag (
-    tag_id          SERIAL PRIMARY KEY,
-    name            text UNIQUE NOT NULL,
-    color           text NOT NULL,
-    date_created    timestamptz NOT NULL DEFAULT NOW()
-);
-
 CREATE TABLE post (
     post_id         SERIAL PRIMARY KEY,
     title           text,
@@ -52,6 +45,22 @@ CREATE TABLE post_comment (
     date_created    timestamptz NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE tag (
+    tag_id          SERIAL PRIMARY KEY,
+    description     text,
+    avatar          uuid,
+    banner          uuid,
+    date_created    timestamptz NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE tag_name (
+    tag_id          integer NOT NULL REFERENCES tag ON DELETE CASCADE,
+    value           text NOT NULL,
+    main            boolean NOT NULL DEFAULT false,
+
+    PRIMARY KEY (tag_id, value)
+);
+
 CREATE TABLE post_tag (
     post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
     tag_id          integer NOT NULL REFERENCES tag ON DELETE CASCADE,
@@ -59,34 +68,11 @@ CREATE TABLE post_tag (
     PRIMARY KEY (post_id, tag_id)
 );
 
-CREATE TABLE creator (
-    creator_id      SERIAL PRIMARY KEY,
-    bio             text,
-    avatar          uuid,
-    banner          uuid,
-    date_added      timestamptz NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE creator_name (
-    creator_id      integer NOT NULL REFERENCES creator ON DELETE CASCADE,
-    value           text,
-    main            boolean NOT NULL DEFAULT false,
-
-    PRIMARY KEY (creator_id, value)
-);
-
-CREATE TABLE post_creator (
-    post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
-    creator_id      integer NOT NULL REFERENCES creator ON DELETE CASCADE,
-
-    PRIMARY KEY (post_id, creator_id)
-);
-
-CREATE TABLE creator_source (
-    creator_id      integer NOT NULL REFERENCES creator ON DELETE CASCADE,
+CREATE TABLE tag_source (
+    tag_id      integer NOT NULL REFERENCES tag ON DELETE CASCADE,
     source_id       integer NOT NULL REFERENCES source ON DELETE NO ACTION,
 
-    PRIMARY KEY (creator_id, source_id)
+    PRIMARY KEY (tag_id, source_id)
 );
 
 --}}}
@@ -104,56 +90,56 @@ SELECT
 FROM source
 JOIN site USING (site_id);
 
-CREATE VIEW creator_name_view AS
+CREATE VIEW tag_name_view AS
 SELECT
-    creator_id,
+    tag_id,
     name,
     aliases
 FROM (
     SELECT
-        creator_id,
+        tag_id,
         value AS name
-    FROM creator_name
+    FROM tag_name
     WHERE main = true
 ) AS main
 LEFT JOIN (
-    SELECT creator_id,
+    SELECT tag_id,
     array_agg(value ORDER BY value) AS aliases
-    FROM creator_name
+    FROM tag_name
     WHERE main = false
-    GROUP BY creator_id
-) AS alias USING (creator_id);
+    GROUP BY tag_id
+) AS alias USING (tag_id);
 
-CREATE VIEW creator_preview AS
+CREATE VIEW tag_preview AS
 SELECT
-    creator_id,
+    tag_id,
     name,
     avatar
-FROM creator
+FROM tag
 LEFT JOIN (
     SELECT
-        creator_id,
+        tag_id,
         value AS name
-    FROM creator_name
+    FROM tag_name
     WHERE main = true
-) AS main USING (creator_id);
+) AS main USING (tag_id);
 
-CREATE VIEW creator_view AS
+CREATE VIEW tag_view AS
 SELECT
-    creator_id,
+    tag_id,
     name,
     aliases,
-    bio,
+    description,
     avatar,
     banner,
     array_agg(source_id) AS sources,
     count(post_id) AS post_count,
-    date_added
-FROM creator
-LEFT JOIN creator_name_view USING (creator_id)
-LEFT JOIN creator_source USING (creator_id)
-LEFT JOIN post_creator USING (creator_id)
-GROUP BY creator_id, name, aliases;
+    date_created
+FROM tag
+LEFT JOIN tag_name_view USING (tag_id)
+LEFT JOIN tag_source USING (tag_id)
+LEFT JOIN post_tag USING (tag_id)
+GROUP BY tag_id, name, aliases;
 
 CREATE VIEW object_view AS
 SELECT
@@ -209,11 +195,9 @@ SELECT
     description,
     date_created,
     date_modified,
-    array_agg(DISTINCT tag_id) AS tags,
-    array_agg(DISTINCT creator_id) AS creators
+    array_agg(DISTINCT tag_id) AS tags
 FROM post
 LEFT JOIN post_tag USING (post_id)
-LEFT JOIN post_creator USING (post_id)
 GROUP BY post_id;
 
 --}}}
@@ -247,68 +231,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION create_creator(
-    name            text
-) RETURNS integer AS $$
-DECLARE
-    id              integer;
-BEGIN
-    WITH new_creator AS (
-        INSERT INTO creator DEFAULT VALUES
-        RETURNING *
-    )
-    SELECT INTO id
-        creator_id
-    FROM new_creator;
-
-    INSERT INTO creator_name (
-        creator_id,
-        value,
-        main
-    ) VALUES (
-        id,
-        name,
-        true
-    );
-
-    RETURN id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION create_creator_aliases(
-    a_creator       integer,
-    a_aliases       text[]
-) RETURNS void AS $$
-BEGIN
-    INSERT INTO creator_name (
-        creator_id,
-        value
-    )
-    SELECT
-        a_creator,
-        unnest(a_aliases);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION create_creator_source(
-    a_creator_id    integer,
-    a_site_id       integer,
-    a_source_url    text
-) RETURNS void AS $$
-BEGIN
-    INSERT INTO creator_source (
-        creator_id,
-        source_id
-    ) VALUES (
-        a_creator_id,
-        (
-            SELECT source_id
-            FROM create_source(a_site_id, a_source_url)
-        )
-    ) ON CONFLICT DO NOTHING;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE FUNCTION create_object(
     a_object_id     uuid,
     a_preview_id    uuid,
@@ -331,7 +253,6 @@ CREATE FUNCTION create_post(
     a_title         text,
     a_description   text,
     objects         uuid[],
-    creators        integer[],
     tags            integer[]
 ) RETURNS integer AS $$
 DECLARE
@@ -366,21 +287,8 @@ BEGIN
         object_table.ordinality
     FROM object_table;
 
-    WITH creator_table AS (
-        SELECT unnest AS creator_id
-        FROM unnest(creators)
-    )
-    INSERT INTO post_creator (
-        post_id,
-        creator_id
-    )
-    SELECT
-        l_post_id,
-        creator_table.creator_id
-    FROM creator_table;
-
     WITH tag_table AS (
-        SELECT unnest AS tag
+        SELECT unnest AS tag_id
         FROM unnest(tags)
     )
     INSERT INTO post_tag (
@@ -389,26 +297,10 @@ BEGIN
     )
     SELECT
         l_post_id,
-        tag_table.tag
+        tag_table.tag_id
     FROM tag_table;
 
     RETURN l_post_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION create_tag(
-    name            text,
-    color           text
-) RETURNS SETOF tag AS $$
-BEGIN
-    RETURN QUERY
-    INSERT INTO tag (
-        name,
-        color
-    ) VALUES (
-        name,
-        color
-    ) RETURNING *;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -451,6 +343,68 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_tag(
+    name            text
+) RETURNS integer AS $$
+DECLARE
+    id              integer;
+BEGIN
+    WITH new_tag AS (
+        INSERT INTO tag DEFAULT VALUES
+        RETURNING *
+    )
+    SELECT INTO id
+        tag_id
+    FROM new_tag;
+
+    INSERT INTO tag_name (
+        tag_id,
+        value,
+        main
+    ) VALUES (
+        id,
+        name,
+        true
+    );
+
+    RETURN id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION create_tag_aliases(
+    a_tag       integer,
+    a_aliases   text[]
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO tag_name (
+        tag_id,
+        value
+    )
+    SELECT
+        a_tag,
+        unnest(a_aliases);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION create_tag_source(
+    a_tag_id        integer,
+    a_site_id       integer,
+    a_source_url    text
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO tag_source (
+        tag_id,
+        source_id
+    ) VALUES (
+        a_tag_id,
+        (
+            SELECT source_id
+            FROM create_source(a_site_id, a_source_url)
+        )
+    ) ON CONFLICT DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_comments(
     a_post_id       integer
 ) RETURNS SETOF post_comment AS $$
@@ -466,30 +420,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_creator(
-    a_creator_id    integer
-) RETURNS SETOF creator_view AS $$
+CREATE FUNCTION read_tag(
+    a_tag_id    integer
+) RETURNS SETOF tag_view AS $$
 BEGIN
     RETURN QUERY
     SELECT *
     FROM
-    creator_view
-    WHERE creator_id = a_creator_id;
+    tag_view
+    WHERE tag_id = a_tag_id;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_creator_previews_all()
-RETURNS SETOF creator_preview AS $$
+CREATE FUNCTION read_tag_previews_all()
+RETURNS SETOF tag_preview AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM creator_preview
+    FROM tag_preview
     ORDER BY name;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_creator_posts(
-    a_creator       integer
+CREATE FUNCTION read_tag_posts(
+    a_tag       integer
 ) RETURNS SETOF post_preview AS $$
 BEGIN
     RETURN QUERY
@@ -501,20 +455,20 @@ BEGIN
         object_count,
         date_created
     FROM post_preview
-    JOIN post_creator USING (post_id)
-    WHERE creator_id = a_creator
+    JOIN post_tag USING (post_id)
+    WHERE tag_id = a_tag
     ORDER BY date_created DESC;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_creator_previews(
-    a_creators      integer[]
-) RETURNS SETOF creator_preview AS $$
+CREATE FUNCTION read_tag_previews(
+    a_tags      integer[]
+) RETURNS SETOF tag_preview AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM creator_preview
-    WHERE creator_id = any(a_creators)
+    FROM tag_preview
+    WHERE tag_id = any(a_tags)
     ORDER BY name;
 END;
 $$ LANGUAGE plpgsql;
@@ -570,18 +524,6 @@ BEGIN
     SELECT *
     FROM source_view
     WHERE source_id = any(a_sources);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION read_tags(
-    a_tags          integer[]
-) RETURNS SETOF tag AS $$
-BEGIN
-    RETURN QUERY
-    SELECT *
-    FROM tag
-    WHERE tag_id = any(a_tags)
-    ORDER BY name;
 END;
 $$ LANGUAGE plpgsql;
 

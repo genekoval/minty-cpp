@@ -1,39 +1,71 @@
 #include "db.test.h"
 
-#include <minty/error.h>
+#include <minty/repo/db/model.h>
 
 class DatabaseTagTest : public DatabaseTest {
 protected:
+    static constexpr auto tag_name = "minty";
+
+    auto create_tag() -> std::string {
+        return database.create_tag(tag_name);
+    }
+
     auto tables() -> std::vector<std::string> override {
-        return {"tag"};
+        return {
+            "tag",
+            "site"
+        };
     }
 };
 
 TEST_F(DatabaseTagTest, Create) {
-    constexpr auto name = "tag";
-    constexpr auto color = "0f0f0f";
+    const auto id = create_tag();
+    const auto tag = database.read_tag(id);
 
-    const auto tag = database.create_tag(name, color);
-
-    ASSERT_EQ(name, tag.name);
-    ASSERT_EQ(color, tag.color);
+    ASSERT_EQ(id, tag.id);
+    ASSERT_EQ(tag_name, tag.name);
+    ASSERT_TRUE(tag.aliases.empty());
+    ASSERT_FALSE(tag.description.has_value());
+    ASSERT_FALSE(tag.avatar.has_value());
+    ASSERT_FALSE(tag.banner.has_value());
+    ASSERT_TRUE(tag.sources.empty());
 }
 
-TEST_F(DatabaseTagTest, CreateDuplicateName) {
-    const auto tag = database.create_tag("tag", "0f0f0f");
+TEST_F(DatabaseTagTest, CreateAliases) {
+    const auto aliases = std::vector<std::string>{
+        "banana",
+        "citrus",
+        "apple"
+    };
 
-    try {
-        database.create_tag(tag.name, "2b2b2b");
-        FAIL() << "Created a tag with an existing name.";
-    }
-    catch (const minty::unique_entity_violation& ex) {
-        ASSERT_EQ(tag.name, ex.value);
-    }
+    const auto id = create_tag();
+
+    database.create_tag_aliases(id, aliases);
+
+    const auto tag = database.read_tag(id);
+
+    ASSERT_EQ(tag_name, tag.name);
+    ASSERT_EQ(aliases.size(), tag.aliases.size());
+
+    ASSERT_EQ("apple", tag.aliases[0]);
+    ASSERT_EQ("banana", tag.aliases[1]);
+    ASSERT_EQ("citrus", tag.aliases[2]);
 }
 
-TEST_F(DatabaseTagTest, CreateDuplicateColor) {
-    const auto tag1 = database.create_tag("tag1", "0f0f0f");
-    const auto tag2 = database.create_tag("tag2", tag1.color);
+TEST_F(DatabaseTagTest, CreateSource) {
+    constexpr auto url = "https://example.com/cats";
+    const auto id = create_tag();
+    const auto site = database.create_site(
+        "Example",
+        "https://example.com",
+        "937900e4-54a0-40fb-8ac8-315e5d3b2ae1"
+    );
 
-    ASSERT_EQ(tag1.color, tag2.color);
+    database.create_tag_source(id, site.id, url);
+
+    const auto tag = database.read_tag(id);
+
+    ASSERT_EQ(1, tag.sources.size());
+    ASSERT_EQ(url, tag.sources[0].url);
+    ASSERT_EQ(site.id, tag.sources[0].website.id);
 }

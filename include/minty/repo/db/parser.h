@@ -19,31 +19,31 @@ namespace minty::repo::db {
     };
 
     template <>
-    struct parser<creator> {
-        static auto read(row_iterator& it, transaction& tx) -> creator {
+    struct parser<tag> {
+        static auto read(row_iterator& it, transaction& tx) -> tag {
             return {
-                .id = read_field<decltype(creator::id)>(it),
-                .name = read_field<decltype(creator::name)>(it),
-                .aliases = read_array<decltype(creator::aliases)>(it),
-                .bio = read_field<decltype(creator::bio)>(it),
-                .avatar = read_field<decltype(creator::avatar)>(it),
-                .banner = read_field<decltype(creator::banner)>(it),
-                .sources = read_entities<decltype(creator::sources)>(
+                .id = read_field<decltype(tag::id)>(it),
+                .name = read_field<decltype(tag::name)>(it),
+                .aliases = read_array<decltype(tag::aliases)>(it),
+                .description = read_field<decltype(tag::description)>(it),
+                .avatar = read_field<decltype(tag::avatar)>(it),
+                .banner = read_field<decltype(tag::banner)>(it),
+                .sources = read_entities<decltype(tag::sources)>(
                     it, tx, "read_sources"
                 ),
-                .post_count = read_field<decltype(creator::post_count)>(it),
-                .date_added = read_field<decltype(creator::date_added)>(it)
+                .post_count = read_field<decltype(tag::post_count)>(it),
+                .date_created = read_field<decltype(tag::date_created)>(it)
             };
         }
     };
 
     template <>
-    struct parser<creator_preview> {
-        static auto read(row_iterator& it, transaction& tx) -> creator_preview {
+    struct parser<tag_preview> {
+        static auto read(row_iterator& it, transaction& tx) -> tag_preview {
             return {
-                .id = read_field<decltype(creator_preview::id)>(it),
-                .name = read_field<decltype(creator_preview::name)>(it),
-                .avatar = read_field<decltype(creator_preview::avatar)>(it)
+                .id = read_field<decltype(tag_preview::id)>(it),
+                .name = read_field<decltype(tag_preview::name)>(it),
+                .avatar = read_field<decltype(tag_preview::avatar)>(it)
             };
         }
     };
@@ -69,10 +69,7 @@ namespace minty::repo::db {
                 .date_created = read_field<decltype(post::date_created)>(it),
                 .date_modified = read_field<decltype(post::date_modified)>(it),
                 .tags = read_entities<decltype(post::tags)>(
-                    it, tx, "read_tags"
-                ),
-                .creators = read_entities<decltype(post::creators)>(
-                    it, tx, "read_creator_previews"
+                    it, tx, "read_tag_previews"
                 )
             };
         }
@@ -113,18 +110,6 @@ namespace minty::repo::db {
                 .id = read_field<decltype(source::id)>(it),
                 .url = read_field<decltype(source::url)>(it),
                 .website = read_entity<decltype(source::website)>(it, tx)
-            };
-        }
-    };
-
-    template <>
-    struct parser<tag> {
-        static auto read(row_iterator& it, transaction& tx) -> tag {
-            return {
-                .id = read_field<decltype(tag::id)>(it),
-                .name = read_field<decltype(tag::name)>(it),
-                .color = read_field<decltype(tag::color)>(it),
-                .date_created = read_field<decltype(tag::date_created)>(it)
             };
         }
     };

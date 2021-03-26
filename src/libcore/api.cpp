@@ -30,10 +30,6 @@ namespace minty::core {
         };
     }
 
-    auto api::add_creator(std::string_view name) -> std::string {
-        return db->create_creator(ext::trim(std::string(name)));
-    }
-
     auto api::add_object_data(
         std::size_t stream_size,
         std::function<void(fstore::part&&)> pipe
@@ -70,32 +66,17 @@ namespace minty::core {
             ext::trim(parts.title),
             ext::trim(parts.description),
             parts.objects,
-            parts.creators,
             parts.tags
         );
     }
 
-    auto api::add_tag(std::string_view name, std::string_view color) -> tag {
-        return db->create_tag(name, color);
+    auto api::add_tag(std::string_view name) -> std::string {
+        return db->create_tag(ext::trim(std::string(name)));
     }
 
     auto api::get_comments(std::string_view post_id) -> comment_tree {
         const auto entities = db->read_comments(post_id);
         return build_tree(entities);
-    }
-
-    auto api::get_creator(std::string_view id) -> creator {
-        return db->read_creator(id);
-    }
-
-    auto api::get_creator_posts(
-        std::string_view creator_id
-    ) -> std::vector<post_preview> {
-        return db->read_creator_posts(creator_id);
-    }
-
-    auto api::get_creator_previews() -> std::vector<creator_preview> {
-        return db->read_creator_previews_all();
     }
 
     auto api::get_object_metadata(
@@ -130,8 +111,21 @@ namespace minty::core {
             .date_created = data.date_created,
             .date_modified = data.date_modified,
             .objects = get_object_metadata(objects),
-            .tags = data.tags,
-            .creators = data.creators
+            .tags = data.tags
         };
+    }
+
+    auto api::get_tag(std::string_view id) -> tag {
+        return db->read_tag(id);
+    }
+
+    auto api::get_tag_posts(
+        std::string_view tag_id
+    ) -> std::vector<post_preview> {
+        return db->read_tag_posts(tag_id);
+    }
+
+    auto api::get_tag_previews() -> std::vector<tag_preview> {
+        return db->read_tag_previews_all();
     }
 }

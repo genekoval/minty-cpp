@@ -1,4 +1,4 @@
-#include <minty/net/zipline/transfer.h>
+#include <minty/net/zipline/transfer/source.h>
 
 namespace c = minty::core;
 namespace n = minty::net;

@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-static auto $creator(
+static auto $tag(
     const commline::app& app,
     const commline::argv& argv
 ) -> void {
@@ -16,10 +16,10 @@ static auto $creator(
     }
 
     auto api = minty::cli::client();
-    const auto creator = api.get_creator(argv[0]);
+    const auto tag = api.get_tag(argv[0]);
 
     auto out = YAML::Emitter();
-    out << creator;
+    out << tag;
     std::cout << out.c_str() << std::endl;
 }
 
@@ -32,28 +32,28 @@ static auto $add(
     }
 
     auto api = minty::cli::client();
-    std::cout << api.add_creator(argv[0]) << std::endl;
+    std::cout << api.add_tag(argv[0]) << std::endl;
 }
 
 namespace minty::commands {
     using namespace commline;
 
-    auto creator_add() -> std::unique_ptr<command_node> {
+    auto tag_add() -> std::unique_ptr<command_node> {
         return command(
             "add",
-            "Add a creator",
+            "Add a tag",
             $add
         );
     }
 
-    auto creator() -> std::unique_ptr<command_node> {
+    auto tag() -> std::unique_ptr<command_node> {
         auto cmd = command(
-            "creator",
-            "Manage creators",
-            $creator
+            "tag",
+            "Manage tags",
+            $tag
         );
 
-        cmd->subcommand(creator_add());
+        cmd->subcommand(tag_add());
 
         return cmd;
     }

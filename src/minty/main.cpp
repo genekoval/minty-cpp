@@ -52,8 +52,8 @@ auto main(int argc, const char** argv) -> int {
         $main
     );
 
-    app.subcommand(minty::commands::creator());
     app.subcommand(minty::commands::post());
+    app.subcommand(minty::commands::tag());
 
     return app.run(argc, argv);
 }

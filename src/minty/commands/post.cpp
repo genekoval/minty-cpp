@@ -43,7 +43,7 @@ static auto $add(
     const commline::app& app,
     const commline::argv& argv,
     std::optional<std::string_view> description,
-    std::optional<std::string_view> creator
+    std::optional<std::string_view> tag
 ) -> void {
     auto api = minty::cli::client();
 
@@ -61,7 +61,7 @@ static auto $add(
     auto id = api.add_post(
         description,
         files,
-        creator,
+        tag,
         {}
     );
 

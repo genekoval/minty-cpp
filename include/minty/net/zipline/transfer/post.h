@@ -16,7 +16,6 @@ namespace zipline {
         using date_modified_t = decltype(type::date_modified);
         using objects_t = decltype(type::objects);
         using tags_t = decltype(type::tags);
-        using creators_t = decltype(type::creators);
 
         static auto read(minty::net::socket&) -> type;
         static auto write(minty::net::socket&, const type&) -> void;
@@ -28,7 +27,6 @@ namespace zipline {
 
         using title_t = decltype(type::title);
         using description_t = decltype(type::description);
-        using creators_t = decltype(type::creators);
         using tags_t = decltype(type::tags);
         using files_t = decltype(type::files);
         using urls_t = decltype(type::urls);

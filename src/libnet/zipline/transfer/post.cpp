@@ -1,4 +1,5 @@
-#include <minty/net/zipline/transfer.h>
+#include <minty/net/zipline/transfer/object.h>
+#include <minty/net/zipline/transfer/post.h>
 
 namespace c = minty::core;
 namespace n = minty::net;
@@ -12,8 +13,7 @@ namespace zipline {
             .date_created = n::xfr<date_created_t>::read(sock),
             .date_modified = n::xfr<date_modified_t>::read(sock),
             .objects = n::xfr<objects_t>::read(sock),
-            .tags = n::xfr<tags_t>::read(sock),
-            .creators = n::xfr<creators_t>::read(sock)
+            .tags = n::xfr<tags_t>::read(sock)
         };
     }
 
@@ -28,14 +28,12 @@ namespace zipline {
         n::xfr<date_modified_t>::write(sock, t.date_modified);
         n::xfr<objects_t>::write(sock, t.objects);
         n::xfr<tags_t>::write(sock, t.tags);
-        n::xfr<creators_t>::write(sock, t.creators);
     }
 
     auto n::xfr<n::post_parts>::read(n::socket& sock) -> type {
         return {
             .title = n::xfr<title_t>::read(sock),
             .description = n::xfr<description_t>::read(sock),
-            .creators = n::xfr<creators_t>::read(sock),
             .tags = n::xfr<tags_t>::read(sock),
             .files = n::xfr<files_t>::read(sock),
             .urls = n::xfr<urls_t>::read(sock),

@@ -10,23 +10,21 @@ namespace minty::repo::db {
         auto ci = connection_initializer(connection);
 
         ci.prepare("create_comment", 3);
-        ci.prepare("create_creator", 1);
-        ci.prepare("create_creator_aliases", 2);
-        ci.prepare("create_creator_source", 3);
         ci.prepare("create_object", 3);
-        ci.prepare("create_post", 5);
+        ci.prepare("create_post", 4);
         ci.prepare("create_site", 3);
-        ci.prepare("create_tag", 2);
+        ci.prepare("create_tag", 1);
+        ci.prepare("create_tag_aliases", 2);
+        ci.prepare("create_tag_source", 3);
         ci.prepare("read_comments", 1);
-        ci.prepare("read_creator", 1);
-        ci.prepare("read_creator_posts", 1);
-        ci.prepare("read_creator_previews", 1);
-        ci.prepare("read_creator_previews_all", 0);
         ci.prepare("read_object", 1);
         ci.prepare("read_objects", 1);
         ci.prepare("read_post", 1);
         ci.prepare("read_sources", 1);
-        ci.prepare("read_tags", 1);
+        ci.prepare("read_tag", 1);
+        ci.prepare("read_tag_posts", 1);
+        ci.prepare("read_tag_previews", 1);
+        ci.prepare("read_tag_previews_all", 0);
     }
 
     auto database::create_comment(
@@ -43,27 +41,6 @@ namespace minty::repo::db {
         );
     }
 
-    auto database::create_creator(std::string_view name) -> std::string {
-        return ntx
-            .exec_prepared1("create_creator", name)[0]
-            .as<std::string>();
-    }
-
-    auto database::create_creator_aliases(
-        std::string_view creator_id,
-        const std::vector<std::string>& aliases
-    ) -> void {
-        ntx.exec_prepared("create_creator_aliases", creator_id, aliases);
-    }
-
-    auto database::create_creator_source(
-        std::string_view creator_id,
-        std::string_view site_id,
-        std::string_view url
-    ) -> void {
-        ntx.exec_prepared("create_creator_source", creator_id, site_id, url);
-    }
-
     auto database::create_object(
         std::string_view object_id,
         std::optional<std::string_view> preview_id,
@@ -76,7 +53,6 @@ namespace minty::repo::db {
         std::optional<std::string_view> title,
         std::optional<std::string_view> description,
         const std::vector<std::string>& objects,
-        const std::vector<std::string>& creators,
         const std::vector<std::string>& tags
     ) -> std::string {
         return ntx.exec_prepared1(
@@ -84,7 +60,6 @@ namespace minty::repo::db {
             title,
             description,
             objects,
-            creators,
             tags
         )[0].as<std::string>();
     }
@@ -108,16 +83,25 @@ namespace minty::repo::db {
         }
     }
 
-    auto database::create_tag(
-        std::string_view name,
-        std::string_view color
-    ) -> tag {
-        try {
-            return make_entity<tag>(ntx, "create_tag", name, color);
-        }
-        catch (const pqxx::unique_violation& ex) {
-            throw unique_entity_violation("tag", ex);
-        }
+    auto database::create_tag(std::string_view name) -> std::string {
+        return ntx
+            .exec_prepared1("create_tag", name)[0]
+            .as<std::string>();
+    }
+
+    auto database::create_tag_aliases(
+        std::string_view tag_id,
+        const std::vector<std::string>& aliases
+    ) -> void {
+        ntx.exec_prepared("create_tag_aliases", tag_id, aliases);
+    }
+
+    auto database::create_tag_source(
+        std::string_view tag_id,
+        std::string_view site_id,
+        std::string_view url
+    ) -> void {
+        ntx.exec_prepared("create_tag_source", tag_id, site_id, url);
     }
 
     auto database::read_comments(
@@ -127,35 +111,6 @@ namespace minty::repo::db {
             ntx,
             "read_comments",
             post_id
-        );
-    }
-
-    auto database::read_creator(std::string_view creator_id) -> creator {
-        try {
-            return make_entity<creator>(ntx, "read_creator", creator_id);
-        }
-        catch (const pqxx::unexpected_rows& ex) {
-            throw minty_error(
-                "Creator with ID ({}) does not exist",
-                creator_id
-            );
-        }
-    }
-
-    auto database::read_creator_posts(
-        std::string_view creator_id
-    ) -> std::vector<post_preview> {
-        return make_entities<std::vector<post_preview>>(
-            ntx,
-            "read_creator_posts",
-            creator_id
-        );
-    }
-
-    auto database::read_creator_previews_all() -> std::vector<creator_preview> {
-        return make_entities<std::vector<creator_preview>>(
-            ntx,
-            "read_creator_previews_all"
         );
     }
 
@@ -175,5 +130,34 @@ namespace minty::repo::db {
 
     auto database::read_post(std::string_view post_id) -> post {
         return make_entity<post>(ntx, "read_post", post_id);
+    }
+
+    auto database::read_tag(std::string_view tag_id) -> tag {
+        try {
+            return make_entity<tag>(ntx, "read_tag", tag_id);
+        }
+        catch (const pqxx::unexpected_rows& ex) {
+            throw minty_error(
+                "Tag with ID ({}) does not exist",
+                tag_id
+            );
+        }
+    }
+
+    auto database::read_tag_posts(
+        std::string_view tag_id
+    ) -> std::vector<post_preview> {
+        return make_entities<std::vector<post_preview>>(
+            ntx,
+            "read_tag_posts",
+            tag_id
+        );
+    }
+
+    auto database::read_tag_previews_all() -> std::vector<tag_preview> {
+        return make_entities<std::vector<tag_preview>>(
+            ntx,
+            "read_tag_previews_all"
+        );
     }
 }

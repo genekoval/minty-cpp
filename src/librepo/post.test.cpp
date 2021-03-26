@@ -5,12 +5,11 @@
 class DatabasePostTest : public DatabaseTest {
 protected:
     auto create_post() -> std::string {
-        return database.create_post("", "", {}, {}, {});
+        return database.create_post("", "", {}, {});
     }
 
     auto tables() -> std::vector<std::string> override {
         return {
-            "creator",
             "object",
             "post",
             "tag"
@@ -24,7 +23,6 @@ TEST_F(DatabasePostTest, Create) {
 
     ASSERT_EQ(id, post.id);
     ASSERT_FALSE(post.description.has_value());
-    ASSERT_TRUE(post.creators.empty());
     ASSERT_TRUE(post.tags.empty());
 }
 
@@ -32,7 +30,7 @@ TEST_F(DatabasePostTest, CreateWithTitle) {
     constexpr auto title = "Post Title";
 
     const auto post = database.read_post(
-        database.create_post(title, "", {}, {}, {})
+        database.create_post(title, "", {}, {})
     );
 
     ASSERT_TRUE(post.title.has_value());
@@ -43,7 +41,7 @@ TEST_F(DatabasePostTest, CreateWithDescription) {
     constexpr auto description = "This is a test description.";
 
     const auto post = database.read_post(
-        database.create_post("", description, {}, {}, {})
+        database.create_post("", description, {}, {})
     );
 
     ASSERT_TRUE(post.description.has_value());
@@ -61,7 +59,7 @@ TEST_F(DatabasePostTest, CreateWithObjects) {
         database.create_object(object, {}, {});
     }
 
-    const auto id = database.create_post("", "", objects, {}, {});
+    const auto id = database.create_post("", "", objects, {});
     const auto result = database.read_objects(id);
 
     ASSERT_EQ(3, result.size());
@@ -69,17 +67,6 @@ TEST_F(DatabasePostTest, CreateWithObjects) {
     for (auto i = 0u; i < result.size(); i++) {
         ASSERT_EQ(objects[i], result[i].id);
     }
-}
-
-TEST_F(DatabasePostTest, CreateWithCreator) {
-    constexpr auto creator = "test";
-
-    const auto post = database.read_post(
-        database.create_post("", "", {}, {database.create_creator(creator)}, {})
-    );
-
-    ASSERT_EQ(1, post.creators.size());
-    ASSERT_EQ(creator, post.creators[0].name);
 }
 
 TEST_F(DatabasePostTest, CreateWithTags) {
@@ -91,11 +78,11 @@ TEST_F(DatabasePostTest, CreateWithTags) {
 
     auto tags = std::vector<std::string>();
     for (const auto& name : names) {
-        tags.push_back(database.create_tag(name, "#000").id);
+        tags.push_back(database.create_tag(name));
     }
 
     const auto post = database.read_post(
-        database.create_post("", "", {}, {}, tags)
+        database.create_post("", "", {}, tags)
     );
 
     ASSERT_EQ(3, post.tags.size());

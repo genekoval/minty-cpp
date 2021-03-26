@@ -32,26 +32,19 @@ namespace minty::repo::db {
         std::optional<source> src;
     };
 
-    struct tag : entity<4> {
-        std::string id;
-        std::string name;
-        std::string color;
-        std::string date_created;
-    };
-
-    struct creator : entity<9> {
+    struct tag : entity<9> {
         std::string id;
         std::string name;
         std::vector<std::string> aliases;
-        std::optional<std::string> bio;
+        std::optional<std::string> description;
         std::optional<std::string> avatar;
         std::optional<std::string> banner;
         std::vector<source> sources;
         unsigned int post_count;
-        std::string date_added;
+        std::string date_created;
     };
 
-    struct creator_preview : entity<3> {
+    struct tag_preview : entity<3> {
         std::string id;
         std::string name;
         std::optional<std::string> avatar;
@@ -74,8 +67,7 @@ namespace minty::repo::db {
         std::optional<std::string> description;
         std::string date_created;
         std::string date_modified;
-        std::vector<tag> tags;
-        std::vector<creator_preview> creators;
+        std::vector<tag_preview> tags;
     };
 
     struct post_preview : entity<6> {

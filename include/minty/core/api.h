@@ -32,8 +32,6 @@ namespace minty::core {
             std::string_view content
         ) -> comment;
 
-        auto add_creator(std::string_view name) -> std::string;
-
         auto add_object_data(
             std::size_t stream_size,
             std::function<void(fstore::part&&)> pipe
@@ -45,18 +43,18 @@ namespace minty::core {
 
         auto add_post(post_parts parts) -> std::string;
 
-        auto add_tag(std::string_view name, std::string_view color) -> tag;
+        auto add_tag(std::string_view name) -> std::string;
 
         auto get_comments(std::string_view post_id) -> comment_tree;
 
-        auto get_creator(std::string_view id) -> creator;
+        auto get_post(std::string_view id) -> post;
 
-        auto get_creator_posts(
-            std::string_view creator_id
+        auto get_tag(std::string_view id) -> tag;
+
+        auto get_tag_posts(
+            std::string_view tag_id
         ) -> std::vector<post_preview>;
 
-        auto get_creator_previews() -> std::vector<creator_preview>;
-
-        auto get_post(std::string_view id) -> post;
+        auto get_tag_previews() -> std::vector<tag_preview>;
     };
 }

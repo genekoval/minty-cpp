@@ -5,12 +5,11 @@
 #include <memory>
 
 namespace minty::core {
-    using creator = repo::db::creator;
-    using creator_preview = repo::db::creator_preview;
     using post_preview = repo::db::post_preview;
     using site = repo::db::site;
     using source = repo::db::source;
     using tag = repo::db::tag;
+    using tag_preview = repo::db::tag_preview;
 
     struct comment {
         std::string id;
@@ -47,15 +46,13 @@ namespace minty::core {
         std::string date_created;
         std::string date_modified;
         std::vector<object> objects;
-        std::vector<tag> tags;
-        std::vector<creator_preview> creators;
+        std::vector<tag_preview> tags;
     };
 
     struct post_parts {
         std::string title;
         std::string description;
         std::vector<std::string> objects;
-        std::vector<std::string> creators;
         std::vector<std::string> tags;
     };
 }
