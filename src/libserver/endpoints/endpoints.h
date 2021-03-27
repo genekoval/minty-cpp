@@ -6,6 +6,7 @@ namespace minty::server::endpoint {
     auto add_comment(protocol&) -> void;
     auto add_post(protocol&) -> void;
     auto add_tag(protocol&) -> void;
+    auto delete_post(protocol&) -> void;
     auto get_comments(protocol&) -> void;
     auto get_post(protocol&) -> void;
     auto get_server_info(protocol&) -> void;

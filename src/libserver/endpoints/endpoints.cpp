@@ -60,6 +60,12 @@ namespace minty::server::endpoint {
         proto.reply(proto.api->add_tag(name));
     }
 
+    auto delete_post(protocol& proto) -> void {
+        const auto post = proto.read<std::string>();
+        proto.api->delete_post(post);
+        proto.reply();
+    }
+
     auto get_comments(protocol& proto) -> void {
         const auto post_id = proto.read<std::string>();
         proto.reply(proto.api->get_comments(post_id));

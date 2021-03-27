@@ -10,6 +10,7 @@ namespace minty::server {
             endpoint::add_comment,
             endpoint::add_post,
             endpoint::add_tag,
+            endpoint::delete_post,
             endpoint::get_comments,
             endpoint::get_post,
             endpoint::get_server_info,

@@ -30,6 +30,10 @@ namespace minty {
         );
     }
 
+    auto api::delete_post(std::string_view id) -> void {
+        connect().emit(event::delete_post, id);
+    }
+
     auto api::get_comments(
         std::string_view post_id
     ) -> std::vector<core::comment> {

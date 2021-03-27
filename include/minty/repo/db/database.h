@@ -53,6 +53,8 @@ namespace minty::repo::db {
             std::optional<std::string_view> thumbnail_id
         ) -> site;
 
+        auto delete_post(std::string_view post_id) -> void;
+
         auto read_comments(std::string_view post_id) -> std::vector<comment>;
 
         auto read_object(std::string_view object_id) -> object;

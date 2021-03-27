@@ -45,6 +45,8 @@ namespace minty::core {
 
         auto add_tag(std::string_view name) -> std::string;
 
+        auto delete_post(std::string_view id) -> void;
+
         auto get_comments(std::string_view post_id) -> comment_tree;
 
         auto get_post(std::string_view id) -> post;

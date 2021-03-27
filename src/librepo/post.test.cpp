@@ -114,3 +114,31 @@ TEST_F(DatabasePostTest, CreateNestedComment) {
     ASSERT_TRUE(comment.parent_id.has_value());
     ASSERT_EQ(root.id, comment.parent_id);
 }
+
+TEST_F(DatabasePostTest, DeletePost) {
+    const auto post1 = create_post();
+    const auto post2 = create_post();
+
+    ASSERT_EQ(2, count("post"));
+
+    database.delete_post(post1);
+
+    ASSERT_EQ(1, count("post"));
+
+    const auto remaining = database.read_post(post2);
+    ASSERT_EQ(post2, remaining.id);
+}
+
+TEST_F(DatabasePostTest, DeletePostDeletesComments) {
+    const auto post = create_post();
+    const auto comment = database.create_comment(post, {}, "Comment.");
+
+    auto comments = database.read_comments(post);
+    ASSERT_EQ(1, comments.size());
+    ASSERT_EQ(comment, comments.front());
+
+    database.delete_post(post);
+
+    comments = database.read_comments(post);
+    ASSERT_TRUE(comments.empty());
+}

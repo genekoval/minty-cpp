@@ -13,6 +13,7 @@ namespace minty {
             add_comment,
             add_post,
             add_tag,
+            delete_post,
             get_comments,
             get_post,
             get_server_info,
@@ -38,6 +39,8 @@ namespace minty {
         ) -> std::string;
 
         auto add_tag(std::string_view name) -> std::string;
+
+        auto delete_post(std::string_view id) -> void;
 
         auto get_comments(
             std::string_view post_id

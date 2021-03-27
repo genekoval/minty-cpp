@@ -74,6 +74,8 @@ namespace minty::core {
         return db->create_tag(ext::trim(std::string(name)));
     }
 
+    auto api::delete_post(std::string_view id) -> void { db->delete_post(id); }
+
     auto api::get_comments(std::string_view post_id) -> comment_tree {
         const auto entities = db->read_comments(post_id);
         return build_tree(entities);
