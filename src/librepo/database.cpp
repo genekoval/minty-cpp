@@ -159,6 +159,16 @@ namespace minty::repo::db {
         );
     }
 
+    auto database::read_tag_previews(
+        const std::vector<std::string>& tags
+    ) -> std::vector<tag_preview> {
+        return make_entities<std::vector<tag_preview>>(
+            ntx,
+            "read_tag_previews",
+            tags
+        );
+    }
+
     auto database::read_tag_previews_all() -> std::vector<tag_preview> {
         return make_entities<std::vector<tag_preview>>(
             ntx,

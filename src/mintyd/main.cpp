@@ -1,5 +1,6 @@
 #include <minty/core/api.h>
 #include <minty/core/downloader.h>
+#include <minty/core/search.h>
 #include <minty/conf/settings.h>
 #include <minty/server/server.h>
 #include <minty/server/server_info.h>
@@ -63,6 +64,8 @@ static auto $main(
         settings.downloader.port
     );
 
+    auto search = minty::core::search_engine(settings.search.host);
+
     INFO()
         << "Using bucket `"
         << bucket_info.name
@@ -72,7 +75,7 @@ static auto $main(
         << ext::data_size::format(bucket_info.space_used)
         << ")";
 
-    auto api = minty::core::api(database, bucket, downloader);
+    auto api = minty::core::api(database, bucket, downloader, search);
     auto info = build_server_info(settings, app.version, bucket_info.id);
 
     INFO() << "Object source: " << info.object_source;

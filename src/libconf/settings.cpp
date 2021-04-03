@@ -105,6 +105,17 @@ namespace YAML {
     };
 
     template <>
+    struct convert<settings::s_search> {
+        using T = settings::s_search;
+
+        static auto decode(const Node& node, T& search) -> bool {
+            search.host = node["host"].as<decltype(T::host)>();
+
+            return true;
+        }
+    };
+
+    template <>
     struct convert<settings> {
         static auto decode(const Node& node, settings& s) -> bool {
             s.connection = node["connection"]
@@ -117,6 +128,8 @@ namespace YAML {
                 .as<decltype(settings::fstore)>();
             if (node["log"]) s.log = node["log"]
                 .as<decltype(settings::log)>();
+            s.search = node["search"]
+                .as<decltype(settings::search)>();
 
             return true;
         }

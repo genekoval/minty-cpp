@@ -9,12 +9,14 @@
 
 namespace minty::core {
     class downloader;
+    class search_engine;
 
     class api {
         repo::db::database* db;
         fstore::bucket* bucket;
         downloader* dl;
         preview_service previews;
+        search_engine* search;
 
         auto get_object_metadata(
             std::span<const repo::db::object> db_objects
@@ -23,7 +25,8 @@ namespace minty::core {
         api(
             repo::db::database& db,
             fstore::bucket& bucket,
-            downloader& dl
+            downloader& dl,
+            search_engine& search
         );
 
         auto add_comment(
@@ -52,6 +55,10 @@ namespace minty::core {
         auto get_post(std::string_view id) -> post;
 
         auto get_tag(std::string_view id) -> tag;
+
+        auto get_tags_by_name(
+            std::string_view term
+        ) -> std::vector<tag_preview>;
 
         auto get_tag_posts(
             std::string_view tag_id

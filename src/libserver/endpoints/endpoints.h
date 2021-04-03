@@ -11,6 +11,7 @@ namespace minty::server::endpoint {
     auto get_post(protocol&) -> void;
     auto get_server_info(protocol&) -> void;
     auto get_tag(protocol&) -> void;
+    auto get_tags_by_name(protocol&) -> void;
     auto get_tag_posts(protocol&) -> void;
     auto get_tag_previews(protocol&) -> void;
 }

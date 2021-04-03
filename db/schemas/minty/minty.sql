@@ -475,10 +475,18 @@ CREATE FUNCTION read_tag_previews(
 ) RETURNS SETOF tag_preview AS $$
 BEGIN
     RETURN QUERY
-    SELECT *
-    FROM tag_preview
-    WHERE tag_id = any(a_tags)
-    ORDER BY name;
+    SELECT
+        tag_id,
+        name,
+        avatar
+    FROM (
+        SELECT
+            ordinality,
+            unnest AS tag_id
+        FROM unnest(a_tags) WITH ORDINALITY
+    ) tags
+    JOIN tag_preview USING (tag_id)
+    ORDER BY ordinality;
 END;
 $$ LANGUAGE plpgsql;
 

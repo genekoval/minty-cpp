@@ -18,6 +18,7 @@ namespace minty {
             get_post,
             get_server_info,
             get_tag,
+            get_tags_by_name,
             get_tag_posts,
             get_tag_previews
         };
@@ -51,5 +52,9 @@ namespace minty {
         auto get_server_info() -> server::server_info;
 
         auto get_tag(std::string_view id) -> core::tag;
+
+        auto get_tags_by_name(
+            std::string_view search_term
+        ) -> std::vector<core::tag_preview>;
     };
 }

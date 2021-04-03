@@ -30,6 +30,10 @@ namespace minty::conf {
             timber::level level = timber::level::info;
         };
 
+        struct s_search {
+            std::string host;
+        };
+
         static auto load(const std::string& text) -> settings;
 
         static auto load_file(const std::string& path) -> settings;
@@ -39,6 +43,7 @@ namespace minty::conf {
         s_downloader downloader;
         s_fstore fstore;
         s_log log;
+        s_search search;
 
         auto encode() const -> std::string;
     };

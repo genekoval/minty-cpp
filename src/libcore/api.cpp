@@ -1,6 +1,7 @@
 #include <minty/core/api.h>
 #include <minty/core/downloader.h>
 #include <minty/core/preview.h>
+#include <minty/core/search.h>
 
 #include <ext/string.h>
 
@@ -8,12 +9,14 @@ namespace minty::core {
     api::api(
         repo::db::database& db,
         fstore::bucket& bucket,
-        downloader& dl
+        downloader& dl,
+        search_engine& search
     ) :
         db(&db),
         bucket(&bucket),
         dl(&dl),
-        previews(bucket)
+        previews(bucket),
+        search(&search)
     {}
 
     auto api::add_comment(
@@ -71,7 +74,15 @@ namespace minty::core {
     }
 
     auto api::add_tag(std::string_view name) -> std::string {
-        return db->create_tag(ext::trim(std::string(name)));
+        const auto formatted_name = ext::trim(std::string(name));
+        const auto id = db->create_tag(formatted_name);
+
+        search->add_tag({
+            .id = id,
+            .names = {formatted_name}
+        });
+
+        return id;
     }
 
     auto api::delete_post(std::string_view id) -> void { db->delete_post(id); }
@@ -119,6 +130,13 @@ namespace minty::core {
 
     auto api::get_tag(std::string_view id) -> tag {
         return db->read_tag(id);
+    }
+
+    auto api::get_tags_by_name(
+        std::string_view term
+    ) -> std::vector<tag_preview> {
+        const auto ids = search->find_tags_by_name(term);
+        return db->read_tag_previews(ids);
     }
 
     auto api::get_tag_posts(

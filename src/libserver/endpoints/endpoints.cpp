@@ -85,6 +85,11 @@ namespace minty::server::endpoint {
         proto.reply(proto.api->get_tag(id));
     }
 
+    auto get_tags_by_name(protocol& proto) -> void {
+        const auto search_term = proto.read<std::string>();
+        proto.reply(proto.api->get_tags_by_name(search_term));
+    }
+
     auto get_tag_posts(protocol& proto) -> void {
         const auto id = proto.read<std::string>();
         proto.reply(proto.api->get_tag_posts(id));

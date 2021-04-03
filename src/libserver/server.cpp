@@ -15,6 +15,7 @@ namespace minty::server {
             endpoint::get_post,
             endpoint::get_server_info,
             endpoint::get_tag,
+            endpoint::get_tags_by_name,
             endpoint::get_tag_posts,
             endpoint::get_tag_previews
         );

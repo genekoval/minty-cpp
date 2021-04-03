@@ -35,6 +35,27 @@ static auto $add(
     std::cout << api.add_tag(argv[0]) << std::endl;
 }
 
+static auto $find(
+    const commline::app& app,
+    const commline::argv& argv
+) -> void {
+    if (argv.empty()) return;
+
+    auto api = minty::cli::client();
+    const auto tags = api.get_tags_by_name(argv[0]);
+
+    auto out = YAML::Emitter();
+    out << YAML::BeginSeq;
+
+    for (const auto& tag : tags) {
+        out << tag;
+    }
+
+    out << YAML::EndSeq;
+
+    std::cout << out.c_str() << std::endl;
+}
+
 namespace minty::commands {
     using namespace commline;
 
@@ -46,6 +67,14 @@ namespace minty::commands {
         );
     }
 
+    auto tag_find() -> std::unique_ptr<command_node> {
+        return command(
+            "find",
+            "Find tags",
+            $find
+        );
+    }
+
     auto tag() -> std::unique_ptr<command_node> {
         auto cmd = command(
             "tag",
@@ -54,6 +83,7 @@ namespace minty::commands {
         );
 
         cmd->subcommand(tag_add());
+        cmd->subcommand(tag_find());
 
         return cmd;
     }

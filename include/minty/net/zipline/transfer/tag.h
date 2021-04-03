@@ -2,6 +2,7 @@
 #pragma once
 
 #include <minty/core/model.h>
+#include <minty/core/search.h>
 #include <minty/net/zipline/protocol.h>
 
 namespace zipline {
@@ -32,6 +33,17 @@ namespace zipline {
         using avatar_t = decltype(type::avatar);
 
         static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
+    };
+
+    template <>
+    struct transfer<minty::net::socket, minty::core::search::tag> {
+        using type = minty::core::search::tag;
+
+        using id_t = decltype(type::id);
+        using names_t = decltype(type::names);
+        using description_t = decltype(type::description);
+
         static auto write(minty::net::socket&, const type&) -> void;
     };
 }

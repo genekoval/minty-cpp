@@ -60,4 +60,13 @@ namespace minty {
             id
         );
     }
+
+    auto api::get_tags_by_name(
+        std::string_view search_term
+    ) -> std::vector<core::tag_preview> {
+        return connect().send<std::vector<core::tag_preview>>(
+            event::get_tags_by_name,
+            search_term
+        );
+    }
 }
