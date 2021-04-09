@@ -1,5 +1,7 @@
 #include <minty/core/search.h>
 
+#include <ext/except.h>
+
 namespace minty::core {
     search_engine::search_engine(std::string_view endpoint) :
         endpoint(endpoint)
@@ -8,7 +10,13 @@ namespace minty::core {
     }
 
     auto search_engine::connect() -> client {
-        return client(net::socket(netcore::connect(endpoint)));
+        try {
+            return client(net::socket(netcore::connect(endpoint)));
+        }
+        catch (const ext::system_error& ex) {
+            ERROR() << ex.what();
+            throw std::runtime_error("search service unavailable");
+        }
     }
 
     auto search_engine::add_tag(const search::tag& tag) -> void {
