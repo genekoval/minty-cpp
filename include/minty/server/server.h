@@ -4,18 +4,19 @@
 #include <minty/net/zipline/protocol.h>
 #include <minty/server/server_info.h>
 
+#include <zipline/zipline>
+
 namespace minty::server {
-    struct protocol : zipline::protocol<net::socket> {
+    struct context {
         core::api* api;
         const server_info* info;
-
-        protocol(net::socket& sock, const server_info& info, core::api& api);
     };
+
+    using protocol = zipline::server_protocol<context, net::socket>;
 
     auto listen(
         std::string_view endpoint,
-        const server_info& info,
-        core::api& api,
-        const std::function<void()>& callback
+        context& ctx,
+        std::function<void()>&& callback
     ) -> void;
 }

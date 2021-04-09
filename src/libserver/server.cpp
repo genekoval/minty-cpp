@@ -1,53 +1,53 @@
-#include "endpoints/endpoints.h"
+#include "routes/routes.h"
 
+#include <minty/net/zipline/transfer.h>
 #include <minty/server/server.h>
 
 #include <timber/timber>
 
-namespace minty::server {
-    static inline auto router() {
-        return zipline::make_router<protocol, net::event_t>(
-            endpoint::add_comment,
-            endpoint::add_post,
-            endpoint::add_tag,
-            endpoint::delete_post,
-            endpoint::get_comments,
-            endpoint::get_post,
-            endpoint::get_server_info,
-            endpoint::get_tag,
-            endpoint::get_tags_by_name,
-            endpoint::get_tag_posts,
-            endpoint::get_tag_previews
-        );
-    }
+#define MINTY_ROUTE(r) ZIPLINE_ROUTE(route, protocol, r)
 
-    protocol::protocol(
-        net::socket& sock,
-        const server_info& info,
-        core::api& api
-    ) :
-        zipline::protocol<net::socket>(sock),
-        api(&api),
-        info(&info)
-    {}
+#define MINTY_ROUTER(...) ZIPLINE_ROUTER(protocol, net::event_t, __VA_ARGS__)
+
+namespace minty::server {
+    MINTY_ROUTE(add_comment)
+    MINTY_ROUTE(add_post)
+    MINTY_ROUTE(add_tag)
+    MINTY_ROUTE(delete_post)
+    MINTY_ROUTE(get_comments)
+    MINTY_ROUTE(get_post)
+    MINTY_ROUTE(get_server_info)
+    MINTY_ROUTE(get_tag)
+    MINTY_ROUTE(get_tags_by_name)
+    MINTY_ROUTE(get_tag_posts)
+    MINTY_ROUTE(get_tag_previews)
+
+    MINTY_ROUTER(
+        add_comment,
+        add_post,
+        add_tag,
+        delete_post,
+        get_comments,
+        get_post,
+        get_server_info,
+        get_tag,
+        get_tags_by_name,
+        get_tag_posts,
+        get_tag_previews
+    )
 
     auto listen(
         std::string_view endpoint,
-        const server_info& info,
-        core::api& api,
-        const std::function<void()>& callback
+        context& ctx,
+        std::function<void()>&& callback
     ) -> void {
         const auto routes = router();
 
-        auto server = netcore::server([&api, &info, &routes](
-            netcore::socket&& sock
-        ) {
+        auto server = netcore::server([&ctx, &routes](netcore::socket&& sock) {
             auto socket = net::socket(std::move(sock));
-            routes.route(protocol(socket, info, api));
+            routes.route(protocol(ctx, socket));
         });
 
         server.listen(endpoint, callback);
-
-        INFO() << "Shutting down...";
     }
 }
