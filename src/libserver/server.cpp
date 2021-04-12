@@ -14,6 +14,7 @@ namespace minty::server {
     MINTY_ROUTE(add_post)
     MINTY_ROUTE(add_tag)
     MINTY_ROUTE(delete_post)
+    MINTY_ROUTE(delete_tag)
     MINTY_ROUTE(get_comments)
     MINTY_ROUTE(get_post)
     MINTY_ROUTE(get_server_info)
@@ -27,6 +28,7 @@ namespace minty::server {
         add_post,
         add_tag,
         delete_post,
+        delete_tag,
         get_comments,
         get_post,
         get_server_info,

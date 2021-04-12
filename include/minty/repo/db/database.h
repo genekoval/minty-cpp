@@ -55,6 +55,8 @@ namespace minty::repo::db {
 
         auto delete_post(std::string_view post_id) -> void;
 
+        auto delete_tag(std::string_view tag_id) -> void;
+
         auto read_comments(std::string_view post_id) -> std::vector<comment>;
 
         auto read_object(std::string_view object_id) -> object;

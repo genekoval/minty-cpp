@@ -56,6 +56,33 @@ static auto $find(
     std::cout << out.c_str() << std::endl;
 }
 
+static auto $rm(
+    const commline::app& app,
+    const commline::argv& argv,
+    bool force
+) -> void {
+    auto api = minty::cli::client();
+
+    if (argv.empty()) {
+        throw std::runtime_error("no tag id given");
+    }
+
+    const auto& tag = argv.front();
+
+    if (!force) {
+        std::cout
+            << "Remove tag with ID: (" << tag << ")? [yes/no] ";
+
+        auto response = std::array<char, 4>();
+        std::cin.getline(response.data(), response.size());
+        const auto res = std::string(response.data(), response.size());
+
+        if (res != "yes") return;
+    }
+
+    api.delete_tag(tag);
+}
+
 namespace minty::commands {
     using namespace commline;
 
@@ -75,6 +102,20 @@ namespace minty::commands {
         );
     }
 
+    auto tag_rm() -> std::unique_ptr<command_node> {
+        return command(
+            "rm",
+            "Remove a tag",
+            options(
+                flag(
+                    {"force", "f"},
+                    "Remove the tag without prompting for confirmation."
+                )
+            ),
+            $rm
+        );
+    }
+
     auto tag() -> std::unique_ptr<command_node> {
         auto cmd = command(
             "tag",
@@ -84,6 +125,7 @@ namespace minty::commands {
 
         cmd->subcommand(tag_add());
         cmd->subcommand(tag_find());
+        cmd->subcommand(tag_rm());
 
         return cmd;
     }

@@ -17,6 +17,7 @@ namespace minty::repo::db {
         ci.prepare("create_tag_aliases", 2);
         ci.prepare("create_tag_source", 3);
         ci.prepare("delete_post", 1);
+        ci.prepare("delete_tag", 1);
         ci.prepare("read_comments", 1);
         ci.prepare("read_object", 1);
         ci.prepare("read_objects", 1);
@@ -107,6 +108,10 @@ namespace minty::repo::db {
 
     auto database::delete_post(std::string_view post_id) -> void {
         ntx.exec_prepared("delete_post", post_id);
+    }
+
+    auto database::delete_tag(std::string_view tag_id) -> void {
+        ntx.exec_prepared("delete_tag", tag_id);
     }
 
     auto database::read_comments(

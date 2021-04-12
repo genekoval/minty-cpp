@@ -64,6 +64,10 @@ namespace minty::server::route {
         ctx->api->delete_post(post_id);
 	}
 
+    auto delete_tag(context* ctx, std::string tag_id) -> void {
+        ctx->api->delete_tag(tag_id);
+    }
+
     auto get_comments(context* ctx, std::string post_id) -> core::comment_tree {
         return ctx->api->get_comments(post_id);
 	}

@@ -124,7 +124,7 @@ namespace minty::commands {
             "Remove a post",
             options(
                 flag(
-                    {"force", "f'"},
+                    {"force", "f"},
                     "Remove the post without prompting for confirmation."
                 )
             ),

@@ -414,6 +414,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION delete_tag(
+    a_tag_id        integer
+) RETURNS void AS $$
+BEGIN
+    DELETE FROM tag
+    WHERE tag_id = a_tag_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_comments(
     a_post_id       integer
 ) RETURNS SETOF post_comment AS $$

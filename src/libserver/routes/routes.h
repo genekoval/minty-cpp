@@ -17,6 +17,8 @@ namespace minty::server::route {
 
     auto delete_post(context* ctx, std::string post_id) -> void;
 
+    auto delete_tag(context* ctx, std::string tag_id) -> void;
+
     auto get_comments(context* ctx, std::string post_id) -> core::comment_tree;
 
     auto get_post(context* ctx, std::string post_id) -> core::post;

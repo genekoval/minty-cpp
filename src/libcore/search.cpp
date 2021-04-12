@@ -35,6 +35,10 @@ namespace minty::core {
         );
     }
 
+    auto search_engine::delete_tag(std::string_view tag_id) -> void {
+        return connect().emit(event::delete_tag, tag_id);
+    }
+
     auto search_engine::version() -> std::string {
         return connect().send<std::string>(event::version);
     }

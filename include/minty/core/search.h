@@ -17,6 +17,7 @@ namespace minty::core {
     class search_engine {
         enum class event : net::event_t {
             add_tag,
+            delete_tag,
             find_tags_by_name,
             version
         };
@@ -37,5 +38,7 @@ namespace minty::core {
         auto find_tags_by_name(
             std::string_view term
         ) -> std::vector<std::string>;
+
+        auto delete_tag(std::string_view tag_id) -> void;
     };
 }
