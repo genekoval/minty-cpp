@@ -554,3 +554,21 @@ END;
 $$ LANGUAGE plpgsql;
 
 --}}}
+
+--{{{( Trigger Functions )
+
+CREATE FUNCTION notify_delete_tag() RETURNS trigger AS $$
+BEGIN
+    PERFORM pg_notify(lower(TG_OP || '_' || TG_TABLE_NAME), OLD.tag_id::text);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+--}}}
+
+--{{{( Triggers )
+
+CREATE TRIGGER notify_delete_tag AFTER DELETE ON tag
+FOR EACH ROW EXECUTE FUNCTION notify_delete_tag();
+
+--}}}
