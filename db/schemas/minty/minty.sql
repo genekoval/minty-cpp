@@ -367,6 +367,14 @@ BEGIN
         true
     );
 
+    PERFORM pg_notify(
+        'create_tag',
+        json_build_object(
+            'id', id,
+            'names', json_build_array(name)
+        )::text
+    );
+
     RETURN id;
 END;
 $$ LANGUAGE plpgsql;

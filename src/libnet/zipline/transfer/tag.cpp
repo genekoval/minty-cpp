@@ -51,13 +51,4 @@ namespace zipline {
         n::xfr<name_t>::write(sock, t.name);
         n::xfr<avatar_t>::write(sock, t.avatar);
     }
-
-    auto n::xfr<minty::core::search::tag>::write(
-        n::socket& sock,
-        const type& t
-    ) -> void {
-        n::xfr<id_t>::write(sock, t.id);
-        n::xfr<names_t>::write(sock, t.names);
-        n::xfr<description_t>::write(sock, t.description);
-    }
 }

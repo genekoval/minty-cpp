@@ -19,13 +19,6 @@ namespace minty::core {
         }
     }
 
-    auto search_engine::add_tag(const search::tag& tag) -> void {
-        connect().emit(
-            event::add_tag,
-            tag
-        );
-    }
-
     auto search_engine::find_tags_by_name(
         std::string_view term
     ) -> std::vector<std::string> {

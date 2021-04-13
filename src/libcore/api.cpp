@@ -74,15 +74,7 @@ namespace minty::core {
     }
 
     auto api::add_tag(std::string_view name) -> std::string {
-        const auto formatted_name = ext::trim(std::string(name));
-        const auto id = db->create_tag(formatted_name);
-
-        search->add_tag({
-            .id = id,
-            .names = {formatted_name}
-        });
-
-        return id;
+        return db->create_tag(ext::trim(std::string(name)));
     }
 
     auto api::delete_post(std::string_view id) -> void {
