@@ -188,18 +188,6 @@ LEFT JOIN (
     ORDER BY post_id, sequence
 ) previews USING (post_id);
 
-CREATE VIEW post_view AS
-SELECT
-    post_id,
-    title,
-    description,
-    date_created,
-    date_modified,
-    array_agg(DISTINCT tag_id) AS tags
-FROM post
-LEFT JOIN post_tag USING (post_id)
-GROUP BY post_id;
-
 --}}}
 
 --{{{( Functions )
@@ -557,12 +545,25 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post(
     a_post_id       integer
-) RETURNS SETOF post_view AS $$
+) RETURNS SETOF post AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM post_view
+    FROM post
     WHERE post_id = a_post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_post_tags(
+    a_post_id       integer
+) RETURNS SETOF tag_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT tag_id, name, avatar
+    FROM tag_preview
+    JOIN post_tag USING (tag_id)
+    WHERE post_id = a_post_id
+    ORDER BY name;
 END;
 $$ LANGUAGE plpgsql;
 

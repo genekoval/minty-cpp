@@ -70,6 +70,10 @@ namespace minty::repo::db {
 
         auto read_post(std::string_view post_id) -> post;
 
+        auto read_post_tags(
+            std::string_view post_id
+        ) -> std::vector<tag_preview>;
+
         auto read_tag(std::string_view tag_id) -> tag;
 
         auto read_tag_posts(

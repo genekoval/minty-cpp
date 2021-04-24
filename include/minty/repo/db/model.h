@@ -72,7 +72,6 @@ namespace minty::repo::db {
         std::optional<std::string> description;
         std::string date_created;
         std::string date_modified;
-        std::vector<tag_preview> tags;
     };
 
     struct post_preview : entity<6> {

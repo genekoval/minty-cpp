@@ -23,7 +23,6 @@ TEST_F(DatabasePostTest, Create) {
 
     ASSERT_EQ(id, post.id);
     ASSERT_FALSE(post.description.has_value());
-    ASSERT_TRUE(post.tags.empty());
 }
 
 TEST_F(DatabasePostTest, CreateWithTitle) {
@@ -81,14 +80,13 @@ TEST_F(DatabasePostTest, CreateWithTags) {
         tags.push_back(database.create_tag(name));
     }
 
-    const auto post = database.read_post(
-        database.create_post("", "", {}, tags)
-    );
+    const auto post = database.create_post("", "", {}, tags);
+    const auto post_tags = database.read_post_tags(post);
 
-    ASSERT_EQ(3, post.tags.size());
-    ASSERT_EQ("apple", post.tags[0].name);
-    ASSERT_EQ("banana", post.tags[1].name);
-    ASSERT_EQ("citrus", post.tags[2].name);
+    ASSERT_EQ(3, post_tags.size());
+    ASSERT_EQ("apple", post_tags[0].name);
+    ASSERT_EQ("banana", post_tags[1].name);
+    ASSERT_EQ("citrus", post_tags[2].name);
 }
 
 TEST_F(DatabasePostTest, CreateComment) {

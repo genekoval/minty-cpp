@@ -136,7 +136,7 @@ namespace minty::core {
             .date_created = data.date_created,
             .date_modified = data.date_modified,
             .objects = get_object_metadata(objects),
-            .tags = data.tags
+            .tags = db->read_post_tags(id)
         };
     }
 
