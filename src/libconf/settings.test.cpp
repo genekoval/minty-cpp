@@ -21,6 +21,9 @@ downloader:
 fstore:
     bucket: minty
     connection: /run/fstore/fstore.sock
+
+search:
+    host: /run/minty-search.sock
 )";
 
     const auto settings = minty::conf::settings::load(yaml);
@@ -34,6 +37,7 @@ fstore:
     ASSERT_EQ("3000", settings.downloader.port);
     ASSERT_EQ("minty", settings.fstore.bucket);
     ASSERT_EQ("/run/fstore/fstore.sock", settings.fstore.connection);
+    ASSERT_EQ("/run/minty-search.sock", settings.search.host);
 }
 
 TEST_F(ConfSettingsTest, Encode) {
