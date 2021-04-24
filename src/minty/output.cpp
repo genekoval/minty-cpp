@@ -35,9 +35,14 @@ namespace YAML {
         }
 
         if (tag.description.has_value()) {
-            out
-                << Key << "bio"
-                << Value << tag.description.value();
+            const auto& description = tag.description.value();
+            out << Key << "description" << Value;
+
+            if (description.find("\n") != std::string::npos) {
+                out << Literal;
+            }
+
+            out << description;
         }
 
         if (!tag.sources.empty()) {

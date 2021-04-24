@@ -25,6 +25,17 @@ namespace zipline {
     };
 
     template <>
+    struct transfer<minty::net::socket, minty::core::tag_name> {
+        using type = minty::core::tag_name;
+
+        using name_t = decltype(type::name);
+        using aliases_t = decltype(type::aliases);
+
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
+    };
+
+    template <>
     struct transfer<minty::net::socket, minty::core::tag_preview> {
         using type = minty::core::tag_preview;
 

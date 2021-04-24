@@ -3,24 +3,36 @@
 
 #include "commands.h"
 
-#include <minty/minty>
-
 #include <iostream>
+
+static auto print_tag(
+    minty::api& api,
+    std::string_view tag_id,
+    std::optional<std::string_view> path
+) -> void {
+    minty::cli::print(api.get_tag(tag_id), path);
+}
+
+static auto print_tag(minty::api& api, std::string_view tag_id) -> void {
+    print_tag(api, tag_id, {});
+}
 
 static auto $tag(
     const commline::app& app,
-    const commline::argv& argv
+    const commline::argv& argv,
+    std::optional<std::string_view> path,
+    std::optional<std::string_view> description
 ) -> void {
-    if (argv.empty()) {
-        return;
-    }
+    if (argv.empty()) throw std::runtime_error(
+        "missing tag id"
+    );
 
+    const auto& id = argv.front();
     auto api = minty::cli::client();
-    const auto tag = api.get_tag(argv[0]);
 
-    auto out = YAML::Emitter();
-    out << tag;
-    std::cout << out.c_str() << std::endl;
+    if (description) api.set_tag_description(id, *description);
+
+    print_tag(api, id, path);
 }
 
 static auto $add(
@@ -35,25 +47,69 @@ static auto $add(
     std::cout << api.add_tag(argv[0]) << std::endl;
 }
 
-static auto $find(
+static auto $alias(
+    const commline::app& app,
+    const commline::argv& argv
+) -> void {}
+
+static auto $alias_add(
     const commline::app& app,
     const commline::argv& argv
 ) -> void {
-    if (argv.empty()) return;
+    if (argv.size() < 2) return;
+
+    const auto& id = argv[0];
+    const auto& alias = argv[1];
 
     auto api = minty::cli::client();
-    const auto tags = api.get_tags_by_name(argv[0]);
 
-    auto out = YAML::Emitter();
-    out << YAML::BeginSeq;
+    api.add_tag_alias(id, alias);
+    print_tag(api, id);
+}
 
-    for (const auto& tag : tags) {
-        out << tag;
+static auto $alias_rm(
+    const commline::app& app,
+    const commline::argv& argv
+) -> void {
+    if (argv.size() < 2) return;
+
+    const auto& id = argv[0];
+    const auto& alias = argv[1];
+
+    auto api = minty::cli::client();
+
+    api.delete_tag_alias(id, alias);
+    print_tag(api, id);
+}
+
+static auto $find(
+    const commline::app& app,
+    const commline::argv& argv,
+    std::optional<std::string_view> path
+) -> void {
+    if (argv.empty()) return;
+
+    const auto& search_term = argv.front();
+
+    auto api = minty::cli::client();
+    minty::cli::print(api.get_tags_by_name(search_term), path);
+}
+
+static auto $rename(
+    const commline::app& app,
+    const commline::argv& argv
+) -> void {
+    if (argv.size() < 2) {
+        throw std::runtime_error("tag id and new name required");
     }
 
-    out << YAML::EndSeq;
+    const auto& id = argv[0];
+    const auto& name = argv[1];
 
-    std::cout << out.c_str() << std::endl;
+    auto api = minty::cli::client();
+
+    api.set_tag_name(id, name);
+    print_tag(api, id);
 }
 
 static auto $rm(
@@ -86,6 +142,12 @@ static auto $rm(
 namespace minty::commands {
     using namespace commline;
 
+    const auto select = option<std::optional<std::string_view>>(
+        {"select", "s"},
+        "Select YAML output",
+        "path"
+    );
+
     auto tag_add() -> std::unique_ptr<command_node> {
         return command(
             "add",
@@ -94,11 +156,55 @@ namespace minty::commands {
         );
     }
 
+    auto tag_alias_add() -> std::unique_ptr<command_node> {
+        return command(
+            "add",
+            "Add a tag alias",
+            $alias_add
+        );
+    }
+
+    auto tag_alias_rm() -> std::unique_ptr<command_node> {
+        return command(
+            "add",
+            "Add a tag alias",
+            $alias_rm
+        );
+    }
+
+    auto tag_alias() -> std::unique_ptr<command_node> {
+        auto cmd = command(
+            "alias",
+            "Manage tag aliases",
+            $alias
+        );
+
+        cmd->subcommand(tag_alias_add());
+        cmd->subcommand(tag_alias_rm());
+
+        return cmd;
+    }
+
     auto tag_find() -> std::unique_ptr<command_node> {
         return command(
             "find",
             "Find tags",
+            options(
+                option<std::optional<std::string_view>>(
+                    {"select", "s"},
+                    "Select YAML output",
+                    "path"
+                )
+            ),
             $find
+        );
+    }
+
+    auto tag_rename() -> std::unique_ptr<command_node> {
+        return command(
+            "rename",
+            "Change a tag's name",
+            $rename
         );
     }
 
@@ -119,12 +225,26 @@ namespace minty::commands {
     auto tag() -> std::unique_ptr<command_node> {
         auto cmd = command(
             "tag",
-            "Manage tags",
+            "View or edit a tag",
+            options(
+                option<std::optional<std::string_view>>(
+                    {"select", "s"},
+                    "Select YAML output",
+                    "path"
+                ),
+                option<std::optional<std::string_view>>(
+                    {"description", "d"},
+                    "Set the tag's description",
+                    "new description"
+                )
+            ),
             $tag
         );
 
         cmd->subcommand(tag_add());
+        cmd->subcommand(tag_alias());
         cmd->subcommand(tag_find());
+        cmd->subcommand(tag_rename());
         cmd->subcommand(tag_rm());
 
         return cmd;

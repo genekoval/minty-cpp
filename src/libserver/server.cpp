@@ -13,8 +13,10 @@ namespace minty::server {
     MINTY_ROUTE(add_comment)
     MINTY_ROUTE(add_post)
     MINTY_ROUTE(add_tag)
+    MINTY_ROUTE(add_tag_alias)
     MINTY_ROUTE(delete_post)
     MINTY_ROUTE(delete_tag)
+    MINTY_ROUTE(delete_tag_alias)
     MINTY_ROUTE(get_comments)
     MINTY_ROUTE(get_post)
     MINTY_ROUTE(get_server_info)
@@ -22,20 +24,26 @@ namespace minty::server {
     MINTY_ROUTE(get_tags_by_name)
     MINTY_ROUTE(get_tag_posts)
     MINTY_ROUTE(get_tag_previews)
+    MINTY_ROUTE(set_tag_description)
+    MINTY_ROUTE(set_tag_name)
 
     MINTY_ROUTER(
         add_comment,
         add_post,
         add_tag,
+        add_tag_alias,
         delete_post,
         delete_tag,
+        delete_tag_alias,
         get_comments,
         get_post,
         get_server_info,
         get_tag,
         get_tags_by_name,
         get_tag_posts,
-        get_tag_previews
+        get_tag_previews,
+        set_tag_description,
+        set_tag_name
     )
 
     auto listen(

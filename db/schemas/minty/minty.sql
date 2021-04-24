@@ -263,8 +263,8 @@ BEGIN
             title,
             description
         ) VALUES (
-            NULLIF(a_title, ''),
-            NULLIF(a_description, '')
+            nullif(a_title, ''),
+            nullif(a_description, '')
         ) RETURNING *
     )
     SELECT INTO l_post_id
@@ -367,30 +367,26 @@ BEGIN
         true
     );
 
-    PERFORM pg_notify(
-        'create_tag',
-        json_build_object(
-            'id', id,
-            'names', json_build_array(name)
-        )::text
-    );
-
     RETURN id;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION create_tag_aliases(
-    a_tag       integer,
-    a_aliases   text[]
-) RETURNS void AS $$
+CREATE FUNCTION create_tag_alias(
+    a_tag_id        integer,
+    a_alias         text
+) RETURNS TABLE (
+    name            text,
+    aliases         text[]
+) AS $$
 BEGIN
-    INSERT INTO tag_name (
-        tag_id,
-        value
-    )
-    SELECT
-        a_tag,
-        unnest(a_aliases);
+    INSERT INTO tag_name(tag_id, value)
+    VALUES (a_tag_id, a_alias)
+    ON CONFLICT DO NOTHING;
+
+    RETURN QUERY
+    SELECT t.name, t.aliases
+    FROM tag_name_view t
+    WHERE tag_id = a_tag_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -427,6 +423,26 @@ CREATE FUNCTION delete_tag(
 ) RETURNS void AS $$
 BEGIN
     DELETE FROM tag
+    WHERE tag_id = a_tag_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_tag_alias(
+    a_tag_id        integer,
+    a_alias         text
+) RETURNS TABLE (
+    name            text,
+    aliases         text[]
+) AS $$
+BEGIN
+    DELETE FROM tag_name
+    WHERE tag_id = a_tag_id
+        AND main = false
+        AND value = a_alias;
+
+    RETURN QUERY
+    SELECT t.name, t.aliases
+    FROM tag_name_view t
     WHERE tag_id = a_tag_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -561,6 +577,64 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION update_tag_description(
+    a_tag_id        integer,
+    a_description   text
+) RETURNS text AS $$
+DECLARE
+    result          text;
+BEGIN
+    WITH updated AS (
+        UPDATE tag
+        SET description = nullif(a_description, '')
+        WHERE tag_id = a_tag_id
+        RETURNING description
+    )
+    SELECT INTO result description
+    FROM updated;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Updates a tag's main name.
+--
+-- If the new name already exists as an alias, the alias and the main name are
+-- swapped. Otherwise, the main name is replaced with the new value.
+CREATE FUNCTION update_tag_name(
+    -- The tag for which to update the main name.
+    a_tag_id        integer,
+    -- The new main name.
+    a_name          text
+) RETURNS TABLE (
+    name            text,
+    aliases         text[]
+) AS $$
+BEGIN
+    IF EXISTS (
+        SELECT FROM tag_name
+        WHERE tag_id = a_tag_id AND value = a_name AND main = false
+    ) THEN
+        UPDATE tag_name
+        SET main = false
+        WHERE tag_id = a_tag_id AND main = true;
+
+        UPDATE tag_name
+        SET main = true
+        WHERE tag_id = a_tag_id AND value = a_name;
+    ELSE
+        UPDATE tag_name
+        SET value = a_name
+        WHERE tag_id = a_tag_id AND main = true;
+    END IF;
+
+    RETURN QUERY
+    SELECT t.name, t.aliases
+    FROM tag_name_view t
+    WHERE tag_id = a_tag_id;
+END;
+$$ LANGUAGE plpgsql;
+
 --}}}
 
 --{{{( Trigger Functions )
@@ -572,11 +646,69 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION notify_delete_tag_name() RETURNS trigger AS $$
+BEGIN
+    -- Avoid sending a notification if this was invoked due to a
+    -- delete cascade.
+    IF EXISTS (SELECT FROM tag WHERE tag_id = OLD.tag_id) THEN
+        PERFORM pg_notify(
+            lower(TG_OP || '_' || TG_TABLE_NAME),
+            json_build_object(
+                'id', OLD.tag_id,
+                'name', OLD.value
+            )::text
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION notify_insert_tag_name() RETURNS trigger AS $$
+BEGIN
+    PERFORM pg_notify(
+        lower(TG_OP || '_' || TG_TABLE_NAME),
+        json_build_object(
+            'id', NEW.tag_id,
+            'name', NEW.value
+        )::text
+    );
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION notify_update_tag_name() RETURNS trigger AS $$
+BEGIN
+    IF OLD.value != NEW.value THEN
+        PERFORM pg_notify(
+            lower(TG_OP || '_' || TG_TABLE_NAME),
+            json_build_object(
+                'id', NEW.tag_id,
+                'old', OLD.value,
+                'new', NEW.value
+            )::text
+        );
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 --}}}
 
 --{{{( Triggers )
 
 CREATE TRIGGER notify_delete_tag AFTER DELETE ON tag
 FOR EACH ROW EXECUTE FUNCTION notify_delete_tag();
+
+CREATE TRIGGER notify_delete_tag_name AFTER DELETE ON tag_name
+FOR EACH ROW EXECUTE FUNCTION notify_delete_tag_name();
+
+CREATE TRIGGER notify_insert_tag_name AFTER INSERT ON tag_name
+FOR EACH ROW EXECUTE FUNCTION notify_insert_tag_name();
+
+CREATE TRIGGER notify_update_tag_name AFTER UPDATE ON tag_name
+FOR EACH ROW EXECUTE FUNCTION notify_update_tag_name();
 
 --}}}

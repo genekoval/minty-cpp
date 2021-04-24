@@ -6,7 +6,7 @@ namespace minty::server::route {
         std::string post_id,
         std::optional<std::string> parent_id,
         std::string content
-    ) -> minty::core::comment {
+    ) -> core::comment {
         return ctx->api->add_comment(post_id, parent_id, content);
 	}
 
@@ -60,12 +60,28 @@ namespace minty::server::route {
         return ctx->api->add_tag(name);
 	}
 
+    auto add_tag_alias(
+        context* ctx,
+        std::string tag_id,
+        std::string alias
+    ) -> core::tag_name{
+        return ctx->api->add_tag_alias(tag_id, alias);
+    }
+
     auto delete_post(context* ctx, std::string post_id) -> void {
         ctx->api->delete_post(post_id);
 	}
 
     auto delete_tag(context* ctx, std::string tag_id) -> void {
         ctx->api->delete_tag(tag_id);
+    }
+
+    auto delete_tag_alias(
+        context* ctx,
+        std::string tag_id,
+        std::string alias
+    ) -> core::tag_name {
+        return ctx->api->delete_tag_alias(tag_id, alias);
     }
 
     auto get_comments(context* ctx, std::string post_id) -> core::comment_tree {
@@ -100,5 +116,21 @@ namespace minty::server::route {
 
     auto get_tag_previews(context* ctx) -> std::vector<core::tag_preview> {
         return ctx->api->get_tag_previews();
+    }
+
+    auto set_tag_description(
+        context* ctx,
+        std::string tag_id,
+        std::string description
+    ) -> std::optional<std::string> {
+        return ctx->api->set_tag_description(tag_id, description);
+    }
+
+    auto set_tag_name(
+        context* ctx,
+        std::string tag_id,
+        std::string new_name
+    ) -> core::tag_name {
+        return ctx->api->set_tag_name(tag_id, new_name);
     }
 }

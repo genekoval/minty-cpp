@@ -44,6 +44,11 @@ namespace minty::repo::db {
         std::string date_created;
     };
 
+    struct tag_name : entity<2> {
+        std::string name;
+        std::vector<std::string> aliases;
+    };
+
     struct tag_preview : entity<3> {
         std::string id;
         std::string name;

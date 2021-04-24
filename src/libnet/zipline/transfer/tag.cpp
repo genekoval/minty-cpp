@@ -33,6 +33,21 @@ namespace zipline {
         n::xfr<date_created_t>::write(sock, t.date_created);
     }
 
+    auto n::xfr<c::tag_name>::read(n::socket& sock) -> type {
+        return {
+            .name = n::xfr<name_t>::read(sock),
+            .aliases = n::xfr<aliases_t>::read(sock)
+        };
+    }
+
+    auto n::xfr<c::tag_name>::write(
+        n::socket& sock,
+        const type& t
+    ) -> void {
+        n::xfr<name_t>::write(sock, t.name);
+        n::xfr<aliases_t>::write(sock, t.aliases);
+    }
+
     auto n::xfr<c::tag_preview>::read(
         n::socket& sock
     ) -> type {

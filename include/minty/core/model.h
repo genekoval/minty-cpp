@@ -9,6 +9,7 @@ namespace minty::core {
     using site = repo::db::site;
     using source = repo::db::source;
     using tag = repo::db::tag;
+    using tag_name = repo::db::tag_name;
     using tag_preview = repo::db::tag_preview;
 
     struct comment {

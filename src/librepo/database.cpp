@@ -13,11 +13,15 @@ namespace minty::repo::db {
         ci.prepare("create_object", 3);
         ci.prepare("create_post", 4);
         ci.prepare("create_site", 3);
+
         ci.prepare("create_tag", 1);
-        ci.prepare("create_tag_aliases", 2);
+        ci.prepare("create_tag_alias", 2);
         ci.prepare("create_tag_source", 3);
+
         ci.prepare("delete_post", 1);
         ci.prepare("delete_tag", 1);
+        ci.prepare("delete_tag_alias", 2);
+
         ci.prepare("read_comments", 1);
         ci.prepare("read_object", 1);
         ci.prepare("read_objects", 1);
@@ -27,6 +31,9 @@ namespace minty::repo::db {
         ci.prepare("read_tag_posts", 1);
         ci.prepare("read_tag_previews", 1);
         ci.prepare("read_tag_previews_all", 0);
+
+        ci.prepare("update_tag_description", 2);
+        ci.prepare("update_tag_name", 2);
     }
 
     auto database::create_comment(
@@ -91,11 +98,11 @@ namespace minty::repo::db {
             .as<std::string>();
     }
 
-    auto database::create_tag_aliases(
+    auto database::create_tag_alias(
         std::string_view tag_id,
-        const std::vector<std::string>& aliases
-    ) -> void {
-        ntx.exec_prepared("create_tag_aliases", tag_id, aliases);
+        std::string_view alias
+    ) -> tag_name {
+        return make_entity<tag_name>(ntx, "create_tag_alias", tag_id, alias);
     }
 
     auto database::create_tag_source(
@@ -112,6 +119,13 @@ namespace minty::repo::db {
 
     auto database::delete_tag(std::string_view tag_id) -> void {
         ntx.exec_prepared("delete_tag", tag_id);
+    }
+
+    auto database::delete_tag_alias(
+        std::string_view tag_id,
+        std::string_view alias
+    ) -> tag_name {
+        return make_entity<tag_name>(ntx, "delete_tag_alias", tag_id, alias);
     }
 
     auto database::read_comments(
@@ -179,5 +193,21 @@ namespace minty::repo::db {
             ntx,
             "read_tag_previews_all"
         );
+    }
+
+    auto database::update_tag_description(
+        std::string_view tag_id,
+        std::string_view description
+    ) -> std::optional<std::string> {
+        return ntx
+            .exec_prepared1("update_tag_description", tag_id, description)[0]
+            .as<std::optional<std::string>>();
+    }
+
+    auto database::update_tag_name(
+        std::string_view tag_id,
+        std::string_view name
+    ) -> tag_name {
+        return make_entity<tag_name>(ntx, "update_tag_name", tag_id, name);
     }
 }

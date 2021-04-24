@@ -13,15 +13,19 @@ namespace minty {
             add_comment,
             add_post,
             add_tag,
+            add_tag_alias,
             delete_post,
             delete_tag,
+            delete_tag_alias,
             get_comments,
             get_post,
             get_server_info,
             get_tag,
             get_tags_by_name,
             get_tag_posts,
-            get_tag_previews
+            get_tag_previews,
+            set_tag_description,
+            set_tag_name
         };
 
         using protocol = zipline::protocol<net::socket>;
@@ -42,9 +46,19 @@ namespace minty {
 
         auto add_tag(std::string_view name) -> std::string;
 
+        auto add_tag_alias(
+            std::string_view tag_id,
+            std::string_view alias
+        ) -> core::tag_name;
+
         auto delete_post(std::string_view id) -> void;
 
         auto delete_tag(std::string_view id) -> void;
+
+        auto delete_tag_alias(
+            std::string_view tag_id,
+            std::string_view alias
+        ) -> core::tag_name;
 
         auto get_comments(
             std::string_view post_id
@@ -59,5 +73,15 @@ namespace minty {
         auto get_tags_by_name(
             std::string_view search_term
         ) -> std::vector<core::tag_preview>;
+
+        auto set_tag_description(
+            std::string_view tag_id,
+            std::string_view description
+        ) -> std::optional<std::string>;
+
+        auto set_tag_name(
+            std::string_view tag_id,
+            std::string_view new_name
+        ) -> core::tag_name;
     };
 }

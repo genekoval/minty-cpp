@@ -18,7 +18,7 @@ protected:
     }
 };
 
-TEST_F(DatabaseTagTest, Create) {
+TEST_F(DatabaseTagTest, CreateTag) {
     const auto id = create_tag();
     const auto tag = database.read_tag(id);
 
@@ -40,7 +40,9 @@ TEST_F(DatabaseTagTest, CreateAliases) {
 
     const auto id = create_tag();
 
-    database.create_tag_aliases(id, aliases);
+    for (const auto& alias : aliases) {
+        database.create_tag_alias(id, alias);
+    }
 
     const auto tag = database.read_tag(id);
 
@@ -82,4 +84,86 @@ TEST_F(DatabaseTagTest, DeleteTag) {
 
     const auto remaining = database.read_tag(tag2);
     ASSERT_EQ(tag2, remaining.id);
+}
+
+TEST_F(DatabaseTagTest, DeleteAlias) {
+    constexpr auto alias = "Alias";
+
+    const auto id = create_tag();
+
+    database.create_tag_alias(id, alias);
+    auto tag = database.read_tag(id);
+
+    ASSERT_EQ(1, tag.aliases.size());
+
+    database.delete_tag_alias(id, alias);
+    tag = database.read_tag(id);
+
+    ASSERT_TRUE(tag.aliases.empty());
+}
+
+TEST_F(DatabaseTagTest, UpdateDescription) {
+    constexpr auto description = "This is a test description.";
+
+    const auto id = create_tag();
+
+    auto tag = database.read_tag(id);
+    ASSERT_FALSE(tag.description.has_value());
+
+    const auto desc = database.update_tag_description(id, description);
+    ASSERT_TRUE(desc.has_value());
+    ASSERT_EQ(description, desc.value());
+
+    tag = database.read_tag(id);
+    ASSERT_TRUE(tag.description.has_value());
+    ASSERT_EQ(description, tag.description.value());
+}
+
+TEST_F(DatabaseTagTest, UpdateDescriptionEmpty) {
+    constexpr auto description = "";
+
+    const auto id = create_tag();
+
+    const auto desc = database.update_tag_description(id, description);
+    ASSERT_FALSE(desc.has_value());
+
+    const auto tag = database.read_tag(id);
+    ASSERT_FALSE(tag.description.has_value());
+}
+
+TEST_F(DatabaseTagTest, UpdateName) {
+    constexpr auto new_name = "New Name";
+
+    const auto id = create_tag();
+    const auto [name, aliases] = database.update_tag_name(id, new_name);
+
+    ASSERT_EQ(new_name, name);
+    ASSERT_TRUE(aliases.empty());
+}
+
+TEST_F(DatabaseTagTest, UpdateNameReplace) {
+    constexpr auto new_name = "New Name";
+    constexpr auto alias = "Hello World";
+
+    const auto id = create_tag();
+    database.create_tag_alias(id, alias);
+    database.update_tag_name(id, new_name);
+
+    const auto tag = database.read_tag(id);
+
+    ASSERT_EQ(new_name, tag.name);
+    ASSERT_EQ(alias, tag.aliases.front());
+}
+
+TEST_F(DatabaseTagTest, UpdateNameSwap) {
+    constexpr auto alias = "Other Name";
+
+    const auto id = create_tag();
+    database.create_tag_alias(id, alias);
+    database.update_tag_name(id, alias);
+
+    const auto tag = database.read_tag(id);
+
+    ASSERT_EQ(tag.name, alias);
+    ASSERT_EQ(tag_name, tag.aliases.front());
 }

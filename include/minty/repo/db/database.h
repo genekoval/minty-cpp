@@ -36,10 +36,10 @@ namespace minty::repo::db {
 
         auto create_tag(std::string_view name) -> std::string;
 
-        auto create_tag_aliases(
+        auto create_tag_alias(
             std::string_view tag_id,
-            const std::vector<std::string>& aliases
-        ) -> void;
+            std::string_view alias
+        ) -> tag_name;
 
         auto create_tag_source(
             std::string_view tag_id,
@@ -56,6 +56,11 @@ namespace minty::repo::db {
         auto delete_post(std::string_view post_id) -> void;
 
         auto delete_tag(std::string_view tag_id) -> void;
+
+        auto delete_tag_alias(
+            std::string_view tag_id,
+            std::string_view alias
+        ) -> tag_name;
 
         auto read_comments(std::string_view post_id) -> std::vector<comment>;
 
@@ -76,5 +81,15 @@ namespace minty::repo::db {
         ) -> std::vector<tag_preview>;
 
         auto read_tag_previews_all() -> std::vector<tag_preview>;
+
+        auto update_tag_description(
+            std::string_view tag_id,
+            std::string_view description
+        ) -> std::optional<std::string>;
+
+        auto update_tag_name(
+            std::string_view tag_id,
+            std::string_view name
+        ) -> tag_name;
     };
 }

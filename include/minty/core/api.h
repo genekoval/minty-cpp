@@ -48,9 +48,19 @@ namespace minty::core {
 
         auto add_tag(std::string_view name) -> std::string;
 
+        auto add_tag_alias(
+            std::string_view tag_id,
+            std::string_view alias
+        ) -> tag_name;
+
         auto delete_post(std::string_view id) -> void;
 
         auto delete_tag(std::string_view id) -> void;
+
+        auto delete_tag_alias(
+            std::string_view tag_id,
+            std::string_view alias
+        ) -> tag_name;
 
         auto get_comments(std::string_view post_id) -> comment_tree;
 
@@ -67,5 +77,15 @@ namespace minty::core {
         ) -> std::vector<post_preview>;
 
         auto get_tag_previews() -> std::vector<tag_preview>;
+
+        auto set_tag_description(
+            std::string_view tag_id,
+            std::string_view description
+        ) -> std::optional<std::string>;
+
+        auto set_tag_name(
+            std::string_view tag_id,
+            std::string_view new_name
+        ) -> tag_name;
     };
 }
