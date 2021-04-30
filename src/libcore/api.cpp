@@ -165,7 +165,7 @@ namespace minty::core {
     }
 
     auto api::get_tag(std::string_view id) -> tag {
-        return db->read_tag(id);
+        return tag(db->read_tag(id), db->read_tag_sources(id));
     }
 
     auto api::get_tags_by_name(

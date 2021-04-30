@@ -39,7 +39,6 @@ namespace minty::repo::db {
         std::optional<std::string> description;
         std::optional<std::string> avatar;
         std::optional<std::string> banner;
-        std::vector<source> sources;
         unsigned int post_count;
         std::string date_created;
     };

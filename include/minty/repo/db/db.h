@@ -119,16 +119,6 @@ namespace minty::repo::db {
         return read_entity<typename T::value_type>(it, tx);
     }
 
-    template <typename T>
-    auto read_entities(
-        row_iterator& it,
-        transaction& tx,
-        pqxx::zview function
-    ) -> T {
-        auto keys = read_field<std::string>(it);
-        return make_entities<T>(tx, function, keys);
-    }
-
     struct sql_error {
         const std::string context;
         const std::string detail;

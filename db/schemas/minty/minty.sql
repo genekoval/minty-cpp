@@ -134,12 +134,10 @@ SELECT
     description,
     avatar,
     banner,
-    array_agg(source_id) AS sources,
     count(post_id) AS post_count,
     date_created
 FROM tag
 LEFT JOIN tag_name_view USING (tag_id)
-LEFT JOIN tag_source USING (tag_id)
 LEFT JOIN post_tag USING (tag_id)
 GROUP BY tag_id, name, aliases;
 
@@ -531,6 +529,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_tag_sources(
+    a_tag_id        integer
+) RETURNS SETOF source_view AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        source_id,
+        resource,
+        site_id,
+        scheme,
+        host,
+        icon
+    FROM tag_source
+    JOIN source_view USING (source_id)
+    WHERE tag_id = a_tag_id
+    ORDER BY host;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_object(
     object          uuid
 ) RETURNS SETOF object_view AS $$
@@ -599,17 +616,6 @@ BEGIN
     WHERE host = a_host AND scheme = a_scheme;
 
     RETURN result;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION read_sources(
-    a_sources       integer[]
-) RETURNS SETOF source_view AS $$
-BEGIN
-    RETURN QUERY
-    SELECT *
-    FROM source_view
-    WHERE source_id = any(a_sources);
 END;
 $$ LANGUAGE plpgsql;
 

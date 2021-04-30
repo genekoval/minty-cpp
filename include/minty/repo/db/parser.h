@@ -28,9 +28,6 @@ namespace minty::repo::db {
                 .description = read_field<decltype(tag::description)>(it),
                 .avatar = read_field<decltype(tag::avatar)>(it),
                 .banner = read_field<decltype(tag::banner)>(it),
-                .sources = read_entities<decltype(tag::sources)>(
-                    it, tx, "read_sources"
-                ),
                 .post_count = read_field<decltype(tag::post_count)>(it),
                 .date_created = read_field<decltype(tag::date_created)>(it)
             };

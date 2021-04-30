@@ -29,11 +29,11 @@ namespace minty::repo::db {
         ci.prepare("read_post", 1);
         ci.prepare("read_post_tags", 1);
         ci.prepare("read_site", 2);
-        ci.prepare("read_sources", 1);
         ci.prepare("read_tag", 1);
         ci.prepare("read_tag_posts", 1);
         ci.prepare("read_tag_previews", 1);
         ci.prepare("read_tag_previews_all", 0);
+        ci.prepare("read_tag_sources", 1);
 
         ci.prepare("update_tag_description", 2);
         ci.prepare("update_tag_name", 2);
@@ -227,6 +227,16 @@ namespace minty::repo::db {
         return make_entities<std::vector<tag_preview>>(
             ntx,
             "read_tag_previews_all"
+        );
+    }
+
+    auto database::read_tag_sources(
+        std::string_view tag_id
+    ) -> std::vector<source> {
+        return make_entities<std::vector<source>>(
+            ntx,
+            "read_tag_sources",
+            tag_id
         );
     }
 

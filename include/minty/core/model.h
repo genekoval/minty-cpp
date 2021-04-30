@@ -75,6 +75,9 @@ namespace minty::core {
         decltype(repo::db::tag::date_created) date_created;
 
         tag() = default;
-        tag(const repo::db::tag& t);
+        tag(
+            const repo::db::tag& t,
+            std::vector<repo::db::source>&& sources
+        );
     };
 }

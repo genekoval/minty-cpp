@@ -14,7 +14,10 @@ namespace minty::core {
         icon(src.website.icon)
     {}
 
-    tag::tag(const repo::db::tag& t) :
+    tag::tag(
+        const repo::db::tag& t,
+        std::vector<repo::db::source>&& sources
+    ) :
         id(t.id),
         name(t.name),
         aliases(t.aliases),
@@ -24,8 +27,8 @@ namespace minty::core {
         post_count(t.post_count),
         date_created(t.date_created)
     {
-        for (const auto& src : t.sources) {
-            sources.emplace_back(src);
+        for (auto&& src : sources) {
+            this->sources.emplace_back(std::move(src));
         }
     }
 }

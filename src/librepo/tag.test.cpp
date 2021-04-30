@@ -28,7 +28,6 @@ TEST_F(DatabaseTagTest, CreateTag) {
     ASSERT_FALSE(tag.description.has_value());
     ASSERT_FALSE(tag.avatar.has_value());
     ASSERT_FALSE(tag.banner.has_value());
-    ASSERT_TRUE(tag.sources.empty());
 }
 
 TEST_F(DatabaseTagTest, CreateAliases) {
@@ -66,11 +65,11 @@ TEST_F(DatabaseTagTest, CreateSource) {
 
     database.create_tag_source(id, site.id, resource);
 
-    const auto tag = database.read_tag(id);
+    const auto sources = database.read_tag_sources(id);
 
-    ASSERT_EQ(1, tag.sources.size());
+    ASSERT_EQ(1, sources.size());
 
-    const auto& source = tag.sources.front();
+    const auto& source = sources.front();
 
     ASSERT_EQ(resource, source.resource);
     ASSERT_EQ(site.id, source.website.id);
