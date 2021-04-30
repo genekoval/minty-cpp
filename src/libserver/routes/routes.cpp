@@ -68,6 +68,14 @@ namespace minty::server::route {
         return ctx->api->add_tag_alias(tag_id, alias);
     }
 
+    auto add_tag_source(
+        context* ctx,
+        std::string tag_id,
+        std::string url
+    ) -> core::source {
+        return ctx->api->add_tag_source(tag_id, url);
+    }
+
     auto delete_post(context* ctx, std::string post_id) -> void {
         ctx->api->delete_post(post_id);
 	}
@@ -82,6 +90,14 @@ namespace minty::server::route {
         std::string alias
     ) -> core::tag_name {
         return ctx->api->delete_tag_alias(tag_id, alias);
+    }
+
+    auto delete_tag_source(
+        context* ctx,
+        std::string tag_id,
+        std::string source_id
+    ) -> void {
+        ctx->api->delete_tag_source(tag_id, source_id);
     }
 
     auto get_comments(context* ctx, std::string post_id) -> core::comment_tree {

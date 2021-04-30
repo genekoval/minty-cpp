@@ -37,6 +37,7 @@ define common.libs
  pqxx
  pq
  timber
+ uri
  yaml-cpp
 endef
 

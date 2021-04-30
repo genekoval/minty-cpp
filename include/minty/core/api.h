@@ -11,6 +11,11 @@ namespace minty::core {
     class downloader;
     class search_engine;
 
+    struct source_parts {
+        std::string site_id;
+        std::string resource;
+    };
+
     class api {
         repo::db::database* db;
         fstore::bucket* bucket;
@@ -18,9 +23,16 @@ namespace minty::core {
         preview_service previews;
         search_engine* search;
 
+        auto add_site(
+            std::string_view scheme,
+            std::string_view host
+        ) -> std::string;
+
         auto get_object_metadata(
             std::span<const repo::db::object> db_objects
         ) -> std::vector<object>;
+
+        auto parse_url(std::string_view url) -> source_parts;
     public:
         api(
             repo::db::database& db,
@@ -53,6 +65,11 @@ namespace minty::core {
             std::string_view alias
         ) -> tag_name;
 
+        auto add_tag_source(
+            std::string_view tag_id,
+            std::string_view url
+        ) -> source;
+
         auto delete_post(std::string_view id) -> void;
 
         auto delete_tag(std::string_view id) -> void;
@@ -61,6 +78,11 @@ namespace minty::core {
             std::string_view tag_id,
             std::string_view alias
         ) -> tag_name;
+
+        auto delete_tag_source(
+            std::string_view tag_id,
+            std::string_view source_id
+        ) -> void;
 
         auto get_comments(std::string_view post_id) -> comment_tree;
 

@@ -41,6 +41,17 @@ namespace minty {
         );
     }
 
+    auto api::add_tag_source(
+        std::string_view tag_id,
+        std::string_view url
+    ) -> core::source {
+        return connect().send<core::source>(
+            event::add_tag_source,
+            tag_id,
+            url
+        );
+    }
+
     auto api::delete_post(std::string_view id) -> void {
         connect().emit(event::delete_post, id);
     }
@@ -57,6 +68,17 @@ namespace minty {
             event::delete_tag_alias,
             tag_id,
             alias
+        );
+    }
+
+    auto api::delete_tag_source(
+        std::string_view tag_id,
+        std::string_view source_id
+    ) -> void {
+        connect().emit(
+            event::delete_tag_source,
+            tag_id,
+            source_id
         );
     }
 

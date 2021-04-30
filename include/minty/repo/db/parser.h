@@ -103,9 +103,9 @@ namespace minty::repo::db {
         static auto read(row_iterator& it, transaction& tx) -> site {
             return {
                 .id = read_field<decltype(site::id)>(it),
-                .name = read_field<decltype(site::name)>(it),
-                .homepage = read_field<decltype(site::homepage)>(it),
-                .thumbnail_id = read_field<decltype(site::thumbnail_id)>(it)
+                .scheme = read_field<decltype(site::scheme)>(it),
+                .host = read_field<decltype(site::host)>(it),
+                .icon = read_field<decltype(site::icon)>(it)
             };
         }
     };
@@ -115,7 +115,7 @@ namespace minty::repo::db {
         static auto read(row_iterator& it, transaction& tx) -> source {
             return {
                 .id = read_field<decltype(source::id)>(it),
-                .url = read_field<decltype(source::url)>(it),
+                .resource = read_field<decltype(source::resource)>(it),
                 .website = read_entity<decltype(source::website)>(it, tx)
             };
         }

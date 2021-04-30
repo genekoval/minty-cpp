@@ -2,15 +2,17 @@
 
 CREATE TABLE site (
     site_id         SERIAL PRIMARY KEY,
-    name            text UNIQUE NOT NULL,
-    homepage        text UNIQUE NOT NULL,
-    thumbnail_id    uuid
+    scheme          text NOT NULL,
+    host            text UNIQUE NOT NULL,
+    icon            uuid
 );
 
 CREATE TABLE source (
     source_id       SERIAL PRIMARY KEY,
-    url             text UNIQUE NOT NULL,
-    site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION
+    resource        text NOT NULL,
+    site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION,
+
+    UNIQUE (site_id, resource)
 );
 
 CREATE TABLE object (
@@ -82,11 +84,11 @@ CREATE TABLE tag_source (
 CREATE VIEW source_view AS
 SELECT
     source_id,
-    url,
+    resource,
     site_id,
-    name,
-    homepage,
-    thumbnail_id
+    scheme,
+    host,
+    icon
 FROM source
 JOIN site USING (site_id);
 
@@ -146,14 +148,13 @@ SELECT
     object_id,
     preview_id,
     source_id,
-    url,
+    resource,
     site_id,
-    name,
-    homepage,
-    thumbnail_id
+    scheme,
+    host,
+    icon
 FROM object
-    LEFT JOIN source USING (source_id)
-    LEFT JOIN site USING (site_id);
+LEFT JOIN source_view USING (source_id);
 
 CREATE VIEW post_preview AS
 SELECT
@@ -293,41 +294,44 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_site(
-    name            text,
-    homepage        text,
-    thumbnail_id    uuid
+    a_scheme        text,
+    a_host          text,
+    a_icon          uuid
 ) RETURNS SETOF site AS $$
 BEGIN
     RETURN QUERY
     INSERT INTO site (
-        name,
-        homepage,
-        thumbnail_id
+        scheme,
+        host,
+        icon
     ) VALUES (
-        name,
-        homepage,
-        thumbnail_id
+        a_scheme,
+        a_host,
+        a_icon
     ) RETURNING *;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_source(
-    site            integer,
-    source_url      text
-) RETURNS SETOF source AS $$
+    a_site_id       integer,
+    a_resource      text
+) RETURNS integer AS $$
+DECLARE
+    result          integer;
 BEGIN
     INSERT INTO source (
         site_id,
-        url
+        resource
     ) VALUES (
-        site,
-        source_url
-    ) ON CONFLICT (url) DO NOTHING;
+        a_site_id,
+        a_resource
+    ) ON CONFLICT DO NOTHING;
 
-    RETURN QUERY
-    SELECT *
+    SELECT INTO result source_id
     FROM source
-    WHERE url = source_url;
+    WHERE site_id = a_site_id AND resource = a_resource;
+
+    RETURN result;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -381,19 +385,25 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_tag_source(
     a_tag_id        integer,
     a_site_id       integer,
-    a_source_url    text
-) RETURNS void AS $$
+    a_resource      text
+) RETURNS SETOF source_view AS $$
+DECLARE
+    l_source_id     integer;
 BEGIN
+    SELECT INTO l_source_id create_source(a_site_id, a_resource);
+
     INSERT INTO tag_source (
         tag_id,
         source_id
     ) VALUES (
         a_tag_id,
-        (
-            SELECT source_id
-            FROM create_source(a_site_id, a_source_url)
-        )
+        l_source_id
     ) ON CONFLICT DO NOTHING;
+
+    RETURN QUERY
+    SELECT *
+    FROM source_view
+    WHERE source_id = l_source_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -432,6 +442,16 @@ BEGIN
     SELECT t.name, t.aliases
     FROM tag_name_view t
     WHERE tag_id = a_tag_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_tag_source(
+    a_tag_id        integer,
+    a_source_id     integer
+) RETURNS void AS $$
+BEGIN
+    DELETE FROM tag_source
+    WHERE tag_id = a_tag_id AND source_id = a_source_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -531,11 +551,11 @@ BEGIN
         object_id,
         preview_id,
         source_id,
-        url,
+        resource,
         site_id,
-        name,
-        homepage,
-        thumbnail_id
+        scheme,
+        host,
+        icon
     FROM object_view
     JOIN post_object USING (object_id)
     WHERE post_id = a_post_id
@@ -564,6 +584,21 @@ BEGIN
     JOIN post_tag USING (tag_id)
     WHERE post_id = a_post_id
     ORDER BY name;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_site(
+    a_scheme        text,
+    a_host          text
+) RETURNS integer AS $$
+DECLARE
+    result          integer;
+BEGIN
+    SELECT INTO result site_id
+    FROM site
+    WHERE host = a_host AND scheme = a_scheme;
+
+    RETURN result;
 END;
 $$ LANGUAGE plpgsql;
 

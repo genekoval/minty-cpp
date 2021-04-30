@@ -21,12 +21,14 @@ namespace minty::repo::db {
         ci.prepare("delete_post", 1);
         ci.prepare("delete_tag", 1);
         ci.prepare("delete_tag_alias", 2);
+        ci.prepare("delete_tag_source", 2);
 
         ci.prepare("read_comments", 1);
         ci.prepare("read_object", 1);
         ci.prepare("read_objects", 1);
         ci.prepare("read_post", 1);
         ci.prepare("read_post_tags", 1);
+        ci.prepare("read_site", 2);
         ci.prepare("read_sources", 1);
         ci.prepare("read_tag", 1);
         ci.prepare("read_tag_posts", 1);
@@ -75,17 +77,17 @@ namespace minty::repo::db {
     }
 
     auto database::create_site(
+        std::string_view scheme,
         std::string_view name,
-        std::string_view homepage,
-        std::optional<std::string_view> thumbnail_id
+        std::optional<std::string_view> icon
     ) -> site {
         try {
             return make_entity<site>(
                 ntx,
                 "create_site",
+                scheme,
                 name,
-                homepage,
-                thumbnail_id
+                icon
             );
         }
         catch (const pqxx::unique_violation& ex) {
@@ -109,9 +111,15 @@ namespace minty::repo::db {
     auto database::create_tag_source(
         std::string_view tag_id,
         std::string_view site_id,
-        std::string_view url
-    ) -> void {
-        ntx.exec_prepared("create_tag_source", tag_id, site_id, url);
+        std::string_view resource
+    ) -> source {
+        return make_entity<source>(
+            ntx,
+            "create_tag_source",
+            tag_id,
+            site_id,
+            resource
+        );
     }
 
     auto database::delete_post(std::string_view post_id) -> void {
@@ -127,6 +135,13 @@ namespace minty::repo::db {
         std::string_view alias
     ) -> tag_name {
         return make_entity<tag_name>(ntx, "delete_tag_alias", tag_id, alias);
+    }
+
+    auto database::delete_tag_source(
+        std::string_view tag_id,
+        std::string_view source_id
+    ) -> void {
+        ntx.exec_prepared("delete_tag_source", tag_id, source_id);
     }
 
     auto database::read_comments(
@@ -165,6 +180,15 @@ namespace minty::repo::db {
             "read_post_tags",
             post_id
         );
+    }
+
+    auto database::read_site(
+        std::string_view scheme,
+        std::string_view host
+    ) -> std::optional<std::string> {
+        return ntx
+            .exec_prepared1("read_site", scheme, host)[0]
+            .as<std::optional<std::string>>();
     }
 
     auto database::read_tag(std::string_view tag_id) -> tag {

@@ -55,21 +55,25 @@ TEST_F(DatabaseTagTest, CreateAliases) {
 }
 
 TEST_F(DatabaseTagTest, CreateSource) {
-    constexpr auto url = "https://example.com/cats";
+    constexpr auto resource = "/cats?v=100";
+
     const auto id = create_tag();
     const auto site = database.create_site(
-        "Example",
-        "https://example.com",
+        "https",
+        "example.com",
         "937900e4-54a0-40fb-8ac8-315e5d3b2ae1"
     );
 
-    database.create_tag_source(id, site.id, url);
+    database.create_tag_source(id, site.id, resource);
 
     const auto tag = database.read_tag(id);
 
     ASSERT_EQ(1, tag.sources.size());
-    ASSERT_EQ(url, tag.sources[0].url);
-    ASSERT_EQ(site.id, tag.sources[0].website.id);
+
+    const auto& source = tag.sources.front();
+
+    ASSERT_EQ(resource, source.resource);
+    ASSERT_EQ(site.id, source.website.id);
 }
 
 TEST_F(DatabaseTagTest, DeleteTag) {

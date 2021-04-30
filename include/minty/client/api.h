@@ -14,9 +14,11 @@ namespace minty {
             add_post,
             add_tag,
             add_tag_alias,
+            add_tag_source,
             delete_post,
             delete_tag,
             delete_tag_alias,
+            delete_tag_source,
             get_comments,
             get_post,
             get_server_info,
@@ -51,6 +53,11 @@ namespace minty {
             std::string_view alias
         ) -> core::tag_name;
 
+        auto add_tag_source(
+            std::string_view tag_id,
+            std::string_view url
+        ) -> core::source;
+
         auto delete_post(std::string_view id) -> void;
 
         auto delete_tag(std::string_view id) -> void;
@@ -59,6 +66,11 @@ namespace minty {
             std::string_view tag_id,
             std::string_view alias
         ) -> core::tag_name;
+
+        auto delete_tag_source(
+            std::string_view tag_id,
+            std::string_view source_id
+        ) -> void;
 
         auto get_comments(
             std::string_view post_id

@@ -21,7 +21,8 @@ static auto $tag(
     const commline::app& app,
     const commline::argv& argv,
     std::optional<std::string_view> path,
-    std::optional<std::string_view> description
+    std::optional<std::string_view> description,
+    std::optional<std::string_view> link
 ) -> void {
     if (argv.empty()) throw std::runtime_error(
         "missing tag id"
@@ -31,6 +32,8 @@ static auto $tag(
     auto api = minty::cli::client();
 
     if (description) api.set_tag_description(id, *description);
+
+    if (link) api.add_tag_source(id, *link);
 
     print_tag(api, id, path);
 }
@@ -236,6 +239,11 @@ namespace minty::commands {
                     {"description", "d"},
                     "Set the tag's description",
                     "new description"
+                ),
+                option<std::optional<std::string_view>>(
+                    {"link", "l"},
+                    "Add a link to the tag",
+                    "url"
                 )
             ),
             $tag

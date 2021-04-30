@@ -4,6 +4,8 @@
 #include <minty/core/search.h>
 
 #include <ext/string.h>
+#include <fmt/format.h>
+#include <uri/uri>
 
 namespace minty::core {
     api::api(
@@ -73,6 +75,13 @@ namespace minty::core {
         );
     }
 
+    auto api::add_site(
+        std::string_view scheme,
+        std::string_view host
+    ) -> std::string {
+        return db->create_site(scheme, host, {}).id;
+    }
+
     auto api::add_tag(std::string_view name) -> std::string {
         return db->create_tag(ext::trim(std::string(name)));
     }
@@ -82,6 +91,14 @@ namespace minty::core {
         std::string_view alias
     ) -> tag_name {
         return db->create_tag_alias(tag_id, ext::trim(std::string(alias)));
+    }
+
+    auto api::add_tag_source(
+        std::string_view tag_id,
+        std::string_view url
+    ) -> source {
+        const auto src = parse_url(url);
+        return db->create_tag_source(tag_id, src.site_id, src.resource);
     }
 
     auto api::delete_post(std::string_view id) -> void {
@@ -97,6 +114,13 @@ namespace minty::core {
         std::string_view alias
     ) -> tag_name {
         return db->delete_tag_alias(tag_id, alias);
+    }
+
+    auto api::delete_tag_source(
+        std::string_view tag_id,
+        std::string_view source_id
+    ) -> void {
+        db->delete_tag_source(tag_id, source_id);
     }
 
     auto api::get_comments(std::string_view post_id) -> comment_tree {
@@ -181,5 +205,32 @@ namespace minty::core {
         std::string_view new_name
     ) -> tag_name {
         return db->update_tag_name(tag_id, ext::trim(std::string(new_name)));
+    }
+
+    auto api::parse_url(std::string_view url) -> source_parts {
+        constexpr auto host_prefix = std::string_view("www.");
+
+        const auto url_string = ext::trim(std::string(url));
+        const auto uri = uri::uri(url_string);
+
+        const auto scheme = uri.scheme();
+        auto host = uri.host();
+        if (host.starts_with(host_prefix)) {
+            host = host.substr(host_prefix.size());
+        }
+
+        const auto site_opt = db->read_site(scheme, host);
+        const auto site_id = site_opt ? *site_opt : add_site(scheme, host);
+
+        auto resource = uri.pathname();
+
+        if (!uri.query().empty()) resource.append(
+            fmt::format("?{}", uri.query())
+        );
+        if (!uri.fragment().empty()) resource.append(
+            fmt::format("#{}", uri.fragment())
+        );
+
+        return {site_id, resource};
     }
 }

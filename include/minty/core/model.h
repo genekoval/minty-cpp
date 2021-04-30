@@ -6,11 +6,17 @@
 
 namespace minty::core {
     using post_preview = repo::db::post_preview;
-    using site = repo::db::site;
-    using source = repo::db::source;
-    using tag = repo::db::tag;
     using tag_name = repo::db::tag_name;
     using tag_preview = repo::db::tag_preview;
+
+    struct source {
+        decltype(repo::db::source::id) id;
+        std::string url;
+        decltype(repo::db::site::icon) icon;
+
+        source() = default;
+        source(const repo::db::source& src);
+    };
 
     struct comment {
         std::string id;
@@ -55,5 +61,20 @@ namespace minty::core {
         std::string description;
         std::vector<std::string> objects;
         std::vector<std::string> tags;
+    };
+
+    struct tag {
+        decltype(repo::db::tag::id) id;
+        decltype(repo::db::tag::name) name;
+        decltype(repo::db::tag::aliases) aliases;
+        decltype(repo::db::tag::description) description;
+        decltype(repo::db::tag::avatar) avatar;
+        decltype(repo::db::tag::banner) banner;
+        std::vector<source> sources;
+        decltype(repo::db::tag::post_count) post_count;
+        decltype(repo::db::tag::date_created) date_created;
+
+        tag() = default;
+        tag(const repo::db::tag& t);
     };
 }

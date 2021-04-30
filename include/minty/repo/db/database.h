@@ -44,13 +44,13 @@ namespace minty::repo::db {
         auto create_tag_source(
             std::string_view tag_id,
             std::string_view site_id,
-            std::string_view url
-        ) -> void;
+            std::string_view resource
+        ) -> source;
 
         auto create_site(
+            std::string_view scheme,
             std::string_view name,
-            std::string_view homepage,
-            std::optional<std::string_view> thumbnail_id
+            std::optional<std::string_view> icon
         ) -> site;
 
         auto delete_post(std::string_view post_id) -> void;
@@ -61,6 +61,11 @@ namespace minty::repo::db {
             std::string_view tag_id,
             std::string_view alias
         ) -> tag_name;
+
+        auto delete_tag_source(
+            std::string_view tag_id,
+            std::string_view source_id
+        ) -> void;
 
         auto read_comments(std::string_view post_id) -> std::vector<comment>;
 
@@ -73,6 +78,11 @@ namespace minty::repo::db {
         auto read_post_tags(
             std::string_view post_id
         ) -> std::vector<tag_preview>;
+
+        auto read_site(
+            std::string_view scheme,
+            std::string_view host
+        ) -> std::optional<std::string>;
 
         auto read_tag(std::string_view tag_id) -> tag;
 

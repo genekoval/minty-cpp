@@ -15,14 +15,14 @@ namespace minty::repo::db {
 
     struct site : entity<4> {
         std::string id;
-        std::string name;
-        std::string homepage;
-        std::optional<std::string> thumbnail_id;
+        std::string scheme;
+        std::string host;
+        std::optional<std::string> icon;
     };
 
     struct source : entity<2, site> {
         std::string id;
-        std::string url;
+        std::string resource;
         site website;
     };
 
