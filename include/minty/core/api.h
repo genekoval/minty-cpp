@@ -28,11 +28,11 @@ namespace minty::core {
             std::string_view host
         ) -> std::string;
 
+        auto add_source(std::string_view url) -> source;
+
         auto get_object_metadata(
             std::span<const repo::db::object> db_objects
         ) -> std::vector<object>;
-
-        auto parse_url(std::string_view url) -> source_parts;
     public:
         api(
             repo::db::database& db,

@@ -75,6 +75,33 @@ namespace minty::core {
         );
     }
 
+    auto api::add_source(std::string_view url) -> source {
+        constexpr auto host_prefix = std::string_view("www.");
+
+        const auto url_string = ext::trim(std::string(url));
+        const auto uri = uri::uri(url_string);
+
+        const auto scheme = uri.scheme();
+        auto host = uri.host();
+        if (host.starts_with(host_prefix)) {
+            host = host.substr(host_prefix.size());
+        }
+
+        const auto site_opt = db->read_site(scheme, host);
+        const auto site_id = site_opt ? *site_opt : add_site(scheme, host);
+
+        auto resource = uri.pathname();
+
+        if (!uri.query().empty()) resource.append(
+            fmt::format("?{}", uri.query())
+        );
+        if (!uri.fragment().empty()) resource.append(
+            fmt::format("#{}", uri.fragment())
+        );
+
+        return db->create_source(site_id, resource);
+    }
+
     auto api::add_site(
         std::string_view scheme,
         std::string_view host
@@ -116,8 +143,9 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view url
     ) -> source {
-        const auto src = parse_url(url);
-        return db->create_tag_source(tag_id, src.site_id, src.resource);
+        const auto src = add_source(url);
+        db->create_tag_source(tag_id, src.id);
+        return src;
     }
 
     auto api::delete_post(std::string_view id) -> void {
@@ -224,32 +252,5 @@ namespace minty::core {
         std::string_view new_name
     ) -> tag_name {
         return db->update_tag_name(tag_id, ext::trim(std::string(new_name)));
-    }
-
-    auto api::parse_url(std::string_view url) -> source_parts {
-        constexpr auto host_prefix = std::string_view("www.");
-
-        const auto url_string = ext::trim(std::string(url));
-        const auto uri = uri::uri(url_string);
-
-        const auto scheme = uri.scheme();
-        auto host = uri.host();
-        if (host.starts_with(host_prefix)) {
-            host = host.substr(host_prefix.size());
-        }
-
-        const auto site_opt = db->read_site(scheme, host);
-        const auto site_id = site_opt ? *site_opt : add_site(scheme, host);
-
-        auto resource = uri.pathname();
-
-        if (!uri.query().empty()) resource.append(
-            fmt::format("?{}", uri.query())
-        );
-        if (!uri.fragment().empty()) resource.append(
-            fmt::format("#{}", uri.fragment())
-        );
-
-        return {site_id, resource};
     }
 }

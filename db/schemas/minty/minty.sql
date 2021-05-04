@@ -313,9 +313,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_source(
     a_site_id       integer,
     a_resource      text
-) RETURNS integer AS $$
-DECLARE
-    result          integer;
+) RETURNS SETOF source_view AS $$
 BEGIN
     INSERT INTO source (
         site_id,
@@ -325,11 +323,10 @@ BEGIN
         a_resource
     ) ON CONFLICT DO NOTHING;
 
-    SELECT INTO result source_id
-    FROM source
+    RETURN QUERY
+    SELECT *
+    FROM source_view
     WHERE site_id = a_site_id AND resource = a_resource;
-
-    RETURN result;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -382,26 +379,16 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_tag_source(
     a_tag_id        integer,
-    a_site_id       integer,
-    a_resource      text
-) RETURNS SETOF source_view AS $$
-DECLARE
-    l_source_id     integer;
+    a_source_id     integer
+) RETURNS void AS $$
 BEGIN
-    SELECT INTO l_source_id create_source(a_site_id, a_resource);
-
     INSERT INTO tag_source (
         tag_id,
         source_id
     ) VALUES (
         a_tag_id,
-        l_source_id
+        a_source_id
     ) ON CONFLICT DO NOTHING;
-
-    RETURN QUERY
-    SELECT *
-    FROM source_view
-    WHERE source_id = l_source_id;
 END;
 $$ LANGUAGE plpgsql;
 

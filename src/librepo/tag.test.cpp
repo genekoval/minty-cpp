@@ -63,16 +63,17 @@ TEST_F(DatabaseTagTest, CreateSource) {
         "937900e4-54a0-40fb-8ac8-315e5d3b2ae1"
     );
 
-    database.create_tag_source(id, site.id, resource);
+    const auto source = database.create_source(site.id, resource);
+    database.create_tag_source(id, source.id);
 
     const auto sources = database.read_tag_sources(id);
 
     ASSERT_EQ(1, sources.size());
 
-    const auto& source = sources.front();
+    const auto& src = sources.front();
 
-    ASSERT_EQ(resource, source.resource);
-    ASSERT_EQ(site.id, source.website.id);
+    ASSERT_EQ(resource, src.resource);
+    ASSERT_EQ(site.id, src.website.id);
 }
 
 TEST_F(DatabaseTagTest, DeleteTag) {

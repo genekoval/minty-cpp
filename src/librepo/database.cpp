@@ -13,10 +13,11 @@ namespace minty::repo::db {
         ci.prepare("create_object", 3);
         ci.prepare("create_post", 4);
         ci.prepare("create_site", 3);
+        ci.prepare("create_source", 2);
 
         ci.prepare("create_tag", 1);
         ci.prepare("create_tag_alias", 2);
-        ci.prepare("create_tag_source", 3);
+        ci.prepare("create_tag_source", 2);
 
         ci.prepare("delete_post", 1);
         ci.prepare("delete_tag", 1);
@@ -95,6 +96,13 @@ namespace minty::repo::db {
         }
     }
 
+    auto database::create_source(
+        std::string_view site_id,
+        std::string_view resource
+    ) -> source {
+        return make_entity<source>(ntx, "create_source", site_id, resource);
+    }
+
     auto database::create_tag(std::string_view name) -> std::string {
         return ntx
             .exec_prepared1("create_tag", name)[0]
@@ -110,16 +118,9 @@ namespace minty::repo::db {
 
     auto database::create_tag_source(
         std::string_view tag_id,
-        std::string_view site_id,
-        std::string_view resource
-    ) -> source {
-        return make_entity<source>(
-            ntx,
-            "create_tag_source",
-            tag_id,
-            site_id,
-            resource
-        );
+        std::string_view source_id
+    ) -> void {
+        ntx.exec_prepared("create_tag_source", tag_id, source_id);
     }
 
     auto database::delete_post(std::string_view post_id) -> void {
