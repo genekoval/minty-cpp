@@ -79,7 +79,26 @@ namespace minty::core {
         std::string_view scheme,
         std::string_view host
     ) -> std::string {
-        return db->create_site(scheme, host, {}).id;
+        auto icon_id = std::optional<std::string>();
+
+        dl->get_site_icon(
+            fmt::format("{}://{}", scheme, host),
+            [&](auto& stream) {
+                const auto object = bucket->add(
+                    {},
+                    stream.size(),
+                    [&stream] (auto&& part) {
+                        stream.read([&part](auto&& chunk) {
+                            part.write(chunk);
+                        });
+                    }
+                );
+
+                icon_id = object.id;
+            }
+        );
+
+        return db->create_site(scheme, host, icon_id).id;
     }
 
     auto api::add_tag(std::string_view name) -> std::string {
