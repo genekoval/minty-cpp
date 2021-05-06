@@ -11,7 +11,7 @@ namespace minty::core {
         auto fetch(
             std::string_view url,
             std::function<void(harvest::stream_type&)> callback
-        ) -> void;
+        ) -> bool;
 
         auto get_site_icon(
             std::string_view url,

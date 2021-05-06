@@ -51,19 +51,31 @@ namespace minty::core {
     }
 
     auto api::add_object_url(std::string_view url) -> std::vector<std::string> {
-        auto objects = std::vector<std::string>();
+        auto objects = std::vector<fstore::object_meta>();
 
-        dl->fetch(url, [&](auto& stream) {
-            objects.push_back(
-                add_object_data(stream.size(), [&stream](auto&& part) {
-                    stream.read([&part](auto&& chunk) {
+        const auto used_scraper = dl->fetch(url, [&](auto& file) {
+            objects.push_back(bucket->add(
+                {},
+                file.size(),
+                [&file](auto&& part) {
+                    file.read([&part](auto&& chunk) {
                         part.write(chunk);
                     });
-                })
-            );
+                }
+            ));
         });
 
-        return objects;
+        const auto src = used_scraper ?
+            add_source(url).id : std::optional<std::string>();
+
+        auto result = std::vector<std::string>();
+
+        for (const auto& obj : objects) {
+            db->create_object(obj.id, previews.generate_preview(obj), src);
+            result.push_back(obj.id);
+        }
+
+        return result;
     }
 
     auto api::add_post(post_parts parts) -> std::string {

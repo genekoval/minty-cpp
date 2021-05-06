@@ -11,8 +11,8 @@ namespace minty::core {
     auto downloader::fetch(
         std::string_view url,
         std::function<void(harvest::stream_type&)> callback
-    ) -> void {
-        service.scrape_url(url, [&callback](
+    ) -> bool {
+        return service.scrape_url(url, [&callback](
             auto& stream,
             auto current,
             auto total
