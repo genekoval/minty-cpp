@@ -2,7 +2,6 @@
 #pragma once
 
 #include <minty/core/model.h>
-#include <minty/core/search.h>
 #include <minty/net/zipline/protocol.h>
 
 namespace zipline {

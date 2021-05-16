@@ -12,10 +12,10 @@ namespace minty::core {
             version
         };
 
-        using protocol = zipline::protocol<net::socket>;
-        using client = zipline::client<protocol, event>;
+        using client = net::client<event>;
 
         const std::string endpoint;
+        const net::error_list errors;
 
         auto connect() -> client;
 

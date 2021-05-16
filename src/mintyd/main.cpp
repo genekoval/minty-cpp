@@ -78,14 +78,9 @@ static auto $main(
     auto api = minty::core::api(database, bucket, downloader, search);
     auto info = build_server_info(settings, app.version, bucket_info.id);
 
-    auto context = minty::server::context {
-        .api = &api,
-        .info = &info
-    };
-
     INFO() << "Object source: " << info.object_source;
 
-    minty::server::listen(settings.connection, context, []() {
+    minty::server::listen(api, info, settings.connection, []() {
         INFO() << "Server started. Listening for connections...";
     });
 

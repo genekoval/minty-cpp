@@ -23,17 +23,17 @@ namespace minty {
             get_post,
             get_server_info,
             get_tag,
-            get_tags_by_name,
             get_tag_posts,
             get_tag_previews,
+            get_tags_by_name,
             set_tag_description,
             set_tag_name
         };
 
-        using protocol = zipline::protocol<net::socket>;
-        using client = zipline::client<protocol, event>;
+        using client = net::client<event>;
 
         const std::string endpoint;
+        const net::error_list errors;
 
         auto connect() -> client;
     public:

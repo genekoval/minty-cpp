@@ -5,7 +5,7 @@ namespace minty {
     api::api(std::string_view endpoint) : endpoint(endpoint) {}
 
     auto api::connect() -> client {
-        return client(net::socket(netcore::connect(endpoint)));
+        return client(errors, net::socket(netcore::connect(endpoint)));
     }
 
     auto api::add_post(
@@ -53,11 +53,11 @@ namespace minty {
     }
 
     auto api::delete_post(std::string_view id) -> void {
-        connect().emit(event::delete_post, id);
+        connect().send<void>(event::delete_post, id);
     }
 
     auto api::delete_tag(std::string_view id) -> void {
-        connect().emit(event::delete_tag, id);
+        connect().send<void>(event::delete_tag, id);
     }
 
     auto api::delete_tag_alias(
@@ -75,7 +75,7 @@ namespace minty {
         std::string_view tag_id,
         std::string_view source_id
     ) -> void {
-        connect().emit(
+        connect().send<void>(
             event::delete_tag_source,
             tag_id,
             source_id

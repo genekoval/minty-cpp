@@ -11,7 +11,7 @@ namespace minty::core {
 
     auto search_engine::connect() -> client {
         try {
-            return client(net::socket(netcore::connect(endpoint)));
+            return client(errors, net::socket(netcore::connect(endpoint)));
         }
         catch (const ext::system_error& ex) {
             ERROR() << ex.what();
