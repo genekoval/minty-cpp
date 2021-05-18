@@ -72,7 +72,7 @@ static auto $main(
         << "` with "
         << bucket_info.size
         << " objects ("
-        << ext::data_size::format(bucket_info.space_used)
+        << ext::data_size::format(bucket_info.space_used).str(2)
         << ")";
 
     auto api = minty::core::api(database, bucket, downloader, search);

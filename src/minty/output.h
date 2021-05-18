@@ -12,6 +12,11 @@ namespace YAML {
 
     auto operator<<(
         Emitter& out,
+        const minty::core::data_size& data_size
+    ) -> Emitter&;
+
+    auto operator<<(
+        Emitter& out,
         const minty::core::object& object
     ) -> Emitter&;
 

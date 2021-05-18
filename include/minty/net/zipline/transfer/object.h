@@ -19,4 +19,15 @@ namespace zipline {
         static auto read(minty::net::socket&) -> type;
         static auto write(minty::net::socket&, const type&) -> void;
     };
+
+    template <>
+    struct transfer<minty::net::socket, minty::core::data_size> {
+        using type = minty::core::data_size;
+
+        using bytes_t = decltype(type::bytes);
+        using formatted_t = decltype(type::formatted);
+
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
+    };
 }

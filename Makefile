@@ -63,6 +63,7 @@ define $(cli).libs
  $(project)
  commline
  conf
+ fmt
  netcore
  timber
  yaml-cpp

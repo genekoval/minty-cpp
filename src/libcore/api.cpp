@@ -194,15 +194,7 @@ namespace minty::core {
 
         for (const auto& obj : db_objects) {
             const auto meta = bucket->meta(obj.id);
-            objects.emplace_back(
-                meta.id,
-                meta.hash,
-                meta.size,
-                meta.mime_type,
-                meta.date_added,
-                obj.preview_id,
-                obj.src
-            );
+            objects.emplace_back(obj, meta);
         }
 
         return objects;

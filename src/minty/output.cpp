@@ -1,5 +1,7 @@
 #include "output.h"
 
+#include <fmt/format.h>
+
 namespace YAML {
     auto operator<<(
         Emitter& out,
@@ -11,6 +13,19 @@ namespace YAML {
             << Key << "content" << Value << comment.content
             << Key << "date posted" << Value << comment.date_created
             << EndMap;
+
+        return out;
+    }
+
+    auto operator<<(
+        Emitter& out,
+        const minty::core::data_size& data_size
+    ) -> Emitter& {
+        out << fmt::format(
+            "{} ({} bytes)",
+            data_size.formatted,
+            data_size.bytes
+        );
 
         return out;
     }

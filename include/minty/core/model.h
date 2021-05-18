@@ -2,6 +2,7 @@
 
 #include <minty/repo/db/model.h>
 
+#include <fstore/client.h>
 #include <memory>
 
 namespace minty::core {
@@ -36,14 +37,28 @@ namespace minty::core {
         std::vector<comment_node*> roots;
     };
 
+    struct data_size {
+        uintmax_t bytes;
+        std::string formatted;
+
+        data_size() = default;
+        data_size(uintmax_t bytes);
+    };
+
     struct object {
         std::string id;
         std::string hash;
-        uintmax_t size;
+        data_size size;
         std::string mime_type;
         std::string date_added;
         std::optional<std::string> preview_id;
         std::optional<source> src;
+
+        object() = default;
+        object(
+            const repo::db::object& obj,
+            const fstore::object_meta& meta
+        );
     };
 
     struct post {
