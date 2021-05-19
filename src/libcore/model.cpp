@@ -8,7 +8,8 @@ namespace minty::core {
 
     object::object(
         const repo::db::object& obj,
-        const fstore::object_meta& meta
+        const fstore::object_meta& meta,
+        std::vector<post_preview>&& posts
     ) :
         id(meta.id),
         hash(meta.hash),
@@ -16,7 +17,8 @@ namespace minty::core {
         mime_type(meta.mime_type),
         date_added(meta.date_added),
         preview_id(obj.preview_id),
-        src(obj.src)
+        src(obj.src),
+        posts(std::move(posts))
     {}
 
     data_size::data_size(uintmax_t bytes) :

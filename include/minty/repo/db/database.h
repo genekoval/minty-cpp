@@ -75,6 +75,10 @@ namespace minty::repo::db {
 
         auto read_object(std::string_view object_id) -> object;
 
+        auto read_object_posts(
+            std::string_view object_id
+        ) -> std::vector<post_preview>;
+
         auto read_objects(std::string_view post_id) -> std::vector<object>;
 
         auto read_post(std::string_view post_id) -> post;

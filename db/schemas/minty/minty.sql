@@ -546,6 +546,25 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_object_posts(
+    a_object_id     uuid
+) RETURNS SETOF post_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        post_id,
+        title,
+        preview_id,
+        comment_count,
+        object_count,
+        date_created
+    FROM post_preview
+    JOIN post_object USING (post_id)
+    WHERE object_id = a_object_id
+    ORDER BY date_created DESC;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_objects(
     a_post_id       integer
 ) RETURNS SETOF object_view AS $$

@@ -14,6 +14,7 @@ namespace zipline {
         t.date_added = n::xfr<date_added_t>::read(sock);
         t.preview_id = n::xfr<preview_id_t>::read(sock);
         t.src = n::xfr<src_t>::read(sock);
+        t.posts = n::xfr<posts_t>::read(sock);
 
         return t;
     }
@@ -29,6 +30,7 @@ namespace zipline {
         n::xfr<date_added_t>::write(sock, t.date_added);
         n::xfr<preview_id_t>::write(sock, t.preview_id);
         n::xfr<src_t>::write(sock, t.src);
+        n::xfr<posts_t>::write(sock, t.posts);
     }
 
     auto n::xfr<c::data_size>::read(n::socket& sock) -> type {

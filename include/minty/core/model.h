@@ -53,11 +53,13 @@ namespace minty::core {
         std::string date_added;
         std::optional<std::string> preview_id;
         std::optional<source> src;
+        std::vector<post_preview> posts;
 
         object() = default;
         object(
             const repo::db::object& obj,
-            const fstore::object_meta& meta
+            const fstore::object_meta& meta,
+            std::vector<post_preview>&& posts
         );
     };
 

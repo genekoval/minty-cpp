@@ -194,7 +194,8 @@ namespace minty::core {
 
         for (const auto& obj : db_objects) {
             const auto meta = bucket->meta(obj.id);
-            objects.emplace_back(obj, meta);
+            auto posts = db->read_object_posts(obj.id);
+            objects.emplace_back(obj, meta, std::move(posts));
         }
 
         return objects;
