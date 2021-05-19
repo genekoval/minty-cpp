@@ -25,11 +25,31 @@ namespace minty::core {
         auto image = Magick::Image(blob);
         auto size = image.size();
 
-        if (
-            size.width() <= thumbnail_size ||
-            size.height() <= thumbnail_size
-        ) {
-            return object.id;
+        DEBUG()
+            << "image dimensions: "
+            << size.width() << " x " << size.height();
+
+        if (size.width() != size.height()) {
+            const auto smaller = std::min(size.width(), size.height());
+            const auto larger = std::max(size.width(), size.height());
+            const auto offset = (larger - smaller) / 2;
+
+            const auto crop = Magick::Geometry(
+                smaller,
+                smaller,
+                smaller == size.height() ? offset : 0,
+                smaller == size.width() ? offset : 0
+            );
+
+            DEBUG()
+                << "cropping image to: (width: " << crop.width()
+                << ", height: " << crop.height()
+                << ", xOffset: " << crop.xOff()
+                << ", yOffset: " << crop.yOff()
+                << ")";
+
+            image.crop(crop);
+            size = image.size();
         }
 
         image.thumbnail(thumbnail_geometry);
