@@ -7,18 +7,27 @@ namespace minty::core {
     constexpr auto decimal_places = 2;
 
     object::object(
-        const repo::db::object& obj,
-        const fstore::object_meta& meta,
+        repo::db::object&& obj,
+        fstore::object_meta&& meta,
         std::vector<post_preview>&& posts
     ) :
-        id(meta.id),
-        hash(meta.hash),
-        size(meta.size),
-        mime_type(meta.mime_type),
-        date_added(meta.date_added),
-        preview_id(obj.preview_id),
-        src(obj.src),
+        id(std::move(meta.id)),
+        hash(std::move(meta.hash)),
+        size(std::move(meta.size)),
+        mime_type(std::move(meta.mime_type)),
+        date_added(std::move(meta.date_added)),
+        preview_id(std::move(obj.preview_id)),
+        src(std::move(obj.src)),
         posts(std::move(posts))
+    {}
+
+    object_preview::object_preview(
+        repo::db::object_preview&& obj,
+        fstore::object_meta&& meta
+    ) :
+        id(std::move(obj.id)),
+        preview_id(std::move(obj.preview_id)),
+        mime_type(std::move(meta.mime_type))
     {}
 
     data_size::data_size(uintmax_t bytes) :

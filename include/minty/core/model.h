@@ -57,9 +57,21 @@ namespace minty::core {
 
         object() = default;
         object(
-            const repo::db::object& obj,
-            const fstore::object_meta& meta,
+            repo::db::object&& obj,
+            fstore::object_meta&& meta,
             std::vector<post_preview>&& posts
+        );
+    };
+
+    struct object_preview {
+        decltype(repo::db::object_preview::id) id;
+        decltype(repo::db::object_preview::preview_id) preview_id;
+        decltype(fstore::object_meta::mime_type) mime_type;
+
+        object_preview() = default;
+        object_preview(
+            repo::db::object_preview&& obj,
+            fstore::object_meta&& meta
         );
     };
 
@@ -69,7 +81,7 @@ namespace minty::core {
         std::optional<std::string> description;
         std::string date_created;
         std::string date_modified;
-        std::vector<object> objects;
+        std::vector<object_preview> objects;
         std::vector<tag_preview> tags;
     };
 

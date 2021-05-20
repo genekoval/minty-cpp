@@ -95,16 +95,26 @@ namespace YAML {
         Emitter& out,
         const minty::core::object& object
     ) -> Emitter& {
-        out << BeginMap;
-
-        out
+        out << BeginMap
             << Key << "id" << Value << object.id
             << Key << "hash" << Value << object.hash
             << Key << "size" << Value << object.size
             << Key << "mime type" << Value << object.mime_type
-            << Key << "date added" << Value << object.date_added;
+            << Key << "date added" << Value << object.date_added
+            << EndMap;
 
-        out << EndMap;
+        return out;
+    }
+
+    auto operator<<(
+        Emitter& out,
+        const minty::core::object_preview& object
+    ) -> Emitter& {
+        out << BeginMap
+            << Key << "id" << Value << object.id
+            << Key << "mime type" << Value << object.mime_type
+            << EndMap;
+
         return out;
     }
 

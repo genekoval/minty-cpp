@@ -32,6 +32,11 @@ namespace minty::repo::db {
         std::optional<source> src;
     };
 
+    struct object_preview : entity<2> {
+        std::string id;
+        std::optional<std::string> preview_id;
+    };
+
     struct tag : entity<9> {
         std::string id;
         std::string name;

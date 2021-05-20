@@ -536,13 +536,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_object(
-    object          uuid
+    a_object_id     uuid
 ) RETURNS SETOF object_view AS $$
 BEGIN
     RETURN QUERY
     SELECT *
     FROM object_view
-    WHERE object_id = object;
+    WHERE object_id = a_object_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -565,27 +565,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_objects(
-    a_post_id       integer
-) RETURNS SETOF object_view AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        object_id,
-        preview_id,
-        source_id,
-        resource,
-        site_id,
-        scheme,
-        host,
-        icon
-    FROM object_view
-    JOIN post_object USING (object_id)
-    WHERE post_id = a_post_id
-    ORDER BY sequence;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE FUNCTION read_post(
     a_post_id       integer
 ) RETURNS SETOF post AS $$
@@ -594,6 +573,24 @@ BEGIN
     SELECT *
     FROM post
     WHERE post_id = a_post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_post_objects(
+    a_post_id       integer
+) RETURNS TABLE (
+    object_id       uuid,
+    preview_id      uuid
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.object_id,
+        o.preview_id
+    FROM object o
+    JOIN post_object USING (object_id)
+    WHERE post_id = a_post_id
+    ORDER BY sequence;
 END;
 $$ LANGUAGE plpgsql;
 

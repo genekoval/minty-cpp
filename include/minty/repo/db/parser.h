@@ -67,6 +67,16 @@ namespace minty::repo::db {
     };
 
     template <>
+    struct parser<object_preview> {
+        static auto read(row_iterator& it, transaction& tx) -> object_preview {
+            return {
+                .id = read_field<decltype(object_preview::id)>(it),
+                .preview_id = read_field<decltype(object_preview::preview_id)>(it)
+            };
+        }
+    };
+
+    template <>
     struct parser<post> {
         static auto read(row_iterator& it, transaction& tx) -> post {
             return {

@@ -47,6 +47,8 @@ namespace minty::server {
 
         auto get_comments(std::string post_id) -> core::comment_tree;
 
+        auto get_object(std::string object_id) -> core::object;
+
         auto get_post(std::string post_id) -> core::post;
 
         auto get_server_info() -> server_info;

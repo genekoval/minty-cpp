@@ -29,10 +29,6 @@ namespace minty::core {
         ) -> std::string;
 
         auto add_source(std::string_view url) -> source;
-
-        auto get_object_metadata(
-            std::span<const repo::db::object> db_objects
-        ) -> std::vector<object>;
     public:
         api(
             repo::db::database& db,
@@ -85,6 +81,8 @@ namespace minty::core {
         ) -> void;
 
         auto get_comments(std::string_view post_id) -> comment_tree;
+
+        auto get_object(std::string_view object_id) -> object;
 
         auto get_post(std::string_view id) -> post;
 

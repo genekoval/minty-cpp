@@ -45,9 +45,6 @@ TEST_F(CorePostTest, CreateWhitespaceDescription) {
 TEST_F(CorePostTest, CreateFromBytes) {
     constexpr auto data = "Test data\n";
     constexpr auto size = 10;
-    constexpr auto hash =
-        "c0f5efbef0fe98aa90619444250b1a5e"
-        "b23158d6686f0b190838f3d544ec85b9";
 
     auto object = api.add_object_data(size, [data, size](auto&& part) {
         part.write(std::span(
@@ -61,23 +58,13 @@ TEST_F(CorePostTest, CreateFromBytes) {
     });
 
     ASSERT_EQ(1, post.objects.size());
-    ASSERT_EQ(hash, post.objects[0].hash);
+    ASSERT_EQ(object, post.objects[0].id);
 }
 
 TEST_F(CorePostTest, CreateFromFiles) {
     constexpr auto one_data = "First file.\n";
     constexpr auto two_data = "Second file.\n";
     constexpr auto three_data = "Third file.\n";
-
-    constexpr auto one_hash =
-        "54681d8b997b55f6b65914c349813517"
-        "9eb12255eadcffb3ca6386b2b2a525a4";
-    constexpr auto two_hash =
-        "b18f806b021da79fa5d84d5d895fc3f8"
-        "aa418e30951f06194cb74f0593454505";
-    constexpr auto three_hash =
-        "552565f5ec09c7674b1756d1a268c64b"
-        "18b23467fbc52ad0c206028a0c214437";
 
     auto files = std::vector<std::string>({
         write_file("one.txt", one_data),
@@ -95,7 +82,7 @@ TEST_F(CorePostTest, CreateFromFiles) {
     });
 
     ASSERT_EQ(3, post.objects.size());
-    ASSERT_EQ(one_hash, post.objects[0].hash);
-    ASSERT_EQ(two_hash, post.objects[1].hash);
-    ASSERT_EQ(three_hash, post.objects[2].hash);
+    ASSERT_EQ(objects[0], post.objects[0].id);
+    ASSERT_EQ(objects[1], post.objects[1].id);
+    ASSERT_EQ(objects[2], post.objects[2].id);
 }

@@ -33,6 +33,25 @@ namespace zipline {
         n::xfr<posts_t>::write(sock, t.posts);
     }
 
+    auto n::xfr<c::object_preview>::read(n::socket& sock) -> type {
+        auto t = type();
+
+        t.id = n::xfr<id_t>::read(sock);
+        t.preview_id = n::xfr<preview_id_t>::read(sock);
+        t.mime_type = n::xfr<mime_type_t>::read(sock);
+
+        return t;
+    }
+
+    auto n::xfr<c::object_preview>::write(
+        n::socket& sock,
+        const type& t
+    ) -> void {
+        n::xfr<id_t>::write(sock, t.id);
+        n::xfr<preview_id_t>::write(sock, t.preview_id);
+        n::xfr<mime_type_t>::write(sock, t.mime_type);
+    }
+
     auto n::xfr<c::data_size>::read(n::socket& sock) -> type {
         auto t = type();
 

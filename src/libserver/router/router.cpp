@@ -16,6 +16,7 @@ namespace minty::server {
             &context::delete_tag_alias,
             &context::delete_tag_source,
             &context::get_comments,
+            &context::get_object,
             &context::get_post,
             &context::get_server_info,
             &context::get_tag,

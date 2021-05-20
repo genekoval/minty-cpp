@@ -22,6 +22,11 @@ namespace YAML {
 
     auto operator<<(
         Emitter& out,
+        const minty::core::object_preview& object
+    ) -> Emitter&;
+
+    auto operator<<(
+        Emitter& out,
         const minty::core::post& post
     ) -> Emitter&;
 

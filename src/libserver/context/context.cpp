@@ -104,6 +104,10 @@ namespace minty::server {
         return api->get_comments(post_id);
 	}
 
+    auto context::get_object(std::string object_id) -> core::object {
+        return api->get_object(object_id);
+    }
+
     auto context::get_post(std::string post_id) -> core::post {
         return api->get_post(post_id);
 	}

@@ -27,8 +27,8 @@ namespace minty::repo::db {
         ci.prepare("read_comments", 1);
         ci.prepare("read_object", 1);
         ci.prepare("read_object_posts", 1);
-        ci.prepare("read_objects", 1);
         ci.prepare("read_post", 1);
+        ci.prepare("read_post_objects", 1);
         ci.prepare("read_post_tags", 1);
         ci.prepare("read_site", 2);
         ci.prepare("read_tag", 1);
@@ -170,12 +170,12 @@ namespace minty::repo::db {
         );
     }
 
-    auto database::read_objects(
+    auto database::read_post_objects(
         std::string_view post_id
-    ) -> std::vector<object> {
-        return make_entities<std::vector<object>>(
+    ) -> std::vector<object_preview> {
+        return make_entities<std::vector<object_preview>>(
             ntx,
-            "read_objects",
+            "read_post_objects",
             post_id
         );
     }

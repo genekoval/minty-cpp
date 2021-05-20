@@ -20,6 +20,7 @@ namespace minty {
             delete_tag_alias,
             delete_tag_source,
             get_comments,
+            get_object,
             get_post,
             get_server_info,
             get_tag,
@@ -75,6 +76,8 @@ namespace minty {
         auto get_comments(
             std::string_view post_id
         ) -> std::vector<core::comment>;
+
+        auto get_object(std::string_view object_id) -> core::object;
 
         auto get_post(std::string_view id) -> core::post;
 

@@ -187,33 +187,36 @@ namespace minty::core {
         return build_tree(entities);
     }
 
-    auto api::get_object_metadata(
-        std::span<const repo::db::object> db_objects
-    ) -> std::vector<object> {
-        auto objects = std::vector<object>();
-
-        for (const auto& obj : db_objects) {
-            const auto meta = bucket->meta(obj.id);
-            auto posts = db->read_object_posts(obj.id);
-            objects.emplace_back(obj, meta, std::move(posts));
-        }
-
-        return objects;
+    auto api::get_object(std::string_view object_id) -> object {
+        return object(
+            db->read_object(object_id),
+            bucket->meta(object_id),
+            db->read_object_posts(object_id)
+        );
     }
 
     auto api::get_post(std::string_view id) -> post {
         auto data = db->read_post(id);
-        auto objects = db->read_objects(id);
+        auto objects = db->read_post_objects(id);
 
-        return post {
+        auto result = post {
             .id = data.id,
             .title = data.title,
             .description = data.description,
             .date_created = data.date_created,
             .date_modified = data.date_modified,
-            .objects = get_object_metadata(objects),
             .tags = db->read_post_tags(id)
         };
+
+        for (auto&& obj : objects) {
+            auto meta = bucket->meta(obj.id);
+            result.objects.emplace_back(
+                std::move(obj),
+                std::move(meta)
+            );
+        }
+
+        return result;
     }
 
     auto api::get_tag(std::string_view id) -> tag {

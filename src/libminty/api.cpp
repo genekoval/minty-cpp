@@ -91,6 +91,10 @@ namespace minty {
         );
     }
 
+    auto api::get_object(std::string_view object_id) -> core::object {
+        return connect().send<core::object>(event::get_object, object_id);
+    }
+
     auto api::get_post(std::string_view id) -> core::post {
         return connect().send<core::post>(
             event::get_post,

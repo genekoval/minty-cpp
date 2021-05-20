@@ -59,7 +59,7 @@ TEST_F(DatabasePostTest, CreateWithObjects) {
     }
 
     const auto id = database.create_post("", "", objects, {});
-    const auto result = database.read_objects(id);
+    const auto result = database.read_post_objects(id);
 
     ASSERT_EQ(3, result.size());
 
