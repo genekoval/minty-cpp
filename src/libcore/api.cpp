@@ -240,6 +240,27 @@ namespace minty::core {
         return db->read_tag_previews_all();
     }
 
+    auto api::set_post_description(
+        std::string_view post_id,
+        std::string_view description
+    ) -> std::optional<std::string> {
+        return db->update_post_description(
+            post_id,
+            ext::replace(
+                ext::trim(std::string(description)),
+                std::regex("\r"),
+                [](const auto&) -> std::string { return "\n"; }
+            )
+        );
+    }
+
+    auto api::set_post_title(
+        std::string_view post_id,
+        std::string_view title
+    ) -> std::optional<std::string> {
+        return db->update_post_title(post_id, ext::trim(std::string(title)));
+    }
+
     auto api::set_tag_description(
         std::string_view tag_id,
         std::string_view description

@@ -622,6 +622,44 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION update_post_description(
+    a_post_id       integer,
+    a_description   text
+) RETURNS text AS $$
+DECLARE result      text;
+BEGIN
+    WITH updated AS (
+        UPDATE post
+        SET description = nullif(a_description, '')
+        WHERE post_id = a_post_id
+        RETURNING description
+    )
+    SELECT INTO result description
+    FROM updated;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION update_post_title(
+    a_post_id       integer,
+    a_title         text
+) RETURNS text AS $$
+DECLARE result      text;
+BEGIN
+    WITH updated AS (
+        UPDATE post
+        SET title = nullif(a_title, '')
+        WHERE post_id = a_post_id
+        RETURNING title
+    )
+    SELECT INTO result title
+    FROM updated;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION update_tag_description(
     a_tag_id        integer,
     a_description   text

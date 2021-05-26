@@ -136,6 +136,20 @@ namespace minty::server {
         return api->get_tags_by_name(search_term);
     }
 
+    auto context::set_post_description(
+        std::string post_id,
+        std::string description
+    ) -> std::optional<std::string> {
+        return api->set_post_description(post_id, description);
+    }
+
+    auto context::set_post_title(
+        std::string post_id,
+        std::string title
+    ) -> std::optional<std::string> {
+        return api->set_post_title(post_id, title);
+    }
+
     auto context::set_tag_description(
         std::string tag_id,
         std::string description
