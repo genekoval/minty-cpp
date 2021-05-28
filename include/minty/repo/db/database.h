@@ -34,6 +34,11 @@ namespace minty::repo::db {
             const std::vector<std::string>& tags
         ) -> std::string;
 
+        auto create_post_tag(
+            std::string_view post_id,
+            std::string_view tag_id
+        ) -> void;
+
         auto create_site(
             std::string_view scheme,
             std::string_view name,
@@ -58,6 +63,11 @@ namespace minty::repo::db {
         ) -> void;
 
         auto delete_post(std::string_view post_id) -> void;
+
+        auto delete_post_tag(
+            std::string_view post_id,
+            std::string_view tag_id
+        ) -> void;
 
         auto delete_tag(std::string_view tag_id) -> void;
 

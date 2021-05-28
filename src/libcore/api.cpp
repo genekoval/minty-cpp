@@ -87,6 +87,13 @@ namespace minty::core {
         );
     }
 
+    auto api::add_post_tag(
+        std::string_view post_id,
+        std::string_view tag_id
+    ) -> void {
+        db->create_post_tag(post_id, tag_id);
+    }
+
     auto api::add_source(std::string_view url) -> source {
         constexpr auto host_prefix = std::string_view("www.");
 
@@ -162,6 +169,13 @@ namespace minty::core {
 
     auto api::delete_post(std::string_view id) -> void {
         db->delete_post(id);
+    }
+
+    auto api::delete_post_tag(
+        std::string_view post_id,
+        std::string_view tag_id
+    ) -> void {
+        db->delete_post_tag(post_id, tag_id);
     }
 
     auto api::delete_tag(std::string_view id) -> void {

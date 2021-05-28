@@ -291,6 +291,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_post_tag(
+    a_post_id       integer,
+    a_tag_id        integer
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO post_tag(post_id, tag_id)
+    VALUES (a_post_id, a_tag_id);
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_site(
     a_scheme        text,
     a_host          text,
@@ -398,6 +408,16 @@ CREATE FUNCTION delete_post(
 BEGIN
     DELETE FROM post
     WHERE post_id = a_post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_post_tag(
+    a_post_id       integer,
+    a_tag_id        integer
+) RETURNS void AS $$
+BEGIN
+    DELETE FROM post_tag
+    WHERE post_id = a_post_id AND tag_id = a_tag_id;
 END;
 $$ LANGUAGE plpgsql;
 

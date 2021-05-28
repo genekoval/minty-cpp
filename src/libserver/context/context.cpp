@@ -60,6 +60,13 @@ namespace minty::server {
         return api->add_post(post);
 	}
 
+    auto context::add_post_tag(
+        std::string post_id,
+        std::string tag_id
+    ) -> void {
+        api->add_post_tag(post_id, tag_id);
+    }
+
     auto context::add_tag(std::string name) -> std::string {
         return api->add_tag(name);
 	}
@@ -81,6 +88,13 @@ namespace minty::server {
     auto context::delete_post(std::string post_id) -> void {
         api->delete_post(post_id);
 	}
+
+    auto context::delete_post_tag(
+        std::string post_id,
+        std::string tag_id
+    ) -> void {
+        api->delete_post_tag(post_id, tag_id);
+    }
 
     auto context::delete_tag(std::string tag_id) -> void {
         api->delete_tag(tag_id);

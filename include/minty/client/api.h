@@ -12,10 +12,12 @@ namespace minty {
         enum class event : net::event_t {
             add_comment,
             add_post,
+            add_post_tag,
             add_tag,
             add_tag_alias,
             add_tag_source,
             delete_post,
+            delete_post_tag,
             delete_tag,
             delete_tag_alias,
             delete_tag_source,
@@ -47,6 +49,11 @@ namespace minty {
             const std::vector<std::string>& tags
         ) -> std::string;
 
+        auto add_post_tag(
+            std::string_view post_id,
+            std::string_view tag_id
+        ) -> void;
+
         auto add_tag(std::string_view name) -> std::string;
 
         auto add_tag_alias(
@@ -60,6 +67,11 @@ namespace minty {
         ) -> core::source;
 
         auto delete_post(std::string_view id) -> void;
+
+        auto delete_post_tag(
+            std::string_view post_id,
+            std::string_view tag_id
+        ) -> void;
 
         auto delete_tag(std::string_view id) -> void;
 

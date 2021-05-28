@@ -23,6 +23,17 @@ namespace minty {
         );
     }
 
+    auto api::add_post_tag(
+        std::string_view post_id,
+        std::string_view tag_id
+    ) -> void {
+        connect().send<void>(
+            event::add_post_tag,
+            post_id,
+            tag_id
+        );
+    }
+
     auto api::add_tag(std::string_view name) -> std::string {
         return connect().send<std::string>(
             event::add_tag,
@@ -54,6 +65,13 @@ namespace minty {
 
     auto api::delete_post(std::string_view id) -> void {
         connect().send<void>(event::delete_post, id);
+    }
+
+    auto api::delete_post_tag(
+        std::string_view post_id,
+        std::string_view tag_id
+    ) -> void {
+        connect().send<void>(event::delete_post_tag, post_id, tag_id);
     }
 
     auto api::delete_tag(std::string_view id) -> void {
