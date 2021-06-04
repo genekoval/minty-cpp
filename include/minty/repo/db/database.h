@@ -34,6 +34,12 @@ namespace minty::repo::db {
             const std::vector<std::string>& tags
         ) -> std::string;
 
+        auto create_post_objects(
+            std::string_view post_id,
+            const std::vector<std::string>& objects,
+            unsigned int position
+        ) -> std::vector<object_preview>;
+
         auto create_post_tag(
             std::string_view post_id,
             std::string_view tag_id

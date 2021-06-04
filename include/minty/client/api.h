@@ -11,7 +11,11 @@ namespace minty {
     class api {
         enum class event : net::event_t {
             add_comment,
+            add_object_data,
+            add_object_local,
+            add_objects_url,
             add_post,
+            add_post_objects,
             add_post_tag,
             add_tag,
             add_tag_alias,

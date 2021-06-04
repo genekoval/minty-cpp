@@ -86,8 +86,8 @@ namespace minty::core {
     };
 
     struct post_parts {
-        std::string title;
-        std::string description;
+        std::optional<std::string> title;
+        std::optional<std::string> description;
         std::vector<std::string> objects;
         std::vector<std::string> tags;
     };

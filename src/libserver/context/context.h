@@ -1,7 +1,7 @@
 #pragma once
 
 #include <minty/core/api.h>
-#include <minty/net/zipline/post_parts.h>
+#include <minty/net/zipline/protocol.h>
 #include <minty/server/server_info.h>
 
 namespace minty::server {
@@ -17,7 +17,19 @@ namespace minty::server {
             std::string content
         ) -> core::comment;
 
-        auto add_post(net::post_parts parts) -> std::string;
+        auto add_object_data(net::data_stream stream) -> std::string;
+
+        auto add_object_local(std::string path) -> std::string;
+
+        auto add_objects_url(std::string url) -> std::vector<std::string>;
+
+        auto add_post(core::post_parts parts) -> std::string;
+
+        auto add_post_objects(
+            std::string post_id,
+            std::vector<std::string> objects,
+            unsigned int position
+        ) -> std::vector<core::object_preview>;
 
         auto add_post_tag(std::string post_id, std::string tag_id) -> void;
 

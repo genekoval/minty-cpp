@@ -32,7 +32,7 @@ CREATE TABLE post (
 CREATE TABLE post_object (
     post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
     object_id       uuid NOT NULL REFERENCES object ON DELETE CASCADE,
-    sequence        int NOT NULL,
+    sequence        smallint NOT NULL,
     date_added      timestamptz NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (post_id, object_id)
@@ -239,7 +239,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_post(
     a_title         text,
     a_description   text,
-    objects         uuid[],
+    a_objects       uuid[],
     tags            integer[]
 ) RETURNS integer AS $$
 DECLARE
@@ -258,21 +258,7 @@ BEGIN
         post_id
     FROM new_post;
 
-    WITH object_table AS (
-        SELECT
-            ordinality,
-            unnest AS obj
-        FROM unnest(objects) WITH ORDINALITY
-    )
-    INSERT INTO post_object (
-        post_id,
-        object_id,
-        sequence
-    ) SELECT
-        l_post_id,
-        object_table.obj,
-        object_table.ordinality
-    FROM object_table;
+    PERFORM insert_post_objects(l_post_id, a_objects);
 
     WITH tag_table AS (
         SELECT unnest AS tag_id
@@ -288,6 +274,33 @@ BEGIN
     FROM tag_table;
 
     RETURN l_post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION create_post_objects(
+    a_post_id       integer,
+    a_objects       uuid[],
+    a_position      integer
+) RETURNS TABLE (
+    object_id       uuid,
+    preview_id      uuid
+) AS $$
+BEGIN
+    UPDATE post_object
+    SET sequence = sequence + cardinality(a_objects)
+    WHERE post_id = a_post_id AND sequence > a_position;
+
+    PERFORM insert_post_objects(a_post_id, a_objects, a_position);
+
+    RETURN QUERY
+    SELECT
+        object.object_id,
+        object.preview_id
+    FROM (
+        SELECT unnest AS object_id
+        FROM unnest(a_objects)
+    ) objects
+    JOIN object USING (object_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -457,6 +470,27 @@ CREATE FUNCTION delete_tag_source(
 BEGIN
     DELETE FROM tag_source
     WHERE tag_id = a_tag_id AND source_id = a_source_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION insert_post_objects(
+    a_post_id       integer,
+    a_objects       uuid[],
+    a_position      integer DEFAULT 0
+) RETURNS void AS $$
+BEGIN
+    WITH objects AS (
+        SELECT
+            ordinality,
+            unnest AS object_id
+        FROM unnest(a_objects) WITH ordinality
+    )
+    INSERT INTO post_object (post_id, object_id, sequence)
+    SELECT
+        a_post_id,
+        objects.object_id,
+        objects.ordinality + a_position
+    FROM objects;
 END;
 $$ LANGUAGE plpgsql;
 

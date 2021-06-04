@@ -50,7 +50,9 @@ namespace minty::core {
         return object.id;
     }
 
-    auto api::add_object_url(std::string_view url) -> std::vector<std::string> {
+    auto api::add_objects_url(
+        std::string_view url
+    ) -> std::vector<std::string> {
         auto objects = std::vector<fstore::object_meta>();
 
         const auto used_scraper = dl->fetch(url, [&](auto& file) {
@@ -80,11 +82,34 @@ namespace minty::core {
 
     auto api::add_post(post_parts parts) -> std::string {
         return db->create_post(
-            ext::trim(parts.title),
-            ext::trim(parts.description),
+            parts.title ?
+                ext::trim(parts.title.value()) :
+                parts.title,
+            parts.description ?
+                ext::trim(parts.description.value()) :
+                parts.description,
             parts.objects,
             parts.tags
         );
+    }
+
+    auto api::add_post_objects(
+        std::string_view post_id,
+        const std::vector<std::string>& objects,
+        unsigned int position
+    ) -> std::vector<object_preview> {
+        auto new_objects = db->create_post_objects(post_id, objects, position);
+        auto result = std::vector<object_preview>();
+
+        for (auto&& obj : new_objects) {
+            auto meta = bucket->meta(obj.id);
+            result.emplace_back(
+                std::move(obj),
+                std::move(meta)
+            );
+        }
+
+        return result;
     }
 
     auto api::add_post_tag(

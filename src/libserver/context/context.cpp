@@ -14,51 +14,36 @@ namespace minty::server {
         return api->add_comment(post_id, parent_id, content);
 	}
 
-    auto context::add_post(net::post_parts parts) -> std::string {
-        auto objects = std::vector<std::pair<double, std::string>>();
-
-        for (auto& [index, blob] : parts.blobs) {
-            const auto id = api->add_object_data(
-                blob.size(),
-                [&blob](auto&& part) {
-                    blob.read([&part](auto&& chunk) {
-                        part.write(chunk);
-                    });
-                }
-            );
-
-            objects.push_back({index, id});
-        }
-
-        for (const auto& [index, file] : parts.files) {
-            objects.push_back({index, api->add_object_local(file)});
-        }
-
-        for (const auto& [index, url] : parts.urls) {
-            const auto downloaded = api->add_object_url(url);
-
-            auto i = 0.0;
-
-            for (const auto& obj : downloaded) {
-                objects.push_back({index + i, obj});
-                i += 0.1;
+    auto context::add_object_data(net::data_stream stream) -> std::string {
+        return api->add_object_data(
+            stream.size(),
+            [&stream](auto&& part) {
+                stream.read([&part](auto&& chunk) {
+                    part.write(chunk);
+                });
             }
-        }
+        );
+    }
 
-        std::sort(objects.begin(), objects.end());
+    auto context::add_object_local(std::string path) -> std::string {
+        return api->add_object_local(path);
+    }
 
-        auto post = core::post_parts {
-            .title = parts.title,
-            .description = parts.description,
-            .tags = parts.tags
-        };
+    auto context::add_objects_url(std::string url) -> std::vector<std::string> {
+        return api->add_objects_url(url);
+    }
 
-        for (const auto& obj : objects) {
-            post.objects.push_back(std::move(obj.second));
-        }
-
-        return api->add_post(post);
+    auto context::add_post(core::post_parts parts) -> std::string {
+        return api->add_post(parts);
 	}
+
+    auto context::add_post_objects(
+        std::string post_id,
+        std::vector<std::string> objects,
+        unsigned int position
+    ) -> std::vector<core::object_preview> {
+        return api->add_post_objects(post_id, objects, position);
+    }
 
     auto context::add_post_tag(
         std::string post_id,

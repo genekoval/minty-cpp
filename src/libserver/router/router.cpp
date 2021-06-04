@@ -7,7 +7,11 @@ namespace minty::server {
         return router(
             ctx,
             &context::add_comment,
+            &context::add_object_data,
+            &context::add_object_local,
+            &context::add_objects_url,
             &context::add_post,
+            &context::add_post_objects,
             &context::add_post_tag,
             &context::add_tag,
             &context::add_tag_alias,

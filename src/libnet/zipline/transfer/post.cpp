@@ -30,15 +30,20 @@ namespace zipline {
         n::xfr<tags_t>::write(sock, t.tags);
     }
 
-    auto n::xfr<n::post_parts>::read(n::socket& sock) -> type {
+    auto n::xfr<c::post_parts>::read(n::socket& sock) -> type {
         return {
             .title = n::xfr<title_t>::read(sock),
             .description = n::xfr<description_t>::read(sock),
-            .tags = n::xfr<tags_t>::read(sock),
-            .files = n::xfr<files_t>::read(sock),
-            .urls = n::xfr<urls_t>::read(sock),
-            .blobs = n::xfr<blobs_t>::read(sock)
+            .objects = n::xfr<objects_t>::read(sock),
+            .tags = n::xfr<tags_t>::read(sock)
         };
+    }
+
+    auto n::xfr<c::post_parts>::write(n::socket& sock, const type& t) -> void {
+        n::xfr<title_t>::write(sock, t.title);
+        n::xfr<description_t>::write(sock, t.description);
+        n::xfr<objects_t>::write(sock, t.objects);
+        n::xfr<tags_t>::write(sock, t.tags);
     }
 
     auto n::xfr<c::post_preview>::read(n::socket& sock) -> type {

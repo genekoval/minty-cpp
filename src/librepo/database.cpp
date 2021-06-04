@@ -12,6 +12,7 @@ namespace minty::repo::db {
         ci.prepare("create_comment", 3);
         ci.prepare("create_object", 3);
         ci.prepare("create_post", 4);
+        ci.prepare("create_post_objects", 3);
         ci.prepare("create_post_tag", 2);
         ci.prepare("create_site", 3);
         ci.prepare("create_source", 2);
@@ -80,6 +81,20 @@ namespace minty::repo::db {
             objects,
             tags
         )[0].as<std::string>();
+    }
+
+    auto database::create_post_objects(
+        std::string_view post_id,
+        const std::vector<std::string>& objects,
+        unsigned int position
+    ) -> std::vector<object_preview> {
+        return make_entities<std::vector<object_preview>>(
+            ntx,
+            __FUNCTION__,
+            post_id,
+            objects,
+            position
+        );
     }
 
     auto database::create_post_tag(
