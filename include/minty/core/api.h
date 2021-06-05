@@ -79,6 +79,11 @@ namespace minty::core {
 
         auto delete_post(std::string_view id) -> void;
 
+        auto delete_post_objects(
+            std::string_view post_id,
+            std::span<range> ranges
+        ) -> void;
+
         auto delete_post_tag(
             std::string_view post_id,
             std::string_view tag_id

@@ -2,6 +2,8 @@
 #include <minty/repo/db/database.h>
 #include <minty/repo/db/parser.h>
 
+#include <fmt/format.h>
+
 namespace minty::repo::db {
     database::database(std::string_view connection_string) :
         connection(std::string(connection_string)),
@@ -22,6 +24,7 @@ namespace minty::repo::db {
         ci.prepare("create_tag_source", 2);
 
         ci.prepare("delete_post", 1);
+        ci.prepare("delete_post_objects", 2);
         ci.prepare("delete_post_tag", 2);
         ci.prepare("delete_tag", 1);
         ci.prepare("delete_tag_alias", 2);
@@ -152,6 +155,23 @@ namespace minty::repo::db {
 
     auto database::delete_post(std::string_view post_id) -> void {
         ntx.exec_prepared("delete_post", post_id);
+    }
+
+    auto database::delete_post_objects(
+        std::string_view post_id,
+        std::span<const range> ranges
+    ) -> void {
+        auto arg = std::vector<std::string>();
+
+        for (const auto& r : ranges) {
+            arg.push_back(fmt::format(
+                "[{},{}]",
+                r.first + 1,
+                r.last + 1
+            ));
+        }
+
+        ntx.exec_prepared(__FUNCTION__, post_id, arg);
     }
 
     auto database::delete_post_tag(

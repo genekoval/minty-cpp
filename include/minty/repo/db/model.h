@@ -5,6 +5,13 @@
 #include <vector>
 
 namespace minty::repo::db {
+    struct range {
+        using index_type = int;
+
+        index_type first;
+        index_type last;
+    };
+
     template <int ColumnCount, typename ...Entities>
     struct entity {
         static constexpr auto column_count =

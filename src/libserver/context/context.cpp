@@ -74,6 +74,13 @@ namespace minty::server {
         api->delete_post(post_id);
 	}
 
+    auto context::delete_post_objects(
+        std::string post_id,
+        std::vector<core::range> ranges
+    ) -> void {
+        api->delete_post_objects(post_id, ranges);
+    }
+
     auto context::delete_post_tag(
         std::string post_id,
         std::string tag_id

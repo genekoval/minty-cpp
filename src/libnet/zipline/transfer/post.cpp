@@ -68,4 +68,19 @@ namespace zipline {
         n::xfr<object_count_t>::write(sock, t.object_count);
         n::xfr<date_created_t>::write(sock, t.date_created);
     }
+
+    auto n::xfr<c::range>::read(n::socket& sock) -> type {
+        return {
+            .first = n::xfr<c::range::index_type>::read(sock),
+            .last = n::xfr<c::range::index_type>::read(sock),
+        };
+    }
+
+    auto n::xfr<c::range>::write(
+        n::socket& sock,
+        const type& t
+    ) -> void {
+        n::xfr<c::range::index_type>::write(sock, t.first);
+        n::xfr<c::range::index_type>::write(sock, t.last);
+    }
 }

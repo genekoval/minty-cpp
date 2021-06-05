@@ -196,6 +196,13 @@ namespace minty::core {
         db->delete_post(id);
     }
 
+    auto api::delete_post_objects(
+        std::string_view post_id,
+        std::span<range> ranges
+    ) -> void {
+        db->delete_post_objects(post_id, ranges);
+    }
+
     auto api::delete_post_tag(
         std::string_view post_id,
         std::string_view tag_id

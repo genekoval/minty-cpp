@@ -3,6 +3,7 @@
 #include <minty/repo/db/model.h>
 
 #include <pqxx/pqxx>
+#include <span>
 
 namespace minty::repo::db {
     class database {
@@ -69,6 +70,11 @@ namespace minty::repo::db {
         ) -> void;
 
         auto delete_post(std::string_view post_id) -> void;
+
+        auto delete_post_objects(
+            std::string_view post_id,
+            std::span<const range> ranges
+        ) -> void;
 
         auto delete_post_tag(
             std::string_view post_id,

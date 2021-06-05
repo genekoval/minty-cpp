@@ -47,4 +47,12 @@ namespace zipline {
         static auto read(minty::net::socket&) -> type;
         static auto write(minty::net::socket&, const type&) -> void;
     };
+
+    template <>
+    struct transfer<minty::net::socket, minty::core::range> {
+        using type = minty::core::range;
+
+        static auto read(minty::net::socket&) -> type;
+        static auto write(minty::net::socket&, const type&) -> void;
+    };
 }

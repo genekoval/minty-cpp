@@ -19,6 +19,7 @@ namespace minty::server {
         decltype(&context::add_tag_alias),
         decltype(&context::add_tag_source),
         decltype(&context::delete_post),
+        decltype(&context::delete_post_objects),
         decltype(&context::delete_post_tag),
         decltype(&context::delete_tag),
         decltype(&context::delete_tag_alias),

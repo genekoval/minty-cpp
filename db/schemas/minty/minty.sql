@@ -424,6 +424,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION delete_post_objects(
+    a_post_id       integer,
+    ranges          int4range[]
+) RETURNS void AS $$
+DECLARE
+    range           int4range;
+BEGIN
+    FOR range IN
+        SELECT unnest AS range
+        FROM unnest(ranges)
+        ORDER BY range DESC
+    LOOP
+        PERFORM delete_post_objects_range(a_post_id, range);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_post_objects_range(
+    a_post_id       integer,
+    range           int4range
+) RETURNS void AS $$
+BEGIN
+    DELETE FROM post_object
+    WHERE
+        post_id = a_post_id AND
+        sequence >= lower(range) AND
+        sequence < upper(range);
+
+    UPDATE post_object
+    SET sequence = sequence - (upper(range) - lower(range))
+    WHERE sequence >= upper(range);
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION delete_post_tag(
     a_post_id       integer,
     a_tag_id        integer
