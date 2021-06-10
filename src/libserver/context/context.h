@@ -89,6 +89,12 @@ namespace minty::server {
             std::string search_term
         ) -> std::vector<core::tag_preview>;
 
+        auto move_post_object(
+            std::string post_id,
+            std::uint32_t old_index,
+            std::uint32_t new_index
+        ) -> void;
+
         auto set_post_description(
             std::string post_id,
             std::string description

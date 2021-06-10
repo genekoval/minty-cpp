@@ -93,6 +93,12 @@ namespace minty::repo::db {
             std::string_view source_id
         ) -> void;
 
+        auto move_post_object(
+            std::string_view post_id,
+            unsigned int old_index,
+            unsigned int new_index
+        ) -> void;
+
         auto read_comments(std::string_view post_id) -> std::vector<comment>;
 
         auto read_object(std::string_view object_id) -> object;

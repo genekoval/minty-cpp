@@ -32,6 +32,7 @@ namespace minty::server {
         decltype(&context::get_tag_posts),
         decltype(&context::get_tag_previews),
         decltype(&context::get_tags_by_name),
+        decltype(&context::move_post_object),
         decltype(&context::set_post_description),
         decltype(&context::set_post_title),
         decltype(&context::set_tag_description),

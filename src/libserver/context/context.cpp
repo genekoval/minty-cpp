@@ -142,6 +142,14 @@ namespace minty::server {
         return api->get_tags_by_name(search_term);
     }
 
+    auto context::move_post_object(
+        std::string post_id,
+        std::uint32_t old_index,
+        std::uint32_t new_index
+    ) -> void {
+        api->move_post_object(post_id, old_index, new_index);
+    }
+
     auto context::set_post_description(
         std::string post_id,
         std::string description

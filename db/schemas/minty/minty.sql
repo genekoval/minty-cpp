@@ -528,6 +528,36 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION move_post_object(
+    a_post_id       integer,
+    a_old_index     integer,
+    a_new_index     integer
+) RETURNS void AS $$
+BEGIN
+    UPDATE post_object
+    SET sequence = -1
+    WHERE post_id = a_post_id AND sequence = a_old_index;
+
+    UPDATE post_object
+    SET sequence = sequence + (
+        SELECT
+            CASE
+                WHEN a_new_index < a_old_index THEN 1
+                WHEN a_new_index > a_old_index THEN -1
+            END
+    )
+    WHERE post_id = a_post_id AND sequence::integer <@ int4range(
+        least(a_old_index, a_new_index),
+        greatest(a_old_index, a_new_index),
+        '[]'
+    );
+
+    UPDATE post_object
+    SET sequence = a_new_index
+    WHERE post_id = a_post_id AND sequence = -1;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_comments(
     a_post_id       integer
 ) RETURNS SETOF post_comment AS $$

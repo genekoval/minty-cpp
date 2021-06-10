@@ -119,6 +119,12 @@ namespace minty::core {
 
         auto get_tag_previews() -> std::vector<tag_preview>;
 
+        auto move_post_object(
+            std::string_view post_id,
+            unsigned int old_index,
+            unsigned int new_index
+        ) -> void;
+
         auto set_post_description(
             std::string_view post_id,
             std::string_view description

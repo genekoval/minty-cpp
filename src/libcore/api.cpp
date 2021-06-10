@@ -286,6 +286,14 @@ namespace minty::core {
         return db->read_tag_previews_all();
     }
 
+    auto api::move_post_object(
+        std::string_view post_id,
+        unsigned int old_index,
+        unsigned int new_index
+    ) -> void {
+        db->move_post_object(post_id, old_index, new_index);
+    }
+
     auto api::set_post_description(
         std::string_view post_id,
         std::string_view description
