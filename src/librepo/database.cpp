@@ -45,6 +45,7 @@ namespace minty::repo::db {
         ci.prepare("read_tag_previews_all", 0);
         ci.prepare("read_tag_sources", 1);
 
+        ci.prepare("update_comment", 2);
         ci.prepare("update_post_description", 2);
         ci.prepare("update_post_title", 2);
         ci.prepare("update_tag_description", 2);
@@ -313,6 +314,13 @@ namespace minty::repo::db {
             "read_tag_sources",
             tag_id
         );
+    }
+
+    auto database::update_comment(
+        std::string_view comment_id,
+        std::string_view content
+    ) -> void {
+        ntx.exec_prepared(__FUNCTION__, comment_id, content);
     }
 
     auto database::update_post_description(

@@ -740,6 +740,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION update_comment(
+    a_comment_id    integer,
+    a_content       text
+) RETURNS void AS $$
+BEGIN
+    UPDATE post_comment
+    SET content = a_content
+    WHERE comment_id = a_comment_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION update_post_description(
     a_post_id       integer,
     a_description   text

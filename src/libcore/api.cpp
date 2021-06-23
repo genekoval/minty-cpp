@@ -294,6 +294,24 @@ namespace minty::core {
         db->move_post_object(post_id, old_index, new_index);
     }
 
+    auto api::set_comment_content(
+        std::string_view comment_id,
+        std::string_view content
+    ) -> std::string {
+        const auto formatted = ext::replace(
+            ext::trim(std::string(content)),
+            std::regex("\r"),
+            [](const auto&) -> std::string { return "\n"; }
+        );
+
+        if (formatted.empty()) {
+            throw std::runtime_error("comment cannot be empty");
+        }
+
+        db->update_comment(comment_id, formatted);
+        return formatted;
+    }
+
     auto api::set_post_description(
         std::string_view post_id,
         std::string_view description

@@ -95,6 +95,11 @@ namespace minty::server {
             std::uint32_t new_index
         ) -> void;
 
+        auto set_comment_content(
+            std::string comment_id,
+            std::string content
+        ) -> std::string;
+
         auto set_post_description(
             std::string post_id,
             std::string description

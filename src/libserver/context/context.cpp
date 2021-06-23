@@ -150,6 +150,13 @@ namespace minty::server {
         api->move_post_object(post_id, old_index, new_index);
     }
 
+    auto context::set_comment_content(
+        std::string comment_id,
+        std::string content
+    ) -> std::string {
+        return api->set_comment_content(comment_id, content);
+    }
+
     auto context::set_post_description(
         std::string post_id,
         std::string description

@@ -31,6 +31,7 @@ namespace minty::server {
             &context::get_tag_previews,
             &context::get_tags_by_name,
             &context::move_post_object,
+            &context::set_comment_content,
             &context::set_post_description,
             &context::set_post_title,
             &context::set_tag_description,

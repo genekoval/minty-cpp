@@ -138,6 +138,11 @@ namespace minty::repo::db {
 
         auto read_tag_previews_all() -> std::vector<tag_preview>;
 
+        auto update_comment(
+            std::string_view comment_id,
+            std::string_view content
+        ) -> void;
+
         auto update_post_description(
             std::string_view post_id,
             std::string_view description

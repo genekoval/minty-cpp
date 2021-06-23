@@ -125,6 +125,11 @@ namespace minty::core {
             unsigned int new_index
         ) -> void;
 
+        auto set_comment_content(
+            std::string_view comment_id,
+            std::string_view content
+        ) -> std::string;
+
         auto set_post_description(
             std::string_view post_id,
             std::string_view description
