@@ -907,6 +907,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION update_date_modified() RETURNS trigger AS $$
+BEGIN
+    NEW.date_modified = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION update_post_date_modified() RETURNS trigger AS $$
+BEGIN
+    IF (TG_OP = 'DELETE') THEN
+        UPDATE post
+        SET date_modified = NOW()
+        WHERE post_id IN (SELECT DISTINCT post_id FROM old_table);
+    ELSEIF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+        UPDATE post
+        SET date_modified = NOW()
+        WHERE post_id IN (SELECT DISTINCT post_id FROM new_table);
+    END IF;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
 --}}}
 
 --{{{( Triggers )
@@ -922,5 +945,23 @@ FOR EACH ROW EXECUTE FUNCTION notify_insert_tag_name();
 
 CREATE TRIGGER notify_update_tag_name AFTER UPDATE ON tag_name
 FOR EACH ROW EXECUTE FUNCTION notify_update_tag_name();
+
+CREATE TRIGGER update_post_date_modified BEFORE UPDATE ON post
+FOR EACH ROW EXECUTE FUNCTION update_date_modified();
+
+CREATE TRIGGER update_post_date_modified_object_delete
+AFTER DELETE ON post_object
+REFERENCING OLD TABLE AS old_table
+FOR EACH STATEMENT EXECUTE FUNCTION update_post_date_modified();
+
+CREATE TRIGGER update_post_date_modified_object_insert
+AFTER INSERT ON post_object
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE FUNCTION update_post_date_modified();
+
+CREATE TRIGGER update_post_date_modified_object_update
+AFTER UPDATE ON post_object
+REFERENCING NEW TABLE AS new_table
+FOR EACH STATEMENT EXECUTE FUNCTION update_post_date_modified();
 
 --}}}

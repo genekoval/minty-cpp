@@ -236,3 +236,42 @@ TEST_F(DatabasePostTest, MoveObject) {
     ASSERT_EQ(objects[2], result[3].id);
     ASSERT_EQ(objects[4], result[4].id);
 }
+
+TEST_F(DatabasePostTest, UpdateDateModified) {
+    const auto objects = std::vector<std::string> {
+        "0e5bad49-9cf9-46e4-85c9-83ef9baf1f79",
+        "adf85243-7673-467f-9fa6-56fc40642e06",
+    };
+
+    for (const auto& object : objects) database.create_object(object, {}, {});
+
+    const auto id = database.create_post("", "", {}, {});
+    auto post = database.read_post(id);
+    auto date_modified = post.date_modified;
+
+    ASSERT_EQ(post.date_created, date_modified);
+
+    auto date_changed = [&]() -> bool {
+        post = database.read_post(id);
+        auto changed = date_modified != post.date_modified;
+        date_modified = post.date_modified;
+        return changed;
+    };
+
+    database.update_post_title(id, "New Title");
+    ASSERT_TRUE(date_changed());
+
+    database.update_post_description(id, "New description.");
+    ASSERT_TRUE(date_changed());
+
+    database.create_post_objects(id, objects, 0);
+    ASSERT_TRUE(date_changed());
+
+    database.move_post_object(id, 0, 1);
+    ASSERT_TRUE(date_changed());
+
+    database.delete_post_objects(id, std::array {
+        minty::repo::db::range {0, 1}
+    });
+    ASSERT_TRUE(date_changed());
+}
