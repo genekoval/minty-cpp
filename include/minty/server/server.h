@@ -7,7 +7,7 @@ namespace minty::server {
     auto listen(
         core::api& api,
         const server_info& info,
-        std::string_view endpoint,
+        netcore::unix_socket unix_socket,
         std::function<void()>&& callback
     ) -> void;
 }

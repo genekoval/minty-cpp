@@ -1,5 +1,6 @@
 #pragma once
 
+#include <netcore/netcore>
 #include <optional>
 #include <string>
 #include <timber/timber>
@@ -38,12 +39,12 @@ namespace minty::conf {
 
         static auto load_file(const std::string& path) -> settings;
 
-        std::string connection;
         s_database database;
         s_downloader downloader;
         s_fstore fstore;
         s_log log;
         s_search search;
+        netcore::unix_socket server;
 
         auto encode() const -> std::string;
     };

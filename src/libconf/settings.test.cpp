@@ -6,8 +6,6 @@ class ConfSettingsTest : public testing::Test {};
 
 TEST_F(ConfSettingsTest, Decode) {
     constexpr auto yaml = R"(
-connection: /run/minty/minty.sock
-
 database:
     connection:
         host: localhost
@@ -24,11 +22,14 @@ fstore:
 
 search:
     host: /run/minty-search.sock
+
+server:
+    path: /run/minty/minty.sock
 )";
 
     const auto settings = minty::conf::settings::load(yaml);
 
-    ASSERT_EQ("/run/minty/minty.sock", settings.connection);
+    ASSERT_EQ("/run/minty/minty.sock", settings.server.path);
     ASSERT_EQ(
         "host=localhost user=minty dbname=minty",
         settings.database.connection
@@ -42,7 +43,8 @@ search:
 
 TEST_F(ConfSettingsTest, Encode) {
     constexpr auto yaml =
-R"(connection: localhost:1234
+R"(server:
+  path: /run/minty/minty.sock
 
 database:
   connection: postgres://minty@localhost/minty
@@ -57,7 +59,6 @@ fstore:
 )";
 
     const auto settings = minty::conf::settings {
-        .connection = "localhost:1234",
         .database = {
             .connection = "postgres://minty@localhost/minty"
         },
@@ -68,6 +69,9 @@ fstore:
         .fstore = {
             .bucket = "world",
             .connection = "/tmp/fstore.sock"
+        },
+        .server = {
+            .path = "/run/minty/minty.sock"
         }
     };
 

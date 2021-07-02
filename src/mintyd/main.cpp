@@ -80,7 +80,7 @@ static auto $main(
 
     INFO() << "Object source: " << info.object_source;
 
-    minty::server::listen(api, info, settings.connection, []() {
+    minty::server::listen(api, info, settings.server, []() {
         INFO() << "Server started. Listening for connections...";
     });
 

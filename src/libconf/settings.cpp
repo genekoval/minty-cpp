@@ -116,10 +116,35 @@ namespace YAML {
     };
 
     template <>
+    struct convert<netcore::unix_socket> {
+        using T = netcore::unix_socket;
+
+        static auto decode(const Node& node, T& socket) -> bool {
+            socket.path = node["path"].as<std::string>();
+
+            if (node["mode"]) {
+                socket.mode = static_cast<std::filesystem::perms>(
+                    std::stoi(node["mode"].as<std::string>(), nullptr, 8)
+                );
+            }
+
+            if (node["uid"]) socket.owner = node["uid"].as<uid_t>();
+            else if (node["owner"]) {
+                socket.owner = node["owner"].as<std::string>();
+            }
+
+            if (node["gid"]) socket.group = node["gid"].as<gid_t>();
+            else if (node["group"]) {
+                socket.group = node["group"].as<std::string>();
+            }
+
+            return true;
+        }
+    };
+
+    template <>
     struct convert<settings> {
         static auto decode(const Node& node, settings& s) -> bool {
-            s.connection = node["connection"]
-                .as<decltype(settings::connection)>();
             s.database = node["database"]
                 .as<decltype(settings::database)>();
             s.downloader= node["downloader"]
@@ -130,6 +155,8 @@ namespace YAML {
                 .as<decltype(settings::log)>();
             s.search = node["search"]
                 .as<decltype(settings::search)>();
+            s.server = node["server"]
+                .as<netcore::unix_socket>();
 
             return true;
         }
@@ -144,7 +171,9 @@ namespace minty::conf {
 
         out
             << BeginMap
-                << Key << "connection" << Value << connection
+                << Key << "server" << Value << BeginMap
+                    << Key << "path" << Value << server.path
+                << EndMap
             << EndMap
             << Newline
 

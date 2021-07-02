@@ -13,7 +13,7 @@ const auto default_config = std::filesystem::path(CONFDIR) / "minty.yml";
 namespace minty::cli {
     auto client() -> api {
         const auto settings = minty::conf::settings::load_file(default_config);
-        return api(settings.connection);
+        return api(settings.server.path.string());
     }
 }
 
