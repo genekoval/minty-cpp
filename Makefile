@@ -29,6 +29,7 @@ internal.libs := $(addprefix lib,$(internal))
 define common.libs
  $(internal)
  $(graphics.libs)
+ conftools
  ext++
  fmt
  fstore
@@ -62,6 +63,7 @@ $(cli).deps := $(client) $(conf)
 define $(cli).libs
  $(project)
  commline
+ conftools
  conf
  fmt
  netcore

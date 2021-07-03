@@ -1,8 +1,8 @@
 #include <minty/conf/settings.h>
 #include <minty/error.h>
 
+#include <conftools/yaml.h>
 #include <sstream>
-#include <yaml-cpp/yaml.h>
 
 template <typename Optional>
 static auto optional(
@@ -110,33 +110,6 @@ namespace YAML {
 
         static auto decode(const Node& node, T& search) -> bool {
             search.host = node["host"].as<decltype(T::host)>();
-
-            return true;
-        }
-    };
-
-    template <>
-    struct convert<netcore::unix_socket> {
-        using T = netcore::unix_socket;
-
-        static auto decode(const Node& node, T& socket) -> bool {
-            socket.path = node["path"].as<std::string>();
-
-            if (node["mode"]) {
-                socket.mode = static_cast<std::filesystem::perms>(
-                    std::stoi(node["mode"].as<std::string>(), nullptr, 8)
-                );
-            }
-
-            if (node["uid"]) socket.owner = node["uid"].as<uid_t>();
-            else if (node["owner"]) {
-                socket.owner = node["owner"].as<std::string>();
-            }
-
-            if (node["gid"]) socket.group = node["gid"].as<gid_t>();
-            else if (node["group"]) {
-                socket.group = node["group"].as<std::string>();
-            }
 
             return true;
         }
