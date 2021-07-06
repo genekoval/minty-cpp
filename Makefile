@@ -78,7 +78,6 @@ test.deps = $(internal.libs)
 define test.libs
  $(common.libs)
  gtest
- gtest_main
 endef
 
 include mk/db.mk

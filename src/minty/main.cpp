@@ -8,7 +8,36 @@
 #include <filesystem>
 #include <timber/timber>
 
-const auto default_config = std::filesystem::path(CONFDIR) / "minty.yml";
+namespace fs = std::filesystem;
+
+namespace {
+    const auto default_config = fs::path(CONFDIR) / "minty.yml";
+
+    auto $main(
+        const commline::app& app,
+        const commline::argv& argv,
+        bool version
+    ) -> void {
+        if (!version) {
+            std::cout << app.name << ": " << app.description << std::endl;
+            return;
+        }
+
+        commline::print_version(std::cout, app);
+
+        auto api = minty::cli::client();
+        const auto server_info = api.get_server_info();
+        std::cout << "server version: " << server_info.version << std::endl;
+    }
+
+    auto console_logger(const timber::log& l) noexcept -> void {
+        if (l.log_level != timber::level::info) {
+            std::cerr << l.log_level << ": ";
+        }
+
+        std::cerr << l.stream.str() << std::endl;
+    }
+}
 
 namespace minty::cli {
     auto client() -> api {
@@ -17,27 +46,11 @@ namespace minty::cli {
     }
 }
 
-static auto $main(
-    const commline::app& app,
-    const commline::argv& argv,
-    bool version
-) -> void {
-    if (!version) {
-        std::cout << app.name << ": " << app.description << std::endl;
-        return;
-    }
-
-    commline::print_version(std::cout, app);
-
-    auto api = minty::cli::client();
-    const auto server_info = api.get_server_info();
-    std::cout << "server version: " << server_info.version << std::endl;
-}
-
 auto main(int argc, const char** argv) -> int {
     using namespace commline;
 
-    timber::reporting_level() = timber::level::info;
+    timber::reporting_level = timber::level::info;
+    timber::log_handler = &console_logger;
 
     auto app = application(
         NAME,
