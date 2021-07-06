@@ -3,7 +3,7 @@ include mk/graphics.mk
 project := minty
 summary := A repo of fun.
 
-STD := c++2a
+STD := c++20
 
 db.user := $(project)
 db.name := $(project)
