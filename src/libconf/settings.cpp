@@ -126,6 +126,8 @@ namespace YAML {
                 .as<decltype(settings::fstore)>();
             if (node["log"]) s.log = node["log"]
                 .as<decltype(settings::log)>();
+            s.pidfile = node["pidfile"]
+                .as<decltype(settings::pidfile)>();
             s.search = node["search"]
                 .as<decltype(settings::search)>();
             s.server = node["server"]

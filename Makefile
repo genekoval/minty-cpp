@@ -48,6 +48,7 @@ $(daemon).deps := $(internal.libs)
 define $(daemon).libs
  $(common.libs)
  commline
+ dmon
 endef
 
 client := lib$(project)

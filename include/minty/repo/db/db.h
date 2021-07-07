@@ -81,7 +81,7 @@ namespace minty::repo::db {
                     // We currently do not use nested arrays.
                     break;
                 default:
-                    WARN()
+                    WARNING()
                         << "Unhandled array parser juncture: "
                         << static_cast<int>(junct);
             }

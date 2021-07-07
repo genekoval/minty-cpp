@@ -1,3 +1,5 @@
+#include "commands/commands.h"
+
 #include <minty/core/api.h>
 #include <minty/core/downloader.h>
 #include <minty/core/search.h>
@@ -6,6 +8,7 @@
 #include <minty/server/server_info.h>
 
 #include <commline/commline>
+#include <dmon/dmon>
 #include <ext/data_size.h>
 #include <filesystem>
 #include <fmt/format.h>
@@ -49,12 +52,18 @@ namespace {
 
     auto $main(
         const commline::app& app,
-        const commline::argv& argv
+        const commline::argv& argv,
+        bool daemon
     ) -> void {
         const auto settings = minty::conf::settings::load_file(default_config);
         timber::reporting_level = settings.log.level;
 
-        INFO() << app.name << " version " << app.version << " starting";
+        if (daemon && !dmon::daemonize({
+            .identifier = app.name,
+            .pidfile = settings.pidfile
+        })) return;
+
+        NOTICE() << app.name << " version " << app.version << " starting up";
 
         auto database = minty::repo::db::database(settings.database.connection);
 
@@ -87,7 +96,7 @@ namespace {
             INFO() << "Server started. Listening for connections...";
         });
 
-        INFO() << "Shutting down...";
+        NOTICE() << app.name << " shutting down";
     }
 }
 
@@ -98,8 +107,22 @@ auto main(int argc, const char** argv) -> int {
         NAME,
         VERSION,
         DESCRIPTION,
+        commline::options(
+            commline::flag(
+                {"daemon", "d"},
+                "Run the program as a daemon."
+            )
+        ),
         $main
     );
+
+    app.on_error([](const auto& e) -> void {
+        CRITICAL() << e.what();
+    });
+
+    const auto confpath = default_config.string();
+
+    app.subcommand(minty::cli::stop(confpath));
 
     return app.run(argc, argv);
 }

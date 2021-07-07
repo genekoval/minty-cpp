@@ -43,6 +43,7 @@ namespace minty::conf {
         s_downloader downloader;
         s_fstore fstore;
         s_log log;
+        std::string pidfile;
         s_search search;
         netcore::unix_socket server;
 
