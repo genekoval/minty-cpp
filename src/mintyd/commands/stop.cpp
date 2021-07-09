@@ -17,7 +17,7 @@ namespace {
         );
         timber::reporting_level = settings.log.level;
 
-        dmon::stop(settings.pidfile);
+        dmon::stop(settings.daemon.pidfile);
     }
 }
 

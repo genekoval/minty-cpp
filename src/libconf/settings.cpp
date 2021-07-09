@@ -20,6 +20,19 @@ namespace YAML {
     using settings = minty::conf::settings;
 
     template <>
+    struct convert<settings::s_daemon> {
+        using T = settings::s_daemon;
+
+        static auto decode(const Node& node, T& daemon) -> bool {
+            daemon.group = node["group"].as<decltype(T::group)>();
+            daemon.pidfile = node["pidfile"].as<decltype(T::pidfile)>();
+            daemon.user = node["user"].as<decltype(T::user)>();
+
+            return true;
+        }
+    };
+
+    template <>
     struct convert<settings::s_database> {
         static auto decode(
             const Node& node,
@@ -118,6 +131,8 @@ namespace YAML {
     template <>
     struct convert<settings> {
         static auto decode(const Node& node, settings& s) -> bool {
+            s.daemon = node["daemon"]
+                .as<decltype(settings::daemon)>();
             s.database = node["database"]
                 .as<decltype(settings::database)>();
             s.downloader= node["downloader"]
@@ -126,8 +141,6 @@ namespace YAML {
                 .as<decltype(settings::fstore)>();
             if (node["log"]) s.log = node["log"]
                 .as<decltype(settings::log)>();
-            s.pidfile = node["pidfile"]
-                .as<decltype(settings::pidfile)>();
             s.search = node["search"]
                 .as<decltype(settings::search)>();
             s.server = node["server"]

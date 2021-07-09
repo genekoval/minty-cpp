@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ext/unix.h>
 #include <netcore/netcore>
 #include <optional>
 #include <string>
@@ -7,6 +8,12 @@
 
 namespace minty::conf {
     struct settings {
+        struct s_daemon {
+            ext::group group;
+            std::string pidfile;
+            ext::user user;
+        };
+
         struct s_database {
             std::string connection;
         };
@@ -39,11 +46,11 @@ namespace minty::conf {
 
         static auto load_file(const std::string& path) -> settings;
 
+        s_daemon daemon;
         s_database database;
         s_downloader downloader;
         s_fstore fstore;
         s_log log;
-        std::string pidfile;
         s_search search;
         netcore::unix_socket server;
 

@@ -59,8 +59,10 @@ namespace {
         timber::reporting_level = settings.log.level;
 
         if (daemon && !dmon::daemonize({
+            .group = settings.daemon.group,
             .identifier = app.name,
-            .pidfile = settings.pidfile
+            .pidfile = settings.daemon.pidfile,
+            .user = settings.daemon.user
         })) return;
 
         NOTICE() << app.name << " version " << app.version << " starting up";
