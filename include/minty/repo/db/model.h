@@ -60,6 +60,11 @@ namespace minty::repo::db {
         std::vector<std::string> aliases;
     };
 
+    struct tag_name_update : entity<1, tag_name> {
+        tag_name names;
+        std::optional<std::string> old_name;
+    };
+
     struct tag_preview : entity<3> {
         std::string id;
         std::string name;

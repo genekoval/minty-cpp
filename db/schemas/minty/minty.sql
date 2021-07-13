@@ -820,8 +820,11 @@ CREATE FUNCTION update_tag_name(
     a_name          text
 ) RETURNS TABLE (
     name            text,
-    aliases         text[]
+    aliases         text[],
+    old_name        text
 ) AS $$
+DECLARE
+    l_old_name      text;
 BEGIN
     IF EXISTS (
         SELECT FROM tag_name
@@ -835,13 +838,17 @@ BEGIN
         SET main = true
         WHERE tag_id = a_tag_id AND value = a_name;
     ELSE
+        SELECT INTO l_old_name value
+        FROM tag_name
+        WHERE tag_id = a_tag_id AND main = true;
+
         UPDATE tag_name
         SET value = a_name
         WHERE tag_id = a_tag_id AND main = true;
     END IF;
 
     RETURN QUERY
-    SELECT t.name, t.aliases
+    SELECT t.name, t.aliases, l_old_name
     FROM tag_name_view t
     WHERE tag_id = a_tag_id;
 END;
@@ -850,62 +857,6 @@ $$ LANGUAGE plpgsql;
 --}}}
 
 --{{{( Trigger Functions )
-
-CREATE FUNCTION notify_delete_tag() RETURNS trigger AS $$
-BEGIN
-    PERFORM pg_notify(lower(TG_OP || '_' || TG_TABLE_NAME), OLD.tag_id::text);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION notify_delete_tag_name() RETURNS trigger AS $$
-BEGIN
-    -- Avoid sending a notification if this was invoked due to a
-    -- delete cascade.
-    IF EXISTS (SELECT FROM tag WHERE tag_id = OLD.tag_id) THEN
-        PERFORM pg_notify(
-            lower(TG_OP || '_' || TG_TABLE_NAME),
-            json_build_object(
-                'id', OLD.tag_id,
-                'name', OLD.value
-            )::text
-        );
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION notify_insert_tag_name() RETURNS trigger AS $$
-BEGIN
-    PERFORM pg_notify(
-        lower(TG_OP || '_' || TG_TABLE_NAME),
-        json_build_object(
-            'id', NEW.tag_id,
-            'name', NEW.value
-        )::text
-    );
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION notify_update_tag_name() RETURNS trigger AS $$
-BEGIN
-    IF OLD.value != NEW.value THEN
-        PERFORM pg_notify(
-            lower(TG_OP || '_' || TG_TABLE_NAME),
-            json_build_object(
-                'id', NEW.tag_id,
-                'old', OLD.value,
-                'new', NEW.value
-            )::text
-        );
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
 
 CREATE FUNCTION update_date_modified() RETURNS trigger AS $$
 BEGIN
@@ -933,18 +884,6 @@ $$ LANGUAGE plpgsql;
 --}}}
 
 --{{{( Triggers )
-
-CREATE TRIGGER notify_delete_tag AFTER DELETE ON tag
-FOR EACH ROW EXECUTE FUNCTION notify_delete_tag();
-
-CREATE TRIGGER notify_delete_tag_name AFTER DELETE ON tag_name
-FOR EACH ROW EXECUTE FUNCTION notify_delete_tag_name();
-
-CREATE TRIGGER notify_insert_tag_name AFTER INSERT ON tag_name
-FOR EACH ROW EXECUTE FUNCTION notify_insert_tag_name();
-
-CREATE TRIGGER notify_update_tag_name AFTER UPDATE ON tag_name
-FOR EACH ROW EXECUTE FUNCTION notify_update_tag_name();
 
 CREATE TRIGGER update_post_date_modified BEFORE UPDATE ON post
 FOR EACH ROW EXECUTE FUNCTION update_date_modified();

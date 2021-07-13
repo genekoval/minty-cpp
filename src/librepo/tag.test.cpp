@@ -139,10 +139,12 @@ TEST_F(DatabaseTagTest, UpdateName) {
     constexpr auto new_name = "New Name";
 
     const auto id = create_tag();
-    const auto [name, aliases] = database.update_tag_name(id, new_name);
+    const auto [names, old_name] = database.update_tag_name(id, new_name);
 
-    ASSERT_EQ(new_name, name);
-    ASSERT_TRUE(aliases.empty());
+    ASSERT_TRUE(old_name.has_value());
+    ASSERT_EQ(tag_name, *old_name);
+    ASSERT_EQ(new_name, names.name);
+    ASSERT_TRUE(names.aliases.empty());
 }
 
 TEST_F(DatabaseTagTest, UpdateNameReplace) {
@@ -151,12 +153,12 @@ TEST_F(DatabaseTagTest, UpdateNameReplace) {
 
     const auto id = create_tag();
     database.create_tag_alias(id, alias);
-    database.update_tag_name(id, new_name);
+    const auto [names, old_name] = database.update_tag_name(id, new_name);
 
-    const auto tag = database.read_tag(id);
-
-    ASSERT_EQ(new_name, tag.name);
-    ASSERT_EQ(alias, tag.aliases.front());
+    ASSERT_TRUE(old_name.has_value());
+    ASSERT_EQ(tag_name, *old_name);
+    ASSERT_EQ(new_name, names.name);
+    ASSERT_EQ(alias, names.aliases.front());
 }
 
 TEST_F(DatabaseTagTest, UpdateNameSwap) {
@@ -164,10 +166,9 @@ TEST_F(DatabaseTagTest, UpdateNameSwap) {
 
     const auto id = create_tag();
     database.create_tag_alias(id, alias);
-    database.update_tag_name(id, alias);
+    const auto [names, old_name] = database.update_tag_name(id, alias);
 
-    const auto tag = database.read_tag(id);
-
-    ASSERT_EQ(tag.name, alias);
-    ASSERT_EQ(tag_name, tag.aliases.front());
+    ASSERT_FALSE(old_name.has_value());
+    ASSERT_EQ(alias, names.name);
+    ASSERT_EQ(tag_name, names.aliases.front());
 }

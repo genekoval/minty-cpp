@@ -161,6 +161,6 @@ namespace minty::repo::db {
         auto update_tag_name(
             std::string_view tag_id,
             std::string_view name
-        ) -> tag_name;
+        ) -> tag_name_update;
     };
 }

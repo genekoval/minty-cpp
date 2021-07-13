@@ -19,12 +19,54 @@ namespace minty::core {
         }
     }
 
+    auto search_engine::add_tag_alias(
+        std::string_view tag_id,
+        std::string_view alias
+    ) -> void {
+        connect().send<void>(
+            event::add_tag_alias,
+            tag_id,
+            alias
+        );
+    }
+
+    auto search_engine::delete_tag(std::string_view tag_id) -> void {
+        connect().send<void>(
+            event::delete_tag,
+            tag_id
+        );
+    }
+
+    auto search_engine::delete_tag_alias(
+        std::string_view tag_id,
+        std::string_view alias
+    ) -> void {
+        connect().send<void>(
+            event::delete_tag_alias,
+            tag_id,
+            alias
+        );
+    }
+
     auto search_engine::find_tags_by_name(
         std::string_view term
     ) -> std::vector<std::string> {
         return connect().send<std::vector<std::string>>(
             event::find_tags_by_name,
             term
+        );
+    }
+
+    auto search_engine::update_tag_name(
+        std::string_view tag_id,
+        std::string_view old_name,
+        std::string_view new_name
+    ) -> void {
+        connect().send<void>(
+            event::update_tag_name,
+            tag_id,
+            old_name,
+            new_name
         );
     }
 

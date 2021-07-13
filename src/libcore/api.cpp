@@ -173,14 +173,24 @@ namespace minty::core {
     }
 
     auto api::add_tag(std::string_view name) -> std::string {
-        return db->create_tag(ext::trim(std::string(name)));
+        const auto name_formatted = ext::trim(std::string(name));
+        const auto id = db->create_tag(name_formatted);
+
+        search->add_tag_alias(id, name_formatted);
+
+        return id;
     }
 
     auto api::add_tag_alias(
         std::string_view tag_id,
         std::string_view alias
     ) -> tag_name {
-        return db->create_tag_alias(tag_id, ext::trim(std::string(alias)));
+        const auto alias_formatted = ext::trim(std::string(alias));
+        const auto name = db->create_tag_alias(tag_id, alias_formatted);
+
+        search->add_tag_alias(tag_id, alias_formatted);
+
+        return name;
     }
 
     auto api::add_tag_source(
@@ -212,13 +222,16 @@ namespace minty::core {
 
     auto api::delete_tag(std::string_view id) -> void {
         db->delete_tag(id);
+        search->delete_tag(id);
     }
 
     auto api::delete_tag_alias(
         std::string_view tag_id,
         std::string_view alias
     ) -> tag_name {
-        return db->delete_tag_alias(tag_id, alias);
+        const auto name = db->delete_tag_alias(tag_id, alias);
+        search->delete_tag_alias(tag_id, alias);
+        return name;
     }
 
     auto api::delete_tag_source(
@@ -352,6 +365,17 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view new_name
     ) -> tag_name {
-        return db->update_tag_name(tag_id, ext::trim(std::string(new_name)));
+        const auto name_formatted = ext::trim(std::string(new_name));
+        const auto update  = db->update_tag_name(tag_id, name_formatted);
+
+        if (update.old_name) {
+            search->update_tag_name(
+                tag_id,
+                update.old_name.value(),
+                name_formatted
+            );
+        }
+
+        return update.names;
     }
 }

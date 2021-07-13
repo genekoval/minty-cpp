@@ -353,7 +353,12 @@ namespace minty::repo::db {
     auto database::update_tag_name(
         std::string_view tag_id,
         std::string_view name
-    ) -> tag_name {
-        return make_entity<tag_name>(ntx, "update_tag_name", tag_id, name);
+    ) -> tag_name_update {
+        return make_entity<tag_name_update>(
+            ntx,
+            "update_tag_name",
+            tag_id,
+            name
+        );
     }
 }
