@@ -653,6 +653,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_tag_text()
+RETURNS TABLE (
+    tag_id          integer,
+    names           text[]
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.tag_id,
+        array_agg(value)
+    FROM tag_name t
+    GROUP BY t.tag_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_object(
     a_object_id     uuid
 ) RETURNS SETOF object_view AS $$

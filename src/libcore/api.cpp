@@ -307,6 +307,13 @@ namespace minty::core {
         db->move_post_object(post_id, old_index, new_index);
     }
 
+    auto api::reindex() -> void {
+        search->delete_indices();
+        search->create_indices();
+
+        search->add_tags(db->read_tag_text());
+    }
+
     auto api::set_comment_content(
         std::string_view comment_id,
         std::string_view content

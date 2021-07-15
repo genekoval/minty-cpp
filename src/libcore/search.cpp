@@ -19,6 +19,13 @@ namespace minty::core {
         }
     }
 
+    auto search_engine::add_tags(std::span<const tag_text> tags) -> void {
+        connect().send<void>(
+            event::add_tags,
+            tags
+        );
+    }
+
     auto search_engine::add_tag_alias(
         std::string_view tag_id,
         std::string_view alias
@@ -28,6 +35,14 @@ namespace minty::core {
             tag_id,
             alias
         );
+    }
+
+    auto search_engine::create_indices() -> void {
+        connect().send<void>(event::create_indices);
+    }
+
+    auto search_engine::delete_indices() -> void {
+        connect().send<void>(event::delete_indices);
     }
 
     auto search_engine::delete_tag(std::string_view tag_id) -> void {

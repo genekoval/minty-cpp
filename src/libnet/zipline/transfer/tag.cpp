@@ -68,4 +68,19 @@ namespace zipline {
         n::xfr<name_t>::write(sock, t.name);
         n::xfr<avatar_t>::write(sock, t.avatar);
     }
+
+    auto n::xfr<c::tag_text>::read(n::socket& sock) -> type {
+        return {
+            .id = n::xfr<id_t>::read(sock),
+            .names = n::xfr<names_t>::read(sock)
+        };
+    }
+
+    auto n::xfr<c::tag_text>::write(
+        n::socket& sock,
+        const type& t
+    ) -> void {
+        n::xfr<id_t>::write(sock, t.id);
+        n::xfr<names_t>::write(sock, t.names);
+    }
 }

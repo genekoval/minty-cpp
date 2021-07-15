@@ -1,5 +1,6 @@
 #pragma once
 
+#include <minty/core/model.h>
 #include <minty/net/zipline/protocol.h>
 
 #include <netcore/netcore>
@@ -8,7 +9,10 @@
 namespace minty::core {
     class search_engine {
         enum class event : net::event_t {
+            add_tags,
             add_tag_alias,
+            create_indices,
+            delete_indices,
             delete_tag,
             delete_tag_alias,
             find_tags_by_name,
@@ -27,10 +31,16 @@ namespace minty::core {
     public:
         search_engine(std::string_view endpoint);
 
+        auto add_tags(std::span<const tag_text> tags) -> void;
+
         auto add_tag_alias(
             std::string_view tag_id,
             std::string_view alias
         ) -> void;
+
+        auto create_indices() -> void;
+
+        auto delete_indices() -> void;
 
         auto delete_tag(std::string_view tag_id) -> void;
 

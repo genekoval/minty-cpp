@@ -44,6 +44,7 @@ namespace minty::repo::db {
         ci.prepare("read_tag_previews", 1);
         ci.prepare("read_tag_previews_all", 0);
         ci.prepare("read_tag_sources", 1);
+        ci.prepare("read_tag_text", 0);
 
         ci.prepare("update_comment", 2);
         ci.prepare("update_post_description", 2);
@@ -314,6 +315,10 @@ namespace minty::repo::db {
             "read_tag_sources",
             tag_id
         );
+    }
+
+    auto database::read_tag_text() -> std::vector<tag_text> {
+        return make_entities<std::vector<tag_text>>(ntx, __FUNCTION__);
     }
 
     auto database::update_comment(

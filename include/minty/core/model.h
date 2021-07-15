@@ -10,6 +10,7 @@ namespace minty::core {
     using post_preview = repo::db::post_preview;
     using tag_name = repo::db::tag_name;
     using tag_preview = repo::db::tag_preview;
+    using tag_text = repo::db::tag_text;
 
     struct source {
         decltype(repo::db::source::id) id;

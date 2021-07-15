@@ -66,6 +66,16 @@ namespace minty::repo::db {
     };
 
     template <>
+    struct parser<tag_text> {
+        static auto read(row_iterator& it, transaction& tx) -> tag_text {
+            return {
+                .id = read_field<decltype(tag_text::id)>(it),
+                .names = read_array<decltype(tag_text::names)>(it)
+            };
+        }
+    };
+
+    template <>
     struct parser<object> {
         static auto read(row_iterator& it, transaction& tx) -> object {
             return {

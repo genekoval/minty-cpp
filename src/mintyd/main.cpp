@@ -1,3 +1,4 @@
+#include "api/api.h"
 #include "commands/commands.h"
 
 #include <minty/core/api.h>
@@ -67,34 +68,16 @@ namespace {
 
         NOTICE() << app.name << " version " << app.version << " starting up";
 
-        auto database = minty::repo::db::database(settings.database.connection);
-
-        auto object_store = fstore::object_store(settings.fstore.connection);
-        auto bucket_info = object_store.fetch_bucket(settings.fstore.bucket);
-        auto bucket = fstore::bucket(bucket_info.id, object_store);
-
-        auto downloader = minty::core::downloader(
-            settings.downloader.host,
-            settings.downloader.port
+        auto container = minty::cli::api_container(settings);
+        auto info = build_server_info(
+            settings,
+            app.version,
+            container.bucket_id()
         );
-
-        auto search = minty::core::search_engine(settings.search.host);
-
-        INFO()
-            << "Using bucket `"
-            << bucket_info.name
-            << "` with "
-            << bucket_info.size
-            << " objects ("
-            << ext::data_size::format(bucket_info.space_used).str(2)
-            << ")";
-
-        auto api = minty::core::api(database, bucket, downloader, search);
-        auto info = build_server_info(settings, app.version, bucket_info.id);
 
         INFO() << "Object source: " << info.object_source;
 
-        minty::server::listen(api, info, settings.server, []() {
+        minty::server::listen(container.api(), info, settings.server, []() {
             INFO() << "Server started. Listening for connections...";
         });
 
@@ -124,6 +107,7 @@ auto main(int argc, const char** argv) -> int {
 
     const auto confpath = default_config.string();
 
+    app.subcommand(minty::cli::reindex(confpath));
     app.subcommand(minty::cli::stop(confpath));
 
     return app.run(argc, argv);

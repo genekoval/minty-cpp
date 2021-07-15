@@ -71,6 +71,11 @@ namespace minty::repo::db {
         std::optional<std::string> avatar;
     };
 
+    struct tag_text : entity<2> {
+        std::string id;
+        std::vector<std::string> names;
+    };
+
     struct comment : entity<6> {
         std::string id;
         std::string post_id;
