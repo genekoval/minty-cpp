@@ -103,4 +103,13 @@ namespace minty::repo::db {
         unsigned int object_count;
         std::string date_created;
     };
+
+    struct post_search {
+        decltype(post::id) id;
+        decltype(post::title) title;
+        decltype(post::description) description;
+        decltype(post::date_created) date_created;
+        decltype(post::date_modified) date_modified;
+        std::vector<std::string> tags;
+    };
 }

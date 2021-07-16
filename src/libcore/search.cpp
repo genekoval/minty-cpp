@@ -1,4 +1,5 @@
 #include <minty/core/search.h>
+#include <minty/net/zipline/transfer.h>
 
 #include <ext/except.h>
 
@@ -19,7 +20,13 @@ namespace minty::core {
         }
     }
 
+    auto search_engine::add_post(const post_search& post) -> void {
+        connect().send<void>(event::add_post, post);
+    }
+
     auto search_engine::add_tags(std::span<const tag_text> tags) -> void {
+        if (tags.empty()) return;
+
         connect().send<void>(
             event::add_tags,
             tags

@@ -33,7 +33,7 @@ namespace minty::repo::db {
             std::optional<std::string_view> description,
             const std::vector<std::string>& objects,
             const std::vector<std::string>& tags
-        ) -> std::string;
+        ) -> post_search;
 
         auto create_post_objects(
             std::string_view post_id,

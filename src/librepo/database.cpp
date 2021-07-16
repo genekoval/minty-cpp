@@ -80,14 +80,15 @@ namespace minty::repo::db {
         std::optional<std::string_view> description,
         const std::vector<std::string>& objects,
         const std::vector<std::string>& tags
-    ) -> std::string {
-        return ntx.exec_prepared1(
-            "create_post",
+    ) -> post_search {
+        return make_entity<post_search>(
+            ntx,
+            __FUNCTION__,
             title,
             description,
             objects,
             tags
-        )[0].as<std::string>();
+        );
     }
 
     auto database::create_post_objects(

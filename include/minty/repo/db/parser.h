@@ -126,6 +126,22 @@ namespace minty::repo::db {
     };
 
     template <>
+    struct parser<post_search> {
+        using T = post_search;
+
+        static auto read(row_iterator& it, transaction& tx) -> T {
+            return {
+                .id = read_field<decltype(T::id)>(it),
+                .title = read_field<decltype(T::title)>(it),
+                .description = read_field<decltype(T::description)>(it),
+                .date_created = read_field<decltype(T::date_created)>(it),
+                .date_modified = read_field<decltype(T::date_modified)>(it),
+                .tags = read_array<decltype(T::tags)>(it)
+            };
+        }
+    };
+
+    template <>
     struct parser<site> {
         static auto read(row_iterator& it, transaction& tx) -> site {
             return {

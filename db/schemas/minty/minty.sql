@@ -189,6 +189,19 @@ LEFT JOIN (
 
 --}}}
 
+--{{{( Types )
+
+CREATE TYPE post_search AS (
+    post_id         integer,
+    title           text,
+    description     text,
+    tags            integer[],
+    date_created    timestamptz,
+    date_modified   timestamptz
+);
+
+--}}}
+
 --{{{( Functions )
 
 CREATE FUNCTION create_comment(
@@ -241,7 +254,7 @@ CREATE FUNCTION create_post(
     a_description   text,
     a_objects       uuid[],
     tags            integer[]
-) RETURNS integer AS $$
+) RETURNS SETOF post_search AS $$
 DECLARE
     l_post_id       integer;
 BEGIN
@@ -273,7 +286,18 @@ BEGIN
         tag_table.tag_id
     FROM tag_table;
 
-    RETURN l_post_id;
+    RETURN QUERY
+    SELECT
+        post_id,
+        title,
+        description,
+        array_agg(tag_id),
+        date_created,
+        date_modified
+    FROM post
+    JOIN post_tag USING (post_id)
+    WHERE post_id = l_post_id
+    GROUP BY post_id;
 END;
 $$ LANGUAGE plpgsql;
 

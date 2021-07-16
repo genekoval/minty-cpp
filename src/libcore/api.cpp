@@ -81,7 +81,7 @@ namespace minty::core {
     }
 
     auto api::add_post(post_parts parts) -> std::string {
-        return db->create_post(
+        const auto result = db->create_post(
             parts.title ?
                 ext::trim(parts.title.value()) :
                 parts.title,
@@ -91,6 +91,19 @@ namespace minty::core {
             parts.objects,
             parts.tags
         );
+
+        try {
+            search->add_post(result);
+        }
+        catch (const std::runtime_error& ex) {
+            ERROR()
+                << "Failed to index post ("
+                << result.id
+                << "): "
+                << ex.what();
+        }
+
+        return result.id;
     }
 
     auto api::add_post_objects(

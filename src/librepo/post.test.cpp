@@ -5,7 +5,7 @@
 class DatabasePostTest : public DatabaseTest {
 protected:
     auto create_post() -> std::string {
-        return database.create_post("", "", {}, {});
+        return database.create_post("", "", {}, {}).id;
     }
 
     auto tables() -> std::vector<std::string> override {
@@ -29,7 +29,7 @@ TEST_F(DatabasePostTest, CreateWithTitle) {
     constexpr auto title = "Post Title";
 
     const auto post = database.read_post(
-        database.create_post(title, "", {}, {})
+        database.create_post(title, "", {}, {}).id
     );
 
     ASSERT_TRUE(post.title.has_value());
@@ -40,7 +40,7 @@ TEST_F(DatabasePostTest, CreateWithDescription) {
     constexpr auto description = "This is a test description.";
 
     const auto post = database.read_post(
-        database.create_post("", description, {}, {})
+        database.create_post("", description, {}, {}).id
     );
 
     ASSERT_TRUE(post.description.has_value());
@@ -58,7 +58,7 @@ TEST_F(DatabasePostTest, CreateWithObjects) {
         database.create_object(object, {}, {});
     }
 
-    const auto id = database.create_post("", "", objects, {});
+    const auto id = database.create_post("", "", objects, {}).id;
     const auto result = database.read_post_objects(id);
 
     ASSERT_EQ(3, result.size());
@@ -80,7 +80,7 @@ TEST_F(DatabasePostTest, CreateWithTags) {
         tags.push_back(database.create_tag(name));
     }
 
-    const auto post = database.create_post("", "", {}, tags);
+    const auto post = database.create_post("", "", {}, tags).id;
     const auto post_tags = database.read_post_tags(post);
 
     ASSERT_EQ(3, post_tags.size());
@@ -131,7 +131,7 @@ TEST_F(DatabasePostTest, DeleteSingleObject) {
     constexpr auto object = "38981dea-ff0c-46a5-a411-43d1e431803c";
     database.create_object(object, {}, {});
 
-    const auto id = database.create_post("", "", {object}, {});
+    const auto id = database.create_post("", "", {object}, {}).id;
 
     const auto range = minty::repo::db::range { .first = 0, .last = 0 };
     const auto ranges = std::vector<minty::repo::db::range> { range };
@@ -153,7 +153,7 @@ TEST_F(DatabasePostTest, DeleteObjectRange) {
         database.create_object(object, {}, {});
     }
 
-    const auto id = database.create_post("", "", objects, {});
+    const auto id = database.create_post("", "", objects, {}).id;
 
     const auto range = minty::repo::db::range { .first = 0, .last = 1 };
     const auto ranges = std::vector<minty::repo::db::range> { range };
@@ -178,7 +178,7 @@ TEST_F(DatabasePostTest, DeleteMultipleObjects) {
         database.create_object(object, {}, {});
     }
 
-    const auto id = database.create_post("", "", objects, {});
+    const auto id = database.create_post("", "", objects, {}).id;
 
     const auto first = minty::repo::db::range { .first = 0, .last = 0 };
     const auto third = minty::repo::db::range { .first = 2, .last = 2 };
@@ -224,7 +224,7 @@ TEST_F(DatabasePostTest, MoveObject) {
         database.create_object(object, {}, {});
     }
 
-    const auto post = database.create_post("", "", objects, {});
+    const auto post = database.create_post("", "", objects, {}).id;
 
     database.move_post_object(post, 3, 0);
 
@@ -245,7 +245,7 @@ TEST_F(DatabasePostTest, UpdateDateModified) {
 
     for (const auto& object : objects) database.create_object(object, {}, {});
 
-    const auto id = database.create_post("", "", {}, {});
+    const auto id = database.create_post("", "", {}, {}).id;
     auto post = database.read_post(id);
     auto date_modified = post.date_modified;
 
