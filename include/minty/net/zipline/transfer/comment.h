@@ -1,34 +1,50 @@
 #pragma once
 
 #include <minty/core/model.h>
-#include <minty/net/zipline/protocol.h>
+
+#include <zipline/zipline>
 
 namespace zipline {
-    template <>
-    struct transfer<minty::net::socket, minty::core::comment> {
-        using type = minty::core::comment;
+    ZIPLINE_OBJECT(
+        minty::core::comment,
+        &minty::core::comment::id,
+        &minty::core::comment::content,
+        &minty::core::comment::indent,
+        &minty::core::comment::date_created
+    );
 
-        using id_t = decltype(type::id);
-        using content_t = decltype(type::content);
-        using indent_t = decltype(type::indent);
-        using date_created_t = decltype(type::date_created);
+    template <typename Socket>
+    struct transfer<Socket, minty::core::comment_node> {
+        static auto write(
+            Socket& socket,
+            const minty::core::comment_node& node
+        ) -> void {
+            transfer<Socket, minty::core::comment>::write(socket, node.data);
 
-        static auto read(minty::net::socket&) -> type;
-        static auto write(minty::net::socket&, const type&) -> void;
+            for (const auto* child : node.children) {
+                transfer<Socket, minty::core::comment_node>::write(
+                    socket,
+                    *child
+                );
+            }
+        }
     };
 
-    template <>
-    struct transfer<minty::net::socket, minty::core::comment_node> {
-        using type = minty::core::comment_node;
+    template <typename Socket>
+    struct transfer<Socket, minty::core::comment_tree> {
+        static auto write(
+            Socket& socket,
+            const minty::core::comment_tree& tree
+        ) -> void {
+            write_size(socket, tree.total);
 
-        static auto write(minty::net::socket&, const type&) -> void;
-    };
-
-    template <>
-    struct transfer<minty::net::socket, minty::core::comment_tree> {
-        using type = minty::core::comment_tree;
-
-        static auto write(minty::net::socket&, const type&) -> void;
+            for (const auto* root : tree.roots) {
+                transfer<Socket, minty::core::comment_node>::write(
+                    socket,
+                    *root
+                );
+            }
+        }
     };
 
 }

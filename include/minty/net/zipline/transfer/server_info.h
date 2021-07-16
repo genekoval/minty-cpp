@@ -1,17 +1,13 @@
 #pragma once
 
-#include <minty/net/zipline/protocol.h>
 #include <minty/server/server_info.h>
 
+#include <zipline/zipline>
+
 namespace zipline {
-    template <>
-    struct transfer<minty::net::socket, minty::server::server_info> {
-        using type = minty::server::server_info;
-
-        using object_source_t = decltype(type::object_source);
-        using version_t = decltype(type::version);
-
-        static auto read(minty::net::socket&) -> type;
-        static auto write(minty::net::socket&, const type&) -> void;
-    };
+    ZIPLINE_OBJECT(
+        minty::server::server_info,
+        &minty::server::server_info::object_source,
+        &minty::server::server_info::version
+    );
 }

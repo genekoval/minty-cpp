@@ -17,13 +17,10 @@ $(core).type := static
 server := libserver
 $(server).type := static
 
-net := libnet
-$(net).type := static
-
 conf := libconf
 $(conf).type := static
 
-internal := repo core server net conf
+internal := repo core server conf
 internal.libs := $(addprefix lib,$(internal))
 
 define common.libs
@@ -53,7 +50,6 @@ endef
 
 client := lib$(project)
 $(client).type := shared
-$(client).deps := $(net)
 define $(client).libs
  netcore
 endef

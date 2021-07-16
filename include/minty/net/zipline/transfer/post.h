@@ -1,52 +1,38 @@
 #pragma once
 
 #include <minty/core/model.h>
-#include <minty/net/zipline/protocol.h>
+
+#include <zipline/zipline>
 
 namespace zipline {
-    template <>
-    struct transfer<minty::net::socket, minty::core::post> {
-        using type = minty::core::post;
+    ZIPLINE_OBJECT(
+        minty::core::post,
+        &minty::core::post::id,
+        &minty::core::post::title,
+        &minty::core::post::description,
+        &minty::core::post::date_created,
+        &minty::core::post::date_modified,
+        &minty::core::post::objects,
+        &minty::core::post::tags
+    );
 
-        using id_t = decltype(type::id);
-        using title_t = decltype(type::title);
-        using description_t = decltype(type::description);
-        using date_created_t = decltype(type::date_created);
-        using date_modified_t = decltype(type::date_modified);
-        using objects_t = decltype(type::objects);
-        using tags_t = decltype(type::tags);
+    ZIPLINE_OBJECT(
+        minty::core::post_parts,
+        &minty::core::post_parts::title,
+        &minty::core::post_parts::description,
+        &minty::core::post_parts::objects,
+        &minty::core::post_parts::tags
+    );
 
-        static auto read(minty::net::socket&) -> type;
-        static auto write(minty::net::socket&, const type&) -> void;
-    };
-
-    template <>
-    struct transfer<minty::net::socket, minty::core::post_parts> {
-        using type = minty::core::post_parts;
-
-        using title_t = decltype(type::title);
-        using description_t = decltype(type::description);
-        using objects_t = decltype(type::objects);
-        using tags_t = decltype(type::tags);
-
-        static auto read(minty::net::socket&) -> type;
-        static auto write(minty::net::socket&, const type&) -> void;
-    };
-
-    template <>
-    struct transfer<minty::net::socket, minty::core::post_preview> {
-        using type = minty::core::post_preview;
-
-        using id_t = decltype(type::id);
-        using title_t = decltype(type::title);
-        using preview_id_t = decltype(type::preview_id);
-        using comment_count_t = decltype(type::comment_count);
-        using object_count_t = decltype(type::object_count);
-        using date_created_t = decltype(type::date_created);
-
-        static auto read(minty::net::socket&) -> type;
-        static auto write(minty::net::socket&, const type&) -> void;
-    };
+    ZIPLINE_OBJECT(
+        minty::core::post_preview,
+        &minty::core::post_preview::id,
+        &minty::core::post_preview::title,
+        &minty::core::post_preview::preview_id,
+        &minty::core::post_preview::comment_count,
+        &minty::core::post_preview::object_count,
+        &minty::core::post_preview::date_created
+    );
 
     ZIPLINE_OBJECT(
         minty::core::post_search,
@@ -58,11 +44,9 @@ namespace zipline {
         &minty::core::post_search::tags
     );
 
-    template <>
-    struct transfer<minty::net::socket, minty::core::range> {
-        using type = minty::core::range;
-
-        static auto read(minty::net::socket&) -> type;
-        static auto write(minty::net::socket&, const type&) -> void;
-    };
+    ZIPLINE_OBJECT(
+        minty::core::range,
+        &minty::core::range::first,
+        &minty::core::range::last
+    );
 }
