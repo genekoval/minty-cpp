@@ -6,6 +6,11 @@ class ConfSettingsTest : public testing::Test {};
 
 TEST_F(ConfSettingsTest, Decode) {
     constexpr auto yaml = R"(
+daemon:
+    user: root
+    group: root
+    pidfile: /run/minty/minty.pid
+
 database:
     connection:
         host: localhost
@@ -29,6 +34,9 @@ server:
 
     const auto settings = minty::conf::settings::load(yaml);
 
+    ASSERT_EQ(0, settings.daemon.user.uid());
+    ASSERT_EQ(0, settings.daemon.group.gid());
+    ASSERT_EQ("/run/minty/minty.pid", settings.daemon.pidfile);
     ASSERT_EQ("/run/minty/minty.sock", settings.server.path);
     ASSERT_EQ(
         "host=localhost user=minty dbname=minty",
