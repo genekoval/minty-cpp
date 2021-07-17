@@ -295,7 +295,7 @@ BEGIN
         date_created,
         date_modified
     FROM post
-    JOIN post_tag USING (post_id)
+    LEFT JOIN post_tag USING (post_id)
     WHERE post_id = l_post_id
     GROUP BY post_id;
 END;
