@@ -1,166 +1,125 @@
 #pragma once
 
-#include <minty/repo/db/db.h>
-#include <minty/repo/db/model.h>
+#include "model.h"
+
+#include <pqxx/pqxx>
+#include <timber/timber>
+
+#define ENTITY(Entity) \
+    template <> \
+    struct field_parser<Entity> { \
+        static auto read(row_iterator& it) -> Entity; \
+    };
+
+#define READ_ENTITY(Entity, ...) \
+    auto field_parser<Entity>::read(row_iterator& it) -> Entity {\
+        return read_entity<Entity>(it, __VA_ARGS__); \
+    }
 
 namespace minty::repo::db {
-    template <>
-    struct parser<comment> {
-        static auto read(row_iterator& it, transaction& tx) -> comment {
-            return {
-                .id = read_field<decltype(comment::id)>(it),
-                .post_id = read_field<decltype(comment::post_id)>(it),
-                .parent_id = read_field<decltype(comment::parent_id)>(it),
-                .indent = read_field<decltype(comment::indent)>(it),
-                .content = read_field<decltype(comment::content)>(it),
-                .date_created = read_field<decltype(comment::date_created)>(it)
-            };
-        };
-    };
+    using row_iterator = pqxx::row::const_iterator;
+    using transaction = pqxx::transaction_base;
 
-    template <>
-    struct parser<tag> {
-        static auto read(row_iterator& it, transaction& tx) -> tag {
-            return {
-                .id = read_field<decltype(tag::id)>(it),
-                .name = read_field<decltype(tag::name)>(it),
-                .aliases = read_array<decltype(tag::aliases)>(it),
-                .description = read_field<decltype(tag::description)>(it),
-                .avatar = read_field<decltype(tag::avatar)>(it),
-                .banner = read_field<decltype(tag::banner)>(it),
-                .post_count = read_field<decltype(tag::post_count)>(it),
-                .date_created = read_field<decltype(tag::date_created)>(it)
-            };
+    template <typename T>
+    auto read_field(row_iterator& it) -> T {
+        return (it++)->as<T>();
+    }
+
+    template <typename T>
+    struct field_parser {
+        static auto read(row_iterator& it) -> T {
+            return read_field<T>(it);
         }
     };
 
-    template <>
-    struct parser<tag_name> {
-        static auto read(row_iterator& it, transaction& tx) -> tag_name {
-            return {
-                .name = read_field<decltype(tag_name::name)>(it),
-                .aliases = read_array<decltype(tag_name::aliases)>(it)
-            };
+    template <typename T>
+    struct field_parser<std::optional<T>> {
+        static auto read(row_iterator& it) -> std::optional<T> {
+            if constexpr (std::is_base_of_v<entity_base, T>) {
+                if (it.is_null()) {
+                    it += T::column_count;
+                    return {};
+                }
+
+                return field_parser<T>::read(it);
+            }
+
+            return read_field<std::optional<T>>(it);
         }
     };
 
-    template <>
-    struct parser<tag_name_update> {
-        static auto read(row_iterator& it, transaction& tx) -> tag_name_update {
-            return {
-                .names = read_entity<decltype(tag_name_update::names)>(it, tx),
-                .old_name = read_field<decltype(tag_name_update::old_name)>(it)
-            };
+    template <typename T>
+    struct field_parser<std::vector<T>> {
+        static auto read(row_iterator& it) -> std::vector<T> {
+            using juncture = pqxx::array_parser::juncture;
+
+            auto array = (it++)->as_array();
+            auto result = std::vector<T>();
+
+            auto parsing = true;
+            while (parsing) {
+                auto [junct, value] = array.get_next();
+
+                switch (junct) {
+                    case juncture::string_value:
+                        result.push_back(value);
+                        break;
+                    case juncture::done:
+                        parsing = false;
+                        break;
+                    case juncture::row_start:
+                    case juncture::row_end:
+                        // Do nothing.
+                        // We currently do not use nested arrays.
+                        break;
+                    default:
+                        WARNING()
+                            << "Unhandled array parser juncture: "
+                            << static_cast<std::underlying_type_t<juncture>>(
+                                junct
+                            );
+                }
+            }
+
+            return result;
         }
     };
 
-    template <>
-    struct parser<tag_preview> {
-        static auto read(row_iterator& it, transaction& tx) -> tag_preview {
-            return {
-                .id = read_field<decltype(tag_preview::id)>(it),
-                .name = read_field<decltype(tag_preview::name)>(it),
-                .avatar = read_field<decltype(tag_preview::avatar)>(it)
-            };
+    template <typename T, typename Type>
+    auto read_entity_member(
+        row_iterator& it,
+        T& t,
+        Type T::* member
+    ) -> void {
+        (t.*member) = field_parser<Type>::read(it);
+    }
+
+    template <typename T, typename ...Members>
+    auto read_entity(row_iterator& it, Members... members) -> T {
+        auto t = T();
+        (read_entity_member(it, t, members), ...);
+        return t;
+    }
+
+    template <typename Entity, typename ...Args>
+    auto make_entity(transaction& tx, Args&&... args) -> Entity {
+        const auto row = tx.exec_prepared1(args...);
+        auto it = row.begin();
+        return field_parser<Entity>::read(it);
+    }
+
+    template <typename Collection, typename ...Args>
+    auto make_entities(transaction& tx, Args&&... args) -> Collection {
+        using Entity = typename Collection::value_type;
+
+        const auto rows = tx.exec_prepared(args...);
+        auto result = Collection();
+
+        for (const auto& row : rows) {
+            auto it = row.begin();
+            result.push_back(field_parser<Entity>::read(it));
         }
-    };
 
-    template <>
-    struct parser<tag_text> {
-        static auto read(row_iterator& it, transaction& tx) -> tag_text {
-            return {
-                .id = read_field<decltype(tag_text::id)>(it),
-                .names = read_array<decltype(tag_text::names)>(it)
-            };
-        }
-    };
-
-    template <>
-    struct parser<object> {
-        static auto read(row_iterator& it, transaction& tx) -> object {
-            return {
-                .id = read_field<decltype(object::id)>(it),
-                .preview_id = read_field<decltype(object::preview_id)>(it),
-                .src = read_entity<decltype(object::src)>(it, tx)
-            };
-        }
-    };
-
-    template <>
-    struct parser<object_preview> {
-        static auto read(row_iterator& it, transaction& tx) -> object_preview {
-            return {
-                .id = read_field<decltype(object_preview::id)>(it),
-                .preview_id = read_field<decltype(object_preview::preview_id)>(it)
-            };
-        }
-    };
-
-    template <>
-    struct parser<post> {
-        static auto read(row_iterator& it, transaction& tx) -> post {
-            return {
-                .id = read_field<decltype(post::id)>(it),
-                .title = read_field<decltype(post::title)>(it),
-                .description = read_field<decltype(post::description)>(it),
-                .date_created = read_field<decltype(post::date_created)>(it),
-                .date_modified = read_field<decltype(post::date_modified)>(it)
-            };
-        }
-    };
-
-    template <>
-    struct parser<post_preview> {
-        using T = post_preview;
-
-        static auto read(row_iterator& it, transaction& tx) -> T {
-            return {
-                .id = read_field<decltype(T::id)>(it),
-                .title = read_field<decltype(post::title)>(it),
-                .preview_id = read_field<decltype(T::preview_id)>(it),
-                .comment_count = read_field<decltype(T::comment_count)>(it),
-                .object_count = read_field<decltype(T::object_count)>(it),
-                .date_created = read_field<decltype(T::date_created)>(it)
-            };
-        }
-    };
-
-    template <>
-    struct parser<post_search> {
-        using T = post_search;
-
-        static auto read(row_iterator& it, transaction& tx) -> T {
-            return {
-                .id = read_field<decltype(T::id)>(it),
-                .title = read_field<decltype(T::title)>(it),
-                .description = read_field<decltype(T::description)>(it),
-                .date_created = read_field<decltype(T::date_created)>(it),
-                .date_modified = read_field<decltype(T::date_modified)>(it),
-                .tags = read_array<decltype(T::tags)>(it)
-            };
-        }
-    };
-
-    template <>
-    struct parser<site> {
-        static auto read(row_iterator& it, transaction& tx) -> site {
-            return {
-                .id = read_field<decltype(site::id)>(it),
-                .scheme = read_field<decltype(site::scheme)>(it),
-                .host = read_field<decltype(site::host)>(it),
-                .icon = read_field<decltype(site::icon)>(it)
-            };
-        }
-    };
-
-    template <>
-    struct parser<source> {
-        static auto read(row_iterator& it, transaction& tx) -> source {
-            return {
-                .id = read_field<decltype(source::id)>(it),
-                .resource = read_field<decltype(source::resource)>(it),
-                .website = read_entity<decltype(source::website)>(it, tx)
-            };
-        }
-    };
+        return result;
+    }
 }

@@ -12,12 +12,14 @@ namespace minty::repo::db {
         index_type last;
     };
 
+    struct entity_base {
+        auto operator==(const entity_base&) const -> bool = default;
+    };
+
     template <int ColumnCount, typename ...Entities>
-    struct entity {
+    struct entity : entity_base {
         static constexpr auto column_count =
             (ColumnCount + ... + Entities::column_count);
-
-        auto operator==(const entity&) const -> bool = default;
     };
 
     struct site : entity<4> {
@@ -83,8 +85,6 @@ namespace minty::repo::db {
         unsigned int indent;
         std::string content;
         std::string date_created;
-
-        auto operator==(const comment&) const -> bool = default;
     };
 
     struct post : entity<7> {
@@ -104,7 +104,7 @@ namespace minty::repo::db {
         std::string date_created;
     };
 
-    struct post_search {
+    struct post_search : entity<6> {
         decltype(post::id) id;
         decltype(post::title) title;
         decltype(post::description) description;
