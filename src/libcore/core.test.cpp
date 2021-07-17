@@ -1,7 +1,7 @@
 #include "core.test.h"
 
 constexpr auto db_connection = "postgresql://minty@localhost/minty";
-constexpr auto fstore_connection = "/tmp/fstore.sock";
+constexpr auto fstore_connection = "/tmp/fstore/fstore.sock";
 constexpr auto bucket_name = "minty";
 constexpr auto harvest_host = "192.168.8.2";
 constexpr auto harvest_port = "3000";
