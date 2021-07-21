@@ -11,9 +11,7 @@ namespace {
         const argv& argv,
         std::string_view confpath
     ) -> void {
-        const auto settings = minty::conf::settings::load_file(
-            std::string(confpath)
-        );
+        const auto settings = minty::conf::settings::load_file(confpath);
         timber::reporting_level = settings.log.level;
 
         auto container = minty::cli::api_container(settings);

@@ -1,20 +1,13 @@
 #include "api/api.h"
 #include "commands/commands.h"
 
-#include <minty/core/api.h>
-#include <minty/core/downloader.h>
-#include <minty/core/search.h>
 #include <minty/conf/settings.h>
 #include <minty/server/server.h>
 #include <minty/server/server_info.h>
 
-#include <commline/commline>
 #include <dmon/dmon>
-#include <ext/data_size.h>
 #include <filesystem>
 #include <fmt/format.h>
-#include <fstore/client.h>
-#include <timber/timber>
 
 namespace fs = std::filesystem;
 
@@ -54,9 +47,10 @@ namespace {
     auto $main(
         const commline::app& app,
         const commline::argv& argv,
+        std::string_view confpath,
         bool daemon
     ) -> void {
-        const auto settings = minty::conf::settings::load_file(default_config);
+        const auto settings = minty::conf::settings::load_file(confpath);
         timber::reporting_level = settings.log.level;
 
         if (daemon && !dmon::daemonize({
@@ -88,11 +82,19 @@ namespace {
 auto main(int argc, const char** argv) -> int {
     timber::log_handler = &timber::console_logger;
 
+    const auto confpath = default_config.string();
+
     auto app = commline::application(
         NAME,
         VERSION,
         DESCRIPTION,
         commline::options(
+            commline::option<std::string_view>(
+                {"config", "c"},
+                "Path to configuration file",
+                "path",
+                std::string_view(confpath)
+            ),
             commline::flag(
                 {"daemon", "d"},
                 "Run the program as a daemon."
@@ -105,8 +107,7 @@ auto main(int argc, const char** argv) -> int {
         CRITICAL() << e.what();
     });
 
-    const auto confpath = default_config.string();
-
+    app.subcommand(minty::cli::db(confpath));
     app.subcommand(minty::cli::reindex(confpath));
     app.subcommand(minty::cli::stop(confpath));
 

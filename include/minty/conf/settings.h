@@ -15,6 +15,7 @@ namespace minty::conf {
         };
 
         struct s_database {
+            std::string client = "psql";
             std::string connection;
         };
 
@@ -42,9 +43,9 @@ namespace minty::conf {
             std::string host;
         };
 
-        static auto load(const std::string& text) -> settings;
+        static auto load(std::string_view text) -> settings;
 
-        static auto load_file(const std::string& path) -> settings;
+        static auto load_file(std::string_view path) -> settings;
 
         s_daemon daemon;
         s_database database;

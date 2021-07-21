@@ -34,10 +34,13 @@ namespace YAML {
 
     template <>
     struct convert<settings::s_database> {
-        static auto decode(
-            const Node& node,
-            settings::s_database& database
-        ) -> bool {
+        using T = settings::s_database;
+
+        static auto decode(const Node& node, T& database) -> bool {
+            if (node["client"]) {
+                database.client = node["client"].as<decltype(T::client)>();
+            }
+
             const auto& connection = node["connection"];
 
             if (connection.IsScalar()) {
@@ -191,11 +194,11 @@ namespace minty::conf {
         return out.c_str();
     }
 
-    auto settings::load(const std::string& text) -> settings {
-        return YAML::Load(text).as<settings>();
+    auto settings::load(std::string_view text) -> settings {
+        return YAML::Load(text.data()).as<settings>();
     }
 
-    auto settings::load_file(const std::string& path) -> settings {
-        return YAML::LoadFile(path).as<settings>();
+    auto settings::load_file(std::string_view path) -> settings {
+        return YAML::LoadFile(path.data()).as<settings>();
     }
 }

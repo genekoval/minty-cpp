@@ -11,7 +11,8 @@
 namespace fs = std::filesystem;
 
 namespace {
-    const auto default_config = fs::path(CONFDIR) / "minty.yml";
+    const auto config_directory = fs::path(CONFDIR);
+    const auto default_config = (config_directory / "minty.yml").string();
 
     auto $main(
         const commline::app& app,

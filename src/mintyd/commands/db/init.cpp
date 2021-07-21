@@ -1,31 +1,28 @@
 #include "commands.h"
-
-#include <minty/conf/settings.h>
-
-#include <dmon/dmon>
+#include "../../db/db.h"
 
 using namespace commline;
 
 namespace {
-    auto $stop(
+    auto $init(
         const app& app,
         const argv& argv,
         std::string_view confpath
     ) -> void {
         const auto settings = minty::conf::settings::load_file(confpath);
-        timber::reporting_level = settings.log.level;
+        const auto client = minty::cli::data::client(settings);
 
-        dmon::stop(settings.daemon.pidfile);
+        client.init();
     }
 }
 
 namespace minty::cli {
-    auto stop(
+    auto init(
         std::string_view confpath
     ) -> std::unique_ptr<command_node> {
         return command(
-            "stop",
-            "Stop the server daemon",
+            "init",
+            "Initialize the database",
             options(
                 option<std::string_view>(
                     {"config", "c"},
@@ -34,7 +31,7 @@ namespace minty::cli {
                     std::move(confpath)
                 )
             ),
-            $stop
+            $init
         );
     }
 }

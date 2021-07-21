@@ -77,7 +77,6 @@ define test.libs
  gtest
 endef
 
-include mk/db.mk
 include mkbuild/base.mk
 
 confdir = $(prefix)/etc/$(project)
@@ -95,3 +94,6 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DVERSION='"$(version)"'\
  -DDESCRIPTION='"$(project) server"'\
  -DCONFDIR='"$(confdir)"'
+
+$(obj)/$(daemon)/db/db.o: CXXFLAGS +=\
+ -DSQLDIR='"$(shell pwd)/db/schemas/minty"'
