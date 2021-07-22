@@ -217,6 +217,7 @@ namespace minty::core {
 
     auto api::delete_post(std::string_view id) -> void {
         db->delete_post(id);
+        search->delete_post(id);
     }
 
     auto api::delete_post_objects(

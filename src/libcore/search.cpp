@@ -52,6 +52,10 @@ namespace minty::core {
         connect().send<void>(event::delete_indices);
     }
 
+    auto search_engine::delete_post(std::string_view post_id) -> void {
+        connect().send<void>(event::delete_post, post_id);
+    }
+
     auto search_engine::delete_tag(std::string_view tag_id) -> void {
         connect().send<void>(
             event::delete_tag,

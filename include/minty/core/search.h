@@ -14,6 +14,7 @@ namespace minty::core {
             add_tag_alias,
             create_indices,
             delete_indices,
+            delete_post,
             delete_tag,
             delete_tag_alias,
             find_tags_by_name,
@@ -44,6 +45,8 @@ namespace minty::core {
         auto create_indices() -> void;
 
         auto delete_indices() -> void;
+
+        auto delete_post(std::string_view post_id) -> void;
 
         auto delete_tag(std::string_view tag_id) -> void;
 
