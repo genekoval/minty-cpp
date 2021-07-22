@@ -1,11 +1,10 @@
 #include "commands.h"
-#include "db/commands.h"
-#include "../db/db.h"
+#include "../../db/db.h"
 
 using namespace commline;
 
 namespace {
-    auto $db(
+    auto $migrate(
         const app& app,
         const argv& argv,
         std::string_view confpath
@@ -13,17 +12,17 @@ namespace {
         const auto settings = minty::conf::settings::load_file(confpath);
         const auto client = minty::cli::data::client(settings);
 
-        client.exec(argv);
+        client.migrate();
     }
 }
 
 namespace minty::cli {
-    auto db(
+    auto migrate(
         std::string_view confpath
     ) -> std::unique_ptr<command_node> {
-        auto cmd = command(
-            "db",
-            "Connect to the database using the psql client",
+        return command(
+            __FUNCTION__,
+            "Update schemas to the current program version",
             options(
                 option<std::string_view>(
                     {"config", "c"},
@@ -32,12 +31,7 @@ namespace minty::cli {
                     std::move(confpath)
                 )
             ),
-            $db
+            $migrate
         );
-
-        cmd->subcommand(init(confpath));
-        cmd->subcommand(migrate(confpath));
-
-        return cmd;
     }
 }

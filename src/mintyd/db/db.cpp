@@ -2,14 +2,19 @@
 
 #include <algorithm>
 #include <ext/unix.h>
+#include <fmt/format.h>
 #include <filesystem>
 #include <vector>
 
 namespace fs = std::filesystem;
 
 namespace {
+    constexpr auto stop_on_error = "--set=ON_ERROR_STOP=1";
+
     const auto sql_directory = fs::path(SQLDIR);
-    const auto schema_file = (sql_directory / "minty.sql").string();
+
+    const auto api_schema = (sql_directory / "minty.sql").string();
+    const auto data_schema = (sql_directory / "data.sql").string();
 }
 
 namespace minty::cli::data {
@@ -29,12 +34,50 @@ namespace minty::cli::data {
     }
 
     auto client::init() const -> void {
-        exec({
-            "--set", "ON_ERROR_STOP=1",
-            "--command", "DROP SCHEMA IF EXISTS minty CASCADE",
-            "--command", "CREATE SCHEMA minty",
-            "--command", "SET search_path = minty",
-            "--file", schema_file
+        wait_exec({
+            stop_on_error,
+            "--file", data_schema
         });
+
+        migrate();
+    }
+
+    auto client::migrate() const -> void {
+        exec({
+            stop_on_error,
+            "--file", api_schema
+        });
+    }
+
+    auto client::wait_exec(
+        const std::vector<std::string_view>& args
+    ) const -> void {
+        const auto parent = ext::process::fork();
+
+        if (!parent) exec(args);
+
+        const auto process = *parent;
+        const auto exit = process.wait();
+
+        if (exit.code == CLD_EXITED) {
+            if (exit.status == 0) return;
+            throw std::runtime_error(fmt::format(
+                "{} exited with code {}",
+                program,
+                exit.status
+            ));
+        }
+
+        if (exit.code == CLD_KILLED || exit.code == CLD_DUMPED) {
+            throw std::runtime_error(fmt::format(
+                "{} was killed by signal {}",
+                program,
+                exit.status
+            ));
+        }
+
+        throw std::runtime_error(fmt::format(
+            "{} did not succeed"
+        ));
     }
 }

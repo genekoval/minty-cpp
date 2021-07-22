@@ -96,4 +96,4 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DCONFDIR='"$(confdir)"'
 
 $(obj)/$(daemon)/db/db.o: CXXFLAGS +=\
- -DSQLDIR='"$(shell pwd)/db/schemas/minty"'
+ -DSQLDIR='"$(shell pwd)/db"'
