@@ -122,9 +122,9 @@ CREATE TYPE post_search AS (
     post_id         integer,
     title           text,
     description     text,
-    tags            integer[],
     date_created    timestamptz,
-    date_modified   timestamptz
+    date_modified   timestamptz,
+    tags            integer[]
 );
 
 CREATE TYPE tag_name AS (
@@ -234,9 +234,9 @@ BEGIN
         post_id,
         title,
         description,
-        array_agg(tag_id),
         date_created,
-        date_modified
+        date_modified,
+        array_agg(tag_id)
     FROM data.post
     LEFT JOIN data.post_tag USING (post_id)
     WHERE post_id = l_post_id
