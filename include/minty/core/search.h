@@ -17,6 +17,7 @@ namespace minty::core {
             delete_post,
             delete_tag,
             delete_tag_alias,
+            find_post,
             find_tags_by_name,
             update_tag_name,
             version
@@ -54,6 +55,11 @@ namespace minty::core {
             std::string_view tag_id,
             std::string_view alias
         ) -> void;
+
+        auto find_post(
+            std::string_view term,
+            std::span<std::string> tags
+        ) -> std::vector<std::string>;
 
         auto find_tags_by_name(
             std::string_view term

@@ -75,6 +75,11 @@ namespace minty::server {
 
         auto get_post(std::string post_id) -> core::post;
 
+        auto get_posts(
+            std::string search_term,
+            std::vector<std::string> tags
+        ) -> std::vector<core::post_preview>;
+
         auto get_server_info() -> server_info;
 
         auto get_tag(std::string tag_id) -> core::tag;

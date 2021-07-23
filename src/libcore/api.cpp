@@ -292,6 +292,14 @@ namespace minty::core {
         return result;
     }
 
+    auto api::get_posts(
+        std::string_view search_term,
+        std::span<std::string> tags
+    ) -> std::vector<post_preview> {
+        const auto ids = search->find_post(search_term, tags);
+        return db->read_posts(ids);
+    }
+
     auto api::get_tag(std::string_view id) -> tag {
         return tag(db->read_tag(id), db->read_tag_sources(id));
     }

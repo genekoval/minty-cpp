@@ -531,6 +531,83 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_post(
+    a_post_id       integer
+) RETURNS SETOF data.post AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM data.post
+    WHERE post_id = a_post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_posts(
+    a_posts         integer[]
+) RETURNS SETOF post_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        post_id,
+        title,
+        preview_id,
+        comment_count,
+        object_count,
+        date_created
+    FROM (
+        SELECT
+            ordinality,
+            unnest AS post_id
+        FROM unnest(a_posts) WITH ORDINALITY
+    ) posts
+    JOIN post_preview USING (post_id)
+    ORDER BY ordinality;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_post_objects(
+    a_post_id       integer
+) RETURNS SETOF object_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.object_id,
+        o.preview_id
+    FROM data.object o
+    JOIN data.post_object USING (object_id)
+    WHERE post_id = a_post_id
+    ORDER BY sequence;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_post_tags(
+    a_post_id       integer
+) RETURNS SETOF tag_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT tag_id, name, avatar
+    FROM tag_preview
+    JOIN data.post_tag USING (tag_id)
+    WHERE post_id = a_post_id
+    ORDER BY name;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_site(
+    a_scheme        text,
+    a_host          text
+) RETURNS integer AS $$
+DECLARE
+    result          integer;
+BEGIN
+    SELECT INTO result site_id
+    FROM data.site
+    WHERE host = a_host AND scheme = a_scheme;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_tag(
     a_tag_id    integer
 ) RETURNS SETOF tag_view AS $$
@@ -649,60 +726,6 @@ BEGIN
     JOIN data.post_object USING (post_id)
     WHERE object_id = a_object_id
     ORDER BY date_created DESC;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION read_post(
-    a_post_id       integer
-) RETURNS SETOF data.post AS $$
-BEGIN
-    RETURN QUERY
-    SELECT *
-    FROM data.post
-    WHERE post_id = a_post_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION read_post_objects(
-    a_post_id       integer
-) RETURNS SETOF object_preview AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        o.object_id,
-        o.preview_id
-    FROM data.object o
-    JOIN data.post_object USING (object_id)
-    WHERE post_id = a_post_id
-    ORDER BY sequence;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION read_post_tags(
-    a_post_id       integer
-) RETURNS SETOF tag_preview AS $$
-BEGIN
-    RETURN QUERY
-    SELECT tag_id, name, avatar
-    FROM tag_preview
-    JOIN data.post_tag USING (tag_id)
-    WHERE post_id = a_post_id
-    ORDER BY name;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION read_site(
-    a_scheme        text,
-    a_host          text
-) RETURNS integer AS $$
-DECLARE
-    result          integer;
-BEGIN
-    SELECT INTO result site_id
-    FROM data.site
-    WHERE host = a_host AND scheme = a_scheme;
-
-    RETURN result;
 END;
 $$ LANGUAGE plpgsql;
 

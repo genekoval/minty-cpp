@@ -29,11 +29,16 @@ namespace minty {
             get_comments,
             get_object,
             get_post,
+            get_posts,
             get_server_info,
             get_tag,
             get_tag_posts,
             get_tag_previews,
             get_tags_by_name,
+            move_post_object,
+            set_comment_content,
+            set_post_description,
+            set_post_title,
             set_tag_description,
             set_tag_name
         };

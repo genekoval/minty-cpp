@@ -38,6 +38,7 @@ namespace {
             &context::get_comments,
             &context::get_object,
             &context::get_post,
+            &context::get_posts,
             &context::get_server_info,
             &context::get_tag,
             &context::get_tag_posts,

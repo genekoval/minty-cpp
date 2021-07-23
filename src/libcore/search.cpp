@@ -74,6 +74,17 @@ namespace minty::core {
         );
     }
 
+    auto search_engine::find_post(
+        std::string_view term,
+        std::span<std::string> tags
+    ) -> std::vector<std::string> {
+        return connect().send<std::vector<std::string>>(
+            event::find_post,
+            term,
+            tags
+        );
+    }
+
     auto search_engine::find_tags_by_name(
         std::string_view term
     ) -> std::vector<std::string> {
