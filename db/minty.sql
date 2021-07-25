@@ -127,6 +127,12 @@ CREATE TYPE post_search AS (
     tags            integer[]
 );
 
+CREATE TYPE post_update AS (
+    post_id         integer,
+    new_data        text,
+    date_modified   timestamptz
+);
+
 CREATE TYPE tag_name AS (
     name            text,
     aliases         text[]
@@ -743,38 +749,32 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION update_post_description(
     a_post_id       integer,
     a_description   text
-) RETURNS text AS $$
-DECLARE result      text;
+) RETURNS SETOF post_update AS $$
 BEGIN
-    WITH updated AS (
-        UPDATE data.post
-        SET description = nullif(a_description, '')
-        WHERE post_id = a_post_id
-        RETURNING description
-    )
-    SELECT INTO result description
-    FROM updated;
-
-    RETURN result;
+    RETURN QUERY
+    UPDATE data.post
+    SET description = nullif(a_description, '')
+    WHERE post_id = a_post_id
+    RETURNING
+        post_id,
+        description as new_data,
+        date_modified;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION update_post_title(
     a_post_id       integer,
     a_title         text
-) RETURNS text AS $$
-DECLARE result      text;
+) RETURNS SETOF post_update AS $$
 BEGIN
-    WITH updated AS (
-        UPDATE data.post
-        SET title = nullif(a_title, '')
-        WHERE post_id = a_post_id
-        RETURNING title
-    )
-    SELECT INTO result title
-    FROM updated;
-
-    RETURN result;
+    RETURN QUERY
+    UPDATE data.post
+    SET title = nullif(a_title, '')
+    WHERE post_id = a_post_id
+    RETURNING
+        post_id,
+        title as new_data,
+        date_modified;
 END;
 $$ LANGUAGE plpgsql;
 

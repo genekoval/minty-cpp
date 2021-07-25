@@ -112,4 +112,10 @@ namespace minty::repo::db {
         decltype(post::date_modified) date_modified;
         std::vector<std::string> tags;
     };
+
+    struct post_update : entity<3> {
+        std::string id;
+        std::optional<std::string> new_data;
+        std::string date_modified;
+    };
 }

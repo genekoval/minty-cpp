@@ -54,6 +54,13 @@ namespace minty::repo::db {
     );
 
     READ_ENTITY(
+        post_update,
+        &post_update::id,
+        &post_update::new_data,
+        &post_update::date_modified
+    );
+
+    READ_ENTITY(
         site,
         &site::id,
         &site::scheme,

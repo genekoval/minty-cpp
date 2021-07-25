@@ -9,6 +9,7 @@ namespace minty::core {
     using range = repo::db::range;
     using post_preview = repo::db::post_preview;
     using post_search = repo::db::post_search;
+    using post_update = repo::db::post_update;
     using tag_name = repo::db::tag_name;
     using tag_preview = repo::db::tag_preview;
     using tag_text = repo::db::tag_text;

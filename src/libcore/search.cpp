@@ -94,6 +94,18 @@ namespace minty::core {
         );
     }
 
+    auto search_engine::update_post_description(
+        const post_update& post
+    ) -> void {
+        connect().send<void>(event::update_post_description, post);
+    }
+
+    auto search_engine::update_post_title(
+        const post_update& post
+    ) -> void {
+        connect().send<void>(event::update_post_title, post);
+    }
+
     auto search_engine::update_tag_name(
         std::string_view tag_id,
         std::string_view old_name,

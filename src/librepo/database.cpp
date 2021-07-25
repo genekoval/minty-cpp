@@ -344,19 +344,25 @@ namespace minty::repo::db {
     auto database::update_post_description(
         std::string_view post_id,
         std::string_view description
-    ) -> std::optional<std::string> {
-        return ntx
-            .exec_prepared1("update_post_description", post_id, description)[0]
-            .as<std::optional<std::string>>();
+    ) -> post_update {
+        return make_entity<post_update>(
+            ntx,
+            __FUNCTION__,
+            post_id,
+            description
+        );
     }
 
     auto database::update_post_title(
         std::string_view post_id,
         std::string_view title
-    ) -> std::optional<std::string> {
-        return ntx
-            .exec_prepared1("update_post_title", post_id, title)[0]
-            .as<std::optional<std::string>>();
+    ) -> post_update {
+        return make_entity<post_update>(
+            ntx,
+            __FUNCTION__,
+            post_id,
+            title
+        );
     }
 
     auto database::update_tag_description(

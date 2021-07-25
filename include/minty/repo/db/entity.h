@@ -10,6 +10,7 @@ namespace minty::repo::db {
     ENTITY(post);
     ENTITY(post_preview);
     ENTITY(post_search);
+    ENTITY(post_update);
     ENTITY(site);
     ENTITY(source);
     ENTITY(tag);
