@@ -10,6 +10,7 @@ namespace minty::core {
     class search_engine {
         enum class event : net::event_t {
             add_post,
+            add_post_tag,
             add_tags,
             add_tag_alias,
             create_indices,
@@ -19,6 +20,7 @@ namespace minty::core {
             delete_tag_alias,
             find_post,
             find_tags_by_name,
+            remove_post_tag,
             update_post_description,
             update_post_title,
             update_tag_name,
@@ -37,6 +39,11 @@ namespace minty::core {
         search_engine(std::string_view endpoint);
 
         auto add_post(const post_search& post) -> void;
+
+        auto add_post_tag(
+            std::string_view post_id,
+            std::string_view tag_id
+        ) -> void;
 
         auto add_tags(std::span<const tag_text> tags) -> void;
 
@@ -66,6 +73,11 @@ namespace minty::core {
         auto find_tags_by_name(
             std::string_view term
         ) -> std::vector<std::string>;
+
+        auto remove_post_tag(
+            std::string_view post_id,
+            std::string_view tag_id
+        ) -> void;
 
         auto update_post_description(const post_update& post) -> void;
 

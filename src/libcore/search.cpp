@@ -24,6 +24,13 @@ namespace minty::core {
         connect().send<void>(event::add_post, post);
     }
 
+    auto search_engine::add_post_tag(
+        std::string_view post_id,
+        std::string_view tag_id
+    ) -> void {
+        return connect().send<void>(event::add_post_tag, post_id, tag_id);
+    }
+
     auto search_engine::add_tags(std::span<const tag_text> tags) -> void {
         if (tags.empty()) return;
 
@@ -92,6 +99,13 @@ namespace minty::core {
             event::find_tags_by_name,
             term
         );
+    }
+
+    auto search_engine::remove_post_tag(
+        std::string_view post_id,
+        std::string_view tag_id
+    ) -> void {
+        connect().send<void>(event::remove_post_tag, post_id, tag_id);
     }
 
     auto search_engine::update_post_description(

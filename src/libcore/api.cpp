@@ -130,6 +130,7 @@ namespace minty::core {
         std::string_view tag_id
     ) -> void {
         db->create_post_tag(post_id, tag_id);
+        search->add_post_tag(post_id, tag_id);
     }
 
     auto api::add_source(std::string_view url) -> source {
@@ -232,6 +233,7 @@ namespace minty::core {
         std::string_view tag_id
     ) -> void {
         db->delete_post_tag(post_id, tag_id);
+        search->remove_post_tag(post_id, tag_id);
     }
 
     auto api::delete_tag(std::string_view id) -> void {
