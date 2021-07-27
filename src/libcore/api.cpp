@@ -346,6 +346,7 @@ namespace minty::core {
         search->delete_indices();
         search->create_indices();
 
+        search->add_posts(db->read_post_search());
         search->add_tags(db->read_tag_text());
     }
 

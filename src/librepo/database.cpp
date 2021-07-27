@@ -40,6 +40,7 @@ namespace minty::repo::db {
         ci.prepare("read_post_date_modified", 1);
         ci.prepare("read_posts", 1);
         ci.prepare("read_post_objects", 1);
+        ci.prepare("read_post_search", 0);
         ci.prepare("read_post_tags", 1);
         ci.prepare("read_site", 2);
         ci.prepare("read_tag", 1);
@@ -279,6 +280,10 @@ namespace minty::repo::db {
             "read_post_objects",
             post_id
         );
+    }
+
+    auto database::read_post_search() -> std::vector<post_search> {
+        return make_entities<std::vector<post_search>>(ntx, __FUNCTION__);
     }
 
     auto database::read_post_tags(

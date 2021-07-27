@@ -31,6 +31,10 @@ namespace minty::core {
         return connect().send<void>(event::add_post_tag, post_id, tag_id);
     }
 
+    auto search_engine::add_posts(std::span<const post_search> posts) -> void {
+        connect().send<void>(event::add_posts, posts);
+    }
+
     auto search_engine::add_tags(std::span<const tag_text> tags) -> void {
         if (tags.empty()) return;
 

@@ -3,6 +3,18 @@ CREATE SCHEMA minty;
 
 --{{{( Views )
 
+CREATE VIEW post_search_view AS
+SELECT
+    post_id,
+    title,
+    description,
+    date_created,
+    date_modified,
+    array_agg(tag_id) AS tags
+FROM data.post
+LEFT JOIN data.post_tag USING (post_id)
+GROUP BY post_id;
+
 CREATE VIEW source_view AS
 SELECT
     source_id,
@@ -118,15 +130,6 @@ CREATE TYPE object_preview AS (
     preview_id      uuid
 );
 
-CREATE TYPE post_search AS (
-    post_id         integer,
-    title           text,
-    description     text,
-    date_created    timestamptz,
-    date_modified   timestamptz,
-    tags            integer[]
-);
-
 CREATE TYPE post_update AS (
     post_id         integer,
     new_data        text,
@@ -203,7 +206,7 @@ CREATE FUNCTION create_post(
     a_description   text,
     a_objects       uuid[],
     tags            integer[]
-) RETURNS SETOF post_search AS $$
+) RETURNS SETOF post_search_view AS $$
 DECLARE
     l_post_id       integer;
 BEGIN
@@ -236,17 +239,9 @@ BEGIN
     FROM tag_table;
 
     RETURN QUERY
-    SELECT
-        post_id,
-        title,
-        description,
-        date_created,
-        date_modified,
-        array_agg(tag_id)
-    FROM data.post
-    LEFT JOIN data.post_tag USING (post_id)
-    WHERE post_id = l_post_id
-    GROUP BY post_id;
+    SELECT *
+    FROM post_search_view
+    WHERE post_id = l_post_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -586,6 +581,15 @@ BEGIN
     ) posts
     JOIN post_preview USING (post_id)
     ORDER BY ordinality;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_post_search()
+RETURNS SETOF post_search_view AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM post_search_view;
 END;
 $$ LANGUAGE plpgsql;
 

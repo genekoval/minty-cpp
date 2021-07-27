@@ -11,6 +11,7 @@ namespace minty::core {
         enum class event : net::event_t {
             add_post,
             add_post_tag,
+            add_posts,
             add_tags,
             add_tag_alias,
             create_indices,
@@ -45,6 +46,8 @@ namespace minty::core {
             std::string_view post_id,
             std::string_view tag_id
         ) -> void;
+
+        auto add_posts(std::span<const post_search> posts) -> void;
 
         auto add_tags(std::span<const tag_text> tags) -> void;
 
