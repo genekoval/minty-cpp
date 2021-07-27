@@ -108,6 +108,19 @@ namespace minty::core {
         connect().send<void>(event::remove_post_tag, post_id, tag_id);
     }
 
+    auto search_engine::update_post_date_modified(
+        std::string_view post_id,
+        std::string_view date_modified
+    ) -> void {
+        connect().send<void>(
+            event::update_post_date_modified,
+            post_update {
+                .id = std::string(post_id),
+                .date_modified = std::string(date_modified)
+            }
+        );
+    }
+
     auto search_engine::update_post_description(
         const post_update& post
     ) -> void {

@@ -21,6 +21,7 @@ namespace minty::core {
             find_post,
             find_tags_by_name,
             remove_post_tag,
+            update_post_date_modified,
             update_post_description,
             update_post_title,
             update_tag_name,
@@ -77,6 +78,11 @@ namespace minty::core {
         auto remove_post_tag(
             std::string_view post_id,
             std::string_view tag_id
+        ) -> void;
+
+        auto update_post_date_modified(
+            std::string_view post_id,
+            std::string_view date_modified
         ) -> void;
 
         auto update_post_description(const post_update& post) -> void;

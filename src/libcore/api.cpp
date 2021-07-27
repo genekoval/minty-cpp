@@ -111,9 +111,13 @@ namespace minty::core {
         const std::vector<std::string>& objects,
         unsigned int position
     ) -> std::vector<object_preview> {
-        auto new_objects = db->create_post_objects(post_id, objects, position);
-        auto result = std::vector<object_preview>();
+        auto [new_objects, date_modified]= db->create_post_objects(
+            post_id,
+            objects,
+            position
+        );
 
+        auto result = std::vector<object_preview>();
         for (auto&& obj : new_objects) {
             auto meta = bucket->meta(obj.id);
             result.emplace_back(
@@ -122,6 +126,7 @@ namespace minty::core {
             );
         }
 
+        search->update_post_date_modified(post_id, date_modified);
         return result;
     }
 
@@ -225,7 +230,10 @@ namespace minty::core {
         std::string_view post_id,
         std::span<range> ranges
     ) -> void {
-        db->delete_post_objects(post_id, ranges);
+        search->update_post_date_modified(
+            post_id,
+            db->delete_post_objects(post_id, ranges)
+        );
     }
 
     auto api::delete_post_tag(
@@ -328,7 +336,10 @@ namespace minty::core {
         unsigned int old_index,
         unsigned int new_index
     ) -> void {
-        db->move_post_object(post_id, old_index, new_index);
+        search->update_post_date_modified(
+            post_id,
+            db->move_post_object(post_id, old_index, new_index)
+        );
     }
 
     auto api::reindex() -> void {

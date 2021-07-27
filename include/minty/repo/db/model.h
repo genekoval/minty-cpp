@@ -113,6 +113,11 @@ namespace minty::repo::db {
         std::vector<std::string> tags;
     };
 
+    struct post_object_update {
+        std::vector<object_preview> objects;
+        std::string date_modified;
+    };
+
     struct post_update : entity<3> {
         std::string id;
         std::optional<std::string> new_data;

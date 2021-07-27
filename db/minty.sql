@@ -394,7 +394,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION delete_post_objects(
     a_post_id       integer,
     ranges          int4range[]
-) RETURNS void AS $$
+) RETURNS timestamptz AS $$
 DECLARE
     range           int4range;
 BEGIN
@@ -405,6 +405,8 @@ BEGIN
     LOOP
         PERFORM delete_post_objects_range(a_post_id, range);
     END LOOP;
+
+    RETURN read_post_date_modified(a_post_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -496,7 +498,7 @@ CREATE FUNCTION move_post_object(
     a_post_id       integer,
     a_old_index     integer,
     a_new_index     integer
-) RETURNS void AS $$
+) RETURNS timestamptz AS $$
 BEGIN
     UPDATE data.post_object
     SET sequence = -1
@@ -519,6 +521,8 @@ BEGIN
     UPDATE data.post_object
     SET sequence = a_new_index
     WHERE post_id = a_post_id AND sequence = -1;
+
+    RETURN read_post_date_modified(a_post_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -545,6 +549,20 @@ BEGIN
     SELECT *
     FROM data.post
     WHERE post_id = a_post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_post_date_modified(
+    a_post_id       integer
+) RETURNS timestamptz AS $$
+DECLARE
+    l_date_modified timestamptz;
+BEGIN
+    SElECT date_modified INTO l_date_modified
+    FROM data.post
+    WHERE post_id = a_post_id;
+
+    RETURN l_date_modified;
 END;
 $$ LANGUAGE plpgsql;
 

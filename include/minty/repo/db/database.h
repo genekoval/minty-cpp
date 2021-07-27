@@ -9,6 +9,8 @@ namespace minty::repo::db {
     class database {
         pqxx::connection connection;
         pqxx::nontransaction ntx;
+
+        auto read_post_date_modified(std::string_view post_id) -> std::string;
     public:
         database(std::string_view connection_string);
 
@@ -39,7 +41,7 @@ namespace minty::repo::db {
             std::string_view post_id,
             const std::vector<std::string>& objects,
             unsigned int position
-        ) -> std::vector<object_preview>;
+        ) -> post_object_update;
 
         auto create_post_tag(
             std::string_view post_id,
@@ -74,7 +76,7 @@ namespace minty::repo::db {
         auto delete_post_objects(
             std::string_view post_id,
             std::span<const range> ranges
-        ) -> void;
+        ) -> std::string;
 
         auto delete_post_tag(
             std::string_view post_id,
@@ -97,7 +99,7 @@ namespace minty::repo::db {
             std::string_view post_id,
             unsigned int old_index,
             unsigned int new_index
-        ) -> void;
+        ) -> std::string;
 
         auto read_comments(std::string_view post_id) -> std::vector<comment>;
 

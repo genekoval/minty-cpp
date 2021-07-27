@@ -37,6 +37,7 @@ namespace minty::repo::db {
         ci.prepare("read_object", 1);
         ci.prepare("read_object_posts", 1);
         ci.prepare("read_post", 1);
+        ci.prepare("read_post_date_modified", 1);
         ci.prepare("read_posts", 1);
         ci.prepare("read_post_objects", 1);
         ci.prepare("read_post_tags", 1);
@@ -97,14 +98,17 @@ namespace minty::repo::db {
         std::string_view post_id,
         const std::vector<std::string>& objects,
         unsigned int position
-    ) -> std::vector<object_preview> {
-        return make_entities<std::vector<object_preview>>(
-            ntx,
-            __FUNCTION__,
-            post_id,
-            objects,
-            position
-        );
+    ) -> post_object_update {
+        return {
+            .objects = make_entities<std::vector<object_preview>>(
+                ntx,
+                __FUNCTION__,
+                post_id,
+                objects,
+                position
+            ),
+            .date_modified = read_post_date_modified(post_id)
+        };
     }
 
     auto database::create_post_tag(
@@ -167,7 +171,7 @@ namespace minty::repo::db {
     auto database::delete_post_objects(
         std::string_view post_id,
         std::span<const range> ranges
-    ) -> void {
+    ) -> std::string {
         auto arg = std::vector<std::string>();
 
         for (const auto& r : ranges) {
@@ -178,7 +182,11 @@ namespace minty::repo::db {
             ));
         }
 
-        ntx.exec_prepared(__FUNCTION__, post_id, arg);
+        return ntx.exec_prepared1(
+            __FUNCTION__,
+            post_id,
+            arg
+        )[0].as<std::string>();
     }
 
     auto database::delete_post_tag(
@@ -210,8 +218,13 @@ namespace minty::repo::db {
         std::string_view post_id,
         unsigned int old_index,
         unsigned int new_index
-    ) -> void {
-        ntx.exec_prepared(__FUNCTION__, post_id, old_index + 1, new_index + 1);
+    ) -> std::string {
+        return ntx.exec_prepared1(
+            __FUNCTION__,
+            post_id,
+            old_index + 1,
+            new_index + 1
+        )[0].as<std::string>();
     }
 
     auto database::read_comments(
@@ -240,6 +253,12 @@ namespace minty::repo::db {
 
     auto database::read_post(std::string_view post_id) -> post {
         return make_entity<post>(ntx, "read_post", post_id);
+    }
+
+    auto database::read_post_date_modified(
+        std::string_view post_id
+    ) -> std::string {
+        return ntx.exec_prepared1(__FUNCTION__, post_id)[0].as<std::string>();
     }
 
     auto database::read_posts(
