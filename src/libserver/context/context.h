@@ -76,7 +76,7 @@ namespace minty::server {
         auto get_post(std::string post_id) -> core::post;
 
         auto get_posts(
-            std::string search_term,
+            std::optional<std::string> search_term,
             std::vector<std::string> tags
         ) -> std::vector<core::post_preview>;
 

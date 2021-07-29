@@ -303,7 +303,7 @@ namespace minty::core {
     }
 
     auto api::get_posts(
-        std::string_view search_term,
+        std::optional<std::string_view> search_term,
         std::span<std::string> tags
     ) -> std::vector<post_preview> {
         const auto ids = search->find_post(search_term, tags);

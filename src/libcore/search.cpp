@@ -83,7 +83,7 @@ namespace minty::core {
     }
 
     auto search_engine::find_post(
-        std::string_view term,
+        std::optional<std::string_view> term,
         std::span<std::string> tags
     ) -> std::vector<std::string> {
         return connect().send<std::vector<std::string>>(
