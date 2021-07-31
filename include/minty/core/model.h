@@ -96,6 +96,11 @@ namespace minty::core {
         std::vector<std::string> tags;
     };
 
+    struct post_query {
+        std::optional<std::string> text;
+        std::vector<std::string> tags;
+    };
+
     struct tag {
         decltype(repo::db::tag::id) id;
         decltype(repo::db::tag::name) name;

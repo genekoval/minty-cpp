@@ -35,6 +35,12 @@ namespace zipline {
     );
 
     ZIPLINE_OBJECT(
+        minty::core::post_query,
+        &minty::core::post_query::text,
+        &minty::core::post_query::tags
+    );
+
+    ZIPLINE_OBJECT(
         minty::core::post_search,
         &minty::core::post_search::id,
         &minty::core::post_search::title,

@@ -119,10 +119,9 @@ namespace minty::server {
 	}
 
     auto context::get_posts(
-        std::optional<std::string> search_term,
-        std::vector<std::string> tags
+        core::post_query query
     ) -> std::vector<core::post_preview> {
-        return api->get_posts(search_term, tags);
+        return api->get_posts(query);
     }
 
     auto context::get_server_info() -> server_info {

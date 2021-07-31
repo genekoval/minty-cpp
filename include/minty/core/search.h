@@ -69,10 +69,7 @@ namespace minty::core {
             std::string_view alias
         ) -> void;
 
-        auto find_post(
-            std::optional<std::string_view> term,
-            std::span<std::string> tags
-        ) -> std::vector<std::string>;
+        auto find_post(const post_query& query) -> std::vector<std::string>;
 
         auto find_tags_by_name(
             std::string_view term
