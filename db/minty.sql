@@ -197,7 +197,9 @@ BEGIN
         a_object_id,
         a_preview_id,
         a_source_id
-    ) ON CONFLICT DO NOTHING;
+    ) ON CONFLICT (object_id) DO UPDATE SET
+        preview_id = a_preview_id,
+        source_id = a_source_id;
 END;
 $$ LANGUAGE plpgsql;
 
