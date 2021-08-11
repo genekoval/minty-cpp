@@ -3,7 +3,7 @@
 #include <cstring>
 #include <GraphicsMagick/Magick++.h>
 
-namespace minty::core {
+namespace {
     constexpr auto thumbnail_format = "PNG";
     constexpr auto thumbnail_size = 250;
 
@@ -12,33 +12,26 @@ namespace minty::core {
         thumbnail_size
     );
 
-    auto generate_image_preview(
+    auto generate_preview(
         fstore::bucket& bucket,
-        const fstore::object_meta& object
+        Magick::Image&& image
     ) -> std::string {
-        auto* source = new std::byte[object.size];
-        bucket.get(object.id, source);
+        const auto width = image.size().width();
+        const auto height = image.size().height();
 
-        auto blob = Magick::Blob();
-        blob.updateNoCopy(source, object.size);
+        DEBUG() << "image dimensions: " << width << " x " << height;
 
-        auto image = Magick::Image(blob);
-        auto size = image.size();
-
-        DEBUG()
-            << "image dimensions: "
-            << size.width() << " x " << size.height();
-
-        if (size.width() != size.height()) {
-            const auto smaller = std::min(size.width(), size.height());
-            const auto larger = std::max(size.width(), size.height());
+        // Crop the image to a square if it is not a square already
+        if (width != height) {
+            const auto smaller = std::min(width, height);
+            const auto larger = std::max(width, height);
             const auto offset = (larger - smaller) / 2;
 
             const auto crop = Magick::Geometry(
                 smaller,
                 smaller,
-                smaller == size.height() ? offset : 0,
-                smaller == size.width() ? offset : 0
+                smaller == height ? offset : 0,
+                smaller == width ? offset : 0
             );
 
             DEBUG()
@@ -49,7 +42,6 @@ namespace minty::core {
                 << ")";
 
             image.crop(crop);
-            size = image.size();
         }
 
         image.thumbnail(thumbnail_geometry);
@@ -64,6 +56,36 @@ namespace minty::core {
                 out.length()
             ));
         }).id;
+    }
+}
+
+namespace minty::core {
+    auto generate_image_preview(
+        fstore::bucket& bucket,
+        unsigned int width,
+        unsigned int height,
+        const void* pixels
+    ) -> std::string {
+        return generate_preview(bucket, Magick::Image(
+            width,
+            height,
+            "RGB",
+            MagickLib::StorageType::CharPixel,
+            pixels
+        ));
+    }
+
+    auto generate_image_preview(
+        fstore::bucket& bucket,
+        const fstore::object_meta& object
+    ) -> std::string {
+        auto* source = new std::byte[object.size];
+        bucket.get(object.id, source);
+
+        auto blob = Magick::Blob();
+        blob.updateNoCopy(source, object.size);
+
+        return generate_preview(bucket, Magick::Image(blob));
     }
 
     auto initialize_image_previews() -> void {

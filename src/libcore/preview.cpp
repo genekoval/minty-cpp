@@ -2,34 +2,33 @@
 
 #include <minty/core/preview.h>
 
+#include <ext/string.h>
 #include <unordered_map>
 
-namespace minty::core {
+namespace {
     using preview_generator =
-        std::string (*)(fstore::bucket&, const fstore::object_meta&);
+        auto (*)(fstore::bucket&, const fstore::object_meta&) -> std::string;
 
-    constexpr auto jpeg = "image/jpeg";
-    constexpr auto png = "image/png";
-
-    const auto generators = std::unordered_map<
-        std::string_view,
-        preview_generator
-    > {
-        {jpeg, generate_image_preview},
-        {png, generate_image_preview}
-    };
+    const auto generators =
+        std::unordered_map<std::string_view, preview_generator> {
+            {"image", minty::core::generate_image_preview},
+            {"video", minty::core::generate_video_preview}
+        };
 
     auto get_preview_generator(
         std::string_view mime_type
     ) -> preview_generator {
-        auto generator = generators.find(mime_type.data());
+        const auto type = ext::split(mime_type, "/").front();
+
+        auto generator = generators.find(type);
+
         if (generator == generators.end()) return nullptr;
         return generator->second;
     }
+}
 
-    preview_service::preview_service(fstore::bucket& bucket) :
-        bucket(&bucket)
-    {
+namespace minty::core {
+    preview_service::preview_service(fstore::bucket& bucket) : bucket(&bucket) {
         initialize_image_previews();
     }
 
@@ -47,6 +46,15 @@ namespace minty::core {
             << "Generating preview for object of type: "
             << object.mime_type;
 
-        return generator(*bucket, object);
+        try {
+            return generator(*bucket, object);
+        }
+        catch (const std::runtime_error& ex) {
+            ERROR()
+                << "Failed to generate preview for object ("
+                << object.id << "): " << ex.what();
+        }
+
+        return {};
     }
 }

@@ -26,6 +26,9 @@ internal.libs := $(addprefix lib,$(internal))
 define common.libs
  $(internal)
  $(graphics.libs)
+ avcodec
+ avformat
+ avutil
  conftools
  ext++
  fmt
@@ -34,6 +37,7 @@ define common.libs
  netcore
  pqxx
  pq
+ swscale
  timber
  uri
  yaml-cpp
