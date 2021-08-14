@@ -50,18 +50,18 @@ namespace minty::core::video {
         int buffer_size
     ) -> int {
         auto* bd = static_cast<buffer_data*>(opaque);
-        buffer_size = std::min(
+        const auto size = std::min(
             static_cast<std::size_t>(buffer_size),
-            bd->size
+            bd->remaining
         );
 
-        if (!buffer_size) return AVERROR_EOF;
+        if (!size) return AVERROR_EOF;
 
-        std::memcpy(buffer, bd->data, buffer_size);
-        bd->data += buffer_size;
-        bd->remaining -= buffer_size;
+        std::memcpy(buffer, bd->data, size);
+        bd->data += size;
+        bd->remaining -= size;
 
-        return buffer_size;
+        return size;
     }
 
     auto io_context::seek(
