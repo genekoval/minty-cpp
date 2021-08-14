@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "../../api/api.h"
 #include "../../db/db.h"
 
 using namespace commline;
@@ -13,6 +14,7 @@ namespace {
         const auto client = minty::cli::data::client(settings);
 
         client.init();
+        minty::cli::api_container(settings).api().reindex();
     }
 }
 

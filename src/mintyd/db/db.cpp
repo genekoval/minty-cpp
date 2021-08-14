@@ -43,7 +43,7 @@ namespace minty::cli::data {
     }
 
     auto client::migrate() const -> void {
-        exec({
+        wait_exec({
             stop_on_error,
             "--file", api_schema
         });
