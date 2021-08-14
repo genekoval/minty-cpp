@@ -3,11 +3,15 @@ CREATE SCHEMA data;
 
 SET search_path TO data;
 
+CREATE TABLE object_ref (
+    object_id       uuid PRIMARY KEY
+);
+
 CREATE TABLE site (
     site_id         SERIAL PRIMARY KEY,
     scheme          text NOT NULL,
     host            text UNIQUE NOT NULL,
-    icon            uuid
+    icon            uuid REFERENCES object_ref ON DELETE NO ACTION
 );
 
 CREATE TABLE source (
@@ -19,8 +23,8 @@ CREATE TABLE source (
 );
 
 CREATE TABLE object (
-    object_id       uuid PRIMARY KEY,
-    preview_id      uuid,
+    object_id       uuid PRIMARY KEY REFERENCES object_ref ON DELETE NO ACTION,
+    preview_id      uuid REFERENCES object_ref ON DELETE NO ACTION,
     source_id       integer REFERENCES source ON DELETE NO ACTION
 );
 
@@ -53,8 +57,8 @@ CREATE TABLE post_comment (
 CREATE TABLE tag (
     tag_id          SERIAL PRIMARY KEY,
     description     text,
-    avatar          uuid,
-    banner          uuid,
+    avatar          uuid REFERENCES object_ref ON DELETE NO ACTION,
+    banner          uuid REFERENCES object_ref ON DELETE NO ACTION,
     date_created    timestamptz NOT NULL DEFAULT NOW()
 );
 

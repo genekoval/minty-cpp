@@ -339,6 +339,35 @@ namespace minty::core {
         );
     }
 
+    auto api::prune() -> void {
+        db->prune();
+
+        auto objects_deleted = 0;
+        auto space_freed = uintmax_t();
+
+        db->prune_objects([&](auto objects) -> bool {
+            for (const auto& obj : objects) {
+                const auto info = bucket->remove(obj);
+                space_freed += info.size;
+            }
+
+            objects_deleted = objects.size();
+
+            return true;
+        });
+
+        if (objects_deleted == 0) {
+            INFO() << "No objects to prune";
+            return;
+        }
+
+        INFO()
+            << "Removed "
+            << objects_deleted << " object"
+            << (objects_deleted == 1 ? "" : "s")
+            << " freeing " << data_size(space_freed).formatted;
+    }
+
     auto api::reindex() -> void {
         search->delete_indices();
         search->create_indices();

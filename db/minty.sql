@@ -3,6 +3,46 @@ CREATE SCHEMA minty;
 
 --{{{( Views )
 
+CREATE VIEW object_ref_view AS
+SELECT
+    object_id,
+    count(objects) +
+    count(previews) +
+    count(icons) +
+    count(avatars) +
+    count(banners)
+    AS reference_count
+FROM data.object_ref
+LEFT JOIN (
+    SELECT object_id
+    FROM data.object
+) objects USING (object_id)
+LEFT JOIN (
+    SELECT preview_id AS object_id
+    FROM data.object
+) previews USING (object_id)
+LEFT JOIN (
+    SELECT icon AS object_id
+    FROM data.site
+) icons USING (object_id)
+LEFT JOIN (
+    SELECT avatar AS object_id
+    FROM data.tag
+) avatars USING (object_id)
+LEFT JOIN (
+    SELECT banner AS object_id
+    FROM data.tag
+) banners USING (object_id)
+GROUP BY object_id;
+
+CREATE VIEW post_object_ref_view AS
+SELECT
+    object_id,
+    count(post_objects.object_id) AS reference_count
+FROM data.object
+LEFT JOIN data.post_object post_objects USING (object_id)
+GROUP BY object_id;
+
 CREATE VIEW post_search_view AS
 SELECT
     post_id,
@@ -14,6 +54,23 @@ SELECT
 FROM data.post
 LEFT JOIN data.post_tag USING (post_id)
 GROUP BY post_id;
+
+CREATE VIEW site_ref_view AS
+SELECT
+    site_id,
+    count(sources) AS reference_count
+FROM data.site
+LEFT JOIN data.source sources USING (site_id)
+GROUP BY site_id;
+
+CREATE VIEW source_ref_view AS
+SELECT
+    source_id,
+    count(object) + count(tag) AS reference_count
+FROM data.source
+LEFT JOIN data.object object USING (source_id)
+LEFT JOIN data.tag_source tag USING (source_id)
+GROUP BY source_id;
 
 CREATE VIEW source_view AS
 SELECT
@@ -189,6 +246,8 @@ CREATE FUNCTION create_object(
     a_source_id     integer
 ) RETURNS void AS $$
 BEGIN
+    PERFORM create_object_refs(ARRAY[a_object_id, a_preview_id]);
+
     INSERT INTO data.object (
         object_id,
         preview_id,
@@ -200,6 +259,22 @@ BEGIN
     ) ON CONFLICT (object_id) DO UPDATE SET
         preview_id = a_preview_id,
         source_id = a_source_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION create_object_refs(
+    a_objects       uuid[]
+) RETURNS void AS $$
+BEGIN
+    WITH object_table AS (
+        SELECT unnest AS object_id
+        FROM unnest(a_objects)
+    )
+    INSERT INTO data.object_ref (object_id)
+    SELECT object_id
+    FROM object_table
+    WHERE object_id IS NOT NULL
+    ON CONFLICT DO NOTHING;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -287,6 +362,8 @@ CREATE FUNCTION create_site(
     a_icon          uuid
 ) RETURNS SETOF data.site AS $$
 BEGIN
+    PERFORM create_object_refs(ARRAY[a_icon]);
+
     RETURN QUERY
     INSERT INTO data.site (
         scheme,
@@ -520,6 +597,44 @@ BEGIN
     WHERE post_id = a_post_id AND sequence = -1;
 
     RETURN read_post_date_modified(a_post_id);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION prune() RETURNS void AS $$
+BEGIN
+    PERFORM prune_post_objects();
+    PERFORM prune_sources();
+    PERFORM prune_sites();
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION prune_objects() RETURNS SETOF uuid AS $$
+BEGIN
+    RETURN QUERY
+    DELETE FROM data.object_ref obj USING object_ref_view ref
+    WHERE obj.object_id = ref.object_id AND ref.reference_count = 0
+    RETURNING obj.object_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION prune_post_objects() RETURNS void AS $$
+BEGIN
+    DELETE FROM data.object obj USING post_object_ref_view ref
+    WHERE obj.object_id = ref.object_id AND ref.reference_count = 0;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION prune_sites() RETURNS void AS $$
+BEGIN
+    DELETE FROM data.site site USING site_ref_view ref
+    WHERE site.site_id = ref.site_id AND ref.reference_count = 0;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION prune_sources() RETURNS void AS $$
+BEGIN
+    DELETE FROM data.source source USING source_ref_view ref
+    WHERE source.source_id = ref.source_id AND ref.reference_count = 0;
 END;
 $$ LANGUAGE plpgsql;
 

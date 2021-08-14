@@ -109,17 +109,45 @@ namespace minty::repo::db {
     }
 
     template <typename Collection, typename ...Args>
-    auto make_entities(transaction& tx, Args&&... args) -> Collection {
-        using Entity = typename Collection::value_type;
-
+    auto read_rows(
+        transaction& tx,
+        typename Collection::value_type (*handle_row)(const pqxx::row&),
+        Args&&... args
+    ) -> Collection {
         const auto rows = tx.exec_prepared(args...);
         auto result = Collection();
 
         for (const auto& row : rows) {
-            auto it = row.begin();
-            result.push_back(field_parser<Entity>::read(it));
+            result.push_back(handle_row(row));
         }
 
         return result;
+    }
+
+    template <typename Collection, typename ...Args>
+    auto make_entities(transaction& tx, Args&&... args) -> Collection {
+        using Entity = typename Collection::value_type;
+
+        return read_rows<Collection>(
+            tx,
+            [](const auto& row) -> Entity {
+                auto it = row.begin();
+                return field_parser<Entity>::read(it);
+            },
+            std::forward<Args>(args)...
+        );
+    }
+
+    template <typename Collection, typename ...Args>
+    auto make_objects(transaction& tx, Args&&... args) -> Collection {
+        using Object = typename Collection::value_type;
+
+        return read_rows<Collection>(
+            tx,
+            [](const auto& row) -> Object {
+                return row[0].template as<Object>();
+            },
+            std::forward<Args>(args)...
+        );
     }
 }

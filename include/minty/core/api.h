@@ -127,6 +127,8 @@ namespace minty::core {
             unsigned int new_index
         ) -> void;
 
+        auto prune() -> void;
+
         auto reindex() -> void;
 
         auto set_comment_content(
