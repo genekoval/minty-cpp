@@ -24,7 +24,7 @@ namespace minty::core::video {
     }
 
     format_context::~format_context() {
-        avformat_free_context(ctx);
+        avformat_close_input(&ctx);
     }
 
     auto format_context::data() -> AVFormatContext* {
