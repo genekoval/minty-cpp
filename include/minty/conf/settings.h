@@ -19,6 +19,8 @@ namespace minty::conf {
         struct s_database {
             std::string client = "psql";
             conftools::database_connection connection;
+            std::string dump = "pg_dump";
+            std::string restore = "pg_restore";
         };
 
         struct s_fstore {

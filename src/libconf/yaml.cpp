@@ -27,7 +27,9 @@ namespace YAML {
     DECODE(
         settings::s_database,
         c::optional("client", &settings::s_database::client),
-        c::required("connection", &settings::s_database::connection)
+        c::required("connection", &settings::s_database::connection),
+        c::optional("dump ", &settings::s_database::dump),
+        c::optional("restore", &settings::s_database::restore)
     );
 
     DECODE(
