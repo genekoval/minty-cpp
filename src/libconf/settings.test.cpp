@@ -72,7 +72,7 @@ fstore:
     const auto settings = minty::conf::settings {
         .database = {
             .connection = {
-                .options = {
+                .parameters = {
                     {"host", "localhost"},
                     {"user", "minty"},
                     {"dbname", "minty"}

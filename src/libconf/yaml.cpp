@@ -30,15 +30,6 @@ namespace YAML {
         c::required("connection", &settings::s_database::connection)
     );
 
-    auto convert<settings::s_database::s_connection>::decode(
-        const Node& node,
-        settings::s_database::s_connection& connection
-    ) -> bool {
-        connection.options =
-            node.as<decltype(settings::s_database::s_connection::options)>();
-        return true;
-    }
-
     DECODE(
         settings::s_downloader,
         c::required("host", &settings::s_downloader::host),

@@ -19,7 +19,8 @@ namespace minty::conf {
 
             << BeginMap
                 << Key << "database" << Value << BeginMap
-                    << Key << "connection" << Value << database.connection.options
+                    << Key << "connection"
+                    << Value << database.connection.parameters
                 << EndMap
             << EndMap
             << Newline
