@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ext/unix.h>
+#include <map>
 #include <netcore/netcore>
 #include <optional>
 #include <string>
@@ -15,8 +16,14 @@ namespace minty::conf {
         };
 
         struct s_database {
+            struct s_connection {
+                std::map<std::string, std::string> options;
+
+                auto str() const -> std::string;
+            };
+
             std::string client = "psql";
-            std::string connection;
+            s_connection connection;
         };
 
         struct s_fstore {

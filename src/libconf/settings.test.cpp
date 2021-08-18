@@ -39,8 +39,8 @@ server:
     ASSERT_EQ("/run/minty/minty.pid", settings.daemon.pidfile);
     ASSERT_EQ("/run/minty/minty.sock", settings.server.path);
     ASSERT_EQ(
-        "host=localhost user=minty dbname=minty",
-        settings.database.connection
+        "dbname=minty host=localhost user=minty",
+        settings.database.connection.str()
     );
     ASSERT_EQ("127.0.0.1", settings.downloader.host);
     ASSERT_EQ("3000", settings.downloader.port);
@@ -55,7 +55,10 @@ R"(server:
   path: /run/minty/minty.sock
 
 database:
-  connection: postgres://minty@localhost/minty
+  connection:
+    dbname: minty
+    host: localhost
+    user: minty
 
 downloader:
   host: 127.0.0.1
@@ -68,7 +71,13 @@ fstore:
 
     const auto settings = minty::conf::settings {
         .database = {
-            .connection = "postgres://minty@localhost/minty"
+            .connection = {
+                .options = {
+                    {"host", "localhost"},
+                    {"user", "minty"},
+                    {"dbname", "minty"}
+                }
+            }
         },
         .downloader = {
             .host = "127.0.0.1",

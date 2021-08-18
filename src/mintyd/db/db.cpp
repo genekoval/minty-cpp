@@ -19,7 +19,7 @@ namespace {
 
 namespace minty::cli::data {
     client::client(const conf::settings& settings) :
-        connection_string(settings.database.connection),
+        connection_string(settings.database.connection.str()),
         program(settings.database.client)
     {}
 
