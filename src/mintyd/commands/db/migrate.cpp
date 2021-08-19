@@ -9,7 +9,7 @@ namespace {
         const argv& argv,
         std::string_view confpath
     ) -> void {
-        const auto settings = minty::conf::settings::load_file(confpath);
+        const auto settings = minty::conf::initialize(confpath);
         const auto client = minty::cli::data::client(settings);
 
         client.migrate();

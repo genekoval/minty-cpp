@@ -10,7 +10,7 @@ namespace {
         std::string_view confpath,
         std::optional<std::string_view> file
     ) -> void {
-        const auto settings = minty::conf::settings::load_file(confpath);
+        const auto settings = minty::conf::initialize(confpath);
         const auto client = minty::cli::data::client(settings);
 
         client.dump(file);

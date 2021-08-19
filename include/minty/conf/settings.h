@@ -61,4 +61,6 @@ namespace minty::conf {
 
         auto encode() const -> std::string;
     };
+
+    auto initialize(std::string_view path) -> settings;
 }

@@ -15,7 +15,7 @@ namespace {
             throw std::runtime_error("archive file not specified");
         }
 
-        auto settings = minty::conf::settings::load_file(confpath);
+        auto settings = minty::conf::initialize(confpath);
         if (user) settings.database.connection.parameters["user"] = *user;
 
         const auto client = minty::cli::data::client(settings);

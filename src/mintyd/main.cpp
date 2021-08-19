@@ -50,8 +50,7 @@ namespace {
         std::string_view confpath,
         bool daemon
     ) -> void {
-        const auto settings = minty::conf::settings::load_file(confpath);
-        timber::reporting_level = settings.log.level;
+        const auto settings = minty::conf::initialize(confpath);
 
         if (daemon && !dmon::daemonize({
             .group = settings.daemon.group,

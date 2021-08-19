@@ -42,7 +42,7 @@ namespace {
 
 namespace minty::cli {
     auto client() -> api {
-        const auto settings = minty::conf::settings::load_file(default_config);
+        const auto settings = minty::conf::initialize(default_config);
         return api(settings.server.path.string());
     }
 }

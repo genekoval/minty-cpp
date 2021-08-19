@@ -51,4 +51,12 @@ namespace minty::conf {
     auto settings::load_file(std::string_view path) -> settings {
         return YAML::LoadFile(path.data()).as<settings>();
     }
+
+    auto initialize(std::string_view path) -> settings {
+        auto config = settings::load_file(path);
+
+        timber::reporting_level = config.log.level;
+
+        return config;
+    }
 }
