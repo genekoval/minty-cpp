@@ -128,7 +128,8 @@ namespace minty::cli::data {
         }
 
         throw std::runtime_error(fmt::format(
-            "{} did not succeed"
+            "{} did not succeed",
+            program
         ));
     }
 }
