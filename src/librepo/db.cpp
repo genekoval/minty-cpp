@@ -4,28 +4,6 @@
 #include <regex>
 
 namespace minty::repo::db {
-    connection_initializer::connection_initializer(pqxx::connection& c) :
-        connection(&c)
-    {}
-
-    auto connection_initializer::prepare(
-        const std::string& name,
-        unsigned int argc
-    ) -> void {
-        auto os = std::ostringstream();
-
-        os << "SELECT * FROM " << name << '(';
-
-        for (decltype(argc) i = 1; i <= argc; i++) {
-            os << '$' << i;
-            if (i < argc) os << ", ";
-        }
-
-        os << ')';
-
-        connection->prepare(name, os.str());
-    }
-
     auto parse_error(const pqxx::sql_error& error) -> sql_error {
         const auto message = error.what();
         const auto lines = ext::split(message, "\n");

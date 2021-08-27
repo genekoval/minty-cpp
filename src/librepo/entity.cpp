@@ -1,6 +1,8 @@
 #include <minty/repo/db/entity.h>
 
-namespace minty::repo::db {
+using namespace minty::repo::db;
+
+namespace entix {
     READ_ENTITY(
         comment,
         &comment::id,

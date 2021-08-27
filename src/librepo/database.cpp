@@ -9,54 +9,54 @@ namespace minty::repo::db {
     database::database(std::string_view connection_string) :
         connection(std::string(connection_string))
     {
-        auto ci = connection_initializer(connection);
+        auto c = entix::connection(connection);
 
-        ci.prepare("create_comment", 3);
-        ci.prepare("create_object", 3);
-        ci.prepare("create_post", 4);
-        ci.prepare("create_post_objects", 3);
-        ci.prepare("create_post_tag", 2);
-        ci.prepare("create_site", 3);
-        ci.prepare("create_source", 2);
+        c.prepare("create_comment", 3);
+        c.prepare("create_object", 3);
+        c.prepare("create_post", 4);
+        c.prepare("create_post_objects", 3);
+        c.prepare("create_post_tag", 2);
+        c.prepare("create_site", 3);
+        c.prepare("create_source", 2);
 
-        ci.prepare("create_tag", 1);
-        ci.prepare("create_tag_alias", 2);
-        ci.prepare("create_tag_source", 2);
+        c.prepare("create_tag", 1);
+        c.prepare("create_tag_alias", 2);
+        c.prepare("create_tag_source", 2);
 
-        ci.prepare("delete_post", 1);
-        ci.prepare("delete_post_objects", 2);
-        ci.prepare("delete_post_tag", 2);
-        ci.prepare("delete_tag", 1);
-        ci.prepare("delete_tag_alias", 2);
-        ci.prepare("delete_tag_source", 2);
+        c.prepare("delete_post", 1);
+        c.prepare("delete_post_objects", 2);
+        c.prepare("delete_post_tag", 2);
+        c.prepare("delete_tag", 1);
+        c.prepare("delete_tag_alias", 2);
+        c.prepare("delete_tag_source", 2);
 
-        ci.prepare("move_post_object", 3);
+        c.prepare("move_post_object", 3);
 
-        ci.prepare("prune", 0);
-        ci.prepare("prune_objects", 0);
+        c.prepare("prune", 0);
+        c.prepare("prune_objects", 0);
 
-        ci.prepare("read_comments", 1);
-        ci.prepare("read_object", 1);
-        ci.prepare("read_object_posts", 1);
-        ci.prepare("read_post", 1);
-        ci.prepare("read_post_date_modified", 1);
-        ci.prepare("read_posts", 1);
-        ci.prepare("read_post_objects", 1);
-        ci.prepare("read_post_search", 0);
-        ci.prepare("read_post_tags", 1);
-        ci.prepare("read_site", 2);
-        ci.prepare("read_tag", 1);
-        ci.prepare("read_tag_posts", 1);
-        ci.prepare("read_tag_previews", 1);
-        ci.prepare("read_tag_previews_all", 0);
-        ci.prepare("read_tag_sources", 1);
-        ci.prepare("read_tag_text", 0);
+        c.prepare("read_comments", 1);
+        c.prepare("read_object", 1);
+        c.prepare("read_object_posts", 1);
+        c.prepare("read_post", 1);
+        c.prepare("read_post_date_modified", 1);
+        c.prepare("read_posts", 1);
+        c.prepare("read_post_objects", 1);
+        c.prepare("read_post_search", 0);
+        c.prepare("read_post_tags", 1);
+        c.prepare("read_site", 2);
+        c.prepare("read_tag", 1);
+        c.prepare("read_tag_posts", 1);
+        c.prepare("read_tag_previews", 1);
+        c.prepare("read_tag_previews_all", 0);
+        c.prepare("read_tag_sources", 1);
+        c.prepare("read_tag_text", 0);
 
-        ci.prepare("update_comment", 2);
-        ci.prepare("update_post_description", 2);
-        ci.prepare("update_post_title", 2);
-        ci.prepare("update_tag_description", 2);
-        ci.prepare("update_tag_name", 2);
+        c.prepare("update_comment", 2);
+        c.prepare("update_post_description", 2);
+        c.prepare("update_post_title", 2);
+        c.prepare("update_tag_description", 2);
+        c.prepare("update_tag_name", 2);
     }
 
     auto database::create_comment(
@@ -66,7 +66,7 @@ namespace minty::repo::db {
     ) -> comment {
         auto tx = ntx();
 
-        return make_entity<comment>(
+        return entix::make_entity<comment>(
             tx,
             "create_comment",
             post_id,
@@ -91,7 +91,7 @@ namespace minty::repo::db {
     ) -> post_search {
         auto tx = ntx();
 
-        return make_entity<post_search>(
+        return entix::make_entity<post_search>(
             tx,
             __FUNCTION__,
             title,
@@ -109,7 +109,7 @@ namespace minty::repo::db {
         auto tx = ntx();
 
         return {
-            .objects = make_entities<std::vector<object_preview>>(
+            .objects = entix::make_entities<std::vector<object_preview>>(
                 tx,
                 __FUNCTION__,
                 post_id,
@@ -135,7 +135,7 @@ namespace minty::repo::db {
         auto tx = ntx();
 
         try {
-            return make_entity<site>(
+            return entix::make_entity<site>(
                 tx,
                 "create_site",
                 scheme,
@@ -153,7 +153,12 @@ namespace minty::repo::db {
         std::string_view resource
     ) -> source {
         auto tx = ntx();
-        return make_entity<source>(tx, "create_source", site_id, resource);
+        return entix::make_entity<source>(
+            tx,
+            "create_source",
+            site_id,
+            resource
+        );
     }
 
     auto database::create_tag(std::string_view name) -> std::string {
@@ -167,7 +172,12 @@ namespace minty::repo::db {
         std::string_view alias
     ) -> tag_name {
         auto tx = ntx();
-        return make_entity<tag_name>(tx, "create_tag_alias", tag_id, alias);
+        return entix::make_entity<tag_name>(
+            tx,
+            "create_tag_alias",
+            tag_id,
+            alias
+        );
     }
 
     auto database::create_tag_source(
@@ -218,7 +228,12 @@ namespace minty::repo::db {
         std::string_view alias
     ) -> tag_name {
         auto tx = ntx();
-        return make_entity<tag_name>(tx, "delete_tag_alias", tag_id, alias);
+        return entix::make_entity<tag_name>(
+            tx,
+            "delete_tag_alias",
+            tag_id,
+            alias
+        );
     }
 
     auto database::delete_tag_source(
@@ -254,7 +269,7 @@ namespace minty::repo::db {
     ) -> void {
         auto tx = pqxx::transaction(connection);
         const auto objects =
-            make_objects<std::vector<std::string>>(tx, __FUNCTION__);
+            entix::make_objects<std::vector<std::string>>(tx, __FUNCTION__);
 
         if (on_deleted(objects)) tx.commit();
     }
@@ -263,7 +278,7 @@ namespace minty::repo::db {
         std::string_view post_id
     ) -> std::vector<comment> {
         auto tx = ntx();
-        return make_entities<std::vector<comment>>(
+        return entix::make_entities<std::vector<comment>>(
             tx,
             "read_comments",
             post_id
@@ -272,14 +287,14 @@ namespace minty::repo::db {
 
     auto database::read_object(std::string_view object_id) -> object {
         auto tx = ntx();
-        return make_entity<object>(tx, "read_object", object_id);
+        return entix::make_entity<object>(tx, "read_object", object_id);
     }
 
     auto database::read_object_posts(
         std::string_view object_id
     ) -> std::vector<post_preview> {
         auto tx = ntx();
-        return make_entities<std::vector<post_preview>>(
+        return entix::make_entities<std::vector<post_preview>>(
             tx,
             "read_object_posts",
             object_id
@@ -288,7 +303,7 @@ namespace minty::repo::db {
 
     auto database::read_post(std::string_view post_id) -> post {
         auto tx = ntx();
-        return make_entity<post>(tx, "read_post", post_id);
+        return entix::make_entity<post>(tx, "read_post", post_id);
     }
 
     auto database::read_post_date_modified(
@@ -302,7 +317,7 @@ namespace minty::repo::db {
         const std::vector<std::string>& posts
     ) -> std::vector<post_preview> {
         auto tx = ntx();
-        return make_entities<std::vector<post_preview>>(
+        return entix::make_entities<std::vector<post_preview>>(
             tx,
             __FUNCTION__,
             posts
@@ -313,7 +328,7 @@ namespace minty::repo::db {
         std::string_view post_id
     ) -> std::vector<object_preview> {
         auto tx = ntx();
-        return make_entities<std::vector<object_preview>>(
+        return entix::make_entities<std::vector<object_preview>>(
             tx,
             "read_post_objects",
             post_id
@@ -322,14 +337,14 @@ namespace minty::repo::db {
 
     auto database::read_post_search() -> std::vector<post_search> {
         auto tx = ntx();
-        return make_entities<std::vector<post_search>>(tx, __FUNCTION__);
+        return entix::make_entities<std::vector<post_search>>(tx, __FUNCTION__);
     }
 
     auto database::read_post_tags(
         std::string_view post_id
     ) -> std::vector<tag_preview> {
         auto tx = ntx();
-        return make_entities<std::vector<tag_preview>>(
+        return entix::make_entities<std::vector<tag_preview>>(
             tx,
             "read_post_tags",
             post_id
@@ -349,7 +364,7 @@ namespace minty::repo::db {
         auto tx = ntx();
 
         try {
-            return make_entity<tag>(tx, "read_tag", tag_id);
+            return entix::make_entity<tag>(tx, "read_tag", tag_id);
         }
         catch (const pqxx::unexpected_rows& ex) {
             throw minty_error(
@@ -363,7 +378,7 @@ namespace minty::repo::db {
         std::string_view tag_id
     ) -> std::vector<post_preview> {
         auto tx = ntx();
-        return make_entities<std::vector<post_preview>>(
+        return entix::make_entities<std::vector<post_preview>>(
             tx,
             "read_tag_posts",
             tag_id
@@ -374,7 +389,7 @@ namespace minty::repo::db {
         const std::vector<std::string>& tags
     ) -> std::vector<tag_preview> {
         auto tx = ntx();
-        return make_entities<std::vector<tag_preview>>(
+        return entix::make_entities<std::vector<tag_preview>>(
             tx,
             "read_tag_previews",
             tags
@@ -383,7 +398,7 @@ namespace minty::repo::db {
 
     auto database::read_tag_previews_all() -> std::vector<tag_preview> {
         auto tx = ntx();
-        return make_entities<std::vector<tag_preview>>(
+        return entix::make_entities<std::vector<tag_preview>>(
             tx,
             "read_tag_previews_all"
         );
@@ -393,7 +408,7 @@ namespace minty::repo::db {
         std::string_view tag_id
     ) -> std::vector<source> {
         auto tx = ntx();
-        return make_entities<std::vector<source>>(
+        return entix::make_entities<std::vector<source>>(
             tx,
             "read_tag_sources",
             tag_id
@@ -402,7 +417,7 @@ namespace minty::repo::db {
 
     auto database::read_tag_text() -> std::vector<tag_text> {
         auto tx = ntx();
-        return make_entities<std::vector<tag_text>>(tx, __FUNCTION__);
+        return entix::make_entities<std::vector<tag_text>>(tx, __FUNCTION__);
     }
 
     auto database::update_comment(
@@ -417,7 +432,7 @@ namespace minty::repo::db {
         std::string_view description
     ) -> post_update {
         auto tx = ntx();
-        return make_entity<post_update>(
+        return entix::make_entity<post_update>(
             tx,
             __FUNCTION__,
             post_id,
@@ -430,7 +445,7 @@ namespace minty::repo::db {
         std::string_view title
     ) -> post_update {
         auto tx = ntx();
-        return make_entity<post_update>(
+        return entix::make_entity<post_update>(
             tx,
             __FUNCTION__,
             post_id,
@@ -452,7 +467,7 @@ namespace minty::repo::db {
         std::string_view name
     ) -> tag_name_update {
         auto tx = ntx();
-        return make_entity<tag_name_update>(
+        return entix::make_entity<tag_name_update>(
             tx,
             "update_tag_name",
             tag_id,

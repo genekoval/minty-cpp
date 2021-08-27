@@ -1,21 +1,22 @@
 #pragma once
 
 #include "model.h"
-#include "parser.h"
 
-namespace minty::repo::db {
-    ENTITY(comment);
-    ENTITY(object);
-    ENTITY(object_preview);
-    ENTITY(post);
-    ENTITY(post_preview);
-    ENTITY(post_search);
-    ENTITY(post_update);
-    ENTITY(site);
-    ENTITY(source);
-    ENTITY(tag);
-    ENTITY(tag_name);
-    ENTITY(tag_name_update);
-    ENTITY(tag_preview);
-    ENTITY(tag_text);
+#include <entix/entix>
+
+namespace entix {
+    ENTITY(minty::repo::db::comment);
+    ENTITY(minty::repo::db::object);
+    ENTITY(minty::repo::db::object_preview);
+    ENTITY(minty::repo::db::post);
+    ENTITY(minty::repo::db::post_preview);
+    ENTITY(minty::repo::db::post_search);
+    ENTITY(minty::repo::db::post_update);
+    ENTITY(minty::repo::db::site);
+    ENTITY(minty::repo::db::source);
+    ENTITY(minty::repo::db::tag);
+    ENTITY(minty::repo::db::tag_name);
+    ENTITY(minty::repo::db::tag_name_update);
+    ENTITY(minty::repo::db::tag_preview);
+    ENTITY(minty::repo::db::tag_text);
 }

@@ -30,6 +30,7 @@ define common.libs
  avformat
  avutil
  conftools
+ entix
  ext++
  fmt
  fstore

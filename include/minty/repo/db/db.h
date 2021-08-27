@@ -5,14 +5,6 @@
 #include <pqxx/pqxx>
 
 namespace minty::repo::db {
-    class connection_initializer {
-        pqxx::connection* connection;
-    public:
-        connection_initializer(pqxx::connection& c);
-
-        auto prepare(const std::string& name, unsigned int argc) -> void;
-    };
-
     struct sql_error {
         const std::string context;
         const std::string detail;
