@@ -342,30 +342,29 @@ namespace minty::core {
     auto api::prune() -> void {
         db->prune();
 
-        auto objects_deleted = 0;
-        auto space_freed = uintmax_t();
-
-        db->prune_objects([&](auto objects) -> bool {
-            for (const auto& obj : objects) {
-                const auto info = bucket->remove(obj);
-                space_freed += info.size;
+        auto result = fstore::remove_result();
+        db->prune_objects([this, &result](auto objects) -> bool {
+            try {
+                result = bucket->remove(objects);
+                return true;
+            }
+            catch (const std::runtime_error& ex) {
+                ERROR() << "Object pruning has failed: " << ex.what();
             }
 
-            objects_deleted = objects.size();
-
-            return true;
+            return false;
         });
 
-        if (objects_deleted == 0) {
+        if (result.objects_removed == 0) {
             INFO() << "No objects to prune";
             return;
         }
 
         INFO()
             << "Removed "
-            << objects_deleted << " object"
-            << (objects_deleted == 1 ? "" : "s")
-            << " freeing " << data_size(space_freed).formatted;
+            << result.objects_removed << " object"
+            << (result.objects_removed == 1 ? "" : "s")
+            << " freeing " << data_size(result.space_freed).formatted;
     }
 
     auto api::reindex() -> void {
