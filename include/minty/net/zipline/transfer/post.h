@@ -37,7 +37,14 @@ namespace zipline {
     ZIPLINE_OBJECT(
         minty::core::post_query,
         &minty::core::post_query::text,
-        &minty::core::post_query::tags
+        &minty::core::post_query::tags,
+        &minty::core::post_query::sort
+    );
+
+    ZIPLINE_OBJECT(
+        minty::core::post_query::sort_type,
+        &minty::core::post_query::sort_type::order,
+        &minty::core::post_query::sort_type::value
     );
 
     ZIPLINE_OBJECT(

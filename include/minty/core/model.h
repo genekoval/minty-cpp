@@ -14,6 +14,18 @@ namespace minty::core {
     using tag_preview = repo::db::tag_preview;
     using tag_text = repo::db::tag_text;
 
+    enum class sort_order : uint8_t {
+        ascending,
+        descending
+    };
+
+    enum class post_sort_value : uint8_t {
+        date_created,
+        date_modified,
+        relevance,
+        title
+    };
+
     struct source {
         decltype(repo::db::source::id) id;
         std::string url;
@@ -97,8 +109,14 @@ namespace minty::core {
     };
 
     struct post_query {
+        struct sort_type {
+            sort_order order;
+            post_sort_value value;
+        };
+
         std::optional<std::string> text;
         std::vector<std::string> tags;
+        sort_type sort;
     };
 
     struct tag {
