@@ -42,28 +42,24 @@ static auto $post(
 static auto $add(
     const commline::app& app,
     const commline::argv& argv,
-    std::optional<std::string_view> description,
-    std::optional<std::string_view> tag
+    std::string_view title,
+    std::string_view description,
+    std::string_view tag
 ) -> void {
     auto api = minty::cli::client();
+    auto parts = minty::core::post_parts {
+        .title = title.empty() ?
+            std::optional<std::string>() :
+            std::optional<std::string>(title),
+        .description = description.empty() ?
+            std::optional<std::string>() :
+            std::optional<std::string>(description),
 
-    auto files = std::vector<std::string>();
+    };
 
-    for (const auto file : argv) {
-        auto cwd = std::filesystem::current_path();
-        auto path = cwd / file;
+    parts.tags.emplace_back(tag);
 
-        if (std::filesystem::is_regular_file(path)) {
-            files.push_back(path);
-        }
-    }
-
-    auto id = api.add_post(
-        description,
-        files,
-        tag,
-        {}
-    );
+    auto id = api.add_post(parts);
 
     std::cout << id << std::endl;
 }
@@ -104,13 +100,18 @@ namespace minty::commands {
             "Add a post",
             options(
                 option<std::string_view>(
+                    {"title", "T"},
+                    "Post title",
+                    "text"
+                ),
+                option<std::string_view>(
                     {"description", "d"},
                     "Post description",
                     "text"
                 ),
                 option<std::string_view>(
-                    {"creator", "c"},
-                    "Creator ID",
+                    {"tag", "t"},
+                    "Post tag",
                     "id"
                 )
             ),

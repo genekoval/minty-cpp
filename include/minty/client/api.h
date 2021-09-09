@@ -52,12 +52,7 @@ namespace minty {
     public:
         api(std::string_view endpoint);
 
-        auto add_post(
-            std::optional<std::string_view> description,
-            const std::vector<std::string>& files,
-            std::optional<std::string_view> tag_id,
-            const std::vector<std::string>& tags
-        ) -> std::string;
+        auto add_post(const core::post_parts& parts) -> std::string;
 
         auto add_post_tag(
             std::string_view post_id,

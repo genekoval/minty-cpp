@@ -114,9 +114,17 @@ namespace minty::core {
             post_sort_value value;
         };
 
+        unsigned int from;
+        unsigned int size;
         std::optional<std::string> text;
         std::vector<std::string> tags;
         sort_type sort;
+    };
+
+    template <typename T>
+    struct search_result {
+        unsigned int total;
+        std::vector<T> hits;
     };
 
     struct tag {

@@ -120,7 +120,7 @@ namespace minty::server {
 
     auto context::get_posts(
         core::post_query query
-    ) -> std::vector<core::post_preview> {
+    ) -> core::search_result<core::post_preview> {
         return api->get_posts(query);
     }
 

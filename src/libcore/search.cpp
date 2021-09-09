@@ -82,11 +82,11 @@ namespace minty::core {
         );
     }
 
-    auto search_engine::find_post(
+    auto search_engine::find_posts(
         const post_query& query
-    ) -> std::vector<std::string> {
-        return connect().send<std::vector<std::string>>(
-            event::find_post,
+    ) -> search_result<std::string> {
+        return connect().send<search_result<std::string>>(
+            event::find_posts,
             query
         );
     }

@@ -107,7 +107,7 @@ namespace minty::core {
 
         auto get_post(std::string_view id) -> post;
 
-        auto get_posts(const post_query& query) -> std::vector<post_preview>;
+        auto get_posts(const post_query& query) -> search_result<post_preview>;
 
         auto get_tag(std::string_view id) -> tag;
 
