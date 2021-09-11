@@ -120,12 +120,12 @@ namespace minty {
         );
     }
 
-    auto api::get_tags_by_name(
-        std::string_view search_term
-    ) -> std::vector<core::tag_preview> {
-        return connect().send<std::vector<core::tag_preview>>(
-            event::get_tags_by_name,
-            search_term
+    auto api::get_tags(
+        const core::tag_query& query
+    ) -> core::search_result<core::tag_preview> {
+        return connect().send<core::search_result<core::tag_preview>>(
+            event::get_tags,
+            query
         );
     }
 

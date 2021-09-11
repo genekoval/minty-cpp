@@ -91,12 +91,12 @@ namespace minty::core {
         );
     }
 
-    auto search_engine::find_tags_by_name(
-        std::string_view term
-    ) -> std::vector<std::string> {
-        return connect().send<std::vector<std::string>>(
-            event::find_tags_by_name,
-            term
+    auto search_engine::find_tags(
+        const tag_query& query
+    ) -> search_result<std::string> {
+        return connect().send<search_result<std::string>>(
+            event::find_tags,
+            query
         );
     }
 

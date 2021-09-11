@@ -144,4 +144,11 @@ namespace minty::core {
             std::vector<repo::db::source>&& sources
         );
     };
+
+    struct tag_query {
+        unsigned int from;
+        unsigned int size;
+        std::string name;
+        std::vector<std::string> exclude;
+    };
 }

@@ -20,7 +20,7 @@ namespace minty::core {
             delete_tag,
             delete_tag_alias,
             find_posts,
-            find_tags_by_name,
+            find_tags,
             remove_post_tag,
             update_post_date_modified,
             update_post_description,
@@ -71,9 +71,7 @@ namespace minty::core {
 
         auto find_posts(const post_query& query) -> search_result<std::string>;
 
-        auto find_tags_by_name(
-            std::string_view term
-        ) -> std::vector<std::string>;
+        auto find_tags(const tag_query& query) -> search_result<std::string>;
 
         auto remove_post_tag(
             std::string_view post_id,

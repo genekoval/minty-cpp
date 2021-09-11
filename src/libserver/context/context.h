@@ -89,9 +89,9 @@ namespace minty::server {
 
         auto get_tag_previews() -> std::vector<core::tag_preview>;
 
-        auto get_tags_by_name(
-            std::string search_term
-        ) -> std::vector<core::tag_preview>;
+        auto get_tags(
+            core::tag_query query
+        ) -> core::search_result<core::tag_preview>;
 
         auto move_post_object(
             std::string post_id,

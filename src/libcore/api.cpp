@@ -316,11 +316,12 @@ namespace minty::core {
         return tag(db->read_tag(id), db->read_tag_sources(id));
     }
 
-    auto api::get_tags_by_name(
-        std::string_view term
-    ) -> std::vector<tag_preview> {
-        const auto ids = search->find_tags_by_name(term);
-        return db->read_tag_previews(ids);
+    auto api::get_tags(const tag_query& query) -> search_result<tag_preview> {
+        const auto result = search->find_tags(query);
+        return {
+            .total = result.total,
+            .hits = db->read_tag_previews(result.hits)
+        };
     }
 
     auto api::get_tag_posts(

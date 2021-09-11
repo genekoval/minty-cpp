@@ -34,7 +34,7 @@ namespace minty {
             get_tag,
             get_tag_posts,
             get_tag_previews,
-            get_tags_by_name,
+            get_tags,
             move_post_object,
             set_comment_content,
             set_post_description,
@@ -102,9 +102,9 @@ namespace minty {
 
         auto get_tag(std::string_view id) -> core::tag;
 
-        auto get_tags_by_name(
-            std::string_view search_term
-        ) -> std::vector<core::tag_preview>;
+        auto get_tags(
+            const core::tag_query& query
+        ) -> core::search_result<core::tag_preview>;
 
         auto set_tag_description(
             std::string_view tag_id,

@@ -30,6 +30,23 @@ namespace YAML {
         const minty::core::post& post
     ) -> Emitter&;
 
+    template <typename T>
+    auto operator<<(
+        Emitter& out,
+        const minty::core::search_result<T> result
+    ) -> Emitter& {
+        out << BeginMap;
+
+        out << Key << "total" << Value << result.total;
+
+        out << Key << "hits" << Value << BeginSeq;
+        for (const auto& hit : result.hits) out << hit;
+        out << EndSeq;
+
+        out << EndMap;
+        return out;
+    }
+
     auto operator<<(
         Emitter& out,
         const minty::core::tag& tag

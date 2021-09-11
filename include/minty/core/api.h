@@ -111,9 +111,7 @@ namespace minty::core {
 
         auto get_tag(std::string_view id) -> tag;
 
-        auto get_tags_by_name(
-            std::string_view term
-        ) -> std::vector<tag_preview>;
+        auto get_tags(const tag_query& query) -> search_result<tag_preview>;
 
         auto get_tag_posts(
             std::string_view tag_id

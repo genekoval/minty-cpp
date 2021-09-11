@@ -88,14 +88,22 @@ static auto $alias_rm(
 static auto $find(
     const commline::app& app,
     const commline::argv& argv,
-    std::optional<std::string_view> path
+    int from,
+    std::optional<std::string_view> path,
+    int size
 ) -> void {
     if (argv.empty()) return;
 
     const auto& search_term = argv.front();
 
+    const auto query = minty::core::tag_query {
+        .from = static_cast<unsigned int>(from),
+        .size = static_cast<unsigned int>(size),
+        .name = std::string(search_term)
+    };
+
     auto api = minty::cli::client();
-    minty::cli::print(api.get_tags_by_name(search_term), path);
+    minty::cli::print(api.get_tags(query), path);
 }
 
 static auto $rename(
@@ -145,12 +153,6 @@ static auto $rm(
 namespace minty::commands {
     using namespace commline;
 
-    const auto select = option<std::optional<std::string_view>>(
-        {"select", "s"},
-        "Select YAML output",
-        "path"
-    );
-
     auto tag_add() -> std::unique_ptr<command_node> {
         return command(
             "add",
@@ -193,10 +195,22 @@ namespace minty::commands {
             "find",
             "Find tags",
             options(
+                option<int>(
+                    {"from", "f"},
+                    "Result offset",
+                    "number",
+                    0
+                ),
                 option<std::optional<std::string_view>>(
-                    {"select", "s"},
+                    {"select", "S"},
                     "Select YAML output",
                     "path"
+                ),
+                option<int>(
+                    {"size", "s"},
+                    "Result size",
+                    "number",
+                    10
                 )
             ),
             $find
@@ -231,7 +245,7 @@ namespace minty::commands {
             "View or edit a tag",
             options(
                 option<std::optional<std::string_view>>(
-                    {"select", "s"},
+                    {"select", "S"},
                     "Select YAML output",
                     "path"
                 ),

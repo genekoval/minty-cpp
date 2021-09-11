@@ -142,10 +142,10 @@ namespace minty::server {
         return api->get_tag_previews();
     }
 
-    auto context::get_tags_by_name(
-        std::string search_term
-    ) -> std::vector<core::tag_preview> {
-        return api->get_tags_by_name(search_term);
+    auto context::get_tags(
+        core::tag_query query
+    ) -> core::search_result<core::tag_preview> {
+        return api->get_tags(query);
     }
 
     auto context::move_post_object(

@@ -33,6 +33,14 @@ namespace zipline {
     );
 
     ZIPLINE_OBJECT(
+        minty::core::tag_query,
+        &minty::core::tag_query::from,
+        &minty::core::tag_query::size,
+        &minty::core::tag_query::name,
+        &minty::core::tag_query::exclude
+    );
+
+    ZIPLINE_OBJECT(
         minty::core::tag_text,
         &minty::core::tag_text::id,
         &minty::core::tag_text::names
