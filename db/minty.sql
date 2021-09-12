@@ -764,16 +764,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_tag_previews_all()
-RETURNS SETOF tag_preview AS $$
-BEGIN
-    RETURN QUERY
-    SELECT *
-    FROM tag_preview
-    ORDER BY name;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE FUNCTION read_tag_posts(
     a_tag       integer
 ) RETURNS SETOF post_preview AS $$

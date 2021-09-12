@@ -48,7 +48,6 @@ namespace minty::repo::db {
         c.prepare("read_tag", 1);
         c.prepare("read_tag_posts", 1);
         c.prepare("read_tag_previews", 1);
-        c.prepare("read_tag_previews_all", 0);
         c.prepare("read_tag_sources", 1);
         c.prepare("read_tag_text", 0);
 
@@ -393,14 +392,6 @@ namespace minty::repo::db {
             tx,
             "read_tag_previews",
             tags
-        );
-    }
-
-    auto database::read_tag_previews_all() -> std::vector<tag_preview> {
-        auto tx = ntx();
-        return entix::make_entities<std::vector<tag_preview>>(
-            tx,
-            "read_tag_previews_all"
         );
     }
 

@@ -330,10 +330,6 @@ namespace minty::core {
         return db->read_tag_posts(tag_id);
     }
 
-    auto api::get_tag_previews() -> std::vector<tag_preview> {
-        return db->read_tag_previews_all();
-    }
-
     auto api::move_post_object(
         std::string_view post_id,
         unsigned int old_index,

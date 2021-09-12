@@ -33,7 +33,6 @@ namespace minty {
             get_server_info,
             get_tag,
             get_tag_posts,
-            get_tag_previews,
             get_tags,
             move_post_object,
             set_comment_content,
