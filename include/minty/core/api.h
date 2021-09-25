@@ -113,10 +113,6 @@ namespace minty::core {
 
         auto get_tags(const tag_query& query) -> search_result<tag_preview>;
 
-        auto get_tag_posts(
-            std::string_view tag_id
-        ) -> std::vector<post_preview>;
-
         auto move_post_object(
             std::string_view post_id,
             unsigned int old_index,

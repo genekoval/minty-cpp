@@ -142,10 +142,6 @@ namespace minty::repo::db {
 
         auto read_tag(std::string_view tag_id) -> tag;
 
-        auto read_tag_posts(
-            std::string_view tag_id
-        ) -> std::vector<post_preview>;
-
         auto read_tag_previews(
             const std::vector<std::string>& tags
         ) -> std::vector<tag_preview>;

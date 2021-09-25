@@ -41,7 +41,6 @@ namespace {
             &context::get_posts,
             &context::get_server_info,
             &context::get_tag,
-            &context::get_tag_posts,
             &context::get_tags,
             &context::move_post_object,
             &context::set_comment_content,

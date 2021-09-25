@@ -132,12 +132,6 @@ namespace minty::server {
         return api->get_tag(tag_id);
 	}
 
-    auto context::get_tag_posts(
-        std::string tag_id
-    ) -> std::vector<core::post_preview> {
-        return api->get_tag_posts(tag_id);
-    }
-
     auto context::get_tags(
         core::tag_query query
     ) -> core::search_result<core::tag_preview> {

@@ -764,25 +764,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_tag_posts(
-    a_tag       integer
-) RETURNS SETOF post_preview AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        post_id,
-        title,
-        preview_id,
-        comment_count,
-        object_count,
-        date_created
-    FROM post_preview
-    JOIN data.post_tag USING (post_id)
-    WHERE tag_id = a_tag
-    ORDER BY date_created DESC;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE FUNCTION read_tag_previews(
     a_tags      integer[]
 ) RETURNS SETOF tag_preview AS $$
