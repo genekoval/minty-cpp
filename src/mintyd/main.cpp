@@ -14,36 +14,6 @@ namespace fs = std::filesystem;
 namespace {
     const auto default_config = fs::path(CONFDIR) / "minty.yml";
 
-    auto build_server_info(
-        const minty::conf::settings& settings,
-        std::string_view version,
-        std::string_view bucket_id
-    ) -> minty::server::server_info {
-        const auto host = [&]() -> std::string {
-            if (const auto& proxy = settings.fstore.proxy) {
-                return fmt::format(
-                    "{}:{}",
-                    proxy->host.value_or("0"),
-                    proxy->port
-                );
-            }
-            else return settings.fstore.connection;
-        }();
-
-        const auto path = fmt::format(
-            "{}/{}",
-            static_cast<std::underlying_type_t<fstore::event>>(
-                fstore::event::get_object
-            ),
-            bucket_id
-        );
-
-        return {
-            .object_source = fmt::format("zipline://{}/{}", host, path),
-            .version = std::string(version)
-        };
-    }
-
     auto $main(
         const commline::app& app,
         const commline::argv& argv,
@@ -62,13 +32,14 @@ namespace {
         NOTICE() << app.name << " version " << app.version << " starting up";
 
         auto container = minty::cli::api_container(settings);
-        auto info = build_server_info(
-            settings,
-            app.version,
-            container.bucket_id()
-        );
-
-        INFO() << "Object source: " << info.object_source;
+        auto info = minty::server::server_info {
+            .version = std::string(app.version),
+            .object_source = {
+                .host = settings.fstore.proxy.host,
+                .port = settings.fstore.proxy.port,
+                .bucket_id = std::string(container.bucket_id())
+            }
+        };
 
         minty::server::listen(container.api(), info, settings.server, []() {
             INFO() << "Server started. Listening for connections...";

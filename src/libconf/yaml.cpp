@@ -41,7 +41,7 @@ namespace YAML {
         settings::s_fstore,
         c::required("bucket", &settings::s_fstore::bucket),
         c::required("connection", &settings::s_fstore::connection),
-        c::optional("proxy", &settings::s_fstore::proxy)
+        c::required("proxy", &settings::s_fstore::proxy)
     );
 
     DECODE(

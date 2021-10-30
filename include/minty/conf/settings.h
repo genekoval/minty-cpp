@@ -31,7 +31,7 @@ namespace minty::conf {
 
             std::string bucket;
             std::string connection;
-            std::optional<s_proxy> proxy;
+            s_proxy proxy;
         };
 
         struct s_downloader {

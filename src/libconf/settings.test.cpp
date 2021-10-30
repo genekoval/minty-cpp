@@ -24,6 +24,8 @@ downloader:
 fstore:
     bucket: minty
     connection: /run/fstore/fstore.sock
+    proxy:
+        port: 5000
 
 search:
     host: /run/minty-search.sock
@@ -46,6 +48,7 @@ server:
     ASSERT_EQ("3000", settings.downloader.port);
     ASSERT_EQ("minty", settings.fstore.bucket);
     ASSERT_EQ("/run/fstore/fstore.sock", settings.fstore.connection);
+    ASSERT_EQ(5000, settings.fstore.proxy.port);
     ASSERT_EQ("/run/minty-search.sock", settings.search.host);
 }
 

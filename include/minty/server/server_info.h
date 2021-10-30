@@ -4,7 +4,13 @@
 
 namespace minty::server {
     struct server_info {
-        std::string object_source;
+        struct object_source_type {
+            std::optional<std::string> host;
+            unsigned short port;
+            std::string bucket_id;
+        };
+
         std::string version;
+        object_source_type object_source;
     };
 }
