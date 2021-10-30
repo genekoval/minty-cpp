@@ -8,6 +8,13 @@ namespace minty {
         return client(errors, net::socket(netcore::connect(endpoint)));
     }
 
+    auto api::add_object_local(std::string_view path) -> std::string {
+        return connect().send<std::string>(
+            event::add_object_local,
+            path
+        );
+    }
+
     auto api::add_post(const core::post_parts& parts) -> std::string {
         return connect().send<std::string>(event::add_post, parts);
     }

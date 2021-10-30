@@ -47,19 +47,23 @@ static auto $add(
     std::string_view tag
 ) -> void {
     auto api = minty::cli::client();
+
     auto parts = minty::core::post_parts {
         .title = title.empty() ?
             std::optional<std::string>() :
             std::optional<std::string>(title),
         .description = description.empty() ?
             std::optional<std::string>() :
-            std::optional<std::string>(description),
-
+            std::optional<std::string>(description)
     };
+
+    for (const auto& arg : argv) {
+        parts.objects.emplace_back(api.add_object_local(arg));
+    }
 
     parts.tags.emplace_back(tag);
 
-    auto id = api.add_post(parts);
+    const auto id = api.add_post(parts);
 
     std::cout << id << std::endl;
 }

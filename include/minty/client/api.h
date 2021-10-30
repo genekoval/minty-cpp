@@ -32,7 +32,6 @@ namespace minty {
             get_posts,
             get_server_info,
             get_tag,
-            get_tag_posts,
             get_tags,
             move_post_object,
             set_comment_content,
@@ -50,6 +49,8 @@ namespace minty {
         auto connect() -> client;
     public:
         api(std::string_view endpoint);
+
+        auto add_object_local(std::string_view path) -> std::string;
 
         auto add_post(const core::post_parts& parts) -> std::string;
 
