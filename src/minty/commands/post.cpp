@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <iostream>
 
+namespace fs = std::filesystem;
+
 static auto $post(
     const commline::app& app,
     const commline::argv& argv
@@ -58,7 +60,8 @@ static auto $add(
     };
 
     for (const auto& arg : argv) {
-        parts.objects.emplace_back(api.add_object_local(arg));
+        const auto path = fs::canonical(arg).string();
+        parts.objects.emplace_back(api.add_object_local(path));
     }
 
     parts.tags.emplace_back(tag);
