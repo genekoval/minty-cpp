@@ -101,12 +101,12 @@ namespace minty::server {
         auto set_post_description(
             std::string post_id,
             std::string description
-        ) -> std::optional<std::string>;
+        ) -> core::modification<std::optional<std::string>>;
 
         auto set_post_title(
             std::string post_id,
             std::string title
-        ) -> std::optional<std::string>;
+        ) -> core::modification<std::optional<std::string>>;
 
         auto set_tag_description(
             std::string tag_id,

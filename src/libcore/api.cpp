@@ -392,7 +392,7 @@ namespace minty::core {
     auto api::set_post_description(
         std::string_view post_id,
         std::string_view description
-    ) -> std::optional<std::string> {
+    ) -> modification<std::optional<std::string>> {
         const auto update = db->update_post_description(
             post_id,
             ext::replace(
@@ -402,19 +402,25 @@ namespace minty::core {
             )
         );
         search->update_post_description(update);
-        return update.new_data;
+        return {
+            .date_modified = update.date_modified,
+            .new_value = update.new_data
+        };
     }
 
     auto api::set_post_title(
         std::string_view post_id,
         std::string_view title
-    ) -> std::optional<std::string> {
+    ) -> modification<std::optional<std::string>> {
         const auto update = db->update_post_title(
             post_id,
             ext::trim(std::string(title))
         );
         search->update_post_title(update);
-        return update.new_data;
+        return {
+            .date_modified = update.date_modified,
+            .new_value = update.new_data
+        };
     }
 
     auto api::set_tag_description(

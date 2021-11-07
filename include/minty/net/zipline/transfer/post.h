@@ -5,6 +5,13 @@
 #include <zipline/zipline>
 
 namespace zipline {
+    template <typename Socket, typename T>
+    ZIPLINE_OBJECT_TEMPLATE(
+        minty::core::modification<T>,
+        &minty::core::modification<T>::date_modified,
+        &minty::core::modification<T>::new_value
+    );
+
     ZIPLINE_OBJECT(
         minty::core::post,
         &minty::core::post::id,

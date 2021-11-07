@@ -131,12 +131,12 @@ namespace minty::core {
         auto set_post_description(
             std::string_view post_id,
             std::string_view description
-        ) -> std::optional<std::string>;
+        ) -> modification<std::optional<std::string>>;
 
         auto set_post_title(
             std::string_view post_id,
             std::string_view title
-        ) -> std::optional<std::string>;
+        ) -> modification<std::optional<std::string>>;
 
         auto set_tag_description(
             std::string_view tag_id,

@@ -156,14 +156,14 @@ namespace minty::server {
     auto context::set_post_description(
         std::string post_id,
         std::string description
-    ) -> std::optional<std::string> {
+    ) -> core::modification<std::optional<std::string>> {
         return api->set_post_description(post_id, description);
     }
 
     auto context::set_post_title(
         std::string post_id,
         std::string title
-    ) -> std::optional<std::string> {
+    ) -> core::modification<std::optional<std::string>> {
         return api->set_post_title(post_id, title);
     }
 

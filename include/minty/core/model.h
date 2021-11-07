@@ -61,6 +61,12 @@ namespace minty::core {
         data_size(uintmax_t bytes);
     };
 
+    template <typename T>
+    struct modification {
+        std::string date_modified;
+        T new_value;
+    };
+
     struct object {
         std::string id;
         std::string hash;
