@@ -82,12 +82,12 @@ namespace minty::core {
         auto delete_post_objects(
             std::string_view post_id,
             const std::vector<std::string>& objects
-        ) -> void;
+        ) -> std::string;
 
         auto delete_post_objects(
             std::string_view post_id,
             std::span<range> ranges
-        ) -> void;
+        ) -> std::string;
 
         auto delete_post_tag(
             std::string_view post_id,

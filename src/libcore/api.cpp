@@ -229,21 +229,19 @@ namespace minty::core {
     auto api::delete_post_objects(
         std::string_view post_id,
         const std::vector<std::string>& objects
-    ) -> void {
-        search->update_post_date_modified(
-            post_id,
-            db->delete_post_objects(post_id, objects)
-        );
+    ) -> std::string {
+        const auto modified = db->delete_post_objects(post_id, objects);
+        search->update_post_date_modified(post_id, modified);
+        return modified;
     }
 
     auto api::delete_post_objects(
         std::string_view post_id,
         std::span<range> ranges
-    ) -> void {
-        search->update_post_date_modified(
-            post_id,
-            db->delete_post_objects_ranges(post_id, ranges)
-        );
+    ) -> std::string {
+        const auto modified = db->delete_post_objects_ranges(post_id, ranges);
+        search->update_post_date_modified(post_id, modified);
+        return modified;
     }
 
     auto api::delete_post_tag(
