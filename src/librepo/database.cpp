@@ -25,6 +25,7 @@ namespace minty::repo::db {
 
         c.prepare("delete_post", 1);
         c.prepare("delete_post_objects", 2);
+        c.prepare("delete_post_objects_ranges", 2);
         c.prepare("delete_post_tag", 2);
         c.prepare("delete_tag", 1);
         c.prepare("delete_tag_alias", 2);
@@ -190,6 +191,17 @@ namespace minty::repo::db {
     }
 
     auto database::delete_post_objects(
+        std::string_view post_id,
+        const std::vector<std::string>& objects
+    ) -> std::string {
+        return ntx().exec_prepared1(
+            __FUNCTION__,
+            post_id,
+            objects
+        )[0].as<std::string>();
+    }
+
+    auto database::delete_post_objects_ranges(
         std::string_view post_id,
         std::span<const range> ranges
     ) -> std::string {

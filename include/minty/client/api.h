@@ -22,6 +22,7 @@ namespace minty {
             add_tag_source,
             delete_post,
             delete_post_objects,
+            delete_post_objects_ranges,
             delete_post_tag,
             delete_tag,
             delete_tag_alias,

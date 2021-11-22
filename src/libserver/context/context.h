@@ -49,6 +49,11 @@ namespace minty::server {
 
         auto delete_post_objects(
             std::string post_id,
+            std::vector<std::string> objects
+        ) -> void;
+
+        auto delete_post_objects_ranges(
+            std::string post_id,
             std::vector<core::range> ranges
         ) -> void;
 

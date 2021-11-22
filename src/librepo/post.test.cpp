@@ -127,7 +127,7 @@ TEST_F(DatabasePostTest, DeletePost) {
     ASSERT_EQ(post2, remaining.id);
 }
 
-TEST_F(DatabasePostTest, DeleteSingleObject) {
+TEST_F(DatabasePostTest, DeleteSingleObjectRange) {
     constexpr auto object = "38981dea-ff0c-46a5-a411-43d1e431803c";
     database.create_object(object, {}, {});
 
@@ -135,7 +135,7 @@ TEST_F(DatabasePostTest, DeleteSingleObject) {
 
     const auto range = minty::repo::db::range { .first = 0, .last = 0 };
     const auto ranges = std::vector<minty::repo::db::range> { range };
-    database.delete_post_objects(id, ranges);
+    database.delete_post_objects_ranges(id, ranges);
 
     const auto objects = database.read_post_objects(id);
 
@@ -157,7 +157,7 @@ TEST_F(DatabasePostTest, DeleteObjectRange) {
 
     const auto range = minty::repo::db::range { .first = 0, .last = 1 };
     const auto ranges = std::vector<minty::repo::db::range> { range };
-    database.delete_post_objects(id, ranges);
+    database.delete_post_objects_ranges(id, ranges);
 
     const auto result = database.read_post_objects(id);
 
@@ -165,7 +165,7 @@ TEST_F(DatabasePostTest, DeleteObjectRange) {
     ASSERT_EQ(objects[2], result.front().id);
 }
 
-TEST_F(DatabasePostTest, DeleteMultipleObjects) {
+TEST_F(DatabasePostTest, DeleteMultipleObjectsRange) {
     const auto objects = std::vector<std::string> {
         "0e5bad49-9cf9-46e4-85c9-83ef9baf1f79",
         "adf85243-7673-467f-9fa6-56fc40642e06",
@@ -188,7 +188,7 @@ TEST_F(DatabasePostTest, DeleteMultipleObjects) {
         third,
         fifth
     };
-    database.delete_post_objects(id, ranges);
+    database.delete_post_objects_ranges(id, ranges);
 
     const auto result = database.read_post_objects(id);
 
@@ -270,7 +270,7 @@ TEST_F(DatabasePostTest, UpdateDateModified) {
     database.move_post_object(id, 0, 1);
     ASSERT_TRUE(date_changed());
 
-    database.delete_post_objects(id, std::array {
+    database.delete_post_objects_ranges(id, std::array {
         minty::repo::db::range {0, 1}
     });
     ASSERT_TRUE(date_changed());

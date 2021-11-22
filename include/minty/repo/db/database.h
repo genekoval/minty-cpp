@@ -79,6 +79,11 @@ namespace minty::repo::db {
 
         auto delete_post_objects(
             std::string_view post_id,
+            const std::vector<std::string>& objects
+        ) -> std::string;
+
+        auto delete_post_objects_ranges(
+            std::string_view post_id,
             std::span<const range> ranges
         ) -> std::string;
 

@@ -467,6 +467,18 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post_objects(
     a_post_id       integer,
+    a_objects       uuid[]
+) RETURNS timestamptz AS $$
+BEGIN
+    DELETE FROM data.post_object
+    WHERE post_id = a_post_id AND object_id = ANY(a_objects);
+
+    RETURN read_post_date_modified(a_post_id);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_post_objects_ranges(
+    a_post_id       integer,
     ranges          int4range[]
 ) RETURNS timestamptz AS $$
 DECLARE
