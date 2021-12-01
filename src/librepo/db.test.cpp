@@ -1,12 +1,18 @@
 #include "db.test.h"
 
+#include <minty/conf/settings.test.h>
+
 #include <sstream>
 
-constexpr auto connection_string = "postgresql://minty@localhost/minty";
+namespace {
+    auto connection_string() -> std::string {
+        return minty::test::settings().database.connection.str();
+    }
+}
 
 DatabaseTest::DatabaseTest() :
-    connection(connection_string),
-    database(connection_string)
+    connection(connection_string()),
+    database(connection_string())
 {}
 
 auto DatabaseTest::SetUp() ->  void { truncate_tables(); }

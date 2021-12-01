@@ -1,17 +1,18 @@
 #include "core.test.h"
 
-constexpr auto db_connection = "postgresql://minty@localhost/minty";
-constexpr auto fstore_connection = "/tmp/fstore/fstore.sock";
-constexpr auto bucket_name = "minty";
-constexpr auto harvest_host = "192.168.8.2";
-constexpr auto harvest_port = "3000";
-constexpr auto search_host = "/tmp/minty-search.sock";
+#include <minty/conf/settings.test.h>
+
+namespace {
+    auto settings() -> const minty::conf::settings& {
+        return minty::test::settings();
+    }
+}
 
 CoreTest::CoreTest() :
-    db(db_connection),
-    object_store(fstore_connection),
-    bucket(object_store.fetch_bucket(bucket_name).id, object_store),
-    downloader(harvest_host, harvest_port),
-    search(search_host),
+    db(settings().database.connection.str()),
+    object_store(settings().fstore.connection),
+    bucket(object_store.fetch_bucket(settings().fstore.bucket).id, object_store),
+    downloader(settings().downloader.host, settings().downloader.port),
+    search(settings().search.host),
     api(db, bucket, downloader, search)
 {}

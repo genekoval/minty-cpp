@@ -1,3 +1,5 @@
+#include <minty/conf/settings.test.h>
+
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -7,6 +9,7 @@ namespace fs = std::filesystem;
 
 namespace {
     const auto log_path = fs::temp_directory_path() / "minty.test.log";
+    const auto settings_path = fs::current_path() / ".test.conf.yaml";
 
     auto log_file = std::ofstream(log_path);
 
@@ -15,6 +18,13 @@ namespace {
             << "[" << l.log_level << "] "
             << l.stream.str()
             << std::endl;
+    }
+}
+
+namespace minty::test {
+    auto settings() -> const conf::settings& {
+        static auto instance = conf::initialize(settings_path.string());
+        return instance;
     }
 }
 
