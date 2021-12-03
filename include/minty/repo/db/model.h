@@ -102,6 +102,8 @@ namespace minty::repo::db {
         decltype(post::date_created) date_created;
         decltype(post::date_modified) date_modified;
         std::vector<std::string> tags;
+
+        auto operator==(const post_search&) const -> bool = default;
     };
 
     struct post_object_update {

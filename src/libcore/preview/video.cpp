@@ -7,7 +7,7 @@ namespace {
     constexpr auto pixel_format = AV_PIX_FMT_RGB24;
 
     auto save_image(
-        fstore::bucket& bucket,
+        minty::core::object_store& objects,
         AVCodecContext* codec,
         AVFrame* frame
     ) -> std::string {
@@ -40,7 +40,7 @@ namespace {
         sws.scale(frame, frame_rgb.data());
 
         return minty::core::generate_image_preview(
-            bucket,
+            objects,
             codec->width,
             codec->height,
             frame_rgb.data()->data[0]
@@ -50,10 +50,10 @@ namespace {
 
 namespace minty::core {
     auto generate_video_preview(
-        fstore::bucket& bucket,
+        object_store& objects,
         const fstore::object_meta& object
     ) -> std::string {
-        const auto source = bucket.get(object.id);
+        const auto source = objects.get(object.id);
 
         auto io = video::io_context(source.span());
         auto format = video::format_context(io.data());
@@ -73,7 +73,7 @@ namespace minty::core {
                 codec.decode(pkt.data(), frame.data());
 
                 if (frame.data()->key_frame) {
-                    return save_image(bucket, codec.data(), frame.data());
+                    return save_image(objects, codec.data(), frame.data());
                 }
             }
 

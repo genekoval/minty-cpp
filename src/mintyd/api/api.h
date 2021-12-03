@@ -10,10 +10,10 @@
 
 namespace minty::cli {
     class api_container {
-        repo::db::database database;
+        repo::db::database db;
         fstore::object_store object_store;
-        std::string _bucket_id;
         fstore::bucket bucket;
+        core::object_store objects;
         core::downloader downloader;
         core::search_engine search;
         core::api _api;

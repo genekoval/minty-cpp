@@ -13,7 +13,7 @@ namespace {
     );
 
     auto generate_preview(
-        fstore::bucket& bucket,
+        minty::core::object_store& objects,
         Magick::Image&& image
     ) -> std::string {
         const auto width = image.size().width();
@@ -50,7 +50,7 @@ namespace {
         auto out = Magick::Blob();
         image.write(&out);
 
-        return bucket.add({}, out.length(), [&out](auto&& part) {
+        return objects.add({}, out.length(), [&out](auto&& part) {
             part.write(std::span(
                 reinterpret_cast<const std::byte*>(out.data()),
                 out.length()
@@ -61,12 +61,12 @@ namespace {
 
 namespace minty::core {
     auto generate_image_preview(
-        fstore::bucket& bucket,
+        object_store& objects,
         unsigned int width,
         unsigned int height,
         const void* pixels
     ) -> std::string {
-        return generate_preview(bucket, Magick::Image(
+        return generate_preview(objects, Magick::Image(
             width,
             height,
             "RGB",
@@ -76,16 +76,16 @@ namespace minty::core {
     }
 
     auto generate_image_preview(
-        fstore::bucket& bucket,
+        object_store& objects,
         const fstore::object_meta& object
     ) -> std::string {
         auto* source = new std::byte[object.size];
-        bucket.get(object.id, source);
+        objects.get(object.id, source);
 
         auto blob = Magick::Blob();
         blob.updateNoCopy(source, object.size);
 
-        return generate_preview(bucket, Magick::Image(blob));
+        return generate_preview(objects, Magick::Image(blob));
     }
 
     auto initialize_image_previews() -> void {

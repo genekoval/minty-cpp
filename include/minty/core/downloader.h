@@ -1,19 +1,25 @@
 #pragma once
 
+#include <minty/test.h>
+
 #include <harvest/harvest>
 
 namespace minty::core {
     class downloader {
-        harvest::api service;
+        std::optional<harvest::api> service;
     public:
+        downloader() = default;
+
         downloader(std::string_view host, std::string_view port);
 
-        auto fetch(
+        VIRTUAL_DESTRUCTOR(downloader)
+
+        VIRTUAL auto fetch(
             std::string_view url,
             std::function<void(harvest::stream_type&)> callback
         ) -> bool;
 
-        auto get_site_icon(
+        VIRTUAL auto get_site_icon(
             std::string_view url,
             std::function<void(harvest::stream_type&)> pipe
         ) -> void;

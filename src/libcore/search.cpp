@@ -7,7 +7,7 @@ namespace minty::core {
     search_engine::search_engine(std::string_view endpoint) :
         endpoint(endpoint)
     {
-        INFO() << "Using search engine version " << version();
+        DEBUG() << "Using search engine version " << version();
     }
 
     auto search_engine::connect() -> client {

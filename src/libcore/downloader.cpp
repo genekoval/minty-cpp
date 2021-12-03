@@ -2,17 +2,17 @@
 
 namespace minty::core {
     downloader::downloader(std::string_view host, std::string_view port) :
-        service(host, port)
+        service(harvest::api(host, port))
     {
-        const auto info = service.get_server_info();
-        INFO() << "Using harvest version " << info.server;
+        const auto info = service->get_server_info();
+        DEBUG() << "Using harvest version " << info.server;
     }
 
     auto downloader::fetch(
         std::string_view url,
         std::function<void(harvest::stream_type&)> callback
     ) -> bool {
-        return service.scrape_url(url, [&callback](
+        return service->scrape_url(url, [&callback](
             auto& stream,
             auto current,
             auto total
@@ -26,6 +26,6 @@ namespace minty::core {
         std::string_view url,
         std::function<void(harvest::stream_type&)> pipe
     ) -> void {
-        service.get_site_icon(url, pipe);
+        service->get_site_icon(url, pipe);
     }
 }

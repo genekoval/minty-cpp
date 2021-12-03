@@ -10,14 +10,14 @@
 namespace minty::core {
     api::api(
         repo::db::database& db,
-        fstore::bucket& bucket,
+        object_store& objects,
         downloader& dl,
         search_engine& search
     ) :
         db(&db),
-        bucket(&bucket),
+        objects(&objects),
         dl(&dl),
-        previews(bucket),
+        previews(objects),
         search(&search)
     {}
 
@@ -39,13 +39,13 @@ namespace minty::core {
         std::size_t stream_size,
         std::function<void(fstore::part&&)> pipe
     ) -> std::string {
-        const auto object = bucket->add({}, stream_size, pipe);
+        const auto object = objects->add({}, stream_size, pipe);
         db->create_object(object.id, previews.generate_preview(object), {});
         return object.id;
     }
 
     auto api::add_object_local(std::string_view path) -> std::string {
-        const auto object = bucket->add(path);
+        const auto object = objects->add(path);
         db->create_object(object.id, previews.generate_preview(object), {});
         return object.id;
     }
@@ -56,7 +56,7 @@ namespace minty::core {
         auto objects = std::vector<fstore::object_meta>();
 
         const auto used_scraper = dl->fetch(url, [&](auto& file) {
-            objects.push_back(bucket->add(
+            objects.push_back(this->objects->add(
                 {},
                 file.size(),
                 [&file](auto&& part) {
@@ -119,7 +119,7 @@ namespace minty::core {
 
         auto result = std::vector<object_preview>();
         for (auto&& obj : new_objects) {
-            auto meta = bucket->meta(obj.id);
+            auto meta = this->objects->meta(obj.id);
             result.emplace_back(
                 std::move(obj),
                 std::move(meta)
@@ -174,7 +174,7 @@ namespace minty::core {
         dl->get_site_icon(
             fmt::format("{}://{}", scheme, host),
             [&](auto& stream) {
-                const auto object = bucket->add(
+                const auto object = objects->add(
                     {},
                     stream.size(),
                     [&stream] (auto&& part) {
@@ -281,7 +281,7 @@ namespace minty::core {
     auto api::get_object(std::string_view object_id) -> object {
         return object(
             db->read_object(object_id),
-            bucket->meta(object_id),
+            objects->meta(object_id),
             db->read_object_posts(object_id)
         );
     }
@@ -300,7 +300,7 @@ namespace minty::core {
         };
 
         for (auto&& obj : objects) {
-            auto meta = bucket->meta(obj.id);
+            auto meta = this->objects->meta(obj.id);
             result.objects.emplace_back(
                 std::move(obj),
                 std::move(meta)
@@ -349,7 +349,7 @@ namespace minty::core {
         auto result = fstore::remove_result();
         db->prune_objects([this, &result](auto objects) -> bool {
             try {
-                result = bucket->remove(objects);
+                result = this->objects->remove(objects);
                 return true;
             }
             catch (const std::runtime_error& ex) {

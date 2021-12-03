@@ -2,6 +2,7 @@
 
 #include <minty/core/model.h>
 #include <minty/net/zipline/protocol.h>
+#include <minty/test.h>
 
 #include <netcore/netcore>
 #include <zipline/zipline>
@@ -38,56 +39,64 @@ namespace minty::core {
 
         auto version() -> std::string;
     public:
+        search_engine() = default;
+
         search_engine(std::string_view endpoint);
 
-        auto add_post(const post_search& post) -> void;
+        VIRTUAL_DESTRUCTOR(search_engine)
 
-        auto add_post_tag(
+        VIRTUAL auto add_post(const post_search& post) -> void;
+
+        VIRTUAL auto add_post_tag(
             std::string_view post_id,
             std::string_view tag_id
         ) -> void;
 
-        auto add_posts(std::span<const post_search> posts) -> void;
+        VIRTUAL auto add_posts(std::span<const post_search> posts) -> void;
 
-        auto add_tags(std::span<const tag_text> tags) -> void;
+        VIRTUAL auto add_tags(std::span<const tag_text> tags) -> void;
 
-        auto add_tag_alias(
+        VIRTUAL auto add_tag_alias(
             std::string_view tag_id,
             std::string_view alias
         ) -> void;
 
-        auto create_indices() -> void;
+        VIRTUAL auto create_indices() -> void;
 
-        auto delete_indices() -> void;
+        VIRTUAL auto delete_indices() -> void;
 
-        auto delete_post(std::string_view post_id) -> void;
+        VIRTUAL auto delete_post(std::string_view post_id) -> void;
 
-        auto delete_tag(std::string_view tag_id) -> void;
+        VIRTUAL auto delete_tag(std::string_view tag_id) -> void;
 
-        auto delete_tag_alias(
+        VIRTUAL auto delete_tag_alias(
             std::string_view tag_id,
             std::string_view alias
         ) -> void;
 
-        auto find_posts(const post_query& query) -> search_result<std::string>;
+        VIRTUAL auto find_posts(
+            const post_query& query
+        ) -> search_result<std::string>;
 
-        auto find_tags(const tag_query& query) -> search_result<std::string>;
+        VIRTUAL auto find_tags(
+            const tag_query& query
+        ) -> search_result<std::string>;
 
-        auto remove_post_tag(
+        VIRTUAL auto remove_post_tag(
             std::string_view post_id,
             std::string_view tag_id
         ) -> void;
 
-        auto update_post_date_modified(
+        VIRTUAL auto update_post_date_modified(
             std::string_view post_id,
             std::string_view date_modified
         ) -> void;
 
-        auto update_post_description(const post_update& post) -> void;
+        VIRTUAL auto update_post_description(const post_update& post) -> void;
 
-        auto update_post_title(const post_update& post) -> void;
+        VIRTUAL auto update_post_title(const post_update& post) -> void;
 
-        auto update_tag_name(
+        VIRTUAL auto update_tag_name(
             std::string_view tag_id,
             std::string_view old_name,
             std::string_view new_name

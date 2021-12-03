@@ -2,21 +2,16 @@
 
 namespace minty::cli {
     api_container::api_container(const conf::settings& settings) :
-        database(settings.database.connection.str()),
+        db(settings.database.connection.str()),
         object_store(settings.fstore.connection),
-        _bucket_id(object_store.fetch_bucket(settings.fstore.bucket).id),
-        bucket(_bucket_id, object_store),
+        bucket(object_store, settings.fstore.bucket),
+        objects(bucket),
         downloader(
             settings.downloader.host,
             settings.downloader.port
         ),
         search(settings.search.host),
-        _api(
-            database,
-            bucket,
-            downloader,
-            search
-        )
+        _api(db, objects, downloader, search)
     {}
 
     auto api_container::api() -> core::api& {
@@ -24,6 +19,6 @@ namespace minty::cli {
     }
 
     auto api_container::bucket_id() -> std::string_view {
-        return _bucket_id;
+        return bucket.id;
     }
 }

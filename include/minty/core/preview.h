@@ -1,12 +1,12 @@
 #pragma once
 
-#include <fstore/client.h>
+#include <minty/core/object_store.h>
 
 namespace minty::core {
     class preview_service {
-        fstore::bucket* bucket;
+        object_store* objects;
     public:
-        preview_service(fstore::bucket& bucket);
+        preview_service(object_store& objects);
 
         auto generate_preview(
             const fstore::object_meta& object

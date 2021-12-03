@@ -7,9 +7,9 @@
 
 namespace minty::repo::db {
     database::database(std::string_view connection_string) :
-        connection(std::string(connection_string))
+        connection(pqxx::connection(std::string(connection_string)))
     {
-        auto c = entix::connection(connection);
+        auto c = entix::connection(*connection);
 
         c.prepare("create_comment", {"integer", "integer", "text"});
         c.prepare("create_object", {"uuid", "uuid", "integer"});
@@ -267,7 +267,7 @@ namespace minty::repo::db {
     }
 
     auto database::ntx() -> pqxx::nontransaction {
-        return pqxx::nontransaction(connection);
+        return pqxx::nontransaction(*connection);
     }
 
     auto database::prune() -> void {
@@ -277,7 +277,7 @@ namespace minty::repo::db {
     auto database::prune_objects(
         std::function<bool(std::span<const std::string>)>&& on_deleted
     ) -> void {
-        auto tx = pqxx::transaction(connection);
+        auto tx = pqxx::transaction(*connection);
         const auto objects =
             entix::make_objects<std::vector<std::string>>(tx, __FUNCTION__);
 

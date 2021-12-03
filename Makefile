@@ -80,9 +80,15 @@ test.deps = $(internal.libs)
 define test.libs
  $(common.libs)
  gtest
+ gmock
+ pthread
 endef
 
 include mkbuild/base.mk
+
+ifeq ($(environment),$(environment.develop))
+ CXXFLAGS += -DTEST
+endif
 
 confdir = $(prefix)/etc/$(project)
 

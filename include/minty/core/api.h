@@ -1,16 +1,14 @@
 #pragma once
 
 #include <minty/core/comment_tree.h>
+#include <minty/core/downloader.h>
+#include <minty/core/object_store.h>
 #include <minty/core/model.h>
 #include <minty/core/preview.h>
+#include <minty/core/search.h>
 #include <minty/repo/db/database.h>
 
-#include <fstore/client.h>
-
 namespace minty::core {
-    class downloader;
-    class search_engine;
-
     struct source_parts {
         std::string site_id;
         std::string resource;
@@ -18,7 +16,7 @@ namespace minty::core {
 
     class api {
         repo::db::database* db;
-        fstore::bucket* bucket;
+        object_store* objects;
         downloader* dl;
         preview_service previews;
         search_engine* search;
@@ -32,7 +30,7 @@ namespace minty::core {
     public:
         api(
             repo::db::database& db,
-            fstore::bucket& bucket,
+            object_store& objects,
             downloader& dl,
             search_engine& search
         );

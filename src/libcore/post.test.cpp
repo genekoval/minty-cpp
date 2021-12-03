@@ -1,88 +1,41 @@
 #include "core.test.h"
 
-#include <fstream>
+using minty::test::trimmed_text;
+using minty::test::whitespace_text;
+using testing::Eq;
+using testing::Optional;
+using testing::Return;
 
-class CorePostTest : public CoreTest {
-protected:
-    static auto write_file(
-        std::string_view name,
-        std::string_view content
-    ) -> std::filesystem::path {
-        const auto path = std::filesystem::temp_directory_path() / name;
-
-        auto file = std::ofstream(path);
-        file << content << std::flush;
-
-        return path;
-    }
-
-    auto add_post(minty::core::post_parts&& parts) -> minty::core::post {
-        const auto id = api.add_post(parts);
-        return api.get_post(id);
-    }
-};
-
-TEST_F(CorePostTest, CreateEmptyTitle) {
-    const auto post = add_post({.title = ""});
-    ASSERT_FALSE(post.title.has_value());
+namespace {
+    const auto post_search = minty::repo::db::post_search {
+        .id = "1"
+    };
 }
 
-TEST_F(CorePostTest, CreateEmptyDescription) {
-    const auto post = add_post({.description = ""});
-    ASSERT_FALSE(post.description.has_value());
+class CorePostTest : public CoreTest { };
+
+TEST_F(CorePostTest, AddPostWhitespaceTitle) {
+    EXPECT_CALL(db, create_post(
+        Optional(std::string_view(trimmed_text)),
+        Eq(std::nullopt),
+        std::vector<std::string>(),
+        std::vector<std::string>()
+    )).WillOnce(Return(post_search));
+
+    EXPECT_CALL(search, add_post(post_search));
+
+    api.add_post({ .title = whitespace_text });
 }
 
-TEST_F(CorePostTest, CreateWhitespaceTitle) {
-    const auto post = add_post({.title = "   "});
-    ASSERT_FALSE(post.title.has_value());
-}
+TEST_F(CorePostTest, AddPostWhitespaceDescription) {
+    EXPECT_CALL(db, create_post(
+        Eq(std::nullopt),
+        Optional(std::string_view(trimmed_text)),
+        std::vector<std::string>(),
+        std::vector<std::string>()
+    )).WillOnce(Return(post_search));
 
-TEST_F(CorePostTest, CreateWhitespaceDescription) {
-    const auto post = add_post({.description = "   "});
-    ASSERT_FALSE(post.description.has_value());
-}
+    EXPECT_CALL(search, add_post(post_search));
 
-TEST_F(CorePostTest, CreateFromBytes) {
-    constexpr auto data = "Test data\n";
-    constexpr auto size = 10;
-
-    auto object = api.add_object_data(size, [data, size](auto&& part) {
-        part.write(std::span(
-            reinterpret_cast<const std::byte*>(data),
-            size
-        ));
-    });
-
-    const auto post = add_post({
-        .objects = {object}
-    });
-
-    ASSERT_EQ(1, post.objects.size());
-    ASSERT_EQ(object, post.objects[0].id);
-}
-
-TEST_F(CorePostTest, CreateFromFiles) {
-    constexpr auto one_data = "First file.\n";
-    constexpr auto two_data = "Second file.\n";
-    constexpr auto three_data = "Third file.\n";
-
-    auto files = std::vector<std::string>({
-        write_file("one.txt", one_data),
-        write_file("two.txt", two_data),
-        write_file("three.txt", three_data)
-    });
-
-    auto objects = std::vector<std::string>();
-    for (const auto& file : files) {
-        objects.push_back(api.add_object_local(file));
-    }
-
-    const auto post = add_post({
-        .objects = objects
-    });
-
-    ASSERT_EQ(3, post.objects.size());
-    ASSERT_EQ(objects[0], post.objects[0].id);
-    ASSERT_EQ(objects[1], post.objects[1].id);
-    ASSERT_EQ(objects[2], post.objects[2].id);
+    api.add_post({ .description = whitespace_text });
 }

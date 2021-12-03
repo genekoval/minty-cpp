@@ -6,8 +6,10 @@
 #include <unordered_map>
 
 namespace {
-    using preview_generator =
-        auto (*)(fstore::bucket&, const fstore::object_meta&) -> std::string;
+    using preview_generator = auto (*)(
+        minty::core::object_store&,
+        const fstore::object_meta&
+    ) -> std::string;
 
     const auto generators =
         std::unordered_map<std::string_view, preview_generator> {
@@ -28,7 +30,9 @@ namespace {
 }
 
 namespace minty::core {
-    preview_service::preview_service(fstore::bucket& bucket) : bucket(&bucket) {
+    preview_service::preview_service(
+        object_store& objects
+    ) : objects(&objects) {
         initialize_image_previews();
     }
 
@@ -47,7 +51,7 @@ namespace minty::core {
             << object.mime_type;
 
         try {
-            return generator(*bucket, object);
+            return generator(*objects, object);
         }
         catch (const std::runtime_error& ex) {
             ERROR()

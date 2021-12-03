@@ -1,12 +1,14 @@
 #include "core.test.h"
 
+#include <gmock/gmock.h>
+
+using minty::repo::db::comment;
+using testing::_;
+using testing::Return;
+
 class CoreCommentTest : public CoreTest {
 protected:
-    const std::string post_id;
-
-    CoreCommentTest() : post_id(api.add_post({
-        .description = "Test post"
-    })) {}
+    const std::string post_id = "1";
 
     auto add_root_comment(std::string_view content) -> minty::core::comment {
         return api.add_comment(post_id, {}, content);
@@ -22,6 +24,9 @@ protected:
 
 TEST_F(CoreCommentTest, AddRootComment) {
     constexpr auto content = "First comment.";
+
+    EXPECT_CALL(db, create_comment(post_id, std::optional<std::string_view>(), content))
+        .WillOnce(Return(minty::repo::db::comment { .content = content }));
 
     const auto comment = add_root_comment(content);
 
@@ -41,13 +46,24 @@ TEST_F(CoreCommentTest, ReadCommentChain) {
         c7
     */
 
-    const auto c1 = add_root_comment("c1");
-    const auto c2 = add_child_comment(c1, "c2");
-    const auto c3 = add_child_comment(c2, "c3");
-    const auto c4 = add_child_comment(c1, "c4");
-    const auto c5 = add_root_comment("c5");
-    const auto c6 = add_child_comment(c5, "c6");
-    const auto c7 = add_root_comment("c7");
+    const auto c1 = comment { .id = "1" };
+    const auto c2 = comment { .id = "2", .parent_id = "1" };
+    const auto c3 = comment { .id = "3", .parent_id = "2" };
+    const auto c4 = comment { .id = "4", .parent_id = "1" };
+    const auto c5 = comment { .id = "5" };
+    const auto c6 = comment { .id = "6", .parent_id = "5" };
+    const auto c7 = comment { .id = "7"};
+
+    EXPECT_CALL(db, read_comments(_))
+        .WillOnce(Return(std::vector<comment> {
+            c7,
+            c5,
+            c1,
+            c4,
+            c2,
+            c6,
+            c3
+        }));
 
     auto comments = api.get_comments(post_id);
     const auto& roots = comments.roots;
