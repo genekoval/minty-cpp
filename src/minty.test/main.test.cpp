@@ -1,4 +1,5 @@
-#include <minty/conf/settings.test.h>
+#include <minty/repo/db/db.test.env.h>
+#include <minty/conf/settings.test.env.h>
 
 #include <filesystem>
 #include <fstream>
@@ -9,7 +10,6 @@ namespace fs = std::filesystem;
 
 namespace {
     const auto log_path = fs::temp_directory_path() / "minty.test.log";
-    const auto settings_path = fs::current_path() / ".test.conf.yaml";
 
     auto log_file = std::ofstream(log_path);
 
@@ -21,16 +21,12 @@ namespace {
     }
 }
 
-namespace minty::test {
-    auto settings() -> const conf::settings& {
-        static auto instance = conf::initialize(settings_path.string());
-        return instance;
-    }
-}
-
 auto main(int argc, char** argv) -> int {
     timber::log_handler = &file_logger;
 
     testing::InitGoogleTest(&argc, argv);
+    testing::AddGlobalTestEnvironment(new minty::test::SettingsEnvironment);
+    testing::AddGlobalTestEnvironment(new minty::test::DatabaseEnvironment);
+
     return RUN_ALL_TESTS();
 }

@@ -1,21 +1,19 @@
 #pragma once
 
-#include <minty/repo/db/database.h>
+#include <minty/repo/db/db.test.env.h>
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <vector>
 
 class DatabaseTest : public testing::Test {
-    pqxx::connection connection;
+    pqxx::connection& connection =
+        minty::test::DatabaseEnvironment::connection();
 protected:
-    minty::repo::db::database database;
-
-    DatabaseTest();
+    minty::repo::db::database& database =
+        minty::test::DatabaseEnvironment::database();
 
     virtual auto SetUp() -> void;
-
-    virtual auto TearDown() -> void;
 
     auto count(std::string_view table) -> int;
 
