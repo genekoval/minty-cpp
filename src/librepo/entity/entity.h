@@ -1,6 +1,6 @@
 #pragma once
 
-#include "model.h"
+#include <minty/repo/db/model.h>
 
 #include <entix/entix>
 

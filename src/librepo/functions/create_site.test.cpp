@@ -1,15 +1,8 @@
-#include "db.test.h"
+#include "database.test.h"
 
 #include <minty/error.h>
 
-class DatabaseSiteTest : public DatabaseTest {
-protected:
-    auto tables() -> std::vector<std::string> override {
-        return {"site"};
-    }
-};
-
-TEST_F(DatabaseSiteTest, Create) {
+TEST_F(DatabaseSiteTest, CreateSite) {
     constexpr auto scheme = "https";
     constexpr auto host = "wikipedia.org";
     constexpr auto icon = "44eac3f9-2405-4f37-92e0-0e810c5ac4e8";
@@ -22,7 +15,7 @@ TEST_F(DatabaseSiteTest, Create) {
     ASSERT_EQ(icon, site.icon.value());
 }
 
-TEST_F(DatabaseSiteTest, CreateNoIcon) {
+TEST_F(DatabaseSiteTest, CreateSiteNoIcon) {
     constexpr auto scheme = "https";
     constexpr auto host = "wikipedia.org";
 
@@ -33,7 +26,7 @@ TEST_F(DatabaseSiteTest, CreateNoIcon) {
     ASSERT_FALSE(site.icon.has_value());
 }
 
-TEST_F(DatabaseSiteTest, CreateDuplicateName) {
+TEST_F(DatabaseSiteTest, CreateSiteDuplicateName) {
     const auto site = database.create_site(
         "https",
         "wikipedia.org",

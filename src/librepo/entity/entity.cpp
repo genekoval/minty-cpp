@@ -1,4 +1,4 @@
-#include <minty/repo/db/entity.h>
+#include "entity.h"
 
 using namespace minty::repo::db;
 
