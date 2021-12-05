@@ -3,7 +3,15 @@
 auto DatabasePostObjectTest::SetUp() -> void {
     DatabasePostTest::SetUp();
     database.create_object(new_object, {}, {});
-    post = create_post_with_objects();
+    post_id = create_post_with_objects();
+}
+
+auto DatabasePostObjectTest::create_post_with_objects() -> std::string {
+    for (const auto& object : objects) {
+        database.create_object(object, {}, {});
+    }
+
+    return database.create_post("", "", objects, {}).id;
 }
 
 auto DatabasePostObjectTest::insert_object(
@@ -16,7 +24,7 @@ auto DatabasePostObjectTest::insert_objects(
     const std::vector<std::string>& objects,
     unsigned int position
 ) -> std::vector<minty::test::sequence_object> {
-    database.create_post_objects(post, objects, position);
+    database.create_post_objects(post_id, objects, position);
     return with_sequence();
 }
 
@@ -35,6 +43,6 @@ auto DatabasePostObjectTest::with_sequence()
         "FROM data.post_object "
         "WHERE post_id = $1 "
         "ORDER BY sequence",
-        post
+        post_id
     );
 }

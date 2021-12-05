@@ -465,13 +465,42 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION delete_post_object(
+    a_post_id       integer,
+    a_object_id     uuid
+) RETURNS void AS $$
+BEGIN
+    UPDATE data.post_object
+    SET sequence = sequence - 1
+    WHERE post_id = a_post_id AND sequence > (
+        SELECT sequence
+        FROM data.post_object
+        WHERE post_id = a_post_id AND object_id = a_object_id
+    );
+
+    DELETE FROM data.post_object
+    WHERE post_id = a_post_id AND object_id = a_object_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION delete_post_objects(
     a_post_id       integer,
     a_objects       uuid[]
 ) RETURNS timestamptz AS $$
+DECLARE
+    l_object_id       uuid;
 BEGIN
-    DELETE FROM data.post_object
-    WHERE post_id = a_post_id AND object_id = ANY(a_objects);
+    FOR l_object_id IN
+        SELECT object_id
+        FROM (
+            SELECT unnest AS object_id
+            FROM unnest(a_objects)
+        ) objects
+        JOIN data.post_object USING (object_id)
+        ORDER BY sequence DESC
+    LOOP
+        PERFORM delete_post_object(a_post_id, l_object_id);
+    END LOOP;
 
     RETURN read_post_date_modified(a_post_id);
 END;

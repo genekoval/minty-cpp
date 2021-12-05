@@ -27,11 +27,9 @@ TEST_F(DatabasePostObjectTest, MoveObject) {
 }
 
 TEST_F(DatabasePostObjectTest, MovePostObjectDateModified) {
-    const auto id = create_post_with_objects();
+    const auto date_modified = database.move_post_object(post_id, 0, 1);
+    const auto post = database.read_post(post_id);
 
-    database.move_post_object(id, 0, 1);
-
-    const auto post = database.read_post(id);
-
+    ASSERT_EQ(date_modified, post.date_modified);
     ASSERT_NE(post.date_created, post.date_modified);
 }

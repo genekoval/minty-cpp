@@ -6,9 +6,16 @@
 class DatabasePostObjectTest : public DatabasePostTest {
 protected:
     const std::string new_object = "dc6c5f6e-30a2-46ed-9bb5-721f55895520";
-    std::string post;
+    const std::vector<std::string> objects = {
+        "5c87bd88-27ea-4e4b-9146-3676ec2fb173",
+        "5f8cc35b-262f-483f-8970-68a6f11eeafb",
+        "e4917461-360d-4c96-a9aa-256e76525b4e"
+    };
+    std::string post_id;
 
     virtual auto SetUp() -> void override;
+
+    auto create_post_with_objects() -> std::string;
 
     auto insert_object(
         unsigned int position
