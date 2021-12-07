@@ -4,7 +4,10 @@ namespace minty::cli {
     api_container::api_container(const conf::settings& settings) :
         db(settings.database.connection.str()),
         object_store(settings.fstore.connection),
-        bucket(object_store, settings.fstore.bucket),
+        bucket(
+            object_store,
+            object_store.fetch_bucket(settings.fstore.bucket).id
+        ),
         objects(bucket),
         downloader(
             settings.downloader.host,
