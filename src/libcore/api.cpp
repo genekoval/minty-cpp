@@ -343,6 +343,21 @@ namespace minty::core {
         );
     }
 
+    auto api::move_post_objects(
+        std::string_view post_id,
+        const std::vector<std::string>& objects,
+        std::optional<std::string> destination
+    ) -> std::string {
+        const auto date_modified = db->move_post_objects(
+            post_id,
+            objects,
+            destination
+        );
+
+        search->update_post_date_modified(post_id, date_modified);
+        return date_modified;
+    }
+
     auto api::prune() -> void {
         db->prune();
 

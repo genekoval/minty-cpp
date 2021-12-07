@@ -30,6 +30,7 @@ namespace minty::repo::db {
         c.prepare("delete_tag_alias", {"integer", "text"});
         c.prepare("delete_tag_source", {"integer", "integer"});
         c.prepare("move_post_object", {"integer", "integer", "integer"});
+        c.prepare("move_post_objects", {"integer", "uuid[]", "uuid"});
         c.prepare("prune", {});
         c.prepare("prune_objects", {});
         c.prepare("read_comments", {"integer"});

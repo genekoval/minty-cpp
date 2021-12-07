@@ -44,6 +44,7 @@ namespace {
             &context::get_tag,
             &context::get_tags,
             &context::move_post_object,
+            &context::move_post_objects,
             &context::set_comment_content,
             &context::set_post_description,
             &context::set_post_title,

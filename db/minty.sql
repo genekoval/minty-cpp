@@ -641,6 +641,36 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION move_post_objects(
+    a_post_id       integer,
+    a_objects       uuid[],
+    a_destination   uuid
+) RETURNS timestamptz AS $$
+BEGIN
+    PERFORM delete_post_objects(a_post_id, a_objects);
+    PERFORM create_post_objects(
+        a_post_id,
+        a_objects,
+        (
+            CASE
+                WHEN a_destination IS NULL THEN (
+                    SELECT max(sequence)
+                    FROM data.post_object
+                    WHERE post_id = a_post_id
+                )
+                ELSE (
+                    SELECT sequence - 1
+                    FROM data.post_object
+                    WHERE post_id = a_post_id AND object_id = a_destination
+                )
+            END
+        )
+    );
+
+    RETURN read_post_date_modified(a_post_id);
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION prune() RETURNS void AS $$
 BEGIN
     PERFORM prune_post_objects();
@@ -711,7 +741,7 @@ CREATE FUNCTION read_post_date_modified(
 DECLARE
     l_date_modified timestamptz;
 BEGIN
-    SElECT date_modified INTO l_date_modified
+    SELECT date_modified INTO l_date_modified
     FROM data.post
     WHERE post_id = a_post_id;
 

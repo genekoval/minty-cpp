@@ -96,6 +96,12 @@ namespace minty::test {
             unsigned int new_index
         ), (override));
 
+        MOCK_METHOD(std::string, move_post_objects, (
+            std::string_view post_id,
+            const std::vector<std::string>& objects,
+            std::optional<std::string> destination
+        ), (override));
+
         MOCK_METHOD(void, prune, (), (override));
 
         MOCK_METHOD(void, prune_objects, (

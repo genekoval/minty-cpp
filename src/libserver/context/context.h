@@ -98,6 +98,12 @@ namespace minty::server {
             std::uint32_t new_index
         ) -> void;
 
+        auto move_post_objects(
+            std::string post_id,
+            std::vector<std::string> objects,
+            std::optional<std::string> destination
+        ) -> std::string;
+
         auto set_comment_content(
             std::string comment_id,
             std::string content

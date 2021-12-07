@@ -122,6 +122,12 @@ namespace minty::core {
             unsigned int new_index
         ) -> void;
 
+        auto move_post_objects(
+            std::string_view post_id,
+            const std::vector<std::string>& objects,
+            std::optional<std::string> destination
+        ) -> std::string;
+
         auto prune() -> void;
 
         auto reindex() -> void;

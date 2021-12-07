@@ -115,13 +115,21 @@ namespace minty::repo::db {
             unsigned int new_index
         ) -> std::string;
 
+        VIRTUAL auto move_post_objects(
+            std::string_view post_id,
+            const std::vector<std::string>& objects,
+            std::optional<std::string> destination
+        ) -> std::string;
+
         VIRTUAL auto prune() -> void;
 
         VIRTUAL auto prune_objects(
             std::function<bool(std::span<const std::string>)>&& on_deleted
         ) -> void;
 
-        VIRTUAL auto read_comments(std::string_view post_id) -> std::vector<comment>;
+        VIRTUAL auto read_comments(
+            std::string_view post_id
+        ) -> std::vector<comment>;
 
         VIRTUAL auto read_object(std::string_view object_id) -> object;
 
