@@ -108,3 +108,14 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
 
 $(obj)/$(daemon)/db/db.o: CXXFLAGS +=\
  -DSQLDIR='"$(shell pwd)/db"'
+
+.PHONY: edit.config migrate start
+
+edit.config:
+	$(EDITOR) $(confdir)/minty.yml
+
+migrate:
+	$($(daemon)) db migrate --config .test.conf.yaml
+
+start:
+	$($(daemon))
