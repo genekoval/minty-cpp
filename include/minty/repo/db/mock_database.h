@@ -14,8 +14,8 @@ namespace minty::test {
 
         MOCK_METHOD(void, create_object, (
             std::string_view object_id,
-            std::optional<std::string_view> preview_id,
-            std::optional<std::string_view> source_id
+            const std::optional<std::string_view>& preview_id,
+            const std::optional<std::string_view>& source_id
         ), (override));
 
         MOCK_METHOD(repo::db::post_search, create_post, (
@@ -25,7 +25,7 @@ namespace minty::test {
             const std::vector<std::string>& tags
         ), (override));
 
-        MOCK_METHOD(repo::db::post_object_update, create_post_objects, (
+        MOCK_METHOD(std::string, create_post_objects, (
             std::string_view post_id,
             const std::vector<std::string>& objects,
             unsigned int position

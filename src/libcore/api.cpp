@@ -35,24 +35,35 @@ namespace minty::core {
         };
     }
 
+    auto api::add_object(
+        fstore::object_meta&& object,
+        const std::optional<std::string>& src
+    ) -> object_preview {
+        auto preview_id = previews.generate_preview(object);
+
+        db->create_object(object.id, preview_id, src);
+
+        return {
+            std::move(object.id),
+            std::move(preview_id),
+            std::move(object.mime_type)
+        };
+    }
+
     auto api::add_object_data(
         std::size_t stream_size,
         std::function<void(fstore::part&&)> pipe
-    ) -> std::string {
-        const auto object = objects->add({}, stream_size, pipe);
-        db->create_object(object.id, previews.generate_preview(object), {});
-        return object.id;
+    ) -> object_preview {
+        return add_object(objects->add({}, stream_size, pipe), {});
     }
 
-    auto api::add_object_local(std::string_view path) -> std::string {
-        const auto object = objects->add(path);
-        db->create_object(object.id, previews.generate_preview(object), {});
-        return object.id;
+    auto api::add_object_local(std::string_view path) -> core::object_preview {
+        return add_object(objects->add(path), {});
     }
 
     auto api::add_objects_url(
         std::string_view url
-    ) -> std::vector<std::string> {
+    ) -> std::vector<core::object_preview> {
         auto objects = std::vector<fstore::object_meta>();
 
         const auto used_scraper = dl->fetch(url, [&](auto& file) {
@@ -70,11 +81,10 @@ namespace minty::core {
         const auto src = used_scraper ?
             add_source(url).id : std::optional<std::string>();
 
-        auto result = std::vector<std::string>();
+        auto result = std::vector<object_preview>();
 
-        for (const auto& obj : objects) {
-            db->create_object(obj.id, previews.generate_preview(obj), src);
-            result.push_back(obj.id);
+        for (auto&& obj : objects) {
+            result.push_back(add_object(std::move(obj), src));
         }
 
         return result;
@@ -110,24 +120,13 @@ namespace minty::core {
         std::string_view post_id,
         const std::vector<std::string>& objects,
         unsigned int position
-    ) -> std::vector<object_preview> {
-        auto [new_objects, date_modified]= db->create_post_objects(
-            post_id,
-            objects,
-            position
-        );
-
-        auto result = std::vector<object_preview>();
-        for (auto&& obj : new_objects) {
-            auto meta = this->objects->meta(obj.id);
-            result.emplace_back(
-                std::move(obj),
-                std::move(meta)
-            );
-        }
+    ) -> std::string {
+        const auto date_modified =
+            db->create_post_objects(post_id, objects, position);
 
         search->update_post_date_modified(post_id, date_modified);
-        return result;
+
+        return date_modified;
     }
 
     auto api::add_post_tag(

@@ -14,22 +14,23 @@ namespace minty::server {
         return api->add_comment(post_id, parent_id, content);
 	}
 
-    auto context::add_object_data(net::data_stream stream) -> std::string {
-        return api->add_object_data(
-            stream.size(),
-            [&stream](auto&& part) {
-                stream.read([&part](auto&& chunk) {
-                    part.write(chunk);
-                });
-            }
-        );
+    auto context::add_object_data(
+        net::data_stream stream
+    ) -> core::object_preview {
+        return api->add_object_data(stream.size(), [&stream](auto&& part) {
+            stream.read([&part](auto&& chunk) {
+                part.write(chunk);
+            });
+        });
     }
 
-    auto context::add_object_local(std::string path) -> std::string {
+    auto context::add_object_local(std::string path) -> core::object_preview {
         return api->add_object_local(path);
     }
 
-    auto context::add_objects_url(std::string url) -> std::vector<std::string> {
+    auto context::add_objects_url(
+        std::string url
+    ) -> std::vector<core::object_preview> {
         return api->add_objects_url(url);
     }
 
@@ -41,7 +42,7 @@ namespace minty::server {
         std::string post_id,
         std::vector<std::string> objects,
         unsigned int position
-    ) -> std::vector<core::object_preview> {
+    ) -> std::string {
         return api->add_post_objects(post_id, objects, position);
     }
 

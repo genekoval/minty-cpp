@@ -30,6 +30,16 @@ namespace minty::core {
         mime_type(std::move(meta.mime_type))
     {}
 
+    object_preview::object_preview(
+        std::string&& id,
+        std::optional<std::string>&& preview_id,
+        std::string&& mime_type
+    ) :
+        id(std::move(id)),
+        preview_id(std::move(preview_id)),
+        mime_type(std::move(mime_type))
+    {}
+
     data_size::data_size(uintmax_t bytes) :
         bytes(bytes),
         formatted(ext::data_size::format(bytes).str(decimal_places))

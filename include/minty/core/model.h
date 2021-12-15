@@ -95,6 +95,11 @@ namespace minty::core {
             repo::db::object_preview&& obj,
             fstore::object_meta&& meta
         );
+        object_preview(
+            std::string&& id,
+            std::optional<std::string>&& preview_id,
+            std::string&& mime_type
+        );
     };
 
     struct post {

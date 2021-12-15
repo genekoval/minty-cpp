@@ -35,6 +35,7 @@ namespace minty {
             get_tag,
             get_tags,
             move_post_object,
+            move_post_objects,
             set_comment_content,
             set_post_description,
             set_post_title,

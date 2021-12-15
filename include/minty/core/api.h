@@ -21,6 +21,11 @@ namespace minty::core {
         preview_service previews;
         search_engine* search;
 
+        auto add_object(
+            fstore::object_meta&& object,
+            const std::optional<std::string>& src
+        ) -> object_preview;
+
         auto add_site(
             std::string_view scheme,
             std::string_view host
@@ -44,11 +49,13 @@ namespace minty::core {
         auto add_object_data(
             std::size_t stream_size,
             std::function<void(fstore::part&&)> pipe
-        ) -> std::string;
+        ) -> object_preview;
 
-        auto add_object_local(std::string_view path) -> std::string;
+        auto add_object_local(std::string_view path) -> object_preview;
 
-        auto add_objects_url(std::string_view url) -> std::vector<std::string>;
+        auto add_objects_url(
+            std::string_view url
+        ) -> std::vector<object_preview>;
 
         auto add_post(post_parts parts) -> std::string;
 
@@ -56,7 +63,7 @@ namespace minty::core {
             std::string_view post_id,
             const std::vector<std::string>& objects,
             unsigned int position
-        ) -> std::vector<object_preview>;
+        ) -> std::string;
 
         auto add_post_tag(
             std::string_view post_id,

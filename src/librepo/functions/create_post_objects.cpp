@@ -6,18 +6,9 @@ namespace minty::repo::db {
         std::string_view post_id,
         const std::vector<std::string>& objects,
         unsigned int position
-    ) -> post_object_update {
-        auto tx = ntx();
-
-        return {
-            .objects = entix::make_entities<std::vector<object_preview>>(
-                tx,
-                __FUNCTION__,
-                post_id,
-                objects,
-                position
-            ),
-            .date_modified = read_post_date_modified(tx, post_id)
-        };
+    ) -> std::string {
+        return ntx()
+            .exec_prepared1(__FUNCTION__, post_id, objects, position)[0]
+            .as<std::string>();
     }
 }

@@ -326,7 +326,7 @@ CREATE FUNCTION create_post_objects(
     a_post_id       integer,
     a_objects       uuid[],
     a_position      integer
-) RETURNS SETOF object_preview AS $$
+) RETURNS timestamptz AS $$
 BEGIN
     UPDATE data.post_object
     SET sequence = sequence + cardinality(a_objects)
@@ -334,15 +334,7 @@ BEGIN
 
     PERFORM insert_post_objects(a_post_id, a_objects, a_position);
 
-    RETURN QUERY
-    SELECT
-        object.object_id,
-        object.preview_id
-    FROM (
-        SELECT unnest AS object_id
-        FROM unnest(a_objects)
-    ) objects
-    JOIN data.object USING (object_id);
+    RETURN read_post_date_modified(a_post_id);
 END;
 $$ LANGUAGE plpgsql;
 

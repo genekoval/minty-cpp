@@ -11,11 +11,6 @@ namespace minty::repo::db {
         std::optional<pqxx::connection> connection;
 
         auto ntx() -> pqxx::nontransaction;
-
-        auto read_post_date_modified(
-            pqxx::transaction_base& tx,
-            std::string_view post_id
-        ) -> std::string;
     public:
         database() = default;
 
@@ -35,8 +30,8 @@ namespace minty::repo::db {
 
         VIRTUAL auto create_object(
             std::string_view object_id,
-            std::optional<std::string_view> preview_id,
-            std::optional<std::string_view> source_id
+            const std::optional<std::string_view>& preview_id,
+            const std::optional<std::string_view>& source_id
         ) -> void;
 
         VIRTUAL auto create_post(
@@ -50,7 +45,7 @@ namespace minty::repo::db {
             std::string_view post_id,
             const std::vector<std::string>& objects,
             unsigned int position
-        ) -> post_object_update;
+        ) -> std::string;
 
         VIRTUAL auto create_post_tag(
             std::string_view post_id,

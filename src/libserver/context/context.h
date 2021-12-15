@@ -17,11 +17,13 @@ namespace minty::server {
             std::string content
         ) -> core::comment;
 
-        auto add_object_data(net::data_stream stream) -> std::string;
+        auto add_object_data(net::data_stream stream) -> core::object_preview;
 
-        auto add_object_local(std::string path) -> std::string;
+        auto add_object_local(std::string path) -> core::object_preview;
 
-        auto add_objects_url(std::string url) -> std::vector<std::string>;
+        auto add_objects_url(
+            std::string url
+        ) -> std::vector<core::object_preview>;
 
         auto add_post(core::post_parts parts) -> std::string;
 
@@ -29,7 +31,7 @@ namespace minty::server {
             std::string post_id,
             std::vector<std::string> objects,
             unsigned int position
-        ) -> std::vector<core::object_preview>;
+        ) -> std::string;
 
         auto add_post_tag(std::string post_id, std::string tag_id) -> void;
 

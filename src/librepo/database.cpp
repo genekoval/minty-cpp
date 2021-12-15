@@ -37,7 +37,6 @@ namespace minty::repo::db {
         c.prepare("read_object", {"uuid"});
         c.prepare("read_object_posts", {"uuid"});
         c.prepare("read_post", {"integer"});
-        c.prepare("read_post_date_modified", {"integer"});
         c.prepare("read_posts", {"integer[]"});
         c.prepare("read_post_objects", {"integer"});
         c.prepare("read_post_search", {});
