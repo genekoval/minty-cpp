@@ -35,7 +35,7 @@ namespace zipline {
         minty::core::post_preview,
         &minty::core::post_preview::id,
         &minty::core::post_preview::title,
-        &minty::core::post_preview::preview_id,
+        &minty::core::post_preview::preview,
         &minty::core::post_preview::comment_count,
         &minty::core::post_preview::object_count,
         &minty::core::post_preview::date_created

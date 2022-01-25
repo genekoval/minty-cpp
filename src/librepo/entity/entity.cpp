@@ -39,7 +39,7 @@ namespace entix {
         post_preview,
         &post_preview::id,
         &post_preview::title,
-        &post_preview::preview_id,
+        &post_preview::preview,
         &post_preview::comment_count,
         &post_preview::object_count,
         &post_preview::date_created

@@ -32,6 +32,10 @@ namespace minty::core {
         ) -> std::string;
 
         auto add_source(std::string_view url) -> source;
+
+        auto get_posts(
+            std::vector<repo::db::post_preview>&& posts
+        ) -> std::vector<post_preview>;
     public:
         api(
             repo::db::database& db,

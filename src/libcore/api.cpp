@@ -281,7 +281,7 @@ namespace minty::core {
         return object(
             db->read_object(object_id),
             objects->meta(object_id),
-            db->read_object_posts(object_id)
+            get_posts(db->read_object_posts(object_id))
         );
     }
 
@@ -310,12 +310,36 @@ namespace minty::core {
     }
 
     auto api::get_posts(
+        std::vector<repo::db::post_preview>&& posts
+    ) -> std::vector<post_preview> {
+        auto result = std::vector<post_preview>();
+
+        for (auto&& post : posts) {
+            const auto obj = post.preview ?
+                post.preview.value().id :
+                std::optional<std::string>();
+
+            result.emplace_back(
+                std::move(post),
+                post.preview ?
+                    object_preview(
+                        std::move(post.preview.value()),
+                        objects->meta(obj.value())
+                    ) :
+                    std::optional<object_preview>()
+            );
+        }
+
+        return result;
+    }
+
+    auto api::get_posts(
         const post_query& query
     ) -> search_result<post_preview> {
         const auto result = search->find_posts(query);
         return {
             .total = result.total,
-            .hits = db->read_posts(result.hits)
+            .hits = get_posts(db->read_posts(result.hits))
         };
     }
 

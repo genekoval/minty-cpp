@@ -86,10 +86,10 @@ namespace minty::repo::db {
         std::string date_modified;
     };
 
-    struct post_preview : entix::entity<6> {
+    struct post_preview : entix::entity<5, object_preview> {
         std::string id;
         std::optional<std::string> title;
-        std::optional<std::string> preview_id;
+        std::optional<object_preview> preview;
         unsigned int comment_count;
         unsigned int object_count;
         std::string date_created;

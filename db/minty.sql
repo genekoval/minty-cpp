@@ -149,6 +149,7 @@ CREATE VIEW post_preview AS
 SELECT
     post_id,
     title,
+    object_id,
     preview_id,
     coalesce(comment_count, 0) AS comment_count,
     coalesce(object_count, 0) AS object_count,
@@ -169,13 +170,13 @@ LEFT JOIN (
     GROUP BY post_id
 ) objects USING (post_id)
 LEFT JOIN (
-    SELECT DISTINCT ON (post_id)
+    SELECT
         post_id,
+        object_id,
         preview_id
     FROM data.object
     JOIN data.post_object USING (object_id)
-    WHERE preview_id IS NOT NULL
-    ORDER BY post_id, sequence
+    WHERE sequence = 1
 ) previews USING (post_id);
 
 --}}}
@@ -749,6 +750,7 @@ BEGIN
     SELECT
         post_id,
         title,
+        object_id,
         preview_id,
         comment_count,
         object_count,
@@ -897,13 +899,14 @@ BEGIN
     SELECT
         post_id,
         title,
+        post.object_id,
         preview_id,
         comment_count,
         object_count,
         date_created
-    FROM post_preview
-    JOIN data.post_object USING (post_id)
-    WHERE object_id = a_object_id
+    FROM post_preview post
+    JOIN data.post_object post_object USING (post_id)
+    WHERE post_object.object_id = a_object_id
     ORDER BY date_created DESC;
 END;
 $$ LANGUAGE plpgsql;

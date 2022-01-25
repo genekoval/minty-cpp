@@ -40,6 +40,18 @@ namespace minty::core {
         mime_type(std::move(mime_type))
     {}
 
+    post_preview::post_preview(
+        repo::db::post_preview&& p,
+        std::optional<object_preview>&& obj
+    ) :
+        id(std::move(p.id)),
+        title(std::move(p.title)),
+        preview(std::move(obj)),
+        comment_count(std::move(p.comment_count)),
+        object_count(std::move(p.object_count)),
+        date_created(std::move(p.date_created))
+    {}
+
     data_size::data_size(uintmax_t bytes) :
         bytes(bytes),
         formatted(ext::data_size::format(bytes).str(decimal_places))

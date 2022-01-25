@@ -7,7 +7,6 @@
 
 namespace minty::core {
     using range = repo::db::range;
-    using post_preview = repo::db::post_preview;
     using post_search = repo::db::post_search;
     using post_update = repo::db::post_update;
     using tag_name = repo::db::tag_name;
@@ -67,24 +66,6 @@ namespace minty::core {
         T new_value;
     };
 
-    struct object {
-        std::string id;
-        std::string hash;
-        data_size size;
-        std::string mime_type;
-        std::string date_added;
-        std::optional<std::string> preview_id;
-        std::optional<source> src;
-        std::vector<post_preview> posts;
-
-        object() = default;
-        object(
-            repo::db::object&& obj,
-            fstore::object_meta&& meta,
-            std::vector<post_preview>&& posts
-        );
-    };
-
     struct object_preview {
         decltype(repo::db::object_preview::id) id;
         decltype(repo::db::object_preview::preview_id) preview_id;
@@ -117,6 +98,39 @@ namespace minty::core {
         std::optional<std::string> description;
         std::vector<std::string> objects;
         std::vector<std::string> tags;
+    };
+
+    struct post_preview {
+        decltype(repo::db::post_preview::id) id;
+        decltype(repo::db::post_preview::title) title;
+        std::optional<object_preview> preview;
+        decltype(repo::db::post_preview::comment_count) comment_count;
+        decltype(repo::db::post_preview::object_count) object_count;
+        decltype(repo::db::post_preview::date_created) date_created;
+
+        post_preview() = default;
+        post_preview(
+            repo::db::post_preview&& p,
+            std::optional<object_preview>&& obj
+        );
+    };
+
+    struct object {
+        std::string id;
+        std::string hash;
+        data_size size;
+        std::string mime_type;
+        std::string date_added;
+        std::optional<std::string> preview_id;
+        std::optional<source> src;
+        std::vector<post_preview> posts;
+
+        object() = default;
+        object(
+            repo::db::object&& obj,
+            fstore::object_meta&& meta,
+            std::vector<post_preview>&& posts
+        );
     };
 
     struct post_query {
