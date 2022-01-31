@@ -46,7 +46,7 @@ static auto $add(
     const commline::argv& argv,
     std::string_view title,
     std::string_view description,
-    std::string_view tag
+    const std::vector<std::string>& tags
 ) -> void {
     auto api = minty::cli::client();
 
@@ -56,15 +56,14 @@ static auto $add(
             std::optional<std::string>(title),
         .description = description.empty() ?
             std::optional<std::string>() :
-            std::optional<std::string>(description)
+            std::optional<std::string>(description),
+        .tags = tags
     };
 
     for (const auto& arg : argv) {
         const auto path = fs::canonical(arg).string();
         parts.objects.emplace_back(api.add_object_local(path));
     }
-
-    parts.tags.emplace_back(tag);
 
     const auto id = api.add_post(parts);
 
@@ -116,7 +115,7 @@ namespace minty::commands {
                     "Post description",
                     "text"
                 ),
-                option<std::string_view>(
+                list<std::string>(
                     {"tag", "t"},
                     "Post tag",
                     "id"
