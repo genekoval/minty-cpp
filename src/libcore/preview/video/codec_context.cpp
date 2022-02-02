@@ -1,5 +1,6 @@
 #include "video.h"
 
+#include <sstream>
 #include <stdexcept>
 
 namespace minty::core::video {
@@ -30,19 +31,46 @@ namespace minty::core::video {
         return ctx;
     }
 
-    auto codec_context::decode(AVPacket* packet, AVFrame* frame) -> void {
+    auto codec_context::decode(AVPacket* packet, AVFrame* frame) -> bool {
         if (avcodec_send_packet(ctx, packet) < 0) {
             throw std::runtime_error("Error sending packet for decoding");
         }
 
-        if (avcodec_receive_frame(ctx, frame) < 0) {
-            throw std::runtime_error("Error during decoding");
-        }
+        return receive_frame(frame);
     }
 
     auto codec_context::open() -> void {
         if (avcodec_open2(ctx, codec, nullptr) < 0) {
             throw std::runtime_error("Could not open codec");
         }
+    }
+
+    auto codec_context::receive_frame(AVFrame* frame) -> bool {
+        const auto ret = avcodec_receive_frame(ctx, frame) ;
+
+        if (ret == 0) return true;
+        if (ret == AVERROR(EAGAIN)) return false;
+
+        auto os = std::ostringstream();
+        os << "Error during decoding:";
+
+        if (ret == AVERROR_EOF) {
+            os
+                << " the decoder has been fully flushed,"
+                << " and there will be no more output frames";
+        }
+        else if (ret == AVERROR(EINVAL)) {
+            os << " codec not opened, or it is an encoder";
+        }
+        else if (ret == AVERROR_INPUT_CHANGED) {
+            os
+                << " current decoded frame has changed parameters"
+                << " with respect to first decoded frame";
+        }
+        else {
+            os << " legitimate decoding errors";
+        }
+
+        throw std::runtime_error(os.str());
     }
 }

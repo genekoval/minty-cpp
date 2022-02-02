@@ -70,10 +70,10 @@ namespace minty::core {
 
         while (format.read_frame(pkt.data())) {
             if (pkt.stream(stream)) {
-                codec.decode(pkt.data(), frame.data());
-
-                if (frame.data()->key_frame) {
-                    return save_image(objects, codec.data(), frame.data());
+                if (codec.decode(pkt.data(), frame.data())) {
+                    if (frame.data()->key_frame) {
+                        return save_image(objects, codec.data(), frame.data());
+                    }
                 }
             }
 

@@ -927,6 +927,8 @@ CREATE FUNCTION update_object_preview(
     a_preview_id    uuid
 ) RETURNS void AS $$
 BEGIN
+    PERFORM create_object_refs(ARRAY[a_preview_id]);
+
     UPDATE data.object
     SET preview_id = a_preview_id
     WHERE object_id = a_object_id;

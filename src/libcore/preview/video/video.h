@@ -23,6 +23,8 @@ namespace minty::core::video {
     class codec_context {
         AVCodec* codec;
         AVCodecContext* ctx = nullptr;
+
+        auto receive_frame(AVFrame* frame) -> bool;
     public:
         codec_context(AVCodec* coec);
 
@@ -32,7 +34,7 @@ namespace minty::core::video {
 
         auto data() -> AVCodecContext*;
 
-        auto decode(AVPacket* packet, AVFrame* frame) -> void;
+        auto decode(AVPacket* packet, AVFrame* frame) -> bool;
 
         auto open() -> void;
     };
