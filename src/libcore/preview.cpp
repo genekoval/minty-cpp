@@ -53,7 +53,7 @@ namespace minty::core {
         try {
             return generator(*objects, object);
         }
-        catch (const std::runtime_error& ex) {
+        catch (const std::exception& ex) {
             ERROR()
                 << "Failed to generate preview for object ("
                 << object.id << "): " << ex.what();

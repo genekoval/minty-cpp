@@ -409,6 +409,17 @@ namespace minty::core {
             << " freeing " << data_size(result.space_freed).formatted;
     }
 
+    auto api::regenerate_preview(
+        std::string_view object_id
+    ) -> std::optional<std::string> {
+        const auto metadata = objects->meta(object_id);
+        const auto preview = previews.generate_preview(metadata);
+
+        db->update_object_preview(object_id, preview);
+
+        return preview;
+    }
+
     auto api::reindex() -> void {
         search->delete_indices();
         search->create_indices();

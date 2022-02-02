@@ -47,6 +47,7 @@ namespace minty::repo::db {
         c.prepare("read_tag_sources", {"integer"});
         c.prepare("read_tag_text", {});
         c.prepare("update_comment", {"integer", "text"});
+        c.prepare("update_object_preview", {"uuid", "uuid"});
         c.prepare("update_post_description", {"integer", "text"});
         c.prepare("update_post_title", {"integer", "text"});
         c.prepare("update_tag_description", {"integer", "text"});

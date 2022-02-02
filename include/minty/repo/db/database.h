@@ -170,6 +170,11 @@ namespace minty::repo::db {
             std::string_view content
         ) -> void;
 
+        VIRTUAL auto update_object_preview(
+            std::string_view object_id,
+            const std::optional<std::string>& preview_id
+        ) -> void;
+
         VIRTUAL auto update_post_description(
             std::string_view post_id,
             std::string_view description

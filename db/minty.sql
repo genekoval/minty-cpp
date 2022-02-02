@@ -922,6 +922,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION update_object_preview(
+    a_object_id     uuid,
+    a_preview_id    uuid
+) RETURNS void AS $$
+BEGIN
+    UPDATE data.object
+    SET preview_id = a_preview_id
+    WHERE object_id = a_object_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION update_post_description(
     a_post_id       integer,
     a_description   text

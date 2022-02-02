@@ -141,6 +141,10 @@ namespace minty::core {
 
         auto prune() -> void;
 
+        auto regenerate_preview(
+            std::string_view object_id
+        ) -> std::optional<std::string>;
+
         auto reindex() -> void;
 
         auto set_comment_content(

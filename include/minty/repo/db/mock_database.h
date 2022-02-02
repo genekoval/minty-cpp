@@ -166,6 +166,11 @@ namespace minty::test {
             std::string_view content
         ), (override));
 
+        MOCK_METHOD(void, update_object_preview, (
+            std::string_view object_id,
+            const std::optional<std::string>& preview_id
+        ), (override));
+
         MOCK_METHOD(repo::db::post_update, update_post_description, (
             std::string_view post_id,
             std::string_view description
