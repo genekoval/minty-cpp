@@ -12,20 +12,15 @@ namespace fs = std::filesystem;
 
 static auto $post(
     const commline::app& app,
-    const commline::argv& argv
+    std::string_view id
 ) -> void {
-    if (argv.empty()) {
-        throw std::runtime_error("no post id given");
-    }
-
-    const auto& post_id = argv.front();
     auto api = minty::cli::client();
-    const auto post = api.get_post(post_id);
+    const auto post = api.get_post(id);
 
     auto out = YAML::Emitter();
     out << post;
 
-    const auto comments = api.get_comments(post_id);
+    const auto comments = api.get_comments(id);
 
     if (!comments.empty()) {
         out << YAML::BeginMap
@@ -43,10 +38,10 @@ static auto $post(
 
 static auto $add(
     const commline::app& app,
-    const commline::argv& argv,
     std::string_view title,
     std::string_view description,
-    const std::vector<std::string>& tags
+    const std::vector<std::string>& tags,
+    const std::vector<std::string_view>& objects
 ) -> void {
     auto api = minty::cli::client();
 
@@ -60,8 +55,8 @@ static auto $add(
         .tags = tags
     };
 
-    for (const auto& arg : argv) {
-        const auto path = fs::canonical(arg).string();
+    for (const auto& object : objects) {
+        const auto path = fs::canonical(object).string();
         parts.objects.emplace_back(api.add_object_local(path));
     }
 
@@ -72,20 +67,14 @@ static auto $add(
 
 static auto $rm(
     const commline::app& app,
-    const commline::argv& argv,
-    bool force
+    bool force,
+    std::string_view id
 ) -> void {
     auto api = minty::cli::client();
 
-    if (argv.empty()) {
-        throw std::runtime_error("no post id given");
-    }
-
-    const auto& post = argv.front();
-
     if (!force) {
         std::cout
-            << "Remove post with ID: (" << post << ")? [yes/no] ";
+            << "Remove post with ID: (" << id << ")? [yes/no] ";
 
         auto response = std::array<char, 4>();
         std::cin.getline(response.data(), response.size());
@@ -94,7 +83,7 @@ static auto $rm(
         if (res != "yes") return;
     }
 
-    api.delete_post(post);
+    api.delete_post(id);
 }
 
 namespace minty::commands {
@@ -106,20 +95,23 @@ namespace minty::commands {
             "Add a post",
             options(
                 option<std::string_view>(
-                    {"title", "T"},
-                    "Post title",
+                    {"T", "title"},
+                    "An optional post title",
                     "text"
                 ),
                 option<std::string_view>(
-                    {"description", "d"},
-                    "Post description",
+                    {"d", "description"},
+                    "An optional post description",
                     "text"
                 ),
                 list<std::string>(
-                    {"tag", "t"},
+                    {"t", "tag"},
                     "Post tag",
                     "id"
                 )
+            ),
+            arguments(
+                variadic<std::string_view>("objects")
             ),
             $add
         );
@@ -131,9 +123,12 @@ namespace minty::commands {
             "Remove a post",
             options(
                 flag(
-                    {"force", "f"},
-                    "Remove the post without prompting for confirmation."
+                    {"f", "force"},
+                    "Remove the post without prompting for confirmation"
                 )
+            ),
+            arguments(
+                required<std::string_view>("id")
             ),
             $rm
         );
@@ -142,7 +137,11 @@ namespace minty::commands {
     auto post() -> std::unique_ptr<command_node> {
         auto cmd = command(
             "post",
-            "Manage posts",
+            "Get post information",
+            options(),
+            arguments(
+                required<std::string_view>("id")
+            ),
             $post
         );
 

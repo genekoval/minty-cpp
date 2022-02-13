@@ -1,5 +1,6 @@
 #include "commands.h"
 #include "db/commands.h"
+#include "options/opts.h"
 #include "../db/db.h"
 
 using namespace commline;
@@ -7,13 +8,13 @@ using namespace commline;
 namespace {
     auto $db(
         const app& app,
-        const argv& argv,
-        std::string_view confpath
+        std::string_view confpath,
+        const std::vector<std::string_view>& command
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
         const auto client = minty::cli::data::client(settings);
 
-        client.exec(argv);
+        client.exec(command);
     }
 }
 
@@ -25,12 +26,10 @@ namespace minty::cli {
             "db",
             "Connect to the database using the psql client",
             options(
-                option<std::string_view>(
-                    {"config", "c"},
-                    "Path to configuration file",
-                    "path",
-                    std::move(confpath)
-                )
+                opts::config(confpath)
+            ),
+            arguments(
+                variadic<std::string_view>("command")
             ),
             $db
         );

@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "options/opts.h"
 
 #include <minty/conf/settings.h>
 
@@ -9,7 +10,6 @@ using namespace commline;
 namespace {
     auto $stop(
         const app& app,
-        const argv& argv,
         std::string_view confpath
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
@@ -26,13 +26,9 @@ namespace minty::cli {
             "stop",
             "Stop the server daemon",
             options(
-                option<std::string_view>(
-                    {"config", "c"},
-                    "Path to configuration file",
-                    "path",
-                    std::move(confpath)
-                )
+                opts::config(confpath)
             ),
+            arguments(),
             $stop
         );
     }

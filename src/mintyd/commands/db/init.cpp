@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "../options/opts.h"
 #include "../../api/api.h"
 #include "../../db/db.h"
 
@@ -7,7 +8,6 @@ using namespace commline;
 namespace {
     auto $init(
         const app& app,
-        const argv& argv,
         std::string_view confpath
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
@@ -26,13 +26,9 @@ namespace minty::cli {
             "init",
             "Initialize the database",
             options(
-                option<std::string_view>(
-                    {"config", "c"},
-                    "Path to configuration file",
-                    "path",
-                    std::move(confpath)
-                )
+                opts::config(confpath)
             ),
+            arguments(),
             $init
         );
     }

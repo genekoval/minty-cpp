@@ -1,5 +1,6 @@
 #include "api/api.h"
 #include "commands/commands.h"
+#include "commands/options/opts.h"
 
 #include <minty/conf/settings.h>
 #include <minty/server/server.h>
@@ -16,7 +17,6 @@ namespace {
 
     auto $main(
         const commline::app& app,
-        const commline::argv& argv,
         std::string_view confpath,
         bool daemon
     ) -> void {
@@ -59,17 +59,13 @@ auto main(int argc, const char** argv) -> int {
         VERSION,
         DESCRIPTION,
         commline::options(
-            commline::option<std::string_view>(
-                {"config", "c"},
-                "Path to configuration file",
-                "path",
-                std::string_view(confpath)
-            ),
+            minty::cli::opts::config(confpath),
             commline::flag(
-                {"daemon", "d"},
+                {"d", "daemon"},
                 "Run the program as a daemon."
             )
         ),
+        commline::arguments(),
         $main
     );
 

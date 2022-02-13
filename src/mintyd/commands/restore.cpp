@@ -1,5 +1,6 @@
-#include "../api/api.h"
 #include "commands.h"
+#include "options/opts.h"
+#include "../api/api.h"
 #include "../db/db.h"
 
 using namespace commline;
@@ -7,42 +8,36 @@ using namespace commline;
 namespace {
     auto $restore(
         const app& app,
-        const argv& argv,
         std::string_view confpath,
-        std::optional<std::string_view> user
+        std::optional<std::string_view> user,
+        std::string_view filename
     ) -> void {
-        if (argv.empty()) {
-            throw std::runtime_error("archive file not specified");
-        }
-
         auto settings = minty::conf::initialize(confpath);
         if (user) settings.database.connection.parameters["user"] = *user;
 
         const auto client = minty::cli::data::client(settings);
 
-        client.restore(argv.front());
+        client.restore(filename);
     }
 }
 
 namespace minty::cli {
     auto restore(
         std::string_view confpath
-    ) -> std::unique_ptr<commline::command_node> {
+    ) -> std::unique_ptr<command_node> {
         return command(
             __FUNCTION__,
             "Restore a minty database from an archive",
             options(
-                option<std::string_view>(
-                    {"config", "c"},
-                    "Path to configuration file",
-                    "path",
-                    std::move(confpath)
-                ),
+                opts::config(confpath),
                 option<std::optional<std::string_view>>(
-                    {"user", "u"},
+                    {"u", "user"},
                     "User name to connect as",
                     "username"
                 )
+            ),
+            arguments(
+                required<std::string_view>("filename")
             ),
             $restore
         );

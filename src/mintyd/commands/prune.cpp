@@ -1,7 +1,6 @@
 #include "../api/api.h"
 #include "commands.h"
-
-#include <minty/conf/settings.h>
+#include "options/opts.h"
 
 #include <fmt/format.h>
 
@@ -10,7 +9,6 @@ using namespace commline;
 namespace {
     auto $prune(
         const app& app,
-        const argv& argv,
         std::string_view confpath
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
@@ -28,13 +26,9 @@ namespace minty::cli {
             "prune",
             "Delete unused data",
             options(
-                option<std::string_view>(
-                    {"config", "c"},
-                    "Path to configuration file",
-                    "path",
-                    std::move(confpath)
-                )
+                opts::config(confpath)
             ),
+            arguments(),
             $prune
         );
     }

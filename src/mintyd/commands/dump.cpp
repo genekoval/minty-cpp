@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "options/opts.h"
 #include "../db/db.h"
 
 using namespace commline;
@@ -6,14 +7,13 @@ using namespace commline;
 namespace {
     auto $dump(
         const app& app,
-        const argv& argv,
         std::string_view confpath,
-        std::optional<std::string_view> file
+        std::optional<std::string_view> filename
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
         const auto client = minty::cli::data::client(settings);
 
-        client.dump(file);
+        client.dump(filename);
     }
 }
 
@@ -25,18 +25,14 @@ namespace minty::cli {
             __FUNCTION__,
             "Create a backup of the database",
             options(
-                option<std::string_view>(
-                    {"config", "c"},
-                    "Path to configuration file",
-                    "path",
-                    std::move(confpath)
-                ),
+                opts::config(confpath),
                 option<std::optional<std::string_view>>(
-                    {"file", "f"},
+                    {"f", "file"},
                     "Send output to the specified file or directory",
-                    "file"
+                    "filename"
                 )
             ),
+            arguments(),
             $dump
         );
     }

@@ -14,11 +14,7 @@ namespace {
     const auto config_directory = fs::path(CONFDIR);
     const auto default_config = (config_directory / "minty.yml").string();
 
-    auto $main(
-        const commline::app& app,
-        const commline::argv& argv,
-        bool version
-    ) -> void {
+    auto $main(const commline::app& app, bool version) -> void {
         if (!version) {
             std::cout << app.name << ": " << app.description << std::endl;
             return;
@@ -59,10 +55,11 @@ auto main(int argc, const char** argv) -> int {
         DESCRIPTION,
         options(
             flag(
-                {"version", "v"},
-                "Print version information."
+                {"v", "version"},
+                "Print version information"
             )
         ),
+        arguments(),
         $main
     );
 

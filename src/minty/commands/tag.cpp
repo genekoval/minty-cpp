@@ -19,20 +19,14 @@ static auto print_tag(minty::api& api, std::string_view tag_id) -> void {
 
 static auto $tag(
     const commline::app& app,
-    const commline::argv& argv,
     std::optional<std::string_view> path,
     std::optional<std::string_view> description,
-    std::optional<std::string_view> link
+    std::optional<std::string_view> link,
+    std::string_view id
 ) -> void {
-    if (argv.empty()) throw std::runtime_error(
-        "missing tag id"
-    );
-
-    const auto& id = argv.front();
     auto api = minty::cli::client();
 
     if (description) api.set_tag_description(id, *description);
-
     if (link) api.add_tag_source(id, *link);
 
     print_tag(api, id, path);
@@ -40,30 +34,21 @@ static auto $tag(
 
 static auto $add(
     const commline::app& app,
-    const commline::argv& argv
+    std::string_view name
 ) -> void {
-    if (argv.empty()) {
-        return;
-    }
-
     auto api = minty::cli::client();
-    std::cout << api.add_tag(argv[0]) << std::endl;
+    std::cout << api.add_tag(name) << std::endl;
 }
 
 static auto $alias(
-    const commline::app& app,
-    const commline::argv& argv
+    const commline::app& app
 ) -> void {}
 
 static auto $alias_add(
     const commline::app& app,
-    const commline::argv& argv
+    std::string_view id,
+    std::string_view alias
 ) -> void {
-    if (argv.size() < 2) return;
-
-    const auto& id = argv[0];
-    const auto& alias = argv[1];
-
     auto api = minty::cli::client();
 
     api.add_tag_alias(id, alias);
@@ -72,13 +57,9 @@ static auto $alias_add(
 
 static auto $alias_rm(
     const commline::app& app,
-    const commline::argv& argv
+    std::string_view id,
+    std::string_view alias
 ) -> void {
-    if (argv.size() < 2) return;
-
-    const auto& id = argv[0];
-    const auto& alias = argv[1];
-
     auto api = minty::cli::client();
 
     api.delete_tag_alias(id, alias);
@@ -87,19 +68,15 @@ static auto $alias_rm(
 
 static auto $find(
     const commline::app& app,
-    const commline::argv& argv,
     int from,
     std::optional<std::string_view> path,
-    int size
+    int size,
+    std::string name
 ) -> void {
-    if (argv.empty()) return;
-
-    const auto& search_term = argv.front();
-
     const auto query = minty::core::tag_query {
         .from = static_cast<unsigned int>(from),
         .size = static_cast<unsigned int>(size),
-        .name = std::string(search_term)
+        .name = name
     };
 
     auto api = minty::cli::client();
@@ -108,15 +85,9 @@ static auto $find(
 
 static auto $rename(
     const commline::app& app,
-    const commline::argv& argv
+    std::string_view id,
+    std::string_view name
 ) -> void {
-    if (argv.size() < 2) {
-        throw std::runtime_error("tag id and new name required");
-    }
-
-    const auto& id = argv[0];
-    const auto& name = argv[1];
-
     auto api = minty::cli::client();
 
     api.set_tag_name(id, name);
@@ -125,20 +96,14 @@ static auto $rename(
 
 static auto $rm(
     const commline::app& app,
-    const commline::argv& argv,
-    bool force
+    bool force,
+    std::string_view id
 ) -> void {
     auto api = minty::cli::client();
 
-    if (argv.empty()) {
-        throw std::runtime_error("no tag id given");
-    }
-
-    const auto& tag = argv.front();
-
     if (!force) {
         std::cout
-            << "Remove tag with ID: (" << tag << ")? [yes/no] ";
+            << "Remove tag with ID: (" << id << ")? [yes/no] ";
 
         auto response = std::array<char, 4>();
         std::cin.getline(response.data(), response.size());
@@ -147,7 +112,7 @@ static auto $rm(
         if (res != "yes") return;
     }
 
-    api.delete_tag(tag);
+    api.delete_tag(id);
 }
 
 namespace minty::commands {
@@ -157,6 +122,10 @@ namespace minty::commands {
         return command(
             "add",
             "Add a tag",
+            options(),
+            arguments(
+                required<std::string_view>("name")
+            ),
             $add
         );
     }
@@ -165,6 +134,11 @@ namespace minty::commands {
         return command(
             "add",
             "Add a tag alias",
+            options(),
+            arguments(
+                required<std::string_view>("id"),
+                required<std::string_view>("alias")
+            ),
             $alias_add
         );
     }
@@ -173,6 +147,11 @@ namespace minty::commands {
         return command(
             "add",
             "Add a tag alias",
+            options(),
+            arguments(
+                required<std::string_view>("id"),
+                required<std::string_view>("alias")
+            ),
             $alias_rm
         );
     }
@@ -181,6 +160,8 @@ namespace minty::commands {
         auto cmd = command(
             "alias",
             "Manage tag aliases",
+            options(),
+            arguments(),
             $alias
         );
 
@@ -196,22 +177,25 @@ namespace minty::commands {
             "Find tags",
             options(
                 option<int>(
-                    {"from", "f"},
+                    {"f", "from"},
                     "Result offset",
                     "number",
                     0
                 ),
                 option<std::optional<std::string_view>>(
-                    {"select", "S"},
+                    {"S", "select"},
                     "Select YAML output",
                     "path"
                 ),
                 option<int>(
-                    {"size", "s"},
+                    {"s", "size"},
                     "Result size",
                     "number",
                     10
                 )
+            ),
+            arguments(
+                required<std::string>("name")
             ),
             $find
         );
@@ -221,6 +205,11 @@ namespace minty::commands {
         return command(
             "rename",
             "Change a tag's name",
+            options(),
+            arguments(
+                required<std::string_view>("id"),
+                required<std::string_view>("name")
+            ),
             $rename
         );
     }
@@ -231,9 +220,12 @@ namespace minty::commands {
             "Remove a tag",
             options(
                 flag(
-                    {"force", "f"},
+                    {"f", "force"},
                     "Remove the tag without prompting for confirmation."
                 )
+            ),
+            arguments(
+                required<std::string_view>("id")
             ),
             $rm
         );
@@ -250,15 +242,18 @@ namespace minty::commands {
                     "path"
                 ),
                 option<std::optional<std::string_view>>(
-                    {"description", "d"},
+                    {"d", "description"},
                     "Set the tag's description",
-                    "new description"
+                    "text"
                 ),
                 option<std::optional<std::string_view>>(
-                    {"link", "l"},
+                    {"l", "link"},
                     "Add a link to the tag",
                     "url"
                 )
+            ),
+            arguments(
+                required<std::string_view>("id")
             ),
             $tag
         );

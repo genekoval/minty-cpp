@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "../options/opts.h"
 #include "../../db/db.h"
 
 using namespace commline;
@@ -6,7 +7,6 @@ using namespace commline;
 namespace {
     auto $migrate(
         const app& app,
-        const argv& argv,
         std::string_view confpath
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
@@ -24,13 +24,9 @@ namespace minty::cli {
             __FUNCTION__,
             "Update schemas to the current program version",
             options(
-                option<std::string_view>(
-                    {"config", "c"},
-                    "Path to configuration file",
-                    "path",
-                    std::move(confpath)
-                )
+                opts::config(confpath)
             ),
+            arguments(),
             $migrate
         );
     }
