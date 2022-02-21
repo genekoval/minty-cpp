@@ -28,7 +28,8 @@ fstore:
         port: 5000
 
 search:
-    host: /run/minty-search.sock
+    host:
+        path: /run/minty-search.sock
 
 server:
     path: /run/minty/minty.sock
@@ -49,7 +50,7 @@ server:
     ASSERT_EQ("minty", settings.fstore.bucket);
     ASSERT_EQ("/run/fstore/fstore.sock", settings.fstore.connection);
     ASSERT_EQ(5000, settings.fstore.proxy.port);
-    ASSERT_EQ("/run/minty-search.sock", settings.search.host);
+    ASSERT_EQ("/run/minty-search.sock", settings.search.host.path);
 }
 
 TEST_F(ConfSettingsTest, Encode) {

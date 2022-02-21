@@ -44,7 +44,11 @@ namespace minty::conf {
         };
 
         struct s_search {
-            std::string host;
+            struct s_host {
+                std::string path;
+            };
+
+            s_host host;
         };
 
         static auto load(std::string_view text) -> settings;

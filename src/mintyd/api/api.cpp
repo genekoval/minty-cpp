@@ -13,7 +13,7 @@ namespace minty::cli {
             settings.downloader.host,
             settings.downloader.port
         ),
-        search(settings.search.host),
+        search(settings.search.host.path),
         _api(db, objects, downloader, search)
     {}
 

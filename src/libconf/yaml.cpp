@@ -59,4 +59,9 @@ namespace YAML {
         settings::s_search,
         c::required("host", &settings::s_search::host)
     );
+
+    DECODE(
+        settings::s_search::s_host,
+        c::required("path", &settings::s_search::s_host::path)
+    );
 }
