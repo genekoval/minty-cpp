@@ -30,6 +30,11 @@ namespace YAML {
         const minty::core::post& post
     ) -> Emitter&;
 
+    auto operator<<(
+        Emitter& out,
+        const minty::core::post_preview& post
+    ) -> Emitter&;
+
     template <typename T>
     auto operator<<(
         Emitter& out,

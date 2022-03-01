@@ -126,34 +126,46 @@ namespace YAML {
 
         out << Key << "id" << Value << post.id;
 
-        if (post.description.has_value()) {
-            out
-                << Key << "description"
-                << Value << post.description.value();
-        }
+        if (post.title) out << Key << "title" << Value << post.title.value();
 
-        out << Key << "date created" << Value << post.date_created;
-        if (post.date_modified != post.date_created) {
-            out << Key << "date modified" << Value << post.date_modified;
-        }
+        if (post.description)
+            out << Key << "description" << Value << post.description.value();
 
-        out << Key << "tags" << Value << BeginSeq;
-        for (const auto& tag : post.tags) {
-            out << tag;
+        out << Key << "created" << Value << post.date_created;
+
+        if (post.date_modified != post.date_created)
+            out << Key << "modified" << Value << post.date_modified;
+
+        if (!post.tags.empty()) {
+            out << Key << "tags" << Value << BeginSeq;
+            for (const auto& tag : post.tags) out << tag;
+            out << EndSeq;
         }
-        out << EndSeq;
 
         if (!post.objects.empty()) {
             out << "objects" << Value << BeginSeq;
-
-            for (const auto& object : post.objects) {
-                out << object;
-            }
-
+            for (const auto& object : post.objects) out << object;
             out << EndSeq;
         }
 
         out << EndMap;
+        return out;
+    }
+
+    auto operator<<(
+        Emitter& out,
+        const minty::core::post_preview& post
+    ) -> Emitter& {
+        out << BeginMap;
+
+        out << Key << "id" << Value << post.id;
+        if (post.title) out << Key << "title" << Value << post.title.value();
+        out << Key << "objects" << Value << post.object_count;
+        out << Key << "comments" << Value << post.comment_count;
+        out << Key << "created" << Value << post.date_created;
+
+        out << EndMap;
+
         return out;
     }
 }

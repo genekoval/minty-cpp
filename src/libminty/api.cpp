@@ -116,6 +116,15 @@ namespace minty {
         );
     }
 
+    auto api::get_posts(
+        const core::post_query& query
+    ) -> core::search_result<core::post_preview> {
+        return connect().send<core::search_result<core::post_preview>>(
+            event::get_posts,
+            query
+        );
+    }
+
     auto api::get_server_info() -> server::server_info {
         return connect().send<server::server_info>(event::get_server_info);
     }

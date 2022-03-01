@@ -1,9 +1,9 @@
 #include "../client.h"
 #include "../output.h"
+#include "../options/opts.h"
+#include "../parser/parser.h"
 
 #include "commands.h"
-
-#include <minty/minty>
 
 #include <filesystem>
 #include <iostream>
@@ -65,6 +65,29 @@ static auto $add(
     std::cout << id << std::endl;
 }
 
+static auto $find(
+    const commline::app& app,
+    int from,
+    int size,
+    const std::vector<std::string>& tags,
+    const minty::core::post_query::sort_type sort,
+    std::optional<std::string_view> path,
+    std::optional<std::string> text
+) -> void {
+    auto api = minty::cli::client();
+
+    const auto query = minty::core::post_query {
+        .from = static_cast<unsigned int>(from),
+        .size = static_cast<unsigned int>(size),
+        .text = text,
+        .tags = tags,
+        .sort = sort
+    };
+
+    const auto result = api.get_posts(query);
+    minty::cli::print(result, path);
+}
+
 static auto $rm(
     const commline::app& app,
     bool force,
@@ -104,16 +127,38 @@ namespace minty::commands {
                     "An optional post description",
                     "text"
                 ),
-                list<std::string>(
-                    {"t", "tag"},
-                    "Post tag",
-                    "id"
-                )
+                cli::opts::tags()
             ),
             arguments(
                 variadic<std::string_view>("objects")
             ),
             $add
+        );
+    }
+
+    auto post_find() -> std::unique_ptr<command_node> {
+        return command(
+            "find",
+            "Search for posts",
+            options(
+                cli::opts::from(),
+                cli::opts::size(),
+                cli::opts::tags(),
+                option<core::post_query::sort_type>(
+                    {"s", "sort-by"},
+                    "Result sort",
+                    "",
+                    {
+                        .order = core::sort_order::descending,
+                        .value = core::post_sort_value::date_created
+                    }
+                ),
+                cli::opts::path()
+            ),
+            arguments(
+                optional<std::string>("text")
+            ),
+            $find
         );
     }
 
@@ -146,6 +191,7 @@ namespace minty::commands {
         );
 
         cmd->subcommand(post_add());
+        cmd->subcommand(post_find());
         cmd->subcommand(post_rm());
 
         return cmd;

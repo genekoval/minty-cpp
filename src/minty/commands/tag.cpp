@@ -1,5 +1,6 @@
 #include "../client.h"
 #include "../output.h"
+#include "../options/opts.h"
 
 #include "commands.h"
 
@@ -69,8 +70,8 @@ static auto $alias_rm(
 static auto $find(
     const commline::app& app,
     int from,
-    std::optional<std::string_view> path,
     int size,
+    std::optional<std::string_view> path,
     std::string name
 ) -> void {
     const auto query = minty::core::tag_query {
@@ -176,23 +177,9 @@ namespace minty::commands {
             "find",
             "Find tags",
             options(
-                option<int>(
-                    {"f", "from"},
-                    "Result offset",
-                    "number",
-                    0
-                ),
-                option<std::optional<std::string_view>>(
-                    {"S", "select"},
-                    "Select YAML output",
-                    "path"
-                ),
-                option<int>(
-                    {"s", "size"},
-                    "Result size",
-                    "number",
-                    10
-                )
+                cli::opts::from(),
+                cli::opts::size(),
+                cli::opts::path()
             ),
             arguments(
                 required<std::string>("name")
