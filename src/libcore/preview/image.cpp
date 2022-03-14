@@ -78,7 +78,7 @@ namespace minty::core {
     auto generate_image_preview(
         object_store& objects,
         const fstore::object_meta& object
-    ) -> std::string {
+    ) -> std::optional<std::string> {
         auto* source = new std::byte[object.size];
         objects.get(object.id, source);
 

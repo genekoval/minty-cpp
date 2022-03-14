@@ -42,7 +42,7 @@ namespace minty::core::video {
         );
 
         if (index == AVERROR_STREAM_NOT_FOUND) {
-            throw std::runtime_error("Video stream not found");
+            throw stream_not_found("video stream not found");
         }
 
         if (index == AVERROR_DECODER_NOT_FOUND) {

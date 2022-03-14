@@ -52,7 +52,7 @@ namespace minty::core {
     auto generate_video_preview(
         object_store& objects,
         const fstore::object_meta& object
-    ) -> std::string {
+    ) -> std::optional<std::string> {
         const auto source = objects.get(object.id);
 
         auto io = video::io_context(source.span());
@@ -69,15 +69,16 @@ namespace minty::core {
         auto frame = video::frame();
 
         while (format.read_frame(pkt.data())) {
-            if (pkt.stream(stream)) {
-                if (codec.decode(pkt.data(), frame.data())) {
-                    if (frame.data()->key_frame) {
-                        return save_image(objects, codec.data(), frame.data());
-                    }
-                }
+            if (!pkt.stream(stream)) {
+                pkt.unref();
+                continue;
             }
 
-            pkt.unref();
+            if (codec.decode(pkt.data(), frame.data())) {
+                if (frame.data()->key_frame) {
+                    return save_image(objects, codec.data(), frame.data());
+                }
+            }
         }
 
         throw std::runtime_error("Failed to obtain video frame for preview");

@@ -9,10 +9,11 @@ namespace {
     using preview_generator = auto (*)(
         minty::core::object_store&,
         const fstore::object_meta&
-    ) -> std::string;
+    ) -> std::optional<std::string>;
 
     const auto generators =
         std::unordered_map<std::string_view, preview_generator> {
+            {"audio", minty::core::generate_audio_preview},
             {"image", minty::core::generate_image_preview},
             {"video", minty::core::generate_video_preview}
         };

@@ -1,4 +1,5 @@
 #include <span>
+#include <stdexcept>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -9,6 +10,10 @@ extern "C" {
 
 namespace minty::core::video {
     auto allocate_buffer(std::size_t size) -> uint8_t*;
+
+    class stream_not_found : public std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
 
     class av_buffer {
         uint8_t* buffer;
@@ -60,7 +65,7 @@ namespace minty::core::video {
 
         auto data() -> AVFormatContext*;
 
-        auto find_video_stream(AVCodec** decoder) -> AVStream*;
+        auto find_video_stream(AVCodec** decoder = nullptr) -> AVStream*;
 
         auto read_frame(AVPacket* packet) -> bool;
     };
