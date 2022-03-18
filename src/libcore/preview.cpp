@@ -2,7 +2,6 @@
 
 #include <minty/core/preview.h>
 
-#include <ext/string.h>
 #include <unordered_map>
 
 namespace {
@@ -19,11 +18,9 @@ namespace {
         };
 
     auto get_preview_generator(
-        std::string_view mime_type
+        const fstore::object_meta& object
     ) -> preview_generator {
-        const auto type = ext::split(mime_type, "/").front();
-
-        auto generator = generators.find(type);
+        auto generator = generators.find(object.type);
 
         if (generator == generators.end()) return nullptr;
         return generator->second;
@@ -40,16 +37,16 @@ namespace minty::core {
     auto preview_service::generate_preview(
         const fstore::object_meta& object
     ) -> std::optional<std::string> {
-        auto* generator = get_preview_generator(object.mime_type);
+        auto* generator = get_preview_generator(object);
 
         if (!generator) {
-            DEBUG() << "No preview generator for type: " << object.mime_type;
+            DEBUG() << "No preview generator for type: " << object.mime_type();
             return {};
         }
 
         DEBUG()
             << "Generating preview for object of type: "
-            << object.mime_type;
+            << object.mime_type();
 
         try {
             return generator(*objects, object);

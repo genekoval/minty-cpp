@@ -46,7 +46,8 @@ namespace minty::core {
         return {
             std::move(object.id),
             std::move(preview_id),
-            std::move(object.mime_type)
+            std::move(object.type),
+            std::move(object.subtype)
         };
     }
 

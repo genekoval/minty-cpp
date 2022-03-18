@@ -14,7 +14,8 @@ namespace minty::core {
         id(std::move(meta.id)),
         hash(std::move(meta.hash)),
         size(std::move(meta.size)),
-        mime_type(std::move(meta.mime_type)),
+        type(std::move(meta.type)),
+        subtype(std::move(meta.subtype)),
         date_added(std::move(meta.date_added)),
         preview_id(std::move(obj.preview_id)),
         src(std::move(obj.src)),
@@ -27,17 +28,20 @@ namespace minty::core {
     ) :
         id(std::move(obj.id)),
         preview_id(std::move(obj.preview_id)),
-        mime_type(std::move(meta.mime_type))
+        type(std::move(meta.type)),
+        subtype(std::move(meta.subtype))
     {}
 
     object_preview::object_preview(
         std::string&& id,
         std::optional<std::string>&& preview_id,
-        std::string&& mime_type
+        std::string&& type,
+        std::string&& subtype
     ) :
         id(std::move(id)),
         preview_id(std::move(preview_id)),
-        mime_type(std::move(mime_type))
+        type(std::move(type)),
+        subtype(std::move(subtype))
     {}
 
     post_preview::post_preview(

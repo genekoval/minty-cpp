@@ -99,7 +99,8 @@ namespace YAML {
             << Key << "id" << Value << object.id
             << Key << "hash" << Value << object.hash
             << Key << "size" << Value << object.size
-            << Key << "mime type" << Value << object.mime_type
+            << Key << "type" << Value << object.type
+            << Key << "subtype" << Value << object.subtype
             << Key << "date added" << Value << object.date_added
             << EndMap;
 
@@ -112,7 +113,8 @@ namespace YAML {
     ) -> Emitter& {
         out << BeginMap
             << Key << "id" << Value << object.id
-            << Key << "mime type" << Value << object.mime_type
+            << Key << "type" << Value << object.type
+            << Key << "subtype" << Value << object.subtype
             << EndMap;
 
         return out;

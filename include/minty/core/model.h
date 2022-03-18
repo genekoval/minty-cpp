@@ -69,7 +69,8 @@ namespace minty::core {
     struct object_preview {
         decltype(repo::db::object_preview::id) id;
         decltype(repo::db::object_preview::preview_id) preview_id;
-        decltype(fstore::object_meta::mime_type) mime_type;
+        decltype(fstore::object_meta::type) type;
+        decltype(fstore::object_meta::subtype) subtype;
 
         object_preview() = default;
         object_preview(
@@ -79,7 +80,8 @@ namespace minty::core {
         object_preview(
             std::string&& id,
             std::optional<std::string>&& preview_id,
-            std::string&& mime_type
+            std::string&& type,
+            std::string&& subtype
         );
     };
 
@@ -119,7 +121,8 @@ namespace minty::core {
         std::string id;
         std::string hash;
         data_size size;
-        std::string mime_type;
+        std::string type;
+        std::string subtype;
         std::string date_added;
         std::optional<std::string> preview_id;
         std::optional<source> src;
