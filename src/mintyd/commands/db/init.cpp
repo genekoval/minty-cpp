@@ -8,13 +8,14 @@ using namespace commline;
 namespace {
     auto $init(
         const app& app,
-        std::string_view confpath
+        std::string_view confpath,
+        bool skip_index
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
         const auto client = minty::cli::data::client(settings);
 
         client.init();
-        minty::cli::api_container(settings).api().reindex();
+        if (!skip_index) minty::cli::api_container(settings).api().reindex();
     }
 }
 
@@ -26,7 +27,8 @@ namespace minty::cli {
             "init",
             "Initialize the database",
             options(
-                opts::config(confpath)
+                opts::config(confpath),
+                flag({"skip-index"}, "Skip search engine index operation")
             ),
             arguments(),
             $init

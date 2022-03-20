@@ -5,7 +5,7 @@
 namespace fs = std::filesystem;
 
 namespace {
-    const auto settings_path = fs::current_path() / ".test.conf.yaml";
+    const auto settings_path = fs::current_path() / TEST_CONFIG;
 }
 
 namespace minty::test {

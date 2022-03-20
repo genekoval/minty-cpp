@@ -91,6 +91,9 @@ ifeq ($(environment),$(environment.develop))
 endif
 
 confdir = $(prefix)/etc/$(project)
+test.config = .test.conf.yaml
+
+$(obj)/$(conf)/settings.test.env.o: CXXFLAGS += -DTEST_CONFIG='"$(test.config)"'
 
 $(obj)/$(core)/preview/image.o: CXXFLAGS += $(graphics.flags)
 
@@ -106,16 +109,18 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DDESCRIPTION='"$(project) server"'\
  -DCONFDIR='"$(confdir)"'
 
-$(obj)/$(daemon)/db/db.o: CXXFLAGS +=\
- -DSQLDIR='"$(shell pwd)/db"'
+$(obj)/$(daemon)/db/db.o: CXXFLAGS += -DSQLDIR='"$(shell pwd)/db"'
 
 .PHONY: edit.config migrate start
 
 edit.config:
 	$(EDITOR) $(confdir)/minty.yml
 
+init:
+	$($(daemon)) db init --skip-index --config $(test.config)
+
 migrate:
-	$($(daemon)) db migrate --config .test.conf.yaml
+	$($(daemon)) db migrate --config $(test.config)
 
 start:
 	$($(daemon))
