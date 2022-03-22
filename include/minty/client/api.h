@@ -17,6 +17,7 @@ namespace minty {
             add_post,
             add_post_objects,
             add_post_tag,
+            add_related_post,
             add_tag,
             add_tag_alias,
             add_tag_source,
@@ -24,6 +25,7 @@ namespace minty {
             delete_post_objects,
             delete_post_objects_ranges,
             delete_post_tag,
+            delete_related_post,
             delete_tag,
             delete_tag_alias,
             delete_tag_source,
@@ -61,6 +63,11 @@ namespace minty {
             std::string_view tag_id
         ) -> void;
 
+        auto add_related_post(
+            std::string_view post_id,
+            std::string_view related
+        ) -> void;
+
         auto add_tag(std::string_view name) -> std::string;
 
         auto add_tag_alias(
@@ -78,6 +85,11 @@ namespace minty {
         auto delete_post_tag(
             std::string_view post_id,
             std::string_view tag_id
+        ) -> void;
+
+        auto delete_related_post(
+            std::string_view post_id,
+            std::string_view related
         ) -> void;
 
         auto delete_tag(std::string_view id) -> void;

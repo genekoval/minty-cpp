@@ -45,6 +45,13 @@ CREATE TABLE post_object (
     PRIMARY KEY (post_id, object_id)
 );
 
+CREATE TABLE related_post (
+    post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
+    related         integer NOT NULL REFERENCES post ON DELETE CASCADE,
+
+    PRIMARY KEY (post_id, related)
+);
+
 CREATE TABLE post_comment (
     comment_id      SERIAL PRIMARY KEY,
     post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,

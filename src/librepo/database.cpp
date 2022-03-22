@@ -17,6 +17,7 @@ namespace minty::repo::db {
         c.prepare("create_post", {"text", "text", "uuid[]", "integer[]"});
         c.prepare("create_post_objects", {"integer", "uuid[]", "integer"});
         c.prepare("create_post_tag", {"integer", "integer"});
+        c.prepare("create_related_post", {"integer", "integer"});
         c.prepare("create_site", {"text", "text", "uuid"});
         c.prepare("create_source", {"integer", "text"});
         c.prepare("create_tag", {"text"});
@@ -26,6 +27,7 @@ namespace minty::repo::db {
         c.prepare("delete_post_objects", {"integer", "uuid[]"});
         c.prepare("delete_post_objects_ranges", {"integer", "int4range[]"});
         c.prepare("delete_post_tag", {"integer", "integer"});
+        c.prepare("delete_related_post", {"integer", "integer"});
         c.prepare("delete_tag", {"integer"});
         c.prepare("delete_tag_alias", {"integer", "text"});
         c.prepare("delete_tag_source", {"integer", "integer"});
@@ -41,6 +43,7 @@ namespace minty::repo::db {
         c.prepare("read_post_objects", {"integer"});
         c.prepare("read_post_search", {});
         c.prepare("read_post_tags", {"integer"});
+        c.prepare("read_related_posts", {"integer"});
         c.prepare("read_site", {"text", "text"});
         c.prepare("read_tag", {"integer"});
         c.prepare("read_tag_previews", {"integer[]"});

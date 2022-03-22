@@ -349,6 +349,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_related_post(
+    a_post_id       integer,
+    a_related       integer
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO data.related_post (post_id, related)
+    VALUES (a_post_id, a_related)
+    ON CONFLICT DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_site(
     a_scheme        text,
     a_host          text,
@@ -542,6 +553,16 @@ CREATE FUNCTION delete_post_tag(
 BEGIN
     DELETE FROM data.post_tag
     WHERE post_id = a_post_id AND tag_id = a_tag_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_related_post(
+    a_post_id       integer,
+    a_related       integer
+) RETURNS void AS $$
+BEGIN
+    DELETE FROM data.related_post
+    WHERE post_id = a_post_id AND related = a_related;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -787,6 +808,26 @@ BEGIN
     JOIN data.post_object USING (object_id)
     WHERE post_id = a_post_id
     ORDER BY sequence;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_related_posts(
+    a_post_id       integer
+) RETURNS SETOF post_preview AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        preview.post_id,
+        title,
+        object_id,
+        preview_id,
+        comment_count,
+        object_count,
+        date_created
+    FROM post_preview preview
+    JOIN data.related_post post ON post.related = preview.post_id
+    WHERE post.post_id = a_post_id
+    ORDER BY title ASC, date_created DESC;
 END;
 $$ LANGUAGE plpgsql;
 

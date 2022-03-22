@@ -138,6 +138,13 @@ namespace minty::core {
         search->add_post_tag(post_id, tag_id);
     }
 
+    auto api::add_related_post(
+        std::string_view post_id,
+        std::string_view related
+    ) -> void {
+        db->create_related_post(post_id, related);
+    }
+
     auto api::add_source(std::string_view url) -> source {
         constexpr auto host_prefix = std::string_view("www.");
 
@@ -252,6 +259,13 @@ namespace minty::core {
         search->remove_post_tag(post_id, tag_id);
     }
 
+    auto api::delete_related_post(
+        std::string_view post_id,
+        std::string_view related
+    ) -> void {
+        db->delete_related_post(post_id, related);
+    }
+
     auto api::delete_tag(std::string_view id) -> void {
         db->delete_tag(id);
         search->delete_tag(id);
@@ -288,7 +302,6 @@ namespace minty::core {
 
     auto api::get_post(std::string_view id) -> post {
         auto data = db->read_post(id);
-        auto objects = db->read_post_objects(id);
 
         auto result = post {
             .id = data.id,
@@ -296,8 +309,11 @@ namespace minty::core {
             .description = data.description,
             .date_created = data.date_created,
             .date_modified = data.date_modified,
+            .posts = get_posts(db->read_related_posts(id)),
             .tags = db->read_post_tags(id)
         };
+
+        auto objects = db->read_post_objects(id);
 
         for (auto&& obj : objects) {
             auto meta = this->objects->meta(obj.id);

@@ -85,16 +85,6 @@ namespace minty::core {
         );
     };
 
-    struct post {
-        std::string id;
-        std::optional<std::string> title;
-        std::optional<std::string> description;
-        std::string date_created;
-        std::string date_modified;
-        std::vector<object_preview> objects;
-        std::vector<tag_preview> tags;
-    };
-
     struct post_parts {
         std::optional<std::string> title;
         std::optional<std::string> description;
@@ -115,6 +105,17 @@ namespace minty::core {
             repo::db::post_preview&& p,
             std::optional<object_preview>&& obj
         );
+    };
+
+    struct post {
+        std::string id;
+        std::optional<std::string> title;
+        std::optional<std::string> description;
+        std::string date_created;
+        std::string date_modified;
+        std::vector<object_preview> objects;
+        std::vector<post_preview> posts;
+        std::vector<tag_preview> tags;
     };
 
     struct object {

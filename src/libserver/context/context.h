@@ -35,6 +35,8 @@ namespace minty::server {
 
         auto add_post_tag(std::string post_id, std::string tag_id) -> void;
 
+        auto add_related_post(std::string post_id, std::string related) -> void;
+
         auto add_tag(std::string name) -> std::string;
 
         auto add_tag_alias(
@@ -62,6 +64,11 @@ namespace minty::server {
         auto delete_post_tag(
             std::string post_id,
             std::string tag_id
+        ) -> void;
+
+        auto delete_related_post(
+            std::string post_id,
+            std::string related
         ) -> void;
 
         auto delete_tag(std::string tag_id) -> void;

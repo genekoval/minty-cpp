@@ -20,6 +20,7 @@ namespace zipline {
         &minty::core::post::date_created,
         &minty::core::post::date_modified,
         &minty::core::post::objects,
+        &minty::core::post::posts,
         &minty::core::post::tags
     );
 

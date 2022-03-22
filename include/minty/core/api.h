@@ -74,6 +74,11 @@ namespace minty::core {
             std::string_view tag_id
         ) -> void;
 
+        auto add_related_post(
+            std::string_view post_id,
+            std::string_view related
+        ) -> void;
+
         auto add_tag(std::string_view name) -> std::string;
 
         auto add_tag_alias(
@@ -101,6 +106,11 @@ namespace minty::core {
         auto delete_post_tag(
             std::string_view post_id,
             std::string_view tag_id
+        ) -> void;
+
+        auto delete_related_post(
+            std::string_view post_id,
+            std::string_view related
         ) -> void;
 
         auto delete_tag(std::string_view id) -> void;

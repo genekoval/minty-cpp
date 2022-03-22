@@ -36,6 +36,11 @@ namespace minty::test {
             std::string_view tag_id
         ), (override));
 
+        MOCK_METHOD(void, create_related_post, (
+            std::string_view post_id,
+            std::string_view related
+        ), (override));
+
         MOCK_METHOD(repo::db::site, create_site, (
             std::string_view scheme,
             std::string_view name,
@@ -76,6 +81,11 @@ namespace minty::test {
         MOCK_METHOD(void, delete_post_tag, (
             std::string_view post_id,
             std::string_view tag_id
+        ), (override));
+
+        MOCK_METHOD(void, delete_related_post, (
+            std::string_view post_id,
+            std::string_view related
         ), (override));
 
         MOCK_METHOD(void, delete_tag, (std::string_view tag_id), (override));
@@ -137,6 +147,10 @@ namespace minty::test {
         );
 
         MOCK_METHOD(std::vector<repo::db::tag_preview>, read_post_tags, (
+            std::string_view post_id
+        ), (override));
+
+        MOCK_METHOD(std::vector<repo::db::post_preview>, read_related_posts, (
             std::string_view post_id
         ), (override));
 
