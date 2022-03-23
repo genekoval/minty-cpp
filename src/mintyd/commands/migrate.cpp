@@ -1,6 +1,6 @@
 #include "commands.h"
-#include "../options/opts.h"
-#include "../../db/db.h"
+#include "options/opts.h"
+#include "../db/db.h"
 
 using namespace commline;
 

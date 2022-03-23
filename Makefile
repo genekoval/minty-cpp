@@ -118,10 +118,10 @@ edit.config:
 	$(EDITOR) $(confdir)/minty.yml
 
 init:
-	$($(daemon)) db init --skip-index --config $(test.config)
+	$($(daemon)) init --skip-index --config $(test.config)
 
 migrate:
-	$($(daemon)) db migrate --config $(test.config)
+	$($(daemon)) migrate --config $(test.config)
 
 start:
 	$($(daemon))

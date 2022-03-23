@@ -1,5 +1,4 @@
 #include "commands.h"
-#include "db/commands.h"
 #include "options/opts.h"
 #include "../db/db.h"
 
@@ -20,7 +19,7 @@ namespace minty::cli {
     auto db(
         std::string_view confpath
     ) -> std::unique_ptr<command_node> {
-        auto cmd = command(
+        return command(
             "db",
             "Connect to the database using the psql client",
             options(
@@ -31,10 +30,5 @@ namespace minty::cli {
             ),
             $db
         );
-
-        cmd->subcommand(init(confpath));
-        cmd->subcommand(migrate(confpath));
-
-        return cmd;
     }
 }
