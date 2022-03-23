@@ -11,10 +11,8 @@ namespace {
         std::string_view confpath,
         const std::vector<std::string_view>& command
     ) -> void {
-        const auto settings = minty::conf::initialize(confpath);
-        const auto client = minty::cli::data::client(settings);
-
-        client.exec(command);
+        const auto db = minty::cli::database(confpath);
+        db.exec(command);
     }
 }
 

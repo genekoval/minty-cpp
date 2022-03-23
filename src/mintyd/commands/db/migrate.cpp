@@ -9,10 +9,9 @@ namespace {
         const app& app,
         std::string_view confpath
     ) -> void {
-        const auto settings = minty::conf::initialize(confpath);
-        const auto client = minty::cli::data::client(settings);
+        const auto db = minty::cli::database(confpath);
 
-        client.migrate();
+        db.migrate();
     }
 }
 

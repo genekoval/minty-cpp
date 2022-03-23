@@ -2,39 +2,12 @@
 
 #include <minty/conf/settings.h>
 
-#include <span>
-#include <string>
-#include <string_view>
+#include <dbtools/dbtools>
 
-namespace minty::cli::data {
-    class client {
-        std::string client_program;
-        std::string connection_string;
-        std::string dump_program;
-        std::string restore_program;
+namespace minty::cli {
+    constexpr auto dump_file = "minty.dump";
 
-        auto analyze() const -> void;
+    auto database(std::string_view confpath) -> dbtools::postgresql;
 
-        auto exec(
-            std::string_view program,
-            const std::vector<std::string_view>& args
-        ) const -> void;
-
-        auto wait_exec(
-            std::string_view program,
-            const std::vector<std::string_view>& args
-        ) const -> void;
-    public:
-        client(const conf::settings& settings);
-
-        auto dump(std::optional<std::string_view> file) const -> void;
-
-        auto exec(const std::vector<std::string_view>& args) const -> void;
-
-        auto init() const -> void;
-
-        auto migrate() const -> void;
-
-        auto restore(std::string_view file) const -> void;
-    };
+    auto database(const conf::settings& settings) -> dbtools::postgresql;
 }

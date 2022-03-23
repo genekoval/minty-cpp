@@ -12,9 +12,9 @@ namespace {
         bool skip_index
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
-        const auto client = minty::cli::data::client(settings);
+        const auto db = minty::cli::database(settings);
 
-        client.init();
+        db.init();
         if (!skip_index) minty::cli::api_container(settings).api().reindex();
     }
 }

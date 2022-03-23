@@ -8,12 +8,10 @@ namespace {
     auto $dump(
         const app& app,
         std::string_view confpath,
-        std::optional<std::string_view> filename
+        std::string_view filename
     ) -> void {
-        const auto settings = minty::conf::initialize(confpath);
-        const auto client = minty::cli::data::client(settings);
-
-        client.dump(filename);
+        const auto db = minty::cli::database(confpath);
+        db.dump(filename);
     }
 }
 
@@ -26,10 +24,11 @@ namespace minty::cli {
             "Create a backup of the database",
             options(
                 opts::config(confpath),
-                option<std::optional<std::string_view>>(
+                option<std::string_view>(
                     {"f", "file"},
                     "Send output to the specified file or directory",
-                    "filename"
+                    "filename",
+                    dump_file
                 )
             ),
             arguments(),

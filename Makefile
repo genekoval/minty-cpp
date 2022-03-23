@@ -50,6 +50,7 @@ $(daemon).deps := $(internal.libs)
 define $(daemon).libs
  $(common.libs)
  commline
+ dbtools
  dmon
 endef
 
