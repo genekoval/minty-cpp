@@ -26,14 +26,6 @@ namespace {
         const auto server_info = api.get_server_info();
         std::cout << "server version: " << server_info.version << std::endl;
     }
-
-    auto console_logger(const timber::log& l) noexcept -> void {
-        if (l.log_level != timber::level::info) {
-            std::cerr << l.log_level << ": ";
-        }
-
-        std::cerr << l.stream.str() << std::endl;
-    }
 }
 
 namespace minty::cli {
@@ -47,7 +39,7 @@ auto main(int argc, const char** argv) -> int {
     using namespace commline;
 
     timber::reporting_level = timber::level::info;
-    timber::log_handler = &console_logger;
+    timber::log_handler = &timber::console_logger;
 
     auto app = application(
         NAME,

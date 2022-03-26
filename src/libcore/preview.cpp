@@ -40,21 +40,27 @@ namespace minty::core {
         auto* generator = get_preview_generator(object);
 
         if (!generator) {
-            DEBUG() << "No preview generator for type: " << object.mime_type();
+            TIMBER_DEBUG(
+                "No preview generator for type: {}",
+                object.mime_type()
+            );
             return {};
         }
 
-        DEBUG()
-            << "Generating preview for object of type: "
-            << object.mime_type();
+        TIMBER_DEBUG(
+            "Generating preview for object of type: {}",
+            object.mime_type()
+        );
 
         try {
             return generator(*objects, object);
         }
         catch (const std::exception& ex) {
-            ERROR()
-                << "Failed to generate preview for object ("
-                << object.id << "): " << ex.what();
+            TIMBER_WARNING(
+                "Failed to generate preview for object ({}): {}",
+                object.id,
+                ex.what()
+            );
         }
 
         return {};

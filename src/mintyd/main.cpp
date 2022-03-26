@@ -29,7 +29,7 @@ namespace {
             .user = settings.daemon.user
         })) return;
 
-        NOTICE() << app.name << " version " << app.version << " starting up";
+        TIMBER_NOTICE("{} version {} starting up", app.name, app.version);
 
         auto container = minty::cli::api_container(settings);
         auto info = minty::server::server_info {
@@ -42,10 +42,10 @@ namespace {
         };
 
         minty::server::listen(container.api(), info, settings.server, []() {
-            INFO() << "Server started. Listening for connections...";
+            TIMBER_INFO("Server started. Listening for connections...");
         });
 
-        NOTICE() << app.name << " shutting down";
+        TIMBER_NOTICE("{} shutting down", app.name);
     }
 }
 
@@ -70,7 +70,7 @@ auto main(int argc, const char** argv) -> int {
     );
 
     app.on_error([](const auto& e) -> void {
-        CRITICAL() << e.what();
+        TIMBER_CRITICAL(e.what());
     });
 
     app.subcommand(minty::cli::db(confpath));

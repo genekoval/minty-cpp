@@ -7,7 +7,7 @@ namespace minty::core {
     search_engine::search_engine(std::string_view endpoint) :
         endpoint(endpoint)
     {
-        DEBUG() << "Using search engine version " << version();
+        TIMBER_DEBUG("Using search engine version {}", version());
     }
 
     auto search_engine::connect() -> client {
@@ -15,7 +15,7 @@ namespace minty::core {
             return client(errors, net::socket(netcore::connect(endpoint)));
         }
         catch (const ext::system_error& ex) {
-            ERROR() << ex.what();
+            TIMBER_ERROR("search search unavailable: {}", ex.what());
             throw std::runtime_error("search service unavailable");
         }
     }

@@ -17,9 +17,11 @@ namespace minty::core {
             stream = format.find_video_stream();
         }
         catch (const video::stream_not_found& ex) {
-            DEBUG()
-                << "Cannot get preview for audio file ("
-                << object.id << "): " << ex.what();
+            TIMBER_DEBUG(
+                "Cannot get preview for audio file ({}): {}",
+                object.id,
+                ex.what()
+            );
             return {};
         }
 

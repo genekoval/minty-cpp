@@ -19,7 +19,7 @@ namespace {
         const auto width = image.size().width();
         const auto height = image.size().height();
 
-        DEBUG() << "image dimensions: " << width << " x " << height;
+        TIMBER_DEBUG("Image dimensions: {} x {}", width, height);
 
         // Crop the image to a square if it is not a square already
         if (width != height) {
@@ -34,12 +34,15 @@ namespace {
                 smaller == width ? offset : 0
             );
 
-            DEBUG()
-                << "cropping image to: (width: " << crop.width()
-                << ", height: " << crop.height()
-                << ", xOffset: " << crop.xOff()
-                << ", yOffset: " << crop.yOff()
-                << ")";
+            TIMBER_DEBUG(
+                "Cropping image to: "
+                "(width: {}, height: {}, xOffset: {}, yOffset: {})",
+                crop.width(),
+                crop.height(),
+                crop.xOff(),
+                crop.yOff()
+            );
+
 
             image.crop(crop);
         }

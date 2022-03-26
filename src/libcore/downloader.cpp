@@ -5,7 +5,7 @@ namespace minty::core {
         service(harvest::api(host, port))
     {
         const auto info = service->get_server_info();
-        DEBUG() << "Using harvest version " << info.server;
+        TIMBER_DEBUG("Using harvest version {}", info.server);
     }
 
     auto downloader::fetch(
@@ -17,7 +17,7 @@ namespace minty::core {
             auto current,
             auto total
         ) {
-            DEBUG() << "Downloading file " << current << " of " << total;
+            TIMBER_DEBUG("Downloading file {} of {}", current, total);
             callback(stream);
         });
     }

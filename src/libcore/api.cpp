@@ -107,11 +107,7 @@ namespace minty::core {
             search->add_post(result);
         }
         catch (const std::runtime_error& ex) {
-            ERROR()
-                << "Failed to index post ("
-                << result.id
-                << "): "
-                << ex.what();
+            TIMBER_ERROR("Failed to index post ({}): {}", result.id, ex.what());
         }
 
         return result.id;
@@ -408,22 +404,23 @@ namespace minty::core {
                 return true;
             }
             catch (const std::runtime_error& ex) {
-                ERROR() << "Object pruning has failed: " << ex.what();
+                TIMBER_ERROR("Object pruning has failed: {}", ex.what());
             }
 
             return false;
         });
 
         if (result.objects_removed == 0) {
-            INFO() << "No objects to prune";
+            TIMBER_INFO("No objects to prune");
             return;
         }
 
-        INFO()
-            << "Removed "
-            << result.objects_removed << " object"
-            << (result.objects_removed == 1 ? "" : "s")
-            << " freeing " << data_size(result.space_freed).formatted;
+        TIMBER_INFO(
+            "Removed {} {} freeing {}",
+            result.objects_removed,
+            result.objects_removed == 1 ? "object" : "objects",
+            data_size(result.space_freed).formatted
+        );
     }
 
     auto api::regenerate_preview(
