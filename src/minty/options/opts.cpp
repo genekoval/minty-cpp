@@ -3,37 +3,61 @@
 using namespace commline;
 
 namespace minty::cli::opts {
-    auto from() -> commline::option<int> {
-        return option<int>(
+    auto aliases() -> list<std::string_view> {
+        return {
+            {"a", "alias"},
+            "Add a secondary name",
+            "name"
+        };
+    }
+
+    auto description() -> option<std::optional<std::string_view>> {
+        return {
+            {"d", "description"},
+            "Set the description",
+            "text"
+        };
+    }
+
+    auto from() -> option<int> {
+        return {
             {"f", "from"},
             "Result offset",
             "number",
             0
-        );
+        };
     }
 
-    auto path() -> commline::option<std::optional<std::string_view>> {
-        return option<std::optional<std::string_view>>(
+    auto links() -> list<std::string_view> {
+        return {
+            {"l", "link"},
+            "Add a URL",
+            "url"
+        };
+    }
+
+    auto path() -> option<std::optional<std::string_view>> {
+        return {
             {"S", "select"},
             "Select YAML output",
             "path"
-        );
+        };
     }
 
-    auto size() -> commline::option<int> {
-        return option<int>(
+    auto size() -> option<int> {
+        return {
             {"n", "size"},
             "Result size",
             "number",
             10
-        );
+        };
     }
 
-    auto tags() -> commline::list<std::string> {
-        return list<std::string>(
+    auto tags() -> list<std::string> {
+        return {
             {"t", "tag"},
             "Post tags",
             "id"
-        );
+        };
     }
 }

@@ -71,7 +71,7 @@ namespace YAML {
         }
 
         out
-            << Key << "date added"
+            << Key << "created"
             << Value << tag.date_created;
 
         out << EndMap;
