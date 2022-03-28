@@ -26,6 +26,8 @@ namespace minty::core {
         std::optional<std::string_view> parent_id,
         std::string_view content
     ) -> comment {
+        TIMBER_FUNC();
+
         const auto comment = db->create_comment(post_id, parent_id, content);
         return {
             comment.id,
@@ -55,16 +57,22 @@ namespace minty::core {
         std::size_t stream_size,
         std::function<void(fstore::part&&)> pipe
     ) -> object_preview {
+        TIMBER_FUNC();
+
         return add_object(objects->add({}, stream_size, pipe), {});
     }
 
     auto api::add_object_local(std::string_view path) -> core::object_preview {
+        TIMBER_FUNC();
+
         return add_object(objects->add(path), {});
     }
 
     auto api::add_objects_url(
         std::string_view url
     ) -> std::vector<core::object_preview> {
+        TIMBER_FUNC();
+
         auto objects = std::vector<fstore::object_meta>();
 
         const auto used_scraper = dl->fetch(url, [&](auto& file) {
@@ -92,6 +100,8 @@ namespace minty::core {
     }
 
     auto api::add_post(post_parts parts) -> std::string {
+        TIMBER_FUNC();
+
         const auto result = db->create_post(
             parts.title ?
                 ext::trim(parts.title.value()) :
@@ -118,6 +128,8 @@ namespace minty::core {
         const std::vector<std::string>& objects,
         unsigned int position
     ) -> std::string {
+        TIMBER_FUNC();
+
         const auto date_modified =
             db->create_post_objects(post_id, objects, position);
 
@@ -130,6 +142,8 @@ namespace minty::core {
         std::string_view post_id,
         std::string_view tag_id
     ) -> void {
+        TIMBER_FUNC();
+
         db->create_post_tag(post_id, tag_id);
         search->add_post_tag(post_id, tag_id);
     }
@@ -138,6 +152,8 @@ namespace minty::core {
         std::string_view post_id,
         std::string_view related
     ) -> void {
+        TIMBER_FUNC();
+
         db->create_related_post(post_id, related);
     }
 
@@ -195,6 +211,8 @@ namespace minty::core {
     }
 
     auto api::add_tag(std::string_view name) -> std::string {
+        TIMBER_FUNC();
+
         const auto name_formatted = ext::trim(std::string(name));
         const auto id = db->create_tag(name_formatted);
 
@@ -207,6 +225,8 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view alias
     ) -> tag_name {
+        TIMBER_FUNC();
+
         const auto alias_formatted = ext::trim(std::string(alias));
         const auto name = db->create_tag_alias(tag_id, alias_formatted);
 
@@ -219,12 +239,16 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view url
     ) -> source {
+        TIMBER_FUNC();
+
         const auto src = add_source(url);
         db->create_tag_source(tag_id, src.id);
         return src;
     }
 
     auto api::delete_post(std::string_view id) -> void {
+        TIMBER_FUNC();
+
         db->delete_post(id);
         search->delete_post(id);
     }
@@ -233,6 +257,8 @@ namespace minty::core {
         std::string_view post_id,
         const std::vector<std::string>& objects
     ) -> std::string {
+        TIMBER_FUNC();
+
         const auto modified = db->delete_post_objects(post_id, objects);
         search->update_post_date_modified(post_id, modified);
         return modified;
@@ -242,6 +268,8 @@ namespace minty::core {
         std::string_view post_id,
         std::span<range> ranges
     ) -> std::string {
+        TIMBER_FUNC();
+
         const auto modified = db->delete_post_objects_ranges(post_id, ranges);
         search->update_post_date_modified(post_id, modified);
         return modified;
@@ -251,6 +279,8 @@ namespace minty::core {
         std::string_view post_id,
         std::string_view tag_id
     ) -> void {
+        TIMBER_FUNC();
+
         db->delete_post_tag(post_id, tag_id);
         search->remove_post_tag(post_id, tag_id);
     }
@@ -259,10 +289,14 @@ namespace minty::core {
         std::string_view post_id,
         std::string_view related
     ) -> void {
+        TIMBER_FUNC();
+
         db->delete_related_post(post_id, related);
     }
 
     auto api::delete_tag(std::string_view id) -> void {
+        TIMBER_FUNC();
+
         db->delete_tag(id);
         search->delete_tag(id);
     }
@@ -271,6 +305,8 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view alias
     ) -> tag_name {
+        TIMBER_FUNC();
+
         const auto name = db->delete_tag_alias(tag_id, alias);
         search->delete_tag_alias(tag_id, alias);
         return name;
@@ -280,15 +316,21 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view source_id
     ) -> void {
+        TIMBER_FUNC();
+
         db->delete_tag_source(tag_id, source_id);
     }
 
     auto api::get_comments(std::string_view post_id) -> comment_tree {
+        TIMBER_FUNC();
+
         const auto entities = db->read_comments(post_id);
         return build_tree(entities);
     }
 
     auto api::get_object(std::string_view object_id) -> object {
+        TIMBER_FUNC();
+
         return object(
             db->read_object(object_id),
             objects->meta(object_id),
@@ -297,6 +339,8 @@ namespace minty::core {
     }
 
     auto api::get_post(std::string_view id) -> post {
+        TIMBER_FUNC();
+
         auto data = db->read_post(id);
 
         auto result = post {
@@ -349,6 +393,8 @@ namespace minty::core {
     auto api::get_posts(
         const post_query& query
     ) -> search_result<post_preview> {
+        TIMBER_FUNC();
+
         const auto result = search->find_posts(query);
         return {
             .total = result.total,
@@ -357,10 +403,14 @@ namespace minty::core {
     }
 
     auto api::get_tag(std::string_view id) -> tag {
+        TIMBER_FUNC();
+
         return tag(db->read_tag(id), db->read_tag_sources(id));
     }
 
     auto api::get_tags(const tag_query& query) -> search_result<tag_preview> {
+        TIMBER_FUNC();
+
         const auto result = search->find_tags(query);
         return {
             .total = result.total,
@@ -373,6 +423,8 @@ namespace minty::core {
         unsigned int old_index,
         unsigned int new_index
     ) -> void {
+        TIMBER_FUNC();
+
         search->update_post_date_modified(
             post_id,
             db->move_post_object(post_id, old_index, new_index)
@@ -384,6 +436,8 @@ namespace minty::core {
         const std::vector<std::string>& objects,
         std::optional<std::string> destination
     ) -> std::string {
+        TIMBER_FUNC();
+
         const auto date_modified = db->move_post_objects(
             post_id,
             objects,
@@ -395,6 +449,8 @@ namespace minty::core {
     }
 
     auto api::prune() -> void {
+        TIMBER_FUNC();
+
         db->prune();
 
         auto result = fstore::remove_result();
@@ -426,6 +482,8 @@ namespace minty::core {
     auto api::regenerate_preview(
         std::string_view object_id
     ) -> std::optional<std::string> {
+        TIMBER_FUNC();
+
         const auto metadata = objects->meta(object_id);
         const auto preview = previews.generate_preview(metadata);
 
@@ -435,6 +493,8 @@ namespace minty::core {
     }
 
     auto api::reindex() -> void {
+        TIMBER_FUNC();
+
         search->delete_indices();
         search->create_indices();
 
@@ -446,6 +506,8 @@ namespace minty::core {
         std::string_view comment_id,
         std::string_view content
     ) -> std::string {
+        TIMBER_FUNC();
+
         const auto formatted = ext::replace(
             ext::trim(std::string(content)),
             std::regex("\r"),
@@ -464,6 +526,8 @@ namespace minty::core {
         std::string_view post_id,
         std::string_view description
     ) -> modification<std::optional<std::string>> {
+        TIMBER_FUNC();
+
         const auto update = db->update_post_description(
             post_id,
             ext::replace(
@@ -483,6 +547,8 @@ namespace minty::core {
         std::string_view post_id,
         std::string_view title
     ) -> modification<std::optional<std::string>> {
+        TIMBER_FUNC();
+
         const auto update = db->update_post_title(
             post_id,
             ext::trim(std::string(title))
@@ -498,6 +564,8 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view description
     ) -> std::optional<std::string> {
+        TIMBER_FUNC();
+
         return db->update_tag_description(
             tag_id,
             ext::replace(
@@ -512,6 +580,8 @@ namespace minty::core {
         std::string_view tag_id,
         std::string_view new_name
     ) -> tag_name {
+        TIMBER_FUNC();
+
         const auto name_formatted = ext::trim(std::string(new_name));
         const auto update  = db->update_tag_name(tag_id, name_formatted);
 

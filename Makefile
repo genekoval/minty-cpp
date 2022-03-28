@@ -87,8 +87,17 @@ endef
 
 include mkbuild/base.mk
 
+define defines.add
+ $(addprefix -D, $(1))
+endef
+
+defines.debug = TEST TIMBER_TIMER_ACTIVE
+defines.release = TIMBER_MAX_LEVEL=info
+
 ifeq ($(environment),$(environment.develop))
- CXXFLAGS += -DTEST
+ CXXFLAGS += $(call defines.add,$(defines.debug))
+else
+ CXXFLAGS += $(call defines.add,$(defines.release))
 endif
 
 confdir = $(prefix)/etc/$(project)
@@ -112,7 +121,7 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
 
 $(obj)/$(daemon)/db/db.o: CXXFLAGS += -DSQLDIR='"$(shell pwd)/db"'
 
-.PHONY: edit.config migrate start
+.PHONY: edit.config init migrate start
 
 edit.config:
 	$(EDITOR) $(confdir)/minty.yml
