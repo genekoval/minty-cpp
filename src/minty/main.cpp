@@ -14,6 +14,11 @@ namespace {
     const auto config_directory = fs::path(CONFDIR);
     const auto default_config = (config_directory / "minty.yml").string();
 
+    auto settings() -> const minty::conf::settings& {
+        static const auto instance = minty::conf::initialize(default_config);
+        return instance;
+    }
+
     auto $main(const commline::app& app, bool version) -> void {
         if (!version) {
             std::cout << app.name << ": " << app.description << std::endl;
@@ -29,9 +34,17 @@ namespace {
 }
 
 namespace minty::cli {
+    auto bucket() -> fstore::bucket {
+        static auto object_store = fstore::object_store(
+            settings().fstore.connection
+        );
+
+        const auto bkt = object_store.fetch_bucket(settings().fstore.bucket);
+        return fstore::bucket(object_store, bkt.id);
+    }
+
     auto client() -> api {
-        const auto settings = minty::conf::initialize(default_config);
-        return api(settings.server.path.string());
+        return api(settings().server.path.string());
     }
 }
 
@@ -55,6 +68,7 @@ auto main(int argc, const char** argv) -> int {
         $main
     );
 
+    app.subcommand(minty::commands::object());
     app.subcommand(minty::commands::post());
     app.subcommand(minty::commands::tag());
 

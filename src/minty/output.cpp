@@ -21,11 +21,11 @@ namespace YAML {
         Emitter& out,
         const minty::core::data_size& data_size
     ) -> Emitter& {
-        out << fmt::format(
-            "{} ({} bytes)",
-            data_size.formatted,
-            data_size.bytes
-        );
+        out
+            << BeginMap
+            << Key << "formatted" << Value << data_size.formatted
+            << Key << "bytes" << Value << data_size.bytes
+            << EndMap;
 
         return out;
     }
@@ -101,9 +101,24 @@ namespace YAML {
             << Key << "size" << Value << object.size
             << Key << "type" << Value << object.type
             << Key << "subtype" << Value << object.subtype
-            << Key << "date added" << Value << object.date_added
-            << EndMap;
+            << Key << "added" << Value << object.date_added;
 
+        if (object.preview_id) {
+            out << Key << "preview" << Value << *object.preview_id;
+        }
+
+        if (object.src) {
+            out << Key << "source" << Value << object.src.value().url;
+        }
+
+        if (!object.posts.empty()) {
+            out << Key << "posts" << Value << BeginSeq;
+            for (const auto& post : object.posts) out << post;
+            out << EndSeq;
+
+        }
+
+        out << EndMap;
         return out;
     }
 

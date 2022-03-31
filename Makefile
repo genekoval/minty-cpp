@@ -69,6 +69,7 @@ define $(cli).libs
  conftools
  conf
  fmt
+ fstore
  netcore
  timber
  yaml-cpp

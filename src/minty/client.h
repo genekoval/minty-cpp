@@ -1,10 +1,13 @@
 #pragma once
 
+#include <fstore/client.h>
 #include <minty/minty>
 #include <yaml-cpp/yaml.h>
 
 namespace minty::cli {
     auto add_object(minty::api& api, std::string_view object) -> std::string;
+
+    auto bucket() -> fstore::bucket;
 
     auto client() -> api;
 
