@@ -18,12 +18,12 @@ protected:
     auto create_post_with_objects() -> std::string;
 
     auto insert_object(
-        unsigned int position
+        std::int16_t position
     ) -> std::vector<minty::test::sequence_object>;
 
     auto insert_objects(
         const std::vector<std::string>& objects,
-        unsigned int position
+        std::int16_t position
     ) -> std::vector<minty::test::sequence_object>;
 
     virtual auto tables() -> std::vector<std::string> override;

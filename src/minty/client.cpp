@@ -1,9 +1,33 @@
 #include "client.h"
+#include "output.h"
 
 #include <ext/string.h>
 #include <iostream>
 
+namespace fs = std::filesystem;
+
 namespace minty::cli {
+    auto add_object(minty::api& api, std::string_view object) -> std::string {
+        const auto path = fs::canonical(object);
+        return api.add_object_local(path.string());
+    }
+
+    auto print_post(
+        minty::api& api,
+        std::string_view id,
+        std::optional<std::string_view> path
+    ) -> void {
+        cli::print(api.get_post(id), path);
+    }
+
+    auto print_tag(
+        minty::api& api,
+        std::string_view id,
+        std::optional<std::string_view> path
+    ) -> void {
+        cli::print(api.get_tag(id), path);
+    }
+
     auto print_yaml(
         const YAML::Emitter& emitter,
         std::optional<std::string_view> path

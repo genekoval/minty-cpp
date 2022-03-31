@@ -44,7 +44,7 @@ namespace minty::repo::db {
         VIRTUAL auto create_post_objects(
             std::string_view post_id,
             const std::vector<std::string>& objects,
-            unsigned int position
+            std::int16_t position
         ) -> std::string;
 
         VIRTUAL auto create_post_tag(

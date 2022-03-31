@@ -1,4 +1,3 @@
-#include "cli.h"
 #include "commands.h"
 
 #include "../../client.h"
@@ -13,7 +12,7 @@ namespace {
     auto $add(
         const app& app,
         const std::vector<std::string_view>& aliases,
-        std::optional<std::string_view> description,
+        std::optional<std::string> description,
         const std::vector<std::string_view>& links,
         std::optional<std::string_view> path,
         std::string_view name
@@ -31,11 +30,11 @@ namespace {
             api.add_tag_source(id, link);
         }
 
-        minty::cli::print_tag(api, id, path);
+        std::cout << id << std::endl;
     }
 }
 
-namespace minty::commands {
+namespace minty::subcommands::tag {
     auto add() -> std::unique_ptr<command_node> {
         return command(
             __FUNCTION__,

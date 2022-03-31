@@ -1,4 +1,3 @@
-#include "cli.h"
 #include "commands.h"
 
 #include "../../client.h"
@@ -13,7 +12,7 @@ namespace {
         std::optional<std::string_view> name,
         const std::vector<std::string_view>& new_aliases,
         const std::vector<std::string_view>& aliases_to_remove,
-        std::optional<std::string_view> description,
+        std::optional<std::string> description,
         const std::vector<std::string_view>& new_links,
         const std::vector<std::string_view>& links_to_remove,
         std::optional<std::string_view> path,
@@ -76,9 +75,9 @@ namespace minty::commands {
             $tag
         );
 
-        cmd->subcommand(add());
-        cmd->subcommand(find());
-        cmd->subcommand(rm());
+        cmd->subcommand(subcommands::tag::add());
+        cmd->subcommand(subcommands::tag::find());
+        cmd->subcommand(subcommands::tag::rm());
 
         return cmd;
     }

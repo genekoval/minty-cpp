@@ -19,6 +19,19 @@ namespace minty {
         return connect().send<std::string>(event::add_post, parts);
     }
 
+    auto api::add_post_objects(
+        std::string_view post_id,
+        std::span<std::string> objects,
+        std::int16_t position
+    ) -> std::string {
+        return connect().send<std::string>(
+            event::add_post_objects,
+            post_id,
+            objects,
+            position
+        );
+    }
+
     auto api::add_post_tag(
         std::string_view post_id,
         std::string_view tag_id
@@ -68,6 +81,17 @@ namespace minty {
 
     auto api::delete_post(std::string_view id) -> void {
         connect().send<void>(event::delete_post, id);
+    }
+
+    auto api::delete_post_objects(
+        std::string_view post_id,
+        std::span<const std::string_view> objects
+    ) -> std::string {
+        return connect().send<std::string>(
+            event::delete_post_objects,
+            post_id,
+            objects
+        );
     }
 
     auto api::delete_post_tag(
@@ -156,6 +180,28 @@ namespace minty {
         return connect().send<core::search_result<core::tag_preview>>(
             event::get_tags,
             query
+        );
+    }
+
+    auto api::set_post_description(
+        std::string_view post_id,
+        std::string_view description
+    ) -> core::modification<std::optional<std::string>> {
+        return connect().send<core::modification<std::optional<std::string>>>(
+            event::set_post_description,
+            post_id,
+            description
+        );
+    }
+
+    auto api::set_post_title(
+        std::string_view post_id,
+        std::string_view title
+    ) -> core::modification<std::optional<std::string>> {
+        return connect().send<core::modification<std::optional<std::string>>>(
+            event::set_post_title,
+            post_id,
+            title
         );
     }
 

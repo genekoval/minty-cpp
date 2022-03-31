@@ -15,7 +15,7 @@ namespace minty::repo::db {
         c.prepare("create_comment", {"integer", "integer", "text"});
         c.prepare("create_object", {"uuid", "uuid", "integer"});
         c.prepare("create_post", {"text", "text", "uuid[]", "integer[]"});
-        c.prepare("create_post_objects", {"integer", "uuid[]", "integer"});
+        c.prepare("create_post_objects", {"integer", "uuid[]", "smallint"});
         c.prepare("create_post_tag", {"integer", "integer"});
         c.prepare("create_related_post", {"integer", "integer"});
         c.prepare("create_site", {"text", "text", "uuid"});

@@ -3,6 +3,14 @@
 using namespace commline;
 
 namespace minty::cli::opts {
+    auto add_tags() -> commline::list<std::string> {
+        return {
+            {"t", "tag"},
+            "Add a tag",
+            "id"
+        };
+    }
+
     auto aliases() -> list<std::string_view> {
         return {
             {"a", "alias"},
@@ -11,7 +19,7 @@ namespace minty::cli::opts {
         };
     }
 
-    auto description() -> option<std::optional<std::string_view>> {
+    auto description() -> option<std::optional<std::string>> {
         return {
             {"d", "description"},
             "Set the description",
@@ -19,7 +27,7 @@ namespace minty::cli::opts {
         };
     }
 
-    auto from() -> option<int> {
+    auto from() -> option<unsigned int> {
         return {
             {"f", "from"},
             "Result offset",
@@ -44,7 +52,7 @@ namespace minty::cli::opts {
         };
     }
 
-    auto size() -> option<int> {
+    auto size() -> option<unsigned int> {
         return {
             {"n", "size"},
             "Result size",
@@ -58,6 +66,14 @@ namespace minty::cli::opts {
             {"t", "tag"},
             "Post tags",
             "id"
+        };
+    }
+
+    auto title() -> commline::option<std::optional<std::string>> {
+        return {
+            {"T", "title"},
+            "Set the title",
+            "text"
         };
     }
 }

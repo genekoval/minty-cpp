@@ -15,14 +15,14 @@ auto DatabasePostObjectTest::create_post_with_objects() -> std::string {
 }
 
 auto DatabasePostObjectTest::insert_object(
-    unsigned int position
+    std::int16_t position
 ) -> std::vector<minty::test::sequence_object> {
     return insert_objects({new_object}, position);
 }
 
 auto DatabasePostObjectTest::insert_objects(
     const std::vector<std::string>& objects,
-    unsigned int position
+    std::int16_t position
 ) -> std::vector<minty::test::sequence_object> {
     database.create_post_objects(post_id, objects, position);
     return with_sequence();

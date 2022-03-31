@@ -58,6 +58,12 @@ namespace minty {
 
         auto add_post(const core::post_parts& parts) -> std::string;
 
+        auto add_post_objects(
+            std::string_view post_id,
+            std::span<std::string> objects,
+            std::int16_t position
+        ) -> std::string;
+
         auto add_post_tag(
             std::string_view post_id,
             std::string_view tag_id
@@ -81,6 +87,11 @@ namespace minty {
         ) -> core::source;
 
         auto delete_post(std::string_view id) -> void;
+
+        auto delete_post_objects(
+            std::string_view post_id,
+            std::span<const std::string_view> objects
+        ) -> std::string;
 
         auto delete_post_tag(
             std::string_view post_id,
@@ -123,6 +134,16 @@ namespace minty {
         auto get_tags(
             const core::tag_query& query
         ) -> core::search_result<core::tag_preview>;
+
+        auto set_post_description(
+            std::string_view post_id,
+            std::string_view description
+        ) -> core::modification<std::optional<std::string>>;
+
+        auto set_post_title(
+            std::string_view post_id,
+            std::string_view title
+        ) -> core::modification<std::optional<std::string>>;
 
         auto set_tag_description(
             std::string_view tag_id,

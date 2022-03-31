@@ -17,6 +17,20 @@ TEST_F(DatabasePostObjectTest, AppendPostObject) {
     ASSERT_EQ(4, results.back().sequence);
 }
 
+TEST_F(DatabasePostObjectTest, AppendPostObjectLargeSequence) {
+    const auto results = insert_object(
+        std::numeric_limits<std::int16_t>::max()
+    );
+
+    ASSERT_EQ(4, results.back().sequence);
+}
+
+TEST_F(DatabasePostObjectTest, AppendPostObjectNegativeSequence) {
+    const auto results = insert_object(-1);
+
+    ASSERT_EQ(4, results.back().sequence);
+}
+
 TEST_F(DatabasePostObjectTest, InsertPostObject) {
     const auto results = insert_object(1);
 
@@ -36,13 +50,13 @@ TEST_F(DatabasePostObjectTest, InsertMultiplePostObjects) {
     const auto additional = "c3563941-473d-4ed1-9ea8-ef9569642443";
     database.create_object(additional, {}, {});
 
-    const auto results = insert_objects({new_object, additional}, 1);
+    const auto results = insert_objects({new_object, additional}, 0);
 
     ASSERT_EQ(5, results.size());
 
-    ASSERT_EQ(objects[0], results[0].id);
-    ASSERT_EQ(new_object, results[1].id);
-    ASSERT_EQ(additional, results[2].id);
+    ASSERT_EQ(new_object, results[0].id);
+    ASSERT_EQ(additional, results[1].id);
+    ASSERT_EQ(objects[0], results[2].id);
     ASSERT_EQ(objects[1], results[3].id);
     ASSERT_EQ(objects[2], results[4].id);
 

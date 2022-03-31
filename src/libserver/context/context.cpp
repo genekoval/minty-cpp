@@ -41,7 +41,7 @@ namespace minty::server {
     auto context::add_post_objects(
         std::string post_id,
         std::vector<std::string> objects,
-        unsigned int position
+        std::int16_t position
     ) -> std::string {
         return api->add_post_objects(post_id, objects, position);
     }

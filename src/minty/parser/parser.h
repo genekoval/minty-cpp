@@ -5,5 +5,9 @@
 
 namespace commline {
     template <>
-    auto parse(std::string_view argument) -> minty::core::post_query::sort_type;
+    struct parser<minty::core::post_query::sort_type> {
+        static auto parse(
+            std::string_view argument
+        ) -> minty::core::post_query::sort_type;
+    };
 }

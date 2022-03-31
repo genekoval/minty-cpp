@@ -5,7 +5,7 @@ namespace minty::repo::db {
     auto database::create_post_objects(
         std::string_view post_id,
         const std::vector<std::string>& objects,
-        unsigned int position
+        std::int16_t position
     ) -> std::string {
         return ntx()
             .exec_prepared1(__FUNCTION__, post_id, objects, position)[0]

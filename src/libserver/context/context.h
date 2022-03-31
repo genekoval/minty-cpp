@@ -30,7 +30,7 @@ namespace minty::server {
         auto add_post_objects(
             std::string post_id,
             std::vector<std::string> objects,
-            unsigned int position
+            std::int16_t position
         ) -> std::string;
 
         auto add_post_tag(std::string post_id, std::string tag_id) -> void;

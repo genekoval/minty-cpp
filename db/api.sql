@@ -326,14 +326,31 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_post_objects(
     a_post_id       integer,
     a_objects       uuid[],
-    a_position      integer
+    a_position      smallint
 ) RETURNS timestamptz AS $$
+-- Largest possible smallint
+DECLARE l_greatest_sequence CONSTANT smallint := 32767;
+DECLARE l_position smallint;
 BEGIN
+    l_position := CASE
+        WHEN a_position < 0
+            THEN l_greatest_sequence
+            ELSE a_position
+        END;
+
+    l_position := (
+        SELECT least(l_position, (
+            SELECT max(sequence)
+            FROM data.post_object
+            WHERE post_id = a_post_id
+        ))
+    );
+
     UPDATE data.post_object
     SET sequence = sequence + cardinality(a_objects)
-    WHERE post_id = a_post_id AND sequence > a_position;
+    WHERE post_id = a_post_id AND sequence > l_position;
 
-    PERFORM insert_post_objects(a_post_id, a_objects, a_position);
+    PERFORM insert_post_objects(a_post_id, a_objects, l_position);
 
     RETURN read_post_date_modified(a_post_id);
 END;
@@ -605,7 +622,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION insert_post_objects(
     a_post_id       integer,
     a_objects       uuid[],
-    a_position      integer DEFAULT 0
+    a_position      smallint DEFAULT 0
 ) RETURNS void AS $$
 BEGIN
     WITH objects AS (
@@ -678,7 +695,7 @@ BEGIN
                     WHERE post_id = a_post_id AND object_id = a_destination
                 )
             END
-        )
+        )::smallint
     );
 
     RETURN read_post_date_modified(a_post_id);

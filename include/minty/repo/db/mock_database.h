@@ -28,7 +28,7 @@ namespace minty::test {
         MOCK_METHOD(std::string, create_post_objects, (
             std::string_view post_id,
             const std::vector<std::string>& objects,
-            unsigned int position
+            std::int16_t position
         ), (override));
 
         MOCK_METHOD(void, create_post_tag, (

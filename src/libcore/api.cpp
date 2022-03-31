@@ -126,7 +126,7 @@ namespace minty::core {
     auto api::add_post_objects(
         std::string_view post_id,
         const std::vector<std::string>& objects,
-        unsigned int position
+        std::int16_t position
     ) -> std::string {
         TIMBER_FUNC();
 

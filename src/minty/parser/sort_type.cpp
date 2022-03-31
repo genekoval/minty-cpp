@@ -64,8 +64,7 @@ namespace {
 }
 
 namespace commline {
-    template <>
-    auto parse(
+    auto parser<minty::core::post_query::sort_type>::parse(
         std::string_view argument
     ) -> minty::core::post_query::sort_type {
         const auto delim = argument.find(delimiter);

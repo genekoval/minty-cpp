@@ -9,14 +9,14 @@ using namespace commline;
 namespace {
     auto $find(
         const commline::app& app,
-        int from,
-        int size,
+        unsigned int from,
+        unsigned int size,
         std::optional<std::string_view> path,
         const std::string& name
     ) -> void {
         const auto query = minty::core::tag_query {
-            .from = static_cast<unsigned int>(from),
-            .size = static_cast<unsigned int>(size),
+            .from = from,
+            .size = size,
             .name = name
         };
 
@@ -25,7 +25,7 @@ namespace {
     }
 }
 
-namespace minty::commands {
+namespace minty::subcommands::tag {
     auto find() -> std::unique_ptr<command_node> {
         return command(
             __FUNCTION__,
