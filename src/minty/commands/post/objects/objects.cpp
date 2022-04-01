@@ -34,6 +34,7 @@ namespace minty::subcommands::post {
         );
 
         cmd->subcommand(post_objects::add());
+        cmd->subcommand(post_objects::mv());
         cmd->subcommand(post_objects::rm());
 
         return cmd;

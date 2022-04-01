@@ -183,6 +183,19 @@ namespace minty {
         );
     }
 
+    auto api::move_post_objects(
+        std::string_view post_id,
+        std::span<const std::string_view> objects,
+        std::optional<std::string_view> destination
+    ) -> std::string {
+        return connect().send<std::string>(
+            event::move_post_objects,
+            post_id,
+            objects,
+            destination
+        );
+    }
+
     auto api::set_post_description(
         std::string_view post_id,
         std::string_view description

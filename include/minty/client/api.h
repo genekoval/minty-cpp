@@ -100,6 +100,12 @@ namespace minty {
             const core::tag_query& query
         ) -> core::search_result<core::tag_preview>;
 
+        auto move_post_objects(
+            std::string_view post_id,
+            std::span<const std::string_view> objects,
+            std::optional<std::string_view> destination
+        ) -> std::string;
+
         auto set_post_description(
             std::string_view post_id,
             std::string_view description
