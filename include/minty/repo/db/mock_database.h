@@ -19,8 +19,8 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(repo::db::post_search, create_post, (
-            std::optional<std::string_view> title,
-            std::optional<std::string_view> description,
+            std::string_view title,
+            std::string_view description,
             const std::vector<std::string>& objects,
             const std::vector<std::string>& tags
         ), (override));

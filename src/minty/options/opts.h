@@ -7,7 +7,7 @@ namespace minty::cli::opts {
 
     auto aliases() -> commline::list<std::string_view>;
 
-    auto description() -> commline::option<std::optional<std::string>>;
+    auto description() -> commline::option<std::string>;
 
     auto from() -> commline::option<unsigned int>;
 
@@ -19,5 +19,5 @@ namespace minty::cli::opts {
 
     auto tags() -> commline::list<std::string>;
 
-    auto title() -> commline::option<std::optional<std::string>>;
+    auto title() -> commline::option<std::string>;
 }

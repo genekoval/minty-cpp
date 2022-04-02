@@ -9,8 +9,8 @@ namespace {
     namespace internal {
         auto add(
             const app& app,
-            std::optional<std::string> title,
-            std::optional<std::string> description,
+            std::string title,
+            std::string description,
             const std::vector<std::string>& tags,
             const std::vector<std::string_view>& objects
         ) -> void {

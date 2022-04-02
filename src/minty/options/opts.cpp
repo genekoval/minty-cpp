@@ -19,7 +19,7 @@ namespace minty::cli::opts {
         };
     }
 
-    auto description() -> option<std::optional<std::string>> {
+    auto description() -> option<std::string> {
         return {
             {"d", "description"},
             "Set the description",
@@ -69,7 +69,7 @@ namespace minty::cli::opts {
         };
     }
 
-    auto title() -> commline::option<std::optional<std::string>> {
+    auto title() -> commline::option<std::string> {
         return {
             {"T", "title"},
             "Set the title",

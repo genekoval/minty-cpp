@@ -1,10 +1,10 @@
+#include "utility.h"
+
 #include <minty/core/api.h>
 #include <minty/core/downloader.h>
 #include <minty/core/preview.h>
 #include <minty/core/search.h>
 
-#include <ext/string.h>
-#include <fmt/format.h>
 #include <uri/uri>
 
 namespace minty::core {
@@ -28,7 +28,12 @@ namespace minty::core {
     ) -> comment {
         TIMBER_FUNC();
 
-        const auto comment = db->create_comment(post_id, parent_id, content);
+        const auto comment = db->create_comment(
+            post_id,
+            parent_id,
+            format_comment(content)
+        );
+
         return {
             comment.id,
             comment.content,
@@ -103,12 +108,8 @@ namespace minty::core {
         TIMBER_FUNC();
 
         const auto result = db->create_post(
-            parts.title ?
-                ext::trim(parts.title.value()) :
-                parts.title,
-            parts.description ?
-                ext::trim(parts.description.value()) :
-                parts.description,
+            format_title(parts.title),
+            format_description(parts.description),
             parts.objects,
             parts.tags
         );
@@ -160,8 +161,7 @@ namespace minty::core {
     auto api::add_source(std::string_view url) -> source {
         constexpr auto host_prefix = std::string_view("www.");
 
-        const auto url_string = ext::trim(std::string(url));
-        const auto uri = uri::uri(url_string);
+        const auto uri = uri::uri(std::string(url));
 
         const auto scheme = uri.scheme();
         auto host = uri.host();
@@ -213,10 +213,10 @@ namespace minty::core {
     auto api::add_tag(std::string_view name) -> std::string {
         TIMBER_FUNC();
 
-        const auto name_formatted = ext::trim(std::string(name));
-        const auto id = db->create_tag(name_formatted);
+        const auto formatted = format_tag(name);
+        const auto id = db->create_tag(formatted);
 
-        search->add_tag_alias(id, name_formatted);
+        search->add_tag_alias(id, formatted);
 
         return id;
     }
@@ -227,10 +227,10 @@ namespace minty::core {
     ) -> tag_name {
         TIMBER_FUNC();
 
-        const auto alias_formatted = ext::trim(std::string(alias));
-        const auto name = db->create_tag_alias(tag_id, alias_formatted);
+        const auto formatted = format_tag(alias);
+        const auto name = db->create_tag_alias(tag_id, formatted);
 
-        search->add_tag_alias(tag_id, alias_formatted);
+        search->add_tag_alias(tag_id, formatted);
 
         return name;
     }
@@ -508,17 +508,9 @@ namespace minty::core {
     ) -> std::string {
         TIMBER_FUNC();
 
-        const auto formatted = ext::replace(
-            ext::trim(std::string(content)),
-            std::regex("\r"),
-            [](const auto&) -> std::string { return "\n"; }
-        );
-
-        if (formatted.empty()) {
-            throw std::runtime_error("comment cannot be empty");
-        }
-
+        const auto formatted = format_comment(content);
         db->update_comment(comment_id, formatted);
+
         return formatted;
     }
 
@@ -530,11 +522,7 @@ namespace minty::core {
 
         const auto update = db->update_post_description(
             post_id,
-            ext::replace(
-                ext::trim(std::string(description)),
-                std::regex("\r"),
-                [](const auto&) -> std::string { return "\n"; }
-            )
+            format_description(description)
         );
         search->update_post_description(update);
         return {
@@ -549,11 +537,9 @@ namespace minty::core {
     ) -> modification<std::optional<std::string>> {
         TIMBER_FUNC();
 
-        const auto update = db->update_post_title(
-            post_id,
-            ext::trim(std::string(title))
-        );
+        const auto update = db->update_post_title(post_id, format_title(title));
         search->update_post_title(update);
+
         return {
             .date_modified = update.date_modified,
             .new_value = update.new_data
@@ -568,11 +554,7 @@ namespace minty::core {
 
         return db->update_tag_description(
             tag_id,
-            ext::replace(
-                ext::trim(std::string(description)),
-                std::regex("\r"),
-                [](const auto&) -> std::string { return "\n"; }
-            )
+            format_description(description)
         );
     }
 
@@ -582,14 +564,14 @@ namespace minty::core {
     ) -> tag_name {
         TIMBER_FUNC();
 
-        const auto name_formatted = ext::trim(std::string(new_name));
-        const auto update  = db->update_tag_name(tag_id, name_formatted);
+        const auto formatted = format_tag(new_name);
+        const auto update  = db->update_tag_name(tag_id, formatted);
 
         if (update.old_name) {
             search->update_tag_name(
                 tag_id,
                 update.old_name.value(),
-                name_formatted
+                formatted
             );
         }
 

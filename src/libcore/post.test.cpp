@@ -16,8 +16,8 @@ class CorePostTest : public CoreTest { };
 
 TEST_F(CorePostTest, AddPostWhitespaceTitle) {
     EXPECT_CALL(db, create_post(
-        Optional(std::string_view(trimmed_text)),
-        Eq(std::nullopt),
+        std::string_view(trimmed_text),
+        std::string_view(),
         std::vector<std::string>(),
         std::vector<std::string>()
     )).WillOnce(Return(post_search));
@@ -29,8 +29,8 @@ TEST_F(CorePostTest, AddPostWhitespaceTitle) {
 
 TEST_F(CorePostTest, AddPostWhitespaceDescription) {
     EXPECT_CALL(db, create_post(
-        Eq(std::nullopt),
-        Optional(std::string_view(trimmed_text)),
+        std::string_view(),
+        std::string_view(trimmed_text),
         std::vector<std::string>(),
         std::vector<std::string>()
     )).WillOnce(Return(post_search));
