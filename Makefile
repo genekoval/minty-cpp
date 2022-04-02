@@ -68,9 +68,11 @@ define $(cli).libs
  commline
  conftools
  conf
+ date
  fmt
  fstore
  netcore
+ pthread
  timber
  yaml-cpp
 endef
