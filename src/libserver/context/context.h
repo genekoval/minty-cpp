@@ -37,6 +37,11 @@ namespace minty::server {
 
         auto add_related_post(std::string post_id, std::string related) -> void;
 
+        auto add_reply(
+            std::string parent_id,
+            std::string content
+        ) -> core::comment;
+
         auto add_tag(std::string name) -> std::string;
 
         auto add_tag_alias(

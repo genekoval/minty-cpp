@@ -52,6 +52,11 @@ namespace minty::repo::db {
             std::string_view tag_id
         ) -> void;
 
+        VIRTUAL auto create_reply(
+            std::string_view parent_id,
+            std::string_view content
+        ) -> comment;
+
         VIRTUAL auto create_related_post(
             std::string_view post_id,
             std::string_view related

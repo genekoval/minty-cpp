@@ -41,6 +41,11 @@ namespace minty::test {
             std::string_view related
         ), (override));
 
+        MOCK_METHOD(repo::db::comment, create_reply, (
+            std::string_view parent_id,
+            std::string_view content
+        ), (override));
+
         MOCK_METHOD(repo::db::site, create_site, (
             std::string_view scheme,
             std::string_view name,

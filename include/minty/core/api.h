@@ -79,6 +79,11 @@ namespace minty::core {
             std::string_view related
         ) -> void;
 
+        auto add_reply(
+            std::string_view parent_id,
+            std::string_view content
+        ) -> comment;
+
         auto add_tag(std::string_view name) -> std::string;
 
         auto add_tag_alias(

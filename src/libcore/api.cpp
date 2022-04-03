@@ -158,6 +158,25 @@ namespace minty::core {
         db->create_related_post(post_id, related);
     }
 
+    auto api::add_reply(
+        std::string_view parent_id,
+        std::string_view content
+    ) -> comment {
+        TIMBER_FUNC();
+
+        const auto comment = db->create_reply(
+            parent_id,
+            format_comment(content)
+        );
+
+        return {
+            comment.id,
+            comment.content,
+            comment.indent,
+            comment.date_created
+        };
+    }
+
     auto api::add_source(std::string_view url) -> source {
         constexpr auto host_prefix = std::string_view("www.");
 

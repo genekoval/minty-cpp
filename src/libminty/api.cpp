@@ -8,6 +8,19 @@ namespace minty {
         return client(errors, net::socket(netcore::connect(endpoint)));
     }
 
+    auto api::add_comment(
+        std::string_view post_id,
+        std::optional<std::string_view> parent_id,
+        std::string_view content
+    ) -> core::comment {
+        return connect().send<core::comment>(
+            event::add_comment,
+            post_id,
+            parent_id,
+            content
+        );
+    }
+
     auto api::add_object_local(std::string_view path) -> std::string {
         return connect().send<std::string>(
             event::add_object_local,
@@ -48,6 +61,17 @@ namespace minty {
         std::string_view related
     ) -> void {
         return connect().send<void>(event::add_related_post, post_id, related);
+    }
+
+    auto api::add_reply(
+        std::string_view parent_id,
+        std::string_view content
+    ) -> core::comment {
+        return connect().send<core::comment>(
+            event::add_reply,
+            parent_id,
+            content
+        );
     }
 
     auto api::add_tag(std::string_view name) -> std::string {

@@ -70,6 +70,7 @@ auto main(int argc, const char** argv) -> int {
 
     app.subcommand(minty::commands::object());
     app.subcommand(minty::commands::post());
+    app.subcommand(minty::commands::reply());
     app.subcommand(minty::commands::tag());
 
     return app.run(argc, argv);

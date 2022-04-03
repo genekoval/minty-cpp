@@ -60,6 +60,13 @@ namespace minty::server {
         api->add_related_post(post_id, related);
     }
 
+    auto context::add_reply(
+        std::string parent_id,
+        std::string content
+    ) -> core::comment {
+        return api->add_reply(parent_id, content);
+    }
+
     auto context::add_tag(std::string name) -> std::string {
         return api->add_tag(name);
 	}

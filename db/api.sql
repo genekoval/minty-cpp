@@ -377,6 +377,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_reply(
+    a_parent_id     integer,
+    a_content       text
+) RETURNS SETOF data.post_comment AS $$
+DECLARE l_parent record;
+BEGIN
+    SELECT post_id, indent
+    INTO l_parent
+    FROM data.post_comment
+    WHERE comment_id = a_parent_id;
+
+    RETURN QUERY
+    INSERT INTO data.post_comment(
+        post_id,
+        parent_id,
+        indent,
+        content
+    ) VALUES (
+        l_parent.post_id,
+        a_parent_id,
+        l_parent.indent + 1,
+        a_content
+    ) RETURNING *;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_site(
     a_scheme        text,
     a_host          text,

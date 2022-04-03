@@ -12,6 +12,7 @@ namespace minty {
         add_post_objects,
         add_post_tag,
         add_related_post,
+        add_reply,
         add_tag,
         add_tag_alias,
         add_tag_source,

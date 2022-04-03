@@ -27,6 +27,7 @@ namespace {
             &context::add_post_objects,
             &context::add_post_tag,
             &context::add_related_post,
+            &context::add_reply,
             &context::add_tag,
             &context::add_tag_alias,
             &context::add_tag_source,

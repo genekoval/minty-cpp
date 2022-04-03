@@ -19,6 +19,12 @@ namespace minty {
     public:
         api(std::string_view endpoint);
 
+        auto add_comment(
+            std::string_view post_id,
+            std::optional<std::string_view> parent_id,
+            std::string_view content
+        ) -> core::comment;
+
         auto add_object_local(std::string_view path) -> std::string;
 
         auto add_post(const core::post_parts& parts) -> std::string;
@@ -38,6 +44,11 @@ namespace minty {
             std::string_view post_id,
             std::string_view related
         ) -> void;
+
+        auto add_reply(
+            std::string_view parent_id,
+            std::string_view content
+        ) -> core::comment;
 
         auto add_tag(std::string_view name) -> std::string;
 
