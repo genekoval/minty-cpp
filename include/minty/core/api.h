@@ -46,7 +46,6 @@ namespace minty::core {
 
         auto add_comment(
             std::string_view post_id,
-            std::optional<std::string_view> parent_id,
             std::string_view content
         ) -> comment;
 

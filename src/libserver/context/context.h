@@ -13,7 +13,6 @@ namespace minty::server {
 
         auto add_comment(
             std::string post_id,
-            std::optional<std::string> parent_id,
             std::string content
         ) -> core::comment;
 

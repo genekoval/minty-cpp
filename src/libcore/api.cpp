@@ -23,14 +23,12 @@ namespace minty::core {
 
     auto api::add_comment(
         std::string_view post_id,
-        std::optional<std::string_view> parent_id,
         std::string_view content
     ) -> comment {
         TIMBER_FUNC();
 
         const auto comment = db->create_comment(
             post_id,
-            parent_id,
             format_comment(content)
         );
 

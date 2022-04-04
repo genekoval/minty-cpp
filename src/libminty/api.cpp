@@ -10,13 +10,11 @@ namespace minty {
 
     auto api::add_comment(
         std::string_view post_id,
-        std::optional<std::string_view> parent_id,
         std::string_view content
     ) -> core::comment {
         return connect().send<core::comment>(
             event::add_comment,
             post_id,
-            parent_id,
             content
         );
     }

@@ -56,7 +56,7 @@ CREATE TABLE post_comment (
     comment_id      SERIAL PRIMARY KEY,
     post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
     parent_id       integer REFERENCES post_comment ON DELETE NO ACTION,
-    indent          integer NOT NULL,
+    indent          integer NOT NULL DEFAULT 0,
     content         text NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW()
 );

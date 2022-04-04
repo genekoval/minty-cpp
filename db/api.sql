@@ -216,26 +216,15 @@ CREATE TYPE tag_text AS (
 
 CREATE FUNCTION create_comment(
     a_post_id       integer,
-    a_parent_id     integer,
     a_content       text
 ) RETURNS SETOF data.post_comment AS $$
 BEGIN
     RETURN QUERY
     INSERT INTO data.post_comment (
         post_id,
-        parent_id,
-        indent,
         content
     ) VALUES (
         a_post_id,
-        a_parent_id,
-        (
-            SELECT coalesce((
-                SELECT indent + 1
-                FROM data.post_comment
-                WHERE comment_id = a_parent_id
-            ), 0)
-        ),
         a_content
     ) RETURNING *;
 END;

@@ -8,10 +8,9 @@ namespace minty::server {
 
     auto context::add_comment(
         std::string post_id,
-        std::optional<std::string> parent_id,
         std::string content
     ) -> core::comment {
-        return api->add_comment(post_id, parent_id, content);
+        return api->add_comment(post_id, content);
 	}
 
     auto context::add_object_data(

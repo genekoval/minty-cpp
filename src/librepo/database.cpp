@@ -12,7 +12,7 @@ namespace minty::repo::db {
     {
         auto c = entix::connection(*connection);
 
-        c.prepare("create_comment", {"integer", "integer", "text"});
+        c.prepare("create_comment", {"integer", "text"});
         c.prepare("create_object", {"uuid", "uuid", "integer"});
         c.prepare("create_post", {"text", "text", "uuid[]", "integer[]"});
         c.prepare("create_post_objects", {"integer", "uuid[]", "smallint"});

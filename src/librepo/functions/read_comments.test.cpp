@@ -11,7 +11,7 @@ TEST_F(DatabasePostTest, ReadOneComment) {
     constexpr auto text = "First post.";
 
     const auto post_id = create_post();
-    const auto comment = database.create_comment(post_id, {}, text);
+    const auto comment = database.create_comment(post_id, text);
 
     auto comments = database.read_comments(post_id);
 
@@ -22,11 +22,11 @@ TEST_F(DatabasePostTest, ReadOneComment) {
 TEST_F(DatabasePostTest, ReadNestedComments) {
     const auto post_id = create_post();
 
-    const auto root1 = database.create_comment(post_id, {}, "Root 1");
-    const auto child1 = database.create_comment(post_id, root1.id, "Child 1");
+    const auto root1 = database.create_comment(post_id, "Root 1");
+    const auto child1 = database.create_reply(root1.id, "Child 1");
 
-    const auto root2 = database.create_comment(post_id, {}, "Root 2");
-    const auto child2 = database.create_comment(post_id, root2.id, "Child 2");
+    const auto root2 = database.create_comment(post_id, "Root 2");
+    const auto child2 = database.create_reply(root2.id, "Child 2");
 
     const auto comments = database.read_comments(post_id);
 

@@ -9,26 +9,17 @@ using testing::Return;
 class CoreCommentTest : public CoreTest {
 protected:
     const std::string post_id = "1";
-
-    auto add_root_comment(std::string_view content) -> minty::core::comment {
-        return api.add_comment(post_id, {}, content);
-    }
-
-    auto add_child_comment(
-        const minty::core::comment root,
-        std::string_view content
-    ) -> minty::core::comment {
-        return api.add_comment(post_id, root.id, content);
-    }
 };
 
 TEST_F(CoreCommentTest, AddRootComment) {
     constexpr auto content = "First comment.";
 
-    EXPECT_CALL(db, create_comment(post_id, std::optional<std::string_view>(), content))
-        .WillOnce(Return(minty::repo::db::comment { .content = content }));
+    EXPECT_CALL(db, create_comment(
+        post_id,
+        content)
+    ).WillOnce(Return(minty::repo::db::comment { .content = content }));
 
-    const auto comment = add_root_comment(content);
+    const auto comment = api.add_comment(post_id, content);
 
     ASSERT_EQ(content, comment.content);
 }
