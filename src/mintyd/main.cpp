@@ -42,7 +42,7 @@ namespace {
             .object_source = {
                 .host = settings.fstore.proxy.host,
                 .port = settings.fstore.proxy.port,
-                .bucket_id = std::string(container.bucket_id())
+                .bucket_id = UUID::uuid(container.bucket_id())
             }
         };
 
