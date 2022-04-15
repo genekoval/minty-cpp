@@ -2,6 +2,7 @@
 
 #include <minty/minty>
 #include <commline/commline>
+#include <uuid++/commline>
 
 namespace commline {
     template <>

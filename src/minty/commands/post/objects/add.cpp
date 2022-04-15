@@ -1,6 +1,7 @@
 #include "commands.h"
 
 #include "../../../client.h"
+#include "../../../parser/parser.h"
 
 using namespace commline;
 
@@ -10,14 +11,14 @@ namespace {
             const app& app,
             std::int16_t index,
             std::string_view id,
-            const std::vector<std::string_view>& objects
+            const std::vector<UUID::uuid>& objects
         ) -> void {
             auto api = minty::cli::client();
 
-            auto uploaded = std::vector<std::string>();
+            auto uploaded = std::vector<UUID::uuid>();
 
             for (const auto& object : objects) {
-                uploaded.push_back(minty::cli::add_object(api, object));
+                uploaded.push_back(minty::cli::add_object(api, object).id);
             }
 
             if (!uploaded.empty()) api.add_post_objects(id, uploaded, index);
@@ -40,7 +41,7 @@ namespace minty::subcommands::post_objects {
             ),
             arguments(
                 required<std::string_view>("id"),
-                variadic<std::string_view>("objects")
+                variadic<UUID::uuid>("objects")
             ),
             internal::add
         );

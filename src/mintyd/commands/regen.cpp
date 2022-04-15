@@ -2,13 +2,15 @@
 #include "commands.h"
 #include "options/opts.h"
 
+#include <uuid++/commline>
+
 using namespace commline;
 
 namespace {
     auto $regen(
         const commline::app& app,
         std::string_view confpath,
-        std::string_view id
+        const UUID::uuid& id
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
         auto container = minty::cli::api_container(settings);
@@ -35,7 +37,7 @@ namespace minty::cli {
                 opts::config(confpath)
             ),
             arguments(
-                required<std::string_view>("id")
+                required<UUID::uuid>("id")
             ),
             $regen
         );

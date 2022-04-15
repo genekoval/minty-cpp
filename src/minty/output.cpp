@@ -185,4 +185,11 @@ namespace YAML {
 
         return out;
     }
+
+    auto operator<<(
+        Emitter& out,
+        const UUID::uuid& uuid
+    ) -> Emitter& {
+        return out << uuid.string().data();
+    }
 }

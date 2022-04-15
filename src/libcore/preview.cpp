@@ -8,7 +8,7 @@ namespace {
     using preview_generator = auto (*)(
         minty::core::object_store&,
         const fstore::object_meta&
-    ) -> std::optional<std::string>;
+    ) -> std::optional<UUID::uuid>;
 
     const auto generators =
         std::unordered_map<std::string_view, preview_generator> {
@@ -36,7 +36,7 @@ namespace minty::core {
 
     auto preview_service::generate_preview(
         const fstore::object_meta& object
-    ) -> std::optional<std::string> {
+    ) -> std::optional<UUID::uuid> {
         auto* generator = get_preview_generator(object);
 
         if (!generator) {

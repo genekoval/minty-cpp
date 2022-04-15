@@ -1,5 +1,6 @@
 #include "commands.h"
 #include "../../client.h"
+#include "../../parser/parser.h"
 
 #include <fstream>
 
@@ -12,7 +13,7 @@ namespace {
         auto get(
             const app& app,
             bool no_clobber,
-            std::string_view id,
+            const UUID::uuid& id,
             std::optional<std::string_view> file
         ) -> void {
             auto bucket = minty::cli::bucket();
@@ -24,7 +25,7 @@ namespace {
 
             auto path = fs::path(*file);
 
-            if (fs::is_directory(path)) path = path / id;
+            if (fs::is_directory(path)) path = path / id.string();
             if (no_clobber && fs::exists(path)) return;
 
             auto out = std::ofstream(path);
@@ -42,7 +43,7 @@ namespace minty::subcommands::object {
                 flag({"n", "no-clobber"}, "Do not overwrite an existing file")
             ),
             arguments(
-                required<std::string_view>("id"),
+                required<UUID::uuid>("id"),
                 optional<std::string_view>("file")
             ),
             internal::get

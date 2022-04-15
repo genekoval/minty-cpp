@@ -24,13 +24,13 @@ namespace minty {
             std::string_view content
         ) -> core::comment;
 
-        auto add_object_local(std::string_view path) -> std::string;
+        auto add_object_local(std::string_view path) -> core::object_preview;
 
         auto add_post(const core::post_parts& parts) -> std::string;
 
         auto add_post_objects(
             std::string_view post_id,
-            std::span<std::string> objects,
+            std::span<const UUID::uuid> objects,
             std::int16_t position
         ) -> std::string;
 
@@ -65,7 +65,7 @@ namespace minty {
 
         auto delete_post_objects(
             std::string_view post_id,
-            std::span<const std::string_view> objects
+            std::span<const UUID::uuid> objects
         ) -> std::string;
 
         auto delete_post_tag(
@@ -94,7 +94,7 @@ namespace minty {
             std::string_view post_id
         ) -> std::vector<core::comment>;
 
-        auto get_object(std::string_view object_id) -> core::object;
+        auto get_object(const UUID::uuid& object_id) -> core::object;
 
         auto get_post(std::string_view id) -> core::post;
 
@@ -112,8 +112,8 @@ namespace minty {
 
         auto move_post_objects(
             std::string_view post_id,
-            std::span<const std::string_view> objects,
-            std::optional<std::string_view> destination
+            std::span<const UUID::uuid> objects,
+            const std::optional<UUID::uuid>& destination
         ) -> std::string;
 
         auto set_post_description(

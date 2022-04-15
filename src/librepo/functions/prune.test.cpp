@@ -48,7 +48,7 @@ TEST_F(DatabasePruneTest, PrunePostObject) {
     const auto site = create_site();
     const auto source = database.create_source(site, "/prune").id;
     database.create_object(object_id, {}, source);
-    const auto objects = std::vector<std::string> { object_id };
+    const auto objects = std::vector<UUID::uuid> { object_id };
     const auto post = database.create_post({}, {}, objects, {}).id;
 
     ASSERT_EQ(1, count("object"));

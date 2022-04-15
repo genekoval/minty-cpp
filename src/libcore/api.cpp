@@ -124,7 +124,7 @@ namespace minty::core {
 
     auto api::add_post_objects(
         std::string_view post_id,
-        const std::vector<std::string>& objects,
+        const std::vector<UUID::uuid>& objects,
         std::int16_t position
     ) -> std::string {
         TIMBER_FUNC();
@@ -272,7 +272,7 @@ namespace minty::core {
 
     auto api::delete_post_objects(
         std::string_view post_id,
-        const std::vector<std::string>& objects
+        const std::vector<UUID::uuid>& objects
     ) -> std::string {
         TIMBER_FUNC();
 
@@ -345,7 +345,7 @@ namespace minty::core {
         return build_tree(entities);
     }
 
-    auto api::get_object(std::string_view object_id) -> object {
+    auto api::get_object(const UUID::uuid& object_id) -> object {
         TIMBER_FUNC();
 
         return object(
@@ -391,7 +391,7 @@ namespace minty::core {
         for (auto&& post : posts) {
             const auto obj = post.preview ?
                 post.preview.value().id :
-                std::optional<std::string>();
+                std::optional<UUID::uuid>();
 
             result.emplace_back(
                 std::move(post),
@@ -450,8 +450,8 @@ namespace minty::core {
 
     auto api::move_post_objects(
         std::string_view post_id,
-        const std::vector<std::string>& objects,
-        std::optional<std::string> destination
+        const std::vector<UUID::uuid>& objects,
+        const std::optional<UUID::uuid>& destination
     ) -> std::string {
         TIMBER_FUNC();
 
@@ -497,8 +497,8 @@ namespace minty::core {
     }
 
     auto api::regenerate_preview(
-        std::string_view object_id
-    ) -> std::optional<std::string> {
+        const UUID::uuid& object_id
+    ) -> std::optional<UUID::uuid> {
         TIMBER_FUNC();
 
         const auto metadata = objects->meta(object_id);

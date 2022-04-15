@@ -64,7 +64,7 @@ namespace minty::core {
 
         auto add_post_objects(
             std::string_view post_id,
-            const std::vector<std::string>& objects,
+            const std::vector<UUID::uuid>& objects,
             std::int16_t position
         ) -> std::string;
 
@@ -99,7 +99,7 @@ namespace minty::core {
 
         auto delete_post_objects(
             std::string_view post_id,
-            const std::vector<std::string>& objects
+            const std::vector<UUID::uuid>& objects
         ) -> std::string;
 
         auto delete_post_objects(
@@ -131,7 +131,7 @@ namespace minty::core {
 
         auto get_comments(std::string_view post_id) -> comment_tree;
 
-        auto get_object(std::string_view object_id) -> object;
+        auto get_object(const UUID::uuid& object_id) -> object;
 
         auto get_post(std::string_view id) -> post;
 
@@ -149,15 +149,15 @@ namespace minty::core {
 
         auto move_post_objects(
             std::string_view post_id,
-            const std::vector<std::string>& objects,
-            std::optional<std::string> destination
+            const std::vector<UUID::uuid>& objects,
+            const std::optional<UUID::uuid>& destination
         ) -> std::string;
 
         auto prune() -> void;
 
         auto regenerate_preview(
-            std::string_view object_id
-        ) -> std::optional<std::string>;
+            const UUID::uuid& object_id
+        ) -> std::optional<UUID::uuid>;
 
         auto reindex() -> void;
 

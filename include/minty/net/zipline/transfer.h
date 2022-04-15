@@ -1,3 +1,5 @@
+#include <uuid++/zipline>
+
 #include "transfer/comment.h"
 #include "transfer/object.h"
 #include "transfer/post.h"

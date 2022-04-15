@@ -39,7 +39,7 @@ namespace minty::server {
 
     auto context::add_post_objects(
         std::string post_id,
-        std::vector<std::string> objects,
+        std::vector<UUID::uuid> objects,
         std::int16_t position
     ) -> std::string {
         return api->add_post_objects(post_id, objects, position);
@@ -90,7 +90,7 @@ namespace minty::server {
 
     auto context::delete_post_objects(
         std::string post_id,
-        std::vector<std::string> objects
+        std::vector<UUID::uuid> objects
     ) -> std::string {
         return api->delete_post_objects(post_id, objects);
     }
@@ -138,7 +138,7 @@ namespace minty::server {
         return api->get_comments(post_id);
 	}
 
-    auto context::get_object(std::string object_id) -> core::object {
+    auto context::get_object(UUID::uuid object_id) -> core::object {
         return api->get_object(object_id);
     }
 
@@ -176,8 +176,8 @@ namespace minty::server {
 
     auto context::move_post_objects(
         std::string post_id,
-        std::vector<std::string> objects,
-        std::optional<std::string> destination
+        std::vector<UUID::uuid> objects,
+        std::optional<UUID::uuid> destination
     ) -> std::string {
         return api->move_post_objects(post_id, objects, destination);
     }

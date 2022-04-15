@@ -3,8 +3,8 @@
 namespace minty::repo::db {
     auto database::move_post_objects(
         std::string_view post_id,
-        const std::vector<std::string>& objects,
-        std::optional<std::string> destination
+        const std::vector<UUID::uuid>& objects,
+        const std::optional<UUID::uuid>& destination
     ) -> std::string {
         return ntx().exec_prepared1(
             __FUNCTION__,

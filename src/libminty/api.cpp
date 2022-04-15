@@ -19,8 +19,8 @@ namespace minty {
         );
     }
 
-    auto api::add_object_local(std::string_view path) -> std::string {
-        return connect().send<std::string>(
+    auto api::add_object_local(std::string_view path) -> core::object_preview {
+        return connect().send<core::object_preview>(
             event::add_object_local,
             path
         );
@@ -32,7 +32,7 @@ namespace minty {
 
     auto api::add_post_objects(
         std::string_view post_id,
-        std::span<std::string> objects,
+        std::span<const UUID::uuid> objects,
         std::int16_t position
     ) -> std::string {
         return connect().send<std::string>(
@@ -107,7 +107,7 @@ namespace minty {
 
     auto api::delete_post_objects(
         std::string_view post_id,
-        std::span<const std::string_view> objects
+        std::span<const UUID::uuid> objects
     ) -> std::string {
         return connect().send<std::string>(
             event::delete_post_objects,
@@ -165,7 +165,7 @@ namespace minty {
         );
     }
 
-    auto api::get_object(std::string_view object_id) -> core::object {
+    auto api::get_object(const UUID::uuid& object_id) -> core::object {
         return connect().send<core::object>(event::get_object, object_id);
     }
 
@@ -207,8 +207,8 @@ namespace minty {
 
     auto api::move_post_objects(
         std::string_view post_id,
-        std::span<const std::string_view> objects,
-        std::optional<std::string_view> destination
+        std::span<const UUID::uuid> objects,
+        const std::optional<UUID::uuid>& destination
     ) -> std::string {
         return connect().send<std::string>(
             event::move_post_objects,

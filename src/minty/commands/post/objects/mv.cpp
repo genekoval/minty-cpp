@@ -1,6 +1,7 @@
 #include "commands.h"
 
 #include "../../../client.h"
+#include "../../../parser/parser.h"
 
 using namespace commline;
 
@@ -8,9 +9,9 @@ namespace {
     namespace internal {
         auto mv(
             const app& app,
-            std::optional<std::string_view> destination,
+            std::optional<UUID::uuid> destination,
             std::string_view id,
-            const std::vector<std::string_view>& objects
+            const std::vector<UUID::uuid>& objects
         ) -> void {
             if (objects.empty()) return;
 
@@ -26,7 +27,7 @@ namespace minty::subcommands::post_objects {
             __FUNCTION__,
             "Reorder objects within a post.",
             options(
-                option<std::optional<std::string_view>>(
+                option<std::optional<UUID::uuid>>(
                     {"d", "destination"},
                     "Move OBJECTS in front of this object",
                     "object"
@@ -34,7 +35,7 @@ namespace minty::subcommands::post_objects {
             ),
             arguments(
                 required<std::string_view>("id"),
-                variadic<std::string_view>("objects")
+                variadic<UUID::uuid>("objects")
             ),
             internal::mv
         );

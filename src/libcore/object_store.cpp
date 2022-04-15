@@ -4,7 +4,7 @@ namespace minty::core {
     object_store::object_store(fstore::bucket& bucket) : bucket(&bucket) {}
 
     auto object_store::add(
-        std::optional<std::string_view> part_id,
+        std::optional<UUID::uuid> part_id,
         std::size_t stream_size,
         std::function<void(fstore::part&&)> pipe
     ) -> fstore::object_meta {
@@ -15,29 +15,31 @@ namespace minty::core {
         return bucket->add(path);
     }
 
-    auto object_store::get(std::string_view object_id) -> fstore::blob {
+    auto object_store::get(const UUID::uuid& object_id) -> fstore::blob {
         return bucket->get(object_id);
 	}
 
     auto object_store::get(
-        std::string_view object_id,
+        const UUID::uuid& object_id,
         std::byte* buffer
     ) -> void {
         bucket->get(object_id, buffer);
 	}
 
-    auto object_store::meta(std::string_view object_id) -> fstore::object_meta {
+    auto object_store::meta(
+        const UUID::uuid& object_id
+    ) -> fstore::object_meta {
         return bucket->meta(object_id);
 	}
 
     auto object_store::remove(
-        std::string_view object_id
+        const UUID::uuid& object_id
     ) -> fstore::object_meta {
         return bucket->remove(object_id);
 	}
 
     auto object_store::remove(
-        std::span<const std::string> objects
+        std::span<const UUID::uuid> objects
     ) -> fstore::remove_result {
         return bucket->remove(objects);
 	}

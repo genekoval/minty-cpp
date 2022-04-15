@@ -10,6 +10,6 @@ namespace minty::core {
 
         auto generate_preview(
             const fstore::object_meta& object
-        ) -> std::optional<std::string>;
+        ) -> std::optional<UUID::uuid>;
     };
 }

@@ -41,6 +41,7 @@ define common.libs
  swscale
  timber
  uri
+ uuid++
  yaml-cpp
 endef
 
@@ -75,6 +76,7 @@ define $(cli).libs
  pthread
  timber
  yaml-cpp
+ uuid++
 endef
 
 install := $(cli) $(client) $(daemon)

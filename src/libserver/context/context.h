@@ -28,7 +28,7 @@ namespace minty::server {
 
         auto add_post_objects(
             std::string post_id,
-            std::vector<std::string> objects,
+            std::vector<UUID::uuid> objects,
             std::int16_t position
         ) -> std::string;
 
@@ -57,7 +57,7 @@ namespace minty::server {
 
         auto delete_post_objects(
             std::string post_id,
-            std::vector<std::string> objects
+            std::vector<UUID::uuid> objects
         ) -> std::string;
 
         auto delete_post_objects_ranges(
@@ -89,7 +89,7 @@ namespace minty::server {
 
         auto get_comments(std::string post_id) -> core::comment_tree;
 
-        auto get_object(std::string object_id) -> core::object;
+        auto get_object(UUID::uuid object_id) -> core::object;
 
         auto get_post(std::string post_id) -> core::post;
 
@@ -113,8 +113,8 @@ namespace minty::server {
 
         auto move_post_objects(
             std::string post_id,
-            std::vector<std::string> objects,
-            std::optional<std::string> destination
+            std::vector<UUID::uuid> objects,
+            std::optional<UUID::uuid> destination
         ) -> std::string;
 
         auto set_comment_content(

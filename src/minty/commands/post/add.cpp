@@ -23,7 +23,9 @@ namespace {
             };
 
             for (const auto& object : objects) {
-                parts.objects.emplace_back(minty::cli::add_object(api, object));
+                parts.objects.emplace_back(
+                    minty::cli::add_object(api, object).id
+                );
             }
 
             const auto id = api.add_post(parts);

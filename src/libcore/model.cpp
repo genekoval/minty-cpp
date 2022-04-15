@@ -33,8 +33,8 @@ namespace minty::core {
     {}
 
     object_preview::object_preview(
-        std::string&& id,
-        std::optional<std::string>&& preview_id,
+        UUID::uuid&& id,
+        std::optional<UUID::uuid>&& preview_id,
         std::string&& type,
         std::string&& subtype
     ) :

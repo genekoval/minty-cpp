@@ -21,7 +21,7 @@ auto DatabasePostObjectTest::insert_object(
 }
 
 auto DatabasePostObjectTest::insert_objects(
-    const std::vector<std::string>& objects,
+    const std::vector<UUID::uuid>& objects,
     std::int16_t position
 ) -> std::vector<minty::test::sequence_object> {
     database.create_post_objects(post_id, objects, position);

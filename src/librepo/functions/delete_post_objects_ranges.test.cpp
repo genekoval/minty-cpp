@@ -16,7 +16,7 @@ TEST_F(DatabasePostObjectTest, DeleteSingleObjectRange) {
 }
 
 TEST_F(DatabasePostObjectTest, DeleteObjectRange) {
-    const auto objects = std::vector<std::string> {
+    const auto objects = std::vector<UUID::uuid> {
         "0e5bad49-9cf9-46e4-85c9-83ef9baf1f79",
         "adf85243-7673-467f-9fa6-56fc40642e06",
         "0797323f-910f-4f90-9bb1-dd145730c7a0"
@@ -39,7 +39,7 @@ TEST_F(DatabasePostObjectTest, DeleteObjectRange) {
 }
 
 TEST_F(DatabasePostObjectTest, DeleteMultipleObjectsRange) {
-    const auto objects = std::vector<std::string> {
+    const auto objects = std::vector<UUID::uuid> {
         "0e5bad49-9cf9-46e4-85c9-83ef9baf1f79",
         "adf85243-7673-467f-9fa6-56fc40642e06",
         "0797323f-910f-4f90-9bb1-dd145730c7a0",

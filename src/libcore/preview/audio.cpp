@@ -5,7 +5,7 @@ namespace minty::core {
     auto generate_audio_preview(
         object_store& objects,
         const fstore::object_meta& object
-    ) -> std::optional<std::string> {
+    ) -> std::optional<UUID::uuid> {
         const auto source = objects.get(object.id);
 
         auto io = video::io_context(source.span());

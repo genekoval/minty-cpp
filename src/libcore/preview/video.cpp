@@ -10,7 +10,7 @@ namespace {
         minty::core::object_store& objects,
         AVCodecContext* codec,
         AVFrame* frame
-    ) -> std::string {
+    ) -> UUID::uuid {
         auto frame_rgb = minty::core::video::frame();
 
         auto bytes = av_image_get_buffer_size(
@@ -52,7 +52,7 @@ namespace minty::core {
     auto generate_video_preview(
         object_store& objects,
         const fstore::object_meta& object
-    ) -> std::optional<std::string> {
+    ) -> std::optional<UUID::uuid> {
         const auto source = objects.get(object.id);
 
         auto io = video::io_context(source.span());

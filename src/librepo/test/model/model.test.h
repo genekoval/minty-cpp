@@ -4,7 +4,7 @@
 
 namespace minty::test {
     struct sequence_object {
-        std::string id;
+        UUID::uuid id;
         unsigned int sequence;
     };
 }

@@ -7,7 +7,10 @@
 namespace fs = std::filesystem;
 
 namespace minty::cli {
-    auto add_object(minty::api& api, std::string_view object) -> std::string {
+    auto add_object(
+        minty::api& api,
+        std::string_view object
+    ) -> core::object_preview {
         const auto path = fs::canonical(object);
         return api.add_object_local(path.string());
     }

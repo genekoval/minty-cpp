@@ -12,21 +12,21 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(void, create_object, (
-            std::string_view object_id,
-            const std::optional<std::string_view>& preview_id,
+            const UUID::uuid& object_id,
+            const std::optional<UUID::uuid>& preview_id,
             const std::optional<std::string_view>& source_id
         ), (override));
 
         MOCK_METHOD(repo::db::post_search, create_post, (
             std::string_view title,
             std::string_view description,
-            const std::vector<std::string>& objects,
+            const std::vector<UUID::uuid>& objects,
             const std::vector<std::string>& tags
         ), (override));
 
         MOCK_METHOD(std::string, create_post_objects, (
             std::string_view post_id,
-            const std::vector<std::string>& objects,
+            const std::vector<UUID::uuid>& objects,
             std::int16_t position
         ), (override));
 
@@ -74,7 +74,7 @@ namespace minty::test {
 
         MOCK_METHOD(std::string, delete_post_objects, (
             std::string_view post_id,
-            const std::vector<std::string>& objects
+            const std::vector<UUID::uuid>& objects
         ), (override));
 
         MOCK_METHOD(std::string, delete_post_objects_ranges, (
@@ -112,14 +112,14 @@ namespace minty::test {
 
         MOCK_METHOD(std::string, move_post_objects, (
             std::string_view post_id,
-            const std::vector<std::string>& objects,
-            std::optional<std::string> destination
+            const std::vector<UUID::uuid>& objects,
+            const std::optional<UUID::uuid>& destination
         ), (override));
 
         MOCK_METHOD(void, prune, (), (override));
 
         MOCK_METHOD(void, prune_objects, (
-            std::function<bool(std::span<const std::string>)>&& on_deleted
+            std::function<bool(std::span<const UUID::uuid>)>&& on_deleted
         ), (override));
 
         MOCK_METHOD(std::vector<repo::db::comment>, read_comments, (
@@ -127,11 +127,11 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(repo::db::object, read_object, (
-            std::string_view object_id
+            const UUID::uuid& object_id
         ), (override));
 
         MOCK_METHOD(std::vector<repo::db::post_preview>, read_object_posts, (
-            std::string_view object_id
+            const UUID::uuid& object_id
         ), (override));
 
         MOCK_METHOD(repo::db::post, read_post, (
@@ -185,8 +185,8 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(void, update_object_preview, (
-            std::string_view object_id,
-            const std::optional<std::string>& preview_id
+            const UUID::uuid& object_id,
+            const std::optional<UUID::uuid>& preview_id
         ), (override));
 
         MOCK_METHOD(repo::db::post_update, update_post_description, (

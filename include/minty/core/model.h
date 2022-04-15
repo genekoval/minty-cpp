@@ -78,8 +78,8 @@ namespace minty::core {
             fstore::object_meta&& meta
         );
         object_preview(
-            std::string&& id,
-            std::optional<std::string>&& preview_id,
+            UUID::uuid&& id,
+            std::optional<UUID::uuid>&& preview_id,
             std::string&& type,
             std::string&& subtype
         );
@@ -88,7 +88,7 @@ namespace minty::core {
     struct post_parts {
         std::string title;
         std::string description;
-        std::vector<std::string> objects;
+        std::vector<UUID::uuid> objects;
         std::vector<std::string> tags;
     };
 

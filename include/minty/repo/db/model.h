@@ -3,6 +3,7 @@
 #include <entix/entity>
 #include <optional>
 #include <string>
+#include <uuid++/uuid++>
 #include <vector>
 
 namespace minty::repo::db {
@@ -27,14 +28,14 @@ namespace minty::repo::db {
     };
 
     struct object : entix::entity<2, source> {
-        std::string id;
-        std::optional<std::string> preview_id;
+        UUID::uuid id;
+        std::optional<UUID::uuid> preview_id;
         std::optional<source> src;
     };
 
     struct object_preview : entix::entity<2> {
-        std::string id;
-        std::optional<std::string> preview_id;
+        UUID::uuid id;
+        std::optional<UUID::uuid> preview_id;
     };
 
     struct tag : entix::entity<9> {
@@ -61,7 +62,7 @@ namespace minty::repo::db {
     struct tag_preview : entix::entity<3> {
         std::string id;
         std::string name;
-        std::optional<std::string> avatar;
+        std::optional<UUID::uuid> avatar;
     };
 
     struct tag_text : entix::entity<2> {

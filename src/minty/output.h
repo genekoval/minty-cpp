@@ -61,4 +61,9 @@ namespace YAML {
         Emitter& out,
         const minty::core::tag_preview& tag
     ) -> Emitter&;
+
+    auto operator<<(
+        Emitter& out,
+        const UUID::uuid& uuid
+    ) -> Emitter&;
 }

@@ -15,7 +15,7 @@ namespace {
     auto generate_preview(
         minty::core::object_store& objects,
         Magick::Image&& image
-    ) -> std::string {
+    ) -> UUID::uuid {
         const auto width = image.size().width();
         const auto height = image.size().height();
 
@@ -68,7 +68,7 @@ namespace minty::core {
         unsigned int width,
         unsigned int height,
         const void* pixels
-    ) -> std::string {
+    ) -> UUID::uuid {
         return generate_preview(objects, Magick::Image(
             width,
             height,
@@ -81,7 +81,7 @@ namespace minty::core {
     auto generate_image_preview(
         object_store& objects,
         const fstore::object_meta& object
-    ) -> std::optional<std::string> {
+    ) -> std::optional<UUID::uuid> {
         auto* source = new std::byte[object.size];
         objects.get(object.id, source);
 
