@@ -64,7 +64,7 @@ namespace minty::repo::db {
         VIRTUAL auto create_site(
             std::string_view scheme,
             std::string_view name,
-            std::optional<std::string_view> icon
+            std::optional<UUID::uuid> icon
         ) -> site;
 
         VIRTUAL auto create_source(

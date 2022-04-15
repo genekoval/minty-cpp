@@ -205,7 +205,7 @@ namespace minty::core {
         std::string_view scheme,
         std::string_view host
     ) -> std::string {
-        auto icon_id = std::optional<std::string>();
+        auto icon_id = std::optional<UUID::uuid>();
 
         dl->get_site_icon(
             fmt::format("{}://{}", scheme, host),

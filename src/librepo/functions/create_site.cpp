@@ -4,7 +4,7 @@ namespace minty::repo::db {
     auto database::create_site(
         std::string_view scheme,
         std::string_view name,
-        std::optional<std::string_view> icon
+        std::optional<UUID::uuid> icon
     ) -> site {
         auto tx = ntx();
 

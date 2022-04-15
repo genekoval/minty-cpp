@@ -18,7 +18,7 @@ namespace minty::repo::db {
         std::string id;
         std::string scheme;
         std::string host;
-        std::optional<std::string> icon;
+        std::optional<UUID::uuid> icon;
     };
 
     struct source : entix::entity<2, site> {

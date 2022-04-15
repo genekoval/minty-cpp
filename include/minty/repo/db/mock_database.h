@@ -48,7 +48,7 @@ namespace minty::test {
         MOCK_METHOD(repo::db::site, create_site, (
             std::string_view scheme,
             std::string_view name,
-            std::optional<std::string_view> icon
+            std::optional<UUID::uuid> icon
         ), (override));
 
         MOCK_METHOD(repo::db::source, create_source, (
