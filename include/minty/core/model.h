@@ -119,13 +119,13 @@ namespace minty::core {
     };
 
     struct object {
-        std::string id;
-        std::string hash;
+        decltype(repo::db::object::id) id;
+        decltype(fstore::object_meta::hash) hash;
         data_size size;
-        std::string type;
-        std::string subtype;
-        std::string date_added;
-        std::optional<std::string> preview_id;
+        decltype(fstore::object_meta::type) type;
+        decltype(fstore::object_meta::subtype) subtype;
+        decltype(fstore::object_meta::date_added) date_added;
+        decltype(repo::db::object::preview_id) preview_id;
         std::optional<source> src;
         std::vector<post_preview> posts;
 
