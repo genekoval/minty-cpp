@@ -15,7 +15,7 @@ CREATE TABLE site (
 );
 
 CREATE TABLE source (
-    source_id       SERIAL PRIMARY KEY,
+    source_id       bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     resource        text NOT NULL,
     site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION,
 
@@ -25,7 +25,7 @@ CREATE TABLE source (
 CREATE TABLE object (
     object_id       uuid PRIMARY KEY REFERENCES object_ref ON DELETE NO ACTION,
     preview_id      uuid REFERENCES object_ref ON DELETE NO ACTION,
-    source_id       integer REFERENCES source ON DELETE NO ACTION
+    source_id       bigint REFERENCES source ON DELETE NO ACTION
 );
 
 CREATE TABLE post (
@@ -86,7 +86,7 @@ CREATE TABLE post_tag (
 
 CREATE TABLE tag_source (
     tag_id          integer NOT NULL REFERENCES tag ON DELETE CASCADE,
-    source_id       integer NOT NULL REFERENCES source ON DELETE NO ACTION,
+    source_id       bigint NOT NULL REFERENCES source ON DELETE NO ACTION,
 
     PRIMARY KEY (tag_id, source_id)
 );

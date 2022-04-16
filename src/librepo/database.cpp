@@ -20,7 +20,7 @@ namespace minty::repo::db {
         c.prepare("create_related_post", {"integer", "integer"});
         c.prepare("create_reply", {"integer", "text"});
         c.prepare("create_site", {"text", "text", "uuid"});
-        c.prepare("create_source", {"integer", "text"});
+        c.prepare("create_source", {"bigint", "text"});
         c.prepare("create_tag", {"text"});
         c.prepare("create_tag_alias", {"integer", "text"});
         c.prepare("create_tag_source", {"integer", "integer"});

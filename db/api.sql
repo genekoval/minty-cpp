@@ -414,7 +414,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_source(
-    a_site_id       integer,
+    a_site_id       bigint,
     a_resource      text
 ) RETURNS SETOF source_view AS $$
 BEGIN
