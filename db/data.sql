@@ -8,7 +8,7 @@ CREATE TABLE object_ref (
 );
 
 CREATE TABLE site (
-    site_id         SERIAL PRIMARY KEY,
+    site_id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     scheme          text NOT NULL,
     host            text UNIQUE NOT NULL,
     icon            uuid REFERENCES object_ref ON DELETE NO ACTION
