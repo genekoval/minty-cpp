@@ -3,7 +3,7 @@
 
 namespace minty::repo::db {
     auto database::create_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         std::int16_t position
     ) -> std::string {

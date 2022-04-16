@@ -2,7 +2,7 @@
 
 namespace minty::repo::db {
     auto database::read_comments(
-        std::string_view post_id
+        const UUID::uuid& post_id
     ) -> std::vector<comment> {
         auto tx = ntx();
         return entix::make_entities<std::vector<comment>>(

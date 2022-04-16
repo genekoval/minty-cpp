@@ -9,7 +9,7 @@ namespace minty {
     }
 
     auto api::add_comment(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view content
     ) -> core::comment {
         return connect().send<core::comment>(
@@ -26,12 +26,12 @@ namespace minty {
         );
     }
 
-    auto api::add_post(const core::post_parts& parts) -> std::string {
-        return connect().send<std::string>(event::add_post, parts);
+    auto api::add_post(const core::post_parts& parts) -> UUID::uuid {
+        return connect().send<UUID::uuid>(event::add_post, parts);
     }
 
     auto api::add_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         std::int16_t position
     ) -> std::string {
@@ -44,7 +44,7 @@ namespace minty {
     }
 
     auto api::add_post_tag(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view tag_id
     ) -> void {
         connect().send<void>(
@@ -55,8 +55,8 @@ namespace minty {
     }
 
     auto api::add_related_post(
-        std::string_view post_id,
-        std::string_view related
+        const UUID::uuid& post_id,
+        const UUID::uuid& related
     ) -> void {
         return connect().send<void>(event::add_related_post, post_id, related);
     }
@@ -101,12 +101,12 @@ namespace minty {
         );
     }
 
-    auto api::delete_post(std::string_view id) -> void {
+    auto api::delete_post(const UUID::uuid& id) -> void {
         connect().send<void>(event::delete_post, id);
     }
 
     auto api::delete_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects
     ) -> std::string {
         return connect().send<std::string>(
@@ -117,15 +117,15 @@ namespace minty {
     }
 
     auto api::delete_post_tag(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view tag_id
     ) -> void {
         connect().send<void>(event::delete_post_tag, post_id, tag_id);
     }
 
     auto api::delete_related_post(
-        std::string_view post_id,
-        std::string_view related
+        const UUID::uuid& post_id,
+        const UUID::uuid& related
     ) -> void {
         connect().send<void>(event::delete_related_post, post_id, related);
     }
@@ -157,7 +157,7 @@ namespace minty {
     }
 
     auto api::get_comments(
-        std::string_view post_id
+        const UUID::uuid& post_id
     ) -> std::vector<core::comment> {
         return connect().send<std::vector<core::comment>>(
             event::get_comments,
@@ -169,7 +169,7 @@ namespace minty {
         return connect().send<core::object>(event::get_object, object_id);
     }
 
-    auto api::get_post(std::string_view id) -> core::post {
+    auto api::get_post(const UUID::uuid& id) -> core::post {
         return connect().send<core::post>(
             event::get_post,
             id
@@ -206,7 +206,7 @@ namespace minty {
     }
 
     auto api::move_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         const std::optional<UUID::uuid>& destination
     ) -> std::string {
@@ -219,7 +219,7 @@ namespace minty {
     }
 
     auto api::set_post_description(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view description
     ) -> core::modification<std::optional<std::string>> {
         return connect().send<core::modification<std::optional<std::string>>>(
@@ -230,7 +230,7 @@ namespace minty {
     }
 
     auto api::set_post_title(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view title
     ) -> core::modification<std::optional<std::string>> {
         return connect().send<core::modification<std::optional<std::string>>>(

@@ -29,7 +29,7 @@ CREATE TABLE object (
 );
 
 CREATE TABLE post (
-    post_id         SERIAL PRIMARY KEY,
+    post_id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     title           text,
     description     text,
     date_created    timestamptz NOT NULL DEFAULT NOW(),
@@ -37,7 +37,7 @@ CREATE TABLE post (
 );
 
 CREATE TABLE post_object (
-    post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
+    post_id         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
     object_id       uuid NOT NULL REFERENCES object ON DELETE CASCADE,
     sequence        smallint NOT NULL,
     date_added      timestamptz NOT NULL DEFAULT NOW(),
@@ -46,15 +46,15 @@ CREATE TABLE post_object (
 );
 
 CREATE TABLE related_post (
-    post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
-    related         integer NOT NULL REFERENCES post ON DELETE CASCADE,
+    post_id         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
+    related         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
 
     PRIMARY KEY (post_id, related)
 );
 
 CREATE TABLE post_comment (
     comment_id      SERIAL PRIMARY KEY,
-    post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
+    post_id         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
     parent_id       integer REFERENCES post_comment ON DELETE NO ACTION,
     indent          integer NOT NULL DEFAULT 0,
     content         text NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE tag_name (
 );
 
 CREATE TABLE post_tag (
-    post_id         integer NOT NULL REFERENCES post ON DELETE CASCADE,
+    post_id         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
     tag_id          integer NOT NULL REFERENCES tag ON DELETE CASCADE,
 
     PRIMARY KEY (post_id, tag_id)

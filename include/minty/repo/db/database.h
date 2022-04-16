@@ -23,7 +23,7 @@ namespace minty::repo::db {
         VIRTUAL_DESTRUCTOR(database)
 
         VIRTUAL auto create_comment(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view content
         ) -> comment;
 
@@ -41,13 +41,13 @@ namespace minty::repo::db {
         ) -> post_search;
 
         VIRTUAL auto create_post_objects(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             std::int16_t position
         ) -> std::string;
 
         VIRTUAL auto create_post_tag(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ) -> void;
 
@@ -57,8 +57,8 @@ namespace minty::repo::db {
         ) -> comment;
 
         VIRTUAL auto create_related_post(
-            std::string_view post_id,
-            std::string_view related
+            const UUID::uuid& post_id,
+            const UUID::uuid& related
         ) -> void;
 
         VIRTUAL auto create_site(
@@ -84,26 +84,26 @@ namespace minty::repo::db {
             std::string_view source_id
         ) -> void;
 
-        VIRTUAL auto delete_post(std::string_view post_id) -> void;
+        VIRTUAL auto delete_post(const UUID::uuid& post_id) -> void;
 
         VIRTUAL auto delete_post_objects(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects
         ) -> std::string;
 
         VIRTUAL auto delete_post_objects_ranges(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::span<const range> ranges
         ) -> std::string;
 
         VIRTUAL auto delete_post_tag(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ) -> void;
 
         VIRTUAL auto delete_related_post(
-            std::string_view post_id,
-            std::string_view related
+            const UUID::uuid& post_id,
+            const UUID::uuid& related
         ) -> void;
 
         VIRTUAL auto delete_tag(std::string_view tag_id) -> void;
@@ -119,13 +119,13 @@ namespace minty::repo::db {
         ) -> void;
 
         VIRTUAL auto move_post_object(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             unsigned int old_index,
             unsigned int new_index
         ) -> std::string;
 
         VIRTUAL auto move_post_objects(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination
         ) -> std::string;
@@ -137,7 +137,7 @@ namespace minty::repo::db {
         ) -> void;
 
         VIRTUAL auto read_comments(
-            std::string_view post_id
+            const UUID::uuid& post_id
         ) -> std::vector<comment>;
 
         VIRTUAL auto read_object(const UUID::uuid& object_id) -> object;
@@ -146,24 +146,24 @@ namespace minty::repo::db {
             const UUID::uuid& object_id
         ) -> std::vector<post_preview>;
 
-        VIRTUAL auto read_post(std::string_view post_id) -> post;
+        VIRTUAL auto read_post(const UUID::uuid& post_id) -> post;
 
         VIRTUAL auto read_posts(
-            const std::vector<std::string>& posts
+            const std::vector<UUID::uuid>& posts
         ) -> std::vector<post_preview>;
 
         VIRTUAL auto read_post_objects(
-            std::string_view post_id
+            const UUID::uuid& post_id
         ) -> std::vector<object_preview>;
 
         VIRTUAL auto read_post_search() -> std::vector<post_search>;
 
         VIRTUAL auto read_post_tags(
-            std::string_view post_id
+            const UUID::uuid& post_id
         ) -> std::vector<tag_preview>;
 
         VIRTUAL auto read_related_posts(
-            std::string_view post_id
+            const UUID::uuid& post_id
         ) -> std::vector<post_preview>;
 
         VIRTUAL auto read_site(
@@ -194,12 +194,12 @@ namespace minty::repo::db {
         ) -> void;
 
         VIRTUAL auto update_post_description(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view description
         ) -> post_update;
 
         VIRTUAL auto update_post_title(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view title
         ) -> post_update;
 

@@ -2,8 +2,8 @@
 
 namespace {
     struct related_post {
-        std::string post_id;
-        std::string related;
+        UUID::uuid post_id;
+        UUID::uuid related;
     };
 }
 

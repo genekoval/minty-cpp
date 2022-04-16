@@ -1,6 +1,7 @@
 #include "commands.h"
 
 #include "../../../client.h"
+#include "../../../parser/parser.h"
 
 using namespace commline;
 
@@ -8,7 +9,7 @@ namespace {
     namespace internal {
         auto rm(
             const app& app,
-            std::string_view id,
+            const UUID::uuid& id,
             const std::vector<std::string_view>& tags
         ) -> void {
             auto api = minty::cli::client();
@@ -27,7 +28,7 @@ namespace minty::subcommands::post_tags {
             "Remove tags from a post",
             options(),
             arguments(
-                required<std::string_view>("id"),
+                required<UUID::uuid>("id"),
                 variadic<std::string_view>("tags")
             ),
             internal::rm

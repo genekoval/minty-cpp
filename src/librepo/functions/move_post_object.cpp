@@ -2,7 +2,7 @@
 
 namespace minty::repo::db {
     auto database::move_post_object(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         unsigned int old_index,
         unsigned int new_index
     ) -> std::string {

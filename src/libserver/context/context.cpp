@@ -7,7 +7,7 @@ namespace minty::server {
     {}
 
     auto context::add_comment(
-        std::string post_id,
+        UUID::uuid post_id,
         std::string content
     ) -> core::comment {
         return api->add_comment(post_id, content);
@@ -33,12 +33,12 @@ namespace minty::server {
         return api->add_objects_url(url);
     }
 
-    auto context::add_post(core::post_parts parts) -> std::string {
+    auto context::add_post(core::post_parts parts) -> UUID::uuid {
         return api->add_post(parts);
 	}
 
     auto context::add_post_objects(
-        std::string post_id,
+        UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::int16_t position
     ) -> std::string {
@@ -46,15 +46,15 @@ namespace minty::server {
     }
 
     auto context::add_post_tag(
-        std::string post_id,
+        UUID::uuid post_id,
         std::string tag_id
     ) -> void {
         api->add_post_tag(post_id, tag_id);
     }
 
     auto context::add_related_post(
-        std::string post_id,
-        std::string related
+        UUID::uuid post_id,
+        UUID::uuid related
     ) -> void {
         api->add_related_post(post_id, related);
     }
@@ -84,34 +84,34 @@ namespace minty::server {
         return api->add_tag_source(tag_id, url);
     }
 
-    auto context::delete_post(std::string post_id) -> void {
+    auto context::delete_post(UUID::uuid post_id) -> void {
         api->delete_post(post_id);
 	}
 
     auto context::delete_post_objects(
-        std::string post_id,
+        UUID::uuid post_id,
         std::vector<UUID::uuid> objects
     ) -> std::string {
         return api->delete_post_objects(post_id, objects);
     }
 
     auto context::delete_post_objects_ranges(
-        std::string post_id,
+        UUID::uuid post_id,
         std::vector<core::range> ranges
     ) -> std::string {
         return api->delete_post_objects(post_id, ranges);
     }
 
     auto context::delete_post_tag(
-        std::string post_id,
+        UUID::uuid post_id,
         std::string tag_id
     ) -> void {
         api->delete_post_tag(post_id, tag_id);
     }
 
     auto context::delete_related_post(
-        std::string post_id,
-        std::string related
+        UUID::uuid post_id,
+        UUID::uuid related
     ) -> void {
         api->delete_related_post(post_id, related);
     }
@@ -134,7 +134,7 @@ namespace minty::server {
         api->delete_tag_source(tag_id, source_id);
     }
 
-    auto context::get_comments(std::string post_id) -> core::comment_tree {
+    auto context::get_comments(UUID::uuid post_id) -> core::comment_tree {
         return api->get_comments(post_id);
 	}
 
@@ -142,7 +142,7 @@ namespace minty::server {
         return api->get_object(object_id);
     }
 
-    auto context::get_post(std::string post_id) -> core::post {
+    auto context::get_post(UUID::uuid post_id) -> core::post {
         return api->get_post(post_id);
 	}
 
@@ -167,7 +167,7 @@ namespace minty::server {
     }
 
     auto context::move_post_object(
-        std::string post_id,
+        UUID::uuid post_id,
         std::uint32_t old_index,
         std::uint32_t new_index
     ) -> void {
@@ -175,7 +175,7 @@ namespace minty::server {
     }
 
     auto context::move_post_objects(
-        std::string post_id,
+        UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::optional<UUID::uuid> destination
     ) -> std::string {
@@ -190,14 +190,14 @@ namespace minty::server {
     }
 
     auto context::set_post_description(
-        std::string post_id,
+        UUID::uuid post_id,
         std::string description
     ) -> core::modification<std::optional<std::string>> {
         return api->set_post_description(post_id, description);
     }
 
     auto context::set_post_title(
-        std::string post_id,
+        UUID::uuid post_id,
         std::string title
     ) -> core::modification<std::optional<std::string>> {
         return api->set_post_title(post_id, title);

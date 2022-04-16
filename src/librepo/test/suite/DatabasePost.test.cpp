@@ -1,6 +1,6 @@
 #include "DatabasePost.test.h"
 
-auto DatabasePostTest::create_post() -> std::string {
+auto DatabasePostTest::create_post() -> UUID::uuid {
     return database.create_post("", "", {}, {}).id;
 }
 

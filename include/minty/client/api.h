@@ -20,28 +20,28 @@ namespace minty {
         api(std::string_view endpoint);
 
         auto add_comment(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view content
         ) -> core::comment;
 
         auto add_object_local(std::string_view path) -> core::object_preview;
 
-        auto add_post(const core::post_parts& parts) -> std::string;
+        auto add_post(const core::post_parts& parts) -> UUID::uuid;
 
         auto add_post_objects(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::span<const UUID::uuid> objects,
             std::int16_t position
         ) -> std::string;
 
         auto add_post_tag(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ) -> void;
 
         auto add_related_post(
-            std::string_view post_id,
-            std::string_view related
+            const UUID::uuid& post_id,
+            const UUID::uuid& related
         ) -> void;
 
         auto add_reply(
@@ -61,21 +61,21 @@ namespace minty {
             std::string_view url
         ) -> core::source;
 
-        auto delete_post(std::string_view id) -> void;
+        auto delete_post(const UUID::uuid& id) -> void;
 
         auto delete_post_objects(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::span<const UUID::uuid> objects
         ) -> std::string;
 
         auto delete_post_tag(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ) -> void;
 
         auto delete_related_post(
-            std::string_view post_id,
-            std::string_view related
+            const UUID::uuid& post_id,
+            const UUID::uuid& related
         ) -> void;
 
         auto delete_tag(std::string_view id) -> void;
@@ -91,12 +91,12 @@ namespace minty {
         ) -> void;
 
         auto get_comments(
-            std::string_view post_id
+            const UUID::uuid& post_id
         ) -> std::vector<core::comment>;
 
         auto get_object(const UUID::uuid& object_id) -> core::object;
 
-        auto get_post(std::string_view id) -> core::post;
+        auto get_post(const UUID::uuid& id) -> core::post;
 
         auto get_posts(
             const core::post_query& query
@@ -111,18 +111,18 @@ namespace minty {
         ) -> core::search_result<core::tag_preview>;
 
         auto move_post_objects(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::span<const UUID::uuid> objects,
             const std::optional<UUID::uuid>& destination
         ) -> std::string;
 
         auto set_post_description(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view description
         ) -> core::modification<std::optional<std::string>>;
 
         auto set_post_title(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view title
         ) -> core::modification<std::optional<std::string>>;
 

@@ -25,7 +25,7 @@ namespace minty::core {
     }
 
     auto search_engine::add_post_tag(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view tag_id
     ) -> void {
         return connect().send<void>(event::add_post_tag, post_id, tag_id);
@@ -60,7 +60,7 @@ namespace minty::core {
         connect().send<void>(event::delete_indices);
     }
 
-    auto search_engine::delete_post(std::string_view post_id) -> void {
+    auto search_engine::delete_post(const UUID::uuid& post_id) -> void {
         connect().send<void>(event::delete_post, post_id);
     }
 
@@ -84,8 +84,8 @@ namespace minty::core {
 
     auto search_engine::find_posts(
         const post_query& query
-    ) -> search_result<std::string> {
-        return connect().send<search_result<std::string>>(
+    ) -> search_result<UUID::uuid> {
+        return connect().send<search_result<UUID::uuid>>(
             event::find_posts,
             query
         );
@@ -101,20 +101,20 @@ namespace minty::core {
     }
 
     auto search_engine::remove_post_tag(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view tag_id
     ) -> void {
         connect().send<void>(event::remove_post_tag, post_id, tag_id);
     }
 
     auto search_engine::update_post_date_modified(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view date_modified
     ) -> void {
         connect().send<void>(
             event::update_post_date_modified,
             post_update {
-                .id = std::string(post_id),
+                .id = post_id,
                 .date_modified = std::string(date_modified)
             }
         );

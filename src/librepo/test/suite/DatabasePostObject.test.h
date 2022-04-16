@@ -11,11 +11,11 @@ protected:
         "5f8cc35b-262f-483f-8970-68a6f11eeafb",
         "e4917461-360d-4c96-a9aa-256e76525b4e"
     };
-    std::string post_id;
+    UUID::uuid post_id;
 
     virtual auto SetUp() -> void override;
 
-    auto create_post_with_objects() -> std::string;
+    auto create_post_with_objects() -> UUID::uuid;
 
     auto insert_object(
         std::int16_t position

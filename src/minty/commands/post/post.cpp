@@ -3,6 +3,7 @@
 #include "../commands.h"
 #include "../../client.h"
 #include "../../options/opts.h"
+#include "../../parser/parser.h"
 
 using namespace commline;
 
@@ -11,7 +12,7 @@ namespace {
         auto post(
             const app& app,
             std::optional<std::string_view> path,
-            std::string_view id
+            const UUID::uuid& id
         ) -> void {
             auto api = minty::cli::client();
 
@@ -29,7 +30,7 @@ namespace minty::commands {
                 cli::opts::path()
             ),
             arguments(
-                required<std::string_view>("id")
+                required<UUID::uuid>("id")
             ),
             internal::post
         );

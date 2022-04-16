@@ -6,7 +6,7 @@ auto DatabasePostObjectTest::SetUp() -> void {
     post_id = create_post_with_objects();
 }
 
-auto DatabasePostObjectTest::create_post_with_objects() -> std::string {
+auto DatabasePostObjectTest::create_post_with_objects() -> UUID::uuid {
     for (const auto& object : objects) {
         database.create_object(object, {}, {});
     }

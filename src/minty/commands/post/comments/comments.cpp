@@ -1,5 +1,6 @@
 #include "../commands.h"
 #include "../../../client.h"
+#include "../../../parser/parser.h"
 
 #include <date/date.h>
 #include <date/tz.h>
@@ -83,7 +84,7 @@ namespace {
             int spacing,
             long width,
             const date::time_zone* time_zone,
-            std::string_view post
+            const UUID::uuid& post
         ) -> void {
             auto api = minty::cli::client();
 
@@ -168,7 +169,7 @@ namespace minty::subcommands::post {
                 )
             ),
             arguments(
-                required<std::string_view>("post")
+                required<UUID::uuid>("post")
             ),
             internal::comments
         );

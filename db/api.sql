@@ -189,7 +189,7 @@ CREATE TYPE object_preview AS (
 );
 
 CREATE TYPE post_update AS (
-    post_id         integer,
+    post_id         uuid,
     new_data        text,
     date_modified   timestamptz
 );
@@ -215,7 +215,7 @@ CREATE TYPE tag_text AS (
 --{{{( Functions )
 
 CREATE FUNCTION create_comment(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_content       text
 ) RETURNS SETOF data.post_comment AS $$
 BEGIN
@@ -275,7 +275,7 @@ CREATE FUNCTION create_post(
     tags            integer[]
 ) RETURNS SETOF post_search_view AS $$
 DECLARE
-    l_post_id       integer;
+    l_post_id       uuid;
 BEGIN
     WITH new_post AS (
         INSERT INTO data.post (
@@ -313,7 +313,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_post_objects(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_objects       uuid[],
     a_position      smallint
 ) RETURNS timestamptz AS $$
@@ -346,8 +346,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_post_tag(
-    a_post_id integer,
-    a_tag_id integer
+    a_post_id       uuid,
+    a_tag_id        integer
 ) RETURNS void AS $$
 BEGIN
     INSERT INTO data.post_tag (post_id, tag_id)
@@ -356,8 +356,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_related_post(
-    a_post_id       integer,
-    a_related       integer
+    a_post_id       uuid,
+    a_related       uuid
 ) RETURNS void AS $$
 BEGIN
     INSERT INTO data.related_post (post_id, related)
@@ -493,7 +493,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post(
-    a_post_id       integer
+    a_post_id       uuid
 ) RETURNS void AS $$
 BEGIN
     DELETE FROM data.post
@@ -502,7 +502,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post_object(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_object_id     uuid
 ) RETURNS void AS $$
 BEGIN
@@ -520,7 +520,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post_objects(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_objects       uuid[]
 ) RETURNS timestamptz AS $$
 DECLARE
@@ -543,7 +543,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post_objects_ranges(
-    a_post_id       integer,
+    a_post_id       uuid,
     ranges          int4range[]
 ) RETURNS timestamptz AS $$
 DECLARE
@@ -562,7 +562,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post_objects_range(
-    a_post_id       integer,
+    a_post_id       uuid,
     range           int4range
 ) RETURNS void AS $$
 BEGIN
@@ -579,7 +579,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post_tag(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_tag_id        integer
 ) RETURNS void AS $$
 BEGIN
@@ -589,8 +589,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_related_post(
-    a_post_id       integer,
-    a_related       integer
+    a_post_id       uuid,
+    a_related       uuid
 ) RETURNS void AS $$
 BEGIN
     DELETE FROM data.related_post
@@ -635,7 +635,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION insert_post_objects(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_objects       uuid[],
     a_position      smallint DEFAULT 0
 ) RETURNS void AS $$
@@ -656,7 +656,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION move_post_object(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_old_index     integer,
     a_new_index     integer
 ) RETURNS timestamptz AS $$
@@ -688,7 +688,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION move_post_objects(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_objects       uuid[],
     a_destination   uuid
 ) RETURNS timestamptz AS $$
@@ -756,7 +756,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_comments(
-    a_post_id       integer
+    a_post_id       uuid
 ) RETURNS SETOF data.post_comment AS $$
 BEGIN
     RETURN QUERY
@@ -771,7 +771,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post(
-    a_post_id       integer
+    a_post_id       uuid
 ) RETURNS SETOF data.post AS $$
 BEGIN
     RETURN QUERY
@@ -782,7 +782,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post_date_modified(
-    a_post_id       integer
+    a_post_id       uuid
 ) RETURNS timestamptz AS $$
 DECLARE
     l_date_modified timestamptz;
@@ -796,7 +796,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_posts(
-    a_posts         integer[]
+    a_posts         uuid[]
 ) RETURNS SETOF post_preview AS $$
 BEGIN
     RETURN QUERY
@@ -829,7 +829,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post_objects(
-    a_post_id       integer
+    a_post_id       uuid
 ) RETURNS SETOF object_preview AS $$
 BEGIN
     RETURN QUERY
@@ -844,7 +844,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_related_posts(
-    a_post_id       integer
+    a_post_id       uuid
 ) RETURNS SETOF post_preview AS $$
 BEGIN
     RETURN QUERY
@@ -864,7 +864,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post_tags(
-    a_post_id       integer
+    a_post_id       uuid
 ) RETURNS SETOF tag_preview AS $$
 BEGIN
     RETURN QUERY
@@ -1009,7 +1009,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION update_post_description(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_description   text
 ) RETURNS SETOF post_update AS $$
 BEGIN
@@ -1025,7 +1025,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION update_post_title(
-    a_post_id       integer,
+    a_post_id       uuid,
     a_title         text
 ) RETURNS SETOF post_update AS $$
 BEGIN

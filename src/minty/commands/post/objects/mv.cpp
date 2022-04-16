@@ -10,7 +10,7 @@ namespace {
         auto mv(
             const app& app,
             std::optional<UUID::uuid> destination,
-            std::string_view id,
+            const UUID::uuid& id,
             const std::vector<UUID::uuid>& objects
         ) -> void {
             if (objects.empty()) return;
@@ -34,7 +34,7 @@ namespace minty::subcommands::post_objects {
                 )
             ),
             arguments(
-                required<std::string_view>("id"),
+                required<UUID::uuid>("id"),
                 variadic<UUID::uuid>("objects")
             ),
             internal::mv

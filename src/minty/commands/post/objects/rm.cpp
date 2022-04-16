@@ -9,7 +9,7 @@ namespace {
     namespace internal {
         auto rm(
             const app& app,
-            std::string_view id,
+            const UUID::uuid& id,
             const std::vector<UUID::uuid>& objects
         ) -> void {
             auto api = minty::cli::client();
@@ -25,7 +25,7 @@ namespace minty::subcommands::post_objects {
             "Remove objects from a post",
             options(),
             arguments(
-                required<std::string_view>("id"),
+                required<UUID::uuid>("id"),
                 variadic<UUID::uuid>("objects")
             ),
             internal::rm

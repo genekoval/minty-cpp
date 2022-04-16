@@ -22,7 +22,7 @@ namespace minty::core {
     {}
 
     auto api::add_comment(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view content
     ) -> comment {
         TIMBER_FUNC();
@@ -102,7 +102,7 @@ namespace minty::core {
         return result;
     }
 
-    auto api::add_post(post_parts parts) -> std::string {
+    auto api::add_post(post_parts parts) -> UUID::uuid {
         TIMBER_FUNC();
 
         const auto result = db->create_post(
@@ -123,7 +123,7 @@ namespace minty::core {
     }
 
     auto api::add_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         std::int16_t position
     ) -> std::string {
@@ -138,7 +138,7 @@ namespace minty::core {
     }
 
     auto api::add_post_tag(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view tag_id
     ) -> void {
         TIMBER_FUNC();
@@ -148,8 +148,8 @@ namespace minty::core {
     }
 
     auto api::add_related_post(
-        std::string_view post_id,
-        std::string_view related
+        const UUID::uuid& post_id,
+        const UUID::uuid& related
     ) -> void {
         TIMBER_FUNC();
 
@@ -263,7 +263,7 @@ namespace minty::core {
         return src;
     }
 
-    auto api::delete_post(std::string_view id) -> void {
+    auto api::delete_post(const UUID::uuid& id) -> void {
         TIMBER_FUNC();
 
         db->delete_post(id);
@@ -271,7 +271,7 @@ namespace minty::core {
     }
 
     auto api::delete_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects
     ) -> std::string {
         TIMBER_FUNC();
@@ -282,7 +282,7 @@ namespace minty::core {
     }
 
     auto api::delete_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::span<range> ranges
     ) -> std::string {
         TIMBER_FUNC();
@@ -293,7 +293,7 @@ namespace minty::core {
     }
 
     auto api::delete_post_tag(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view tag_id
     ) -> void {
         TIMBER_FUNC();
@@ -303,8 +303,8 @@ namespace minty::core {
     }
 
     auto api::delete_related_post(
-        std::string_view post_id,
-        std::string_view related
+        const UUID::uuid& post_id,
+        const UUID::uuid& related
     ) -> void {
         TIMBER_FUNC();
 
@@ -338,7 +338,7 @@ namespace minty::core {
         db->delete_tag_source(tag_id, source_id);
     }
 
-    auto api::get_comments(std::string_view post_id) -> comment_tree {
+    auto api::get_comments(const UUID::uuid& post_id) -> comment_tree {
         TIMBER_FUNC();
 
         const auto entities = db->read_comments(post_id);
@@ -355,7 +355,7 @@ namespace minty::core {
         );
     }
 
-    auto api::get_post(std::string_view id) -> post {
+    auto api::get_post(const UUID::uuid& id) -> post {
         TIMBER_FUNC();
 
         auto data = db->read_post(id);
@@ -436,7 +436,7 @@ namespace minty::core {
     }
 
     auto api::move_post_object(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         unsigned int old_index,
         unsigned int new_index
     ) -> void {
@@ -449,7 +449,7 @@ namespace minty::core {
     }
 
     auto api::move_post_objects(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         const std::optional<UUID::uuid>& destination
     ) -> std::string {
@@ -532,7 +532,7 @@ namespace minty::core {
     }
 
     auto api::set_post_description(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view description
     ) -> modification<std::optional<std::string>> {
         TIMBER_FUNC();
@@ -549,7 +549,7 @@ namespace minty::core {
     }
 
     auto api::set_post_title(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view title
     ) -> modification<std::optional<std::string>> {
         TIMBER_FUNC();

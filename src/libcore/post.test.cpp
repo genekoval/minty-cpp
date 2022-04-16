@@ -8,7 +8,7 @@ using testing::Return;
 
 namespace {
     const auto post_search = minty::repo::db::post_search {
-        .id = "1"
+        .id = "d589757b-40a8-4bfa-a44a-502d690a8d2b"
     };
 }
 

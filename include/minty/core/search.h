@@ -48,7 +48,7 @@ namespace minty::core {
         VIRTUAL auto add_post(const post_search& post) -> void;
 
         VIRTUAL auto add_post_tag(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ) -> void;
 
@@ -65,7 +65,7 @@ namespace minty::core {
 
         VIRTUAL auto delete_indices() -> void;
 
-        VIRTUAL auto delete_post(std::string_view post_id) -> void;
+        VIRTUAL auto delete_post(const UUID::uuid& post_id) -> void;
 
         VIRTUAL auto delete_tag(std::string_view tag_id) -> void;
 
@@ -76,19 +76,19 @@ namespace minty::core {
 
         VIRTUAL auto find_posts(
             const post_query& query
-        ) -> search_result<std::string>;
+        ) -> search_result<UUID::uuid>;
 
         VIRTUAL auto find_tags(
             const tag_query& query
         ) -> search_result<std::string>;
 
         VIRTUAL auto remove_post_tag(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ) -> void;
 
         VIRTUAL auto update_post_date_modified(
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view date_modified
         ) -> void;
 

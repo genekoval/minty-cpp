@@ -2,7 +2,7 @@
 
 namespace minty::repo::db {
     auto database::create_comment(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view content
     ) -> comment {
         auto tx = ntx();

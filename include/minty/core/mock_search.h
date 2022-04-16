@@ -11,7 +11,7 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(void, add_post_tag, (
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ), (override));
 
@@ -33,7 +33,7 @@ namespace minty::test {
         MOCK_METHOD(void, delete_indices, (), (override));
 
         MOCK_METHOD(void, delete_post, (
-            std::string_view post_id
+            const UUID::uuid& post_id
         ), (override));
 
         MOCK_METHOD(void, delete_tag, (std::string_view tag_id), (override));
@@ -43,7 +43,7 @@ namespace minty::test {
             std::string_view alias
         ), (override));
 
-        MOCK_METHOD(core::search_result<std::string>, find_posts, (
+        MOCK_METHOD(core::search_result<UUID::uuid>, find_posts, (
             const core::post_query& query
         ), (override));
 
@@ -52,12 +52,12 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(void, remove_post_tag, (
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view tag_id
         ), (override));
 
         MOCK_METHOD(void, update_post_date_modified, (
-            std::string_view post_id,
+            const UUID::uuid& post_id,
             std::string_view date_modified
         ), (override));
 

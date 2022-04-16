@@ -31,7 +31,7 @@ namespace minty::cli {
 
     auto print_post(
         minty::api& api,
-        std::string_view id,
+        const UUID::uuid& id,
         std::optional<std::string_view> path
     ) -> void;
 

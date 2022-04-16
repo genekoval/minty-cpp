@@ -8,7 +8,7 @@ using testing::Return;
 
 class CoreCommentTest : public CoreTest {
 protected:
-    const std::string post_id = "1";
+    const UUID::uuid post_id = "216311b1-9b62-4dab-9182-f286a9abe05b";
 };
 
 TEST_F(CoreCommentTest, AddRootComment) {

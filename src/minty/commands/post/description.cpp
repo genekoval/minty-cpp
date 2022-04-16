@@ -1,6 +1,7 @@
 #include "commands.h"
 
 #include "../../client.h"
+#include "../../parser/parser.h"
 
 using namespace commline;
 
@@ -8,7 +9,7 @@ namespace {
     namespace internal {
         auto description(
             const app& app,
-            std::string_view id,
+            const UUID::uuid& id,
             std::optional<std::string_view> description
         ) -> void {
             auto api = minty::cli::client();
@@ -28,7 +29,7 @@ namespace minty::subcommands::post {
             "Get or set a post's description",
             options(),
             arguments(
-                required<std::string_view>("id"),
+                required<UUID::uuid>("id"),
                 optional<std::string_view>("description")
             ),
             internal::description

@@ -2,7 +2,7 @@
 
 namespace minty::repo::db {
     auto database::delete_post_objects_ranges(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::span<const range> ranges
     ) -> std::string {
         auto arg = std::vector<std::string>();

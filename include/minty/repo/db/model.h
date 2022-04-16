@@ -70,25 +70,25 @@ namespace minty::repo::db {
         std::vector<std::string> names;
     };
 
-    struct comment : entix::entity<6> {
-        std::string id;
-        std::string post_id;
-        std::optional<std::string> parent_id;
-        unsigned int indent;
-        std::string content;
-        std::string date_created;
-    };
-
     struct post : entix::entity<7> {
-        std::string id;
+        UUID::uuid id;
         std::optional<std::string> title;
         std::optional<std::string> description;
         std::string date_created;
         std::string date_modified;
     };
 
-    struct post_preview : entix::entity<5, object_preview> {
+    struct comment : entix::entity<6> {
         std::string id;
+        decltype(post::id) post_id;
+        std::optional<std::string> parent_id;
+        unsigned int indent;
+        std::string content;
+        std::string date_created;
+    };
+
+    struct post_preview : entix::entity<5, object_preview> {
+        decltype(post::id) id;
         std::optional<std::string> title;
         std::optional<object_preview> preview;
         unsigned int comment_count;
@@ -113,7 +113,7 @@ namespace minty::repo::db {
     };
 
     struct post_update : entix::entity<3> {
-        std::string id;
+        decltype(post::id) id;
         std::optional<std::string> new_data;
         std::string date_modified;
     };

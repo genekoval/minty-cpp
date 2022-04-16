@@ -1,6 +1,7 @@
 #include "commands.h"
 
 #include "../../../client.h"
+#include "../../../parser/parser.h"
 
 using namespace commline;
 
@@ -8,8 +9,8 @@ namespace {
     namespace internal {
         auto add(
             const app& app,
-            std::string_view id,
-            const std::vector<std::string_view>& posts
+            const UUID::uuid& id,
+            const std::vector<UUID::uuid>& posts
         ) -> void {
             auto api = minty::cli::client();
 
@@ -27,8 +28,8 @@ namespace minty::subcommands::post_related {
             "Add related posts to a post",
             options(),
             arguments(
-                required<std::string_view>("id"),
-                variadic<std::string_view>("posts")
+                required<UUID::uuid>("id"),
+                variadic<UUID::uuid>("posts")
             ),
             internal::add
         );

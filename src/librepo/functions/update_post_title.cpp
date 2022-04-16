@@ -2,7 +2,7 @@
 
 namespace minty::repo::db {
     auto database::update_post_title(
-        std::string_view post_id,
+        const UUID::uuid& post_id,
         std::string_view title
     ) -> post_update {
         auto tx = ntx();

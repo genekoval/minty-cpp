@@ -3,6 +3,7 @@
 #include "../commands.h"
 #include "../../../client.h"
 #include "../../../output.h"
+#include "../../../parser/parser.h"
 
 using namespace commline;
 
@@ -10,7 +11,7 @@ namespace {
     namespace internal {
         auto objects(
             const app& app,
-            std::string_view id
+            const UUID::uuid& id
         ) -> void {
             auto api = minty::cli::client();
 
@@ -28,7 +29,7 @@ namespace minty::subcommands::post {
             "Get a post's objects",
             options(),
             arguments(
-                required<std::string_view>("id")
+                required<UUID::uuid>("id")
             ),
             internal::objects
         );

@@ -108,11 +108,11 @@ namespace minty::core {
     };
 
     struct post {
-        std::string id;
-        std::optional<std::string> title;
-        std::optional<std::string> description;
-        std::string date_created;
-        std::string date_modified;
+        decltype(repo::db::post::id) id;
+        decltype(repo::db::post::title) title;
+        decltype(repo::db::post::description) description;
+        decltype(repo::db::post::date_created) date_created;
+        decltype(repo::db::post::date_modified) date_modified;
         std::vector<object_preview> objects;
         std::vector<post_preview> posts;
         std::vector<tag_preview> tags;
