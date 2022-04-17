@@ -79,7 +79,7 @@ namespace minty::core {
         ) -> void;
 
         auto add_reply(
-            std::string_view parent_id,
+            const UUID::uuid& parent_id,
             std::string_view content
         ) -> comment;
 
@@ -162,7 +162,7 @@ namespace minty::core {
         auto reindex() -> void;
 
         auto set_comment_content(
-            std::string_view comment_id,
+            const UUID::uuid& comment_id,
             std::string_view content
         ) -> std::string;
 

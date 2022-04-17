@@ -60,7 +60,7 @@ namespace minty::server {
     }
 
     auto context::add_reply(
-        std::string parent_id,
+        UUID::uuid parent_id,
         std::string content
     ) -> core::comment {
         return api->add_reply(parent_id, content);
@@ -183,7 +183,7 @@ namespace minty::server {
     }
 
     auto context::set_comment_content(
-        std::string comment_id,
+        UUID::uuid comment_id,
         std::string content
     ) -> std::string {
         return api->set_comment_content(comment_id, content);

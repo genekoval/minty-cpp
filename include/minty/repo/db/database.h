@@ -52,7 +52,7 @@ namespace minty::repo::db {
         ) -> void;
 
         VIRTUAL auto create_reply(
-            std::string_view parent_id,
+            const UUID::uuid& parent_id,
             std::string_view content
         ) -> comment;
 
@@ -184,7 +184,7 @@ namespace minty::repo::db {
         VIRTUAL auto read_tag_text() -> std::vector<tag_text>;
 
         VIRTUAL auto update_comment(
-            std::string_view comment_id,
+            const UUID::uuid& comment_id,
             std::string_view content
         ) -> void;
 

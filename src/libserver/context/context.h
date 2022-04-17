@@ -37,7 +37,7 @@ namespace minty::server {
         auto add_related_post(UUID::uuid post_id, UUID::uuid related) -> void;
 
         auto add_reply(
-            std::string parent_id,
+            UUID::uuid parent_id,
             std::string content
         ) -> core::comment;
 
@@ -118,7 +118,7 @@ namespace minty::server {
         ) -> std::string;
 
         auto set_comment_content(
-            std::string comment_id,
+            UUID::uuid comment_id,
             std::string content
         ) -> std::string;
 

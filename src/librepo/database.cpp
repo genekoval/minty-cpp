@@ -18,7 +18,7 @@ namespace minty::repo::db {
         c.prepare("create_post_objects", {"uuid", "uuid[]", "smallint"});
         c.prepare("create_post_tag", {"uuid", "integer"});
         c.prepare("create_related_post", {"uuid", "uuid"});
-        c.prepare("create_reply", {"integer", "text"});
+        c.prepare("create_reply", {"uuid", "text"});
         c.prepare("create_site", {"text", "text", "uuid"});
         c.prepare("create_source", {"bigint", "text"});
         c.prepare("create_tag", {"text"});
@@ -50,7 +50,7 @@ namespace minty::repo::db {
         c.prepare("read_tag_previews", {"integer[]"});
         c.prepare("read_tag_sources", {"integer"});
         c.prepare("read_tag_text", {});
-        c.prepare("update_comment", {"integer", "text"});
+        c.prepare("update_comment", {"uuid", "text"});
         c.prepare("update_object_preview", {"uuid", "uuid"});
         c.prepare("update_post_description", {"uuid", "text"});
         c.prepare("update_post_title", {"uuid", "text"});

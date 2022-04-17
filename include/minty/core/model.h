@@ -35,10 +35,10 @@ namespace minty::core {
     };
 
     struct comment {
-        std::string id;
-        std::string content;
-        unsigned int indent;
-        std::string date_created;
+        decltype(repo::db::comment::id) id;
+        decltype(repo::db::comment::content) content;
+        decltype(repo::db::comment::indent) indent;
+        decltype(repo::db::comment::date_created) date_created;
     };
 
     struct comment_node {

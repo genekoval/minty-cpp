@@ -79,10 +79,10 @@ namespace minty::repo::db {
     };
 
     struct comment : entix::entity<6> {
-        std::string id;
+        UUID::uuid id;
         decltype(post::id) post_id;
-        std::optional<std::string> parent_id;
-        unsigned int indent;
+        std::optional<decltype(id)> parent_id;
+        std::int16_t indent;
         std::string content;
         std::string date_created;
     };

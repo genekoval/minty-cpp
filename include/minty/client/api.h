@@ -45,7 +45,7 @@ namespace minty {
         ) -> void;
 
         auto add_reply(
-            std::string_view parent_id,
+            const UUID::uuid& parent_id,
             std::string_view content
         ) -> core::comment;
 

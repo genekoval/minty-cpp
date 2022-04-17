@@ -11,7 +11,7 @@ namespace minty::core {
             .comments = std::make_unique<comment_node[]>(entities.size())
         };
 
-        auto map = std::unordered_map<std::string, comment_node*>();
+        auto map = std::unordered_map<decltype(comment::id), comment_node*>();
 
         comment_node* parent = nullptr;
 

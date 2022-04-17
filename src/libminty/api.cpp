@@ -62,7 +62,7 @@ namespace minty {
     }
 
     auto api::add_reply(
-        std::string_view parent_id,
+        const UUID::uuid& parent_id,
         std::string_view content
     ) -> core::comment {
         return connect().send<core::comment>(

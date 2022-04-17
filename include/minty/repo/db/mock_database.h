@@ -41,7 +41,7 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(repo::db::comment, create_reply, (
-            std::string_view parent_id,
+            const UUID::uuid& parent_id,
             std::string_view content
         ), (override));
 
@@ -180,7 +180,7 @@ namespace minty::test {
         );
 
         MOCK_METHOD(void, update_comment, (
-            std::string_view comment_id,
+            const UUID::uuid& comment_id,
             std::string_view content
         ), (override));
 

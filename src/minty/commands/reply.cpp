@@ -2,6 +2,7 @@
 
 #include "../client.h"
 #include "../output.h"
+#include "../parser/parser.h"
 
 using namespace commline;
 
@@ -9,7 +10,7 @@ namespace {
     namespace internal {
         auto reply(
             const app& app,
-            std::string_view comment,
+            const UUID::uuid& comment,
             std::string_view content
         ) -> void {
             auto api = minty::cli::client();
@@ -28,7 +29,7 @@ namespace minty::commands {
             "Create a reply to a comment",
             options(),
             arguments(
-                required<std::string_view>("comment"),
+                required<UUID::uuid>("comment"),
                 required<std::string_view>("content")
             ),
             internal::reply

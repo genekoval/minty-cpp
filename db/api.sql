@@ -367,7 +367,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_reply(
-    a_parent_id     integer,
+    a_parent_id     uuid,
     a_content       text
 ) RETURNS SETOF data.post_comment AS $$
 DECLARE l_parent record;
@@ -985,7 +985,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION update_comment(
-    a_comment_id    integer,
+    a_comment_id    uuid,
     a_content       text
 ) RETURNS void AS $$
 BEGIN
