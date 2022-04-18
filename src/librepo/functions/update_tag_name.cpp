@@ -2,7 +2,7 @@
 
 namespace minty::repo::db {
     auto database::update_tag_name(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view name
     ) -> tag_name_update {
         auto tx = ntx();

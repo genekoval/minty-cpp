@@ -12,7 +12,7 @@ namespace minty::test {
 
         MOCK_METHOD(void, add_post_tag, (
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ), (override));
 
         MOCK_METHOD(void, add_posts, (
@@ -24,7 +24,7 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(void, add_tag_alias, (
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ), (override));
 
@@ -36,10 +36,10 @@ namespace minty::test {
             const UUID::uuid& post_id
         ), (override));
 
-        MOCK_METHOD(void, delete_tag, (std::string_view tag_id), (override));
+        MOCK_METHOD(void, delete_tag, (const UUID::uuid& tag_id), (override));
 
         MOCK_METHOD(void, delete_tag_alias, (
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ), (override));
 
@@ -47,13 +47,13 @@ namespace minty::test {
             const core::post_query& query
         ), (override));
 
-        MOCK_METHOD(core::search_result<std::string>, find_tags, (
+        MOCK_METHOD(core::search_result<UUID::uuid>, find_tags, (
             const core::tag_query& query
         ), (override));
 
         MOCK_METHOD(void, remove_post_tag, (
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ), (override));
 
         MOCK_METHOD(void, update_post_date_modified, (
@@ -70,7 +70,7 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(void, update_tag_name, (
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view old_name,
             std::string_view new_name
         ), (override));

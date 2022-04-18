@@ -85,11 +85,29 @@ namespace minty::core {
         );
     };
 
+    struct tag {
+        decltype(repo::db::tag::id) id;
+        decltype(repo::db::tag::name) name;
+        decltype(repo::db::tag::aliases) aliases;
+        decltype(repo::db::tag::description) description;
+        decltype(repo::db::tag::avatar) avatar;
+        decltype(repo::db::tag::banner) banner;
+        std::vector<source> sources;
+        decltype(repo::db::tag::post_count) post_count;
+        decltype(repo::db::tag::date_created) date_created;
+
+        tag() = default;
+        tag(
+            const repo::db::tag& t,
+            std::vector<repo::db::source>&& sources
+        );
+    };
+
     struct post_parts {
         std::string title;
         std::string description;
         std::vector<UUID::uuid> objects;
-        std::vector<std::string> tags;
+        std::vector<decltype(tag::id)> tags;
     };
 
     struct post_preview {
@@ -137,6 +155,12 @@ namespace minty::core {
         );
     };
 
+    template <typename T>
+    struct search_result {
+        unsigned int total;
+        std::vector<T> hits;
+    };
+
     struct post_query {
         struct sort_type {
             sort_order order;
@@ -146,38 +170,14 @@ namespace minty::core {
         unsigned int from;
         unsigned int size;
         std::optional<std::string> text;
-        std::vector<std::string> tags;
+        std::vector<decltype(tag::id)> tags;
         sort_type sort;
-    };
-
-    template <typename T>
-    struct search_result {
-        unsigned int total;
-        std::vector<T> hits;
-    };
-
-    struct tag {
-        decltype(repo::db::tag::id) id;
-        decltype(repo::db::tag::name) name;
-        decltype(repo::db::tag::aliases) aliases;
-        decltype(repo::db::tag::description) description;
-        decltype(repo::db::tag::avatar) avatar;
-        decltype(repo::db::tag::banner) banner;
-        std::vector<source> sources;
-        decltype(repo::db::tag::post_count) post_count;
-        decltype(repo::db::tag::date_created) date_created;
-
-        tag() = default;
-        tag(
-            const repo::db::tag& t,
-            std::vector<repo::db::source>&& sources
-        );
     };
 
     struct tag_query {
         unsigned int from;
         unsigned int size;
-        std::string name;
-        std::vector<std::string> exclude;
+        decltype(tag::name) name;
+        std::vector<decltype(tag::id)> exclude;
     };
 }

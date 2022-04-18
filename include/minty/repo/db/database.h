@@ -37,7 +37,7 @@ namespace minty::repo::db {
             std::string_view title,
             std::string_view description,
             const std::vector<UUID::uuid>& objects,
-            const std::vector<std::string>& tags
+            const std::vector<UUID::uuid>& tags
         ) -> post_search;
 
         VIRTUAL auto create_post_objects(
@@ -48,7 +48,7 @@ namespace minty::repo::db {
 
         VIRTUAL auto create_post_tag(
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ) -> void;
 
         VIRTUAL auto create_reply(
@@ -72,15 +72,15 @@ namespace minty::repo::db {
             std::string_view resource
         ) -> source;
 
-        VIRTUAL auto create_tag(std::string_view name) -> std::string;
+        VIRTUAL auto create_tag(std::string_view name) -> UUID::uuid;
 
         VIRTUAL auto create_tag_alias(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ) -> tag_name;
 
         VIRTUAL auto create_tag_source(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view source_id
         ) -> void;
 
@@ -98,7 +98,7 @@ namespace minty::repo::db {
 
         VIRTUAL auto delete_post_tag(
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ) -> void;
 
         VIRTUAL auto delete_related_post(
@@ -106,15 +106,15 @@ namespace minty::repo::db {
             const UUID::uuid& related
         ) -> void;
 
-        VIRTUAL auto delete_tag(std::string_view tag_id) -> void;
+        VIRTUAL auto delete_tag(const UUID::uuid& tag_id) -> void;
 
         VIRTUAL auto delete_tag_alias(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ) -> tag_name;
 
         VIRTUAL auto delete_tag_source(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view source_id
         ) -> void;
 
@@ -171,14 +171,14 @@ namespace minty::repo::db {
             std::string_view host
         ) -> std::optional<std::string>;
 
-        VIRTUAL auto read_tag(std::string_view tag_id) -> tag;
+        VIRTUAL auto read_tag(const UUID::uuid& tag_id) -> tag;
 
         VIRTUAL auto read_tag_previews(
-            const std::vector<std::string>& tags
+            const std::vector<UUID::uuid>& tags
         ) -> std::vector<tag_preview>;
 
         VIRTUAL auto read_tag_sources(
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ) -> std::vector<source>;
 
         VIRTUAL auto read_tag_text() -> std::vector<tag_text>;
@@ -204,12 +204,12 @@ namespace minty::repo::db {
         ) -> post_update;
 
         VIRTUAL auto update_tag_description(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view description
         ) -> std::optional<std::string>;
 
         VIRTUAL auto update_tag_name(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view name
         ) -> tag_name_update;
     };

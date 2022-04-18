@@ -37,7 +37,7 @@ namespace minty::cli {
 
     auto print_tag(
         minty::api& api,
-        std::string_view id,
+        const UUID::uuid& id,
         std::optional<std::string_view> path
     ) -> void;
 }

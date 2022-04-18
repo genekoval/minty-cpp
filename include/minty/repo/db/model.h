@@ -29,45 +29,45 @@ namespace minty::repo::db {
 
     struct object : entix::entity<2, source> {
         UUID::uuid id;
-        std::optional<UUID::uuid> preview_id;
+        std::optional<decltype(id)> preview_id;
         std::optional<source> src;
     };
 
     struct object_preview : entix::entity<2> {
-        UUID::uuid id;
-        std::optional<UUID::uuid> preview_id;
+        decltype(object::id) id;
+        decltype(object::preview_id) preview_id;
     };
 
     struct tag : entix::entity<9> {
-        std::string id;
+        UUID::uuid id;
         std::string name;
-        std::vector<std::string> aliases;
+        std::vector<decltype(name)> aliases;
         std::optional<std::string> description;
-        std::optional<std::string> avatar;
-        std::optional<std::string> banner;
+        std::optional<decltype(object::id)> avatar;
+        std::optional<decltype(object::id)> banner;
         unsigned int post_count;
         std::string date_created;
     };
 
     struct tag_name : entix::entity<2> {
-        std::string name;
-        std::vector<std::string> aliases;
+        decltype(tag::name) name;
+        decltype(tag::aliases) aliases;
     };
 
     struct tag_name_update : entix::entity<1, tag_name> {
         tag_name names;
-        std::optional<std::string> old_name;
+        std::optional<decltype(tag::name)> old_name;
     };
 
     struct tag_preview : entix::entity<3> {
-        std::string id;
-        std::string name;
-        std::optional<UUID::uuid> avatar;
+        decltype(tag::id) id;
+        decltype(tag::name) name;
+        decltype(tag::avatar) avatar;
     };
 
     struct tag_text : entix::entity<2> {
-        std::string id;
-        std::vector<std::string> names;
+        decltype(tag::id) id;
+        std::vector<decltype(tag::name)> names;
     };
 
     struct post : entix::entity<7> {
@@ -102,7 +102,7 @@ namespace minty::repo::db {
         decltype(post::description) description;
         decltype(post::date_created) date_created;
         decltype(post::date_modified) date_modified;
-        std::vector<std::string> tags;
+        std::vector<decltype(tag::id)> tags;
 
         auto operator==(const post_search&) const -> bool = default;
     };

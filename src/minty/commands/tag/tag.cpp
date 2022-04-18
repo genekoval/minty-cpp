@@ -3,6 +3,7 @@
 #include "../../client.h"
 #include "../../options/opts.h"
 #include "../../output.h"
+#include "../../parser/parser.h"
 
 using namespace commline;
 
@@ -16,7 +17,7 @@ namespace {
         const std::vector<std::string_view>& new_links,
         const std::vector<std::string_view>& links_to_remove,
         std::optional<std::string_view> path,
-        std::string_view id
+        const UUID::uuid& id
     ) -> void {
         auto api = minty::cli::client();
 
@@ -70,7 +71,7 @@ namespace minty::commands {
                 cli::opts::path()
             ),
             arguments(
-                required<std::string_view>("id")
+                required<UUID::uuid>("id")
             ),
             $tag
         );

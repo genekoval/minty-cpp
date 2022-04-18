@@ -17,7 +17,7 @@ CREATE TABLE site (
 CREATE TABLE source (
     source_id       bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     resource        text NOT NULL,
-    site_id         integer NOT NULL REFERENCES site ON DELETE NO ACTION,
+    site_id         bigint NOT NULL REFERENCES site ON DELETE NO ACTION,
 
     UNIQUE (site_id, resource)
 );
@@ -62,7 +62,7 @@ CREATE TABLE post_comment (
 );
 
 CREATE TABLE tag (
-    tag_id          SERIAL PRIMARY KEY,
+    tag_id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     description     text,
     avatar          uuid REFERENCES object_ref ON DELETE NO ACTION,
     banner          uuid REFERENCES object_ref ON DELETE NO ACTION,
@@ -70,7 +70,7 @@ CREATE TABLE tag (
 );
 
 CREATE TABLE tag_name (
-    tag_id          integer NOT NULL REFERENCES tag ON DELETE CASCADE,
+    tag_id          uuid NOT NULL REFERENCES tag ON DELETE CASCADE,
     value           text NOT NULL,
     main            boolean NOT NULL DEFAULT false,
 
@@ -79,13 +79,13 @@ CREATE TABLE tag_name (
 
 CREATE TABLE post_tag (
     post_id         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
-    tag_id          integer NOT NULL REFERENCES tag ON DELETE CASCADE,
+    tag_id          uuid NOT NULL REFERENCES tag ON DELETE CASCADE,
 
     PRIMARY KEY (post_id, tag_id)
 );
 
 CREATE TABLE tag_source (
-    tag_id          integer NOT NULL REFERENCES tag ON DELETE CASCADE,
+    tag_id          uuid NOT NULL REFERENCES tag ON DELETE CASCADE,
     source_id       bigint NOT NULL REFERENCES source ON DELETE NO ACTION,
 
     PRIMARY KEY (tag_id, source_id)

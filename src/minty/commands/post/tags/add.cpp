@@ -10,7 +10,7 @@ namespace {
         auto add(
             const app& app,
             const UUID::uuid& id,
-            const std::vector<std::string_view>& tags
+            const std::vector<UUID::uuid>& tags
         ) -> void {
             auto api = minty::cli::client();
 
@@ -29,7 +29,7 @@ namespace minty::subcommands::post_tags {
             options(),
             arguments(
                 required<UUID::uuid>("id"),
-                variadic<std::string_view>("tags")
+                variadic<UUID::uuid>("tags")
             ),
             internal::add
         );

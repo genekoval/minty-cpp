@@ -1,7 +1,7 @@
 #include "database.h"
 
 namespace minty::repo::db {
-    auto database::read_tag(std::string_view tag_id) -> tag {
+    auto database::read_tag(const UUID::uuid& tag_id) -> tag {
         auto tx = ntx();
 
         try {

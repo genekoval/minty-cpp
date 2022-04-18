@@ -26,7 +26,7 @@ namespace minty::core {
 
     auto search_engine::add_post_tag(
         const UUID::uuid& post_id,
-        std::string_view tag_id
+        const UUID::uuid& tag_id
     ) -> void {
         return connect().send<void>(event::add_post_tag, post_id, tag_id);
     }
@@ -42,7 +42,7 @@ namespace minty::core {
     }
 
     auto search_engine::add_tag_alias(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view alias
     ) -> void {
         connect().send<void>(
@@ -64,7 +64,7 @@ namespace minty::core {
         connect().send<void>(event::delete_post, post_id);
     }
 
-    auto search_engine::delete_tag(std::string_view tag_id) -> void {
+    auto search_engine::delete_tag(const UUID::uuid& tag_id) -> void {
         connect().send<void>(
             event::delete_tag,
             tag_id
@@ -72,7 +72,7 @@ namespace minty::core {
     }
 
     auto search_engine::delete_tag_alias(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view alias
     ) -> void {
         connect().send<void>(
@@ -93,8 +93,8 @@ namespace minty::core {
 
     auto search_engine::find_tags(
         const tag_query& query
-    ) -> search_result<std::string> {
-        return connect().send<search_result<std::string>>(
+    ) -> search_result<UUID::uuid> {
+        return connect().send<search_result<UUID::uuid>>(
             event::find_tags,
             query
         );
@@ -102,7 +102,7 @@ namespace minty::core {
 
     auto search_engine::remove_post_tag(
         const UUID::uuid& post_id,
-        std::string_view tag_id
+        const UUID::uuid& tag_id
     ) -> void {
         connect().send<void>(event::remove_post_tag, post_id, tag_id);
     }
@@ -133,7 +133,7 @@ namespace minty::core {
     }
 
     auto search_engine::update_tag_name(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view old_name,
         std::string_view new_name
     ) -> void {

@@ -36,7 +36,7 @@ namespace minty {
 
         auto add_post_tag(
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ) -> void;
 
         auto add_related_post(
@@ -49,15 +49,15 @@ namespace minty {
             std::string_view content
         ) -> core::comment;
 
-        auto add_tag(std::string_view name) -> std::string;
+        auto add_tag(std::string_view name) -> UUID::uuid;
 
         auto add_tag_alias(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ) -> core::tag_name;
 
         auto add_tag_source(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view url
         ) -> core::source;
 
@@ -70,7 +70,7 @@ namespace minty {
 
         auto delete_post_tag(
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ) -> void;
 
         auto delete_related_post(
@@ -81,12 +81,12 @@ namespace minty {
         auto delete_tag(std::string_view id) -> void;
 
         auto delete_tag_alias(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ) -> core::tag_name;
 
         auto delete_tag_source(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view source_id
         ) -> void;
 
@@ -104,7 +104,7 @@ namespace minty {
 
         auto get_server_info() -> server::server_info;
 
-        auto get_tag(std::string_view id) -> core::tag;
+        auto get_tag(const UUID::uuid& id) -> core::tag;
 
         auto get_tags(
             const core::tag_query& query
@@ -127,12 +127,12 @@ namespace minty {
         ) -> core::modification<std::optional<std::string>>;
 
         auto set_tag_description(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view description
         ) -> std::optional<std::string>;
 
         auto set_tag_name(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view new_name
         ) -> core::tag_name;
     };

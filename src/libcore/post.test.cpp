@@ -19,7 +19,7 @@ TEST_F(CorePostTest, AddPostWhitespaceTitle) {
         std::string_view(trimmed_text),
         std::string_view(),
         std::vector<UUID::uuid>(),
-        std::vector<std::string>()
+        std::vector<UUID::uuid>()
     )).WillOnce(Return(post_search));
 
     EXPECT_CALL(search, add_post(post_search));
@@ -32,7 +32,7 @@ TEST_F(CorePostTest, AddPostWhitespaceDescription) {
         std::string_view(),
         std::string_view(trimmed_text),
         std::vector<UUID::uuid>(),
-        std::vector<std::string>()
+        std::vector<UUID::uuid>()
     )).WillOnce(Return(post_search));
 
     EXPECT_CALL(search, add_post(post_search));

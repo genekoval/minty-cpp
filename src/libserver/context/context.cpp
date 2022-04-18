@@ -47,7 +47,7 @@ namespace minty::server {
 
     auto context::add_post_tag(
         UUID::uuid post_id,
-        std::string tag_id
+        UUID::uuid tag_id
     ) -> void {
         api->add_post_tag(post_id, tag_id);
     }
@@ -66,19 +66,19 @@ namespace minty::server {
         return api->add_reply(parent_id, content);
     }
 
-    auto context::add_tag(std::string name) -> std::string {
+    auto context::add_tag(std::string name) -> UUID::uuid {
         return api->add_tag(name);
 	}
 
     auto context::add_tag_alias(
-        std::string tag_id,
+        UUID::uuid tag_id,
         std::string alias
     ) -> core::tag_name{
         return api->add_tag_alias(tag_id, alias);
     }
 
     auto context::add_tag_source(
-        std::string tag_id,
+        UUID::uuid tag_id,
         std::string url
     ) -> core::source {
         return api->add_tag_source(tag_id, url);
@@ -104,7 +104,7 @@ namespace minty::server {
 
     auto context::delete_post_tag(
         UUID::uuid post_id,
-        std::string tag_id
+        UUID::uuid tag_id
     ) -> void {
         api->delete_post_tag(post_id, tag_id);
     }
@@ -116,19 +116,19 @@ namespace minty::server {
         api->delete_related_post(post_id, related);
     }
 
-    auto context::delete_tag(std::string tag_id) -> void {
+    auto context::delete_tag(UUID::uuid tag_id) -> void {
         api->delete_tag(tag_id);
     }
 
     auto context::delete_tag_alias(
-        std::string tag_id,
+        UUID::uuid tag_id,
         std::string alias
     ) -> core::tag_name {
         return api->delete_tag_alias(tag_id, alias);
     }
 
     auto context::delete_tag_source(
-        std::string tag_id,
+        UUID::uuid tag_id,
         std::string source_id
     ) -> void {
         api->delete_tag_source(tag_id, source_id);
@@ -156,7 +156,7 @@ namespace minty::server {
         return *info;
 	}
 
-    auto context::get_tag(std::string tag_id) -> core::tag {
+    auto context::get_tag(UUID::uuid tag_id) -> core::tag {
         return api->get_tag(tag_id);
 	}
 
@@ -204,14 +204,14 @@ namespace minty::server {
     }
 
     auto context::set_tag_description(
-        std::string tag_id,
+        UUID::uuid tag_id,
         std::string description
     ) -> std::optional<std::string> {
         return api->set_tag_description(tag_id, description);
     }
 
     auto context::set_tag_name(
-        std::string tag_id,
+        UUID::uuid tag_id,
         std::string new_name
     ) -> core::tag_name {
         return api->set_tag_name(tag_id, new_name);

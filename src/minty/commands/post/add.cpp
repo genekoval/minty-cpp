@@ -2,6 +2,7 @@
 
 #include "../../client.h"
 #include "../../options/opts.h"
+#include "../../parser/parser.h"
 
 using namespace commline;
 
@@ -11,7 +12,7 @@ namespace {
             const app& app,
             std::string title,
             std::string description,
-            const std::vector<std::string>& tags,
+            const std::vector<UUID::uuid>& tags,
             const std::vector<std::string_view>& objects
         ) -> void {
             auto api = minty::cli::client();

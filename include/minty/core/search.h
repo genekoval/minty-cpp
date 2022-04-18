@@ -49,7 +49,7 @@ namespace minty::core {
 
         VIRTUAL auto add_post_tag(
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ) -> void;
 
         VIRTUAL auto add_posts(std::span<const post_search> posts) -> void;
@@ -57,7 +57,7 @@ namespace minty::core {
         VIRTUAL auto add_tags(std::span<const tag_text> tags) -> void;
 
         VIRTUAL auto add_tag_alias(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ) -> void;
 
@@ -67,10 +67,10 @@ namespace minty::core {
 
         VIRTUAL auto delete_post(const UUID::uuid& post_id) -> void;
 
-        VIRTUAL auto delete_tag(std::string_view tag_id) -> void;
+        VIRTUAL auto delete_tag(const UUID::uuid& tag_id) -> void;
 
         VIRTUAL auto delete_tag_alias(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view alias
         ) -> void;
 
@@ -80,11 +80,11 @@ namespace minty::core {
 
         VIRTUAL auto find_tags(
             const tag_query& query
-        ) -> search_result<std::string>;
+        ) -> search_result<UUID::uuid>;
 
         VIRTUAL auto remove_post_tag(
             const UUID::uuid& post_id,
-            std::string_view tag_id
+            const UUID::uuid& tag_id
         ) -> void;
 
         VIRTUAL auto update_post_date_modified(
@@ -97,7 +97,7 @@ namespace minty::core {
         VIRTUAL auto update_post_title(const post_update& post) -> void;
 
         VIRTUAL auto update_tag_name(
-            std::string_view tag_id,
+            const UUID::uuid& tag_id,
             std::string_view old_name,
             std::string_view new_name
         ) -> void;

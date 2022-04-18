@@ -58,7 +58,7 @@ TEST_F(DatabasePostTagTest, CreatePostWithTags) {
         "apple"
     };
 
-    auto tags = std::vector<std::string>();
+    auto tags = std::vector<UUID::uuid>();
     for (const auto& name : names) {
         tags.push_back(database.create_tag(name));
     }

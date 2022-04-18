@@ -206,7 +206,7 @@ CREATE TYPE tag_name_update AS (
 );
 
 CREATE TYPE tag_text AS (
-    tag_id          integer,
+    tag_id          uuid,
     names           text[]
 );
 
@@ -233,7 +233,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_object(
     a_object_id     uuid,
     a_preview_id    uuid,
-    a_source_id     integer
+    a_source_id     bigint
 ) RETURNS void AS $$
 BEGIN
     PERFORM create_object_refs(ARRAY[a_object_id, a_preview_id]);
@@ -272,7 +272,7 @@ CREATE FUNCTION create_post(
     a_title         text,
     a_description   text,
     a_objects       uuid[],
-    tags            integer[]
+    a_tags          uuid[]
 ) RETURNS SETOF post_search_view AS $$
 DECLARE
     l_post_id       uuid;
@@ -294,7 +294,7 @@ BEGIN
 
     WITH tag_table AS (
         SELECT unnest AS tag_id
-        FROM unnest(tags)
+        FROM unnest(a_tags)
     )
     INSERT INTO data.post_tag (
         post_id,
@@ -347,7 +347,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_post_tag(
     a_post_id       uuid,
-    a_tag_id        integer
+    a_tag_id        uuid
 ) RETURNS void AS $$
 BEGIN
     INSERT INTO data.post_tag (post_id, tag_id)
@@ -435,9 +435,9 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_tag(
     name            text
-) RETURNS integer AS $$
+) RETURNS uuid AS $$
 DECLARE
-    id              integer;
+    id              uuid;
 BEGIN
     WITH new_tag AS (
         INSERT INTO data.tag DEFAULT VALUES
@@ -462,7 +462,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_tag_alias(
-    a_tag_id        integer,
+    a_tag_id        uuid,
     a_alias         text
 ) RETURNS SETOF tag_name AS $$
 BEGIN
@@ -478,8 +478,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_tag_source(
-    a_tag_id        integer,
-    a_source_id     integer
+    a_tag_id        uuid,
+    a_source_id     bigint
 ) RETURNS void AS $$
 BEGIN
     INSERT INTO data.tag_source (
@@ -580,7 +580,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_post_tag(
     a_post_id       uuid,
-    a_tag_id        integer
+    a_tag_id        uuid
 ) RETURNS void AS $$
 BEGIN
     DELETE FROM data.post_tag
@@ -599,7 +599,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_tag(
-    a_tag_id        integer
+    a_tag_id        uuid
 ) RETURNS void AS $$
 BEGIN
     DELETE FROM data.tag
@@ -608,7 +608,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_tag_alias(
-    a_tag_id        integer,
+    a_tag_id        uuid,
     a_alias         text
 ) RETURNS SETOF tag_name AS $$
 BEGIN
@@ -625,8 +625,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION delete_tag_source(
-    a_tag_id        integer,
-    a_source_id     integer
+    a_tag_id        uuid,
+    a_source_id     bigint
 ) RETURNS void AS $$
 BEGIN
     DELETE FROM data.tag_source
@@ -879,9 +879,9 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION read_site(
     a_scheme        text,
     a_host          text
-) RETURNS integer AS $$
+) RETURNS bigint AS $$
 DECLARE
-    result          integer;
+    result          bigint;
 BEGIN
     SELECT INTO result site_id
     FROM data.site
@@ -892,7 +892,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_tag(
-    a_tag_id    integer
+    a_tag_id        uuid
 ) RETURNS SETOF tag_view AS $$
 BEGIN
     RETURN QUERY
@@ -903,7 +903,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_tag_previews(
-    a_tags      integer[]
+    a_tags          uuid[]
 ) RETURNS SETOF tag_preview AS $$
 BEGIN
     RETURN QUERY
@@ -923,7 +923,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_tag_sources(
-    a_tag_id        integer
+    a_tag_id        uuid
 ) RETURNS SETOF source_view AS $$
 BEGIN
     RETURN QUERY
@@ -1041,7 +1041,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION update_tag_description(
-    a_tag_id        integer,
+    a_tag_id        uuid,
     a_description   text
 ) RETURNS text AS $$
 DECLARE
@@ -1060,14 +1060,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/*
+/**
  * Updates a tag's main name.
  * If the new name already exists as an alias, the alias and the main name are
  * swapped. Otherwise, the main name is replaced with the new value.
  */
 CREATE FUNCTION update_tag_name(
     -- The tag for which to update the main name.
-    a_tag_id        integer,
+    a_tag_id        uuid,
     -- The new main name.
     a_name          text
 ) RETURNS SETOF tag_name_update AS $$

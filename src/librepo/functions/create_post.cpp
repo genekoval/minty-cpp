@@ -5,7 +5,7 @@ namespace minty::repo::db {
         std::string_view title,
         std::string_view description,
         const std::vector<UUID::uuid>& objects,
-        const std::vector<std::string>& tags
+        const std::vector<UUID::uuid>& tags
     ) -> post_search {
         auto tx = ntx();
 

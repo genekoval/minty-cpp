@@ -45,7 +45,7 @@ namespace minty {
 
     auto api::add_post_tag(
         const UUID::uuid& post_id,
-        std::string_view tag_id
+        const UUID::uuid& tag_id
     ) -> void {
         connect().send<void>(
             event::add_post_tag,
@@ -72,15 +72,15 @@ namespace minty {
         );
     }
 
-    auto api::add_tag(std::string_view name) -> std::string {
-        return connect().send<std::string>(
+    auto api::add_tag(std::string_view name) -> UUID::uuid {
+        return connect().send<UUID::uuid>(
             event::add_tag,
             name
         );
     }
 
     auto api::add_tag_alias(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view alias
     ) -> core::tag_name {
         return connect().send<core::tag_name>(
@@ -91,7 +91,7 @@ namespace minty {
     }
 
     auto api::add_tag_source(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view url
     ) -> core::source {
         return connect().send<core::source>(
@@ -118,7 +118,7 @@ namespace minty {
 
     auto api::delete_post_tag(
         const UUID::uuid& post_id,
-        std::string_view tag_id
+        const UUID::uuid& tag_id
     ) -> void {
         connect().send<void>(event::delete_post_tag, post_id, tag_id);
     }
@@ -135,7 +135,7 @@ namespace minty {
     }
 
     auto api::delete_tag_alias(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view alias
     ) -> core::tag_name {
         return connect().send<core::tag_name>(
@@ -146,7 +146,7 @@ namespace minty {
     }
 
     auto api::delete_tag_source(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view source_id
     ) -> void {
         connect().send<void>(
@@ -189,7 +189,7 @@ namespace minty {
         return connect().send<server::server_info>(event::get_server_info);
     }
 
-    auto api::get_tag(std::string_view id) -> core::tag {
+    auto api::get_tag(const UUID::uuid& id) -> core::tag {
         return connect().send<core::tag>(
             event::get_tag,
             id
@@ -241,7 +241,7 @@ namespace minty {
     }
 
     auto api::set_tag_description(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view description
     ) -> std::optional<std::string> {
         return connect().send<std::optional<std::string>>(
@@ -252,7 +252,7 @@ namespace minty {
     }
 
     auto api::set_tag_name(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view new_name
     ) -> core::tag_name {
         return connect().send<core::tag_name>(

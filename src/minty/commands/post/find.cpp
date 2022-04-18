@@ -13,7 +13,7 @@ namespace {
             const app& app,
             unsigned int from,
             unsigned int size,
-            const std::vector<std::string>& tags,
+            const std::vector<UUID::uuid>& tags,
             const minty::core::post_query::sort_type sort,
             std::optional<std::string_view> path,
             std::optional<std::string> text

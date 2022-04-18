@@ -1,6 +1,6 @@
 #include "DatabaseTag.test.h"
 
-auto DatabaseTagTest::create_tag() -> std::string {
+auto DatabaseTagTest::create_tag() -> UUID::uuid {
     return database.create_tag(tag_name);
 }
 

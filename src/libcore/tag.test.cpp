@@ -7,7 +7,7 @@ using testing::Return;
 class CoreTagTest : public CoreTest {};
 
 TEST_F(CoreTagTest, AddTag) {
-    constexpr auto tag_id = "1";
+    const UUID::uuid tag_id = "1e2478f5-5a29-40b8-8c0e-9ef243f0deb5";
 
     EXPECT_CALL(db, create_tag(trimmed_text)).WillOnce(Return(tag_id));
     EXPECT_CALL(search, add_tag_alias(tag_id, trimmed_text));

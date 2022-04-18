@@ -13,25 +13,25 @@ namespace minty::repo::db {
         auto c = entix::connection(*connection);
 
         c.prepare("create_comment", {"uuid", "text"});
-        c.prepare("create_object", {"uuid", "uuid", "integer"});
-        c.prepare("create_post", {"text", "text", "uuid[]", "integer[]"});
+        c.prepare("create_object", {"uuid", "uuid", "bigint"});
+        c.prepare("create_post", {"text", "text", "uuid[]", "uuid[]"});
         c.prepare("create_post_objects", {"uuid", "uuid[]", "smallint"});
-        c.prepare("create_post_tag", {"uuid", "integer"});
+        c.prepare("create_post_tag", {"uuid", "uuid"});
         c.prepare("create_related_post", {"uuid", "uuid"});
         c.prepare("create_reply", {"uuid", "text"});
         c.prepare("create_site", {"text", "text", "uuid"});
         c.prepare("create_source", {"bigint", "text"});
         c.prepare("create_tag", {"text"});
-        c.prepare("create_tag_alias", {"integer", "text"});
-        c.prepare("create_tag_source", {"integer", "integer"});
+        c.prepare("create_tag_alias", {"uuid", "text"});
+        c.prepare("create_tag_source", {"uuid", "bigint"});
         c.prepare("delete_post", {"uuid"});
         c.prepare("delete_post_objects", {"uuid", "uuid[]"});
         c.prepare("delete_post_objects_ranges", {"uuid", "int4range[]"});
-        c.prepare("delete_post_tag", {"uuid", "integer"});
+        c.prepare("delete_post_tag", {"uuid", "uuid"});
         c.prepare("delete_related_post", {"uuid", "uuid"});
-        c.prepare("delete_tag", {"integer"});
-        c.prepare("delete_tag_alias", {"integer", "text"});
-        c.prepare("delete_tag_source", {"integer", "integer"});
+        c.prepare("delete_tag", {"uuid"});
+        c.prepare("delete_tag_alias", {"uuid", "text"});
+        c.prepare("delete_tag_source", {"uuid", "bigint"});
         c.prepare("move_post_object", {"uuid", "integer", "integer"});
         c.prepare("move_post_objects", {"uuid", "uuid[]", "uuid"});
         c.prepare("prune", {});
@@ -46,16 +46,16 @@ namespace minty::repo::db {
         c.prepare("read_post_tags", {"uuid"});
         c.prepare("read_related_posts", {"uuid"});
         c.prepare("read_site", {"text", "text"});
-        c.prepare("read_tag", {"integer"});
-        c.prepare("read_tag_previews", {"integer[]"});
-        c.prepare("read_tag_sources", {"integer"});
+        c.prepare("read_tag", {"uuid"});
+        c.prepare("read_tag_previews", {"uuid[]"});
+        c.prepare("read_tag_sources", {"uuid"});
         c.prepare("read_tag_text", {});
         c.prepare("update_comment", {"uuid", "text"});
         c.prepare("update_object_preview", {"uuid", "uuid"});
         c.prepare("update_post_description", {"uuid", "text"});
         c.prepare("update_post_title", {"uuid", "text"});
-        c.prepare("update_tag_description", {"integer", "text"});
-        c.prepare("update_tag_name", {"integer", "text"});
+        c.prepare("update_tag_description", {"uuid", "text"});
+        c.prepare("update_tag_name", {"uuid", "text"});
     }
 
     auto database::ntx() -> pqxx::nontransaction {

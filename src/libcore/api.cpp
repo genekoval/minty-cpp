@@ -139,7 +139,7 @@ namespace minty::core {
 
     auto api::add_post_tag(
         const UUID::uuid& post_id,
-        std::string_view tag_id
+        const UUID::uuid& tag_id
     ) -> void {
         TIMBER_FUNC();
 
@@ -227,7 +227,7 @@ namespace minty::core {
         return db->create_site(scheme, host, icon_id).id;
     }
 
-    auto api::add_tag(std::string_view name) -> std::string {
+    auto api::add_tag(std::string_view name) -> UUID::uuid {
         TIMBER_FUNC();
 
         const auto formatted = format_tag(name);
@@ -239,7 +239,7 @@ namespace minty::core {
     }
 
     auto api::add_tag_alias(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view alias
     ) -> tag_name {
         TIMBER_FUNC();
@@ -253,7 +253,7 @@ namespace minty::core {
     }
 
     auto api::add_tag_source(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view url
     ) -> source {
         TIMBER_FUNC();
@@ -294,7 +294,7 @@ namespace minty::core {
 
     auto api::delete_post_tag(
         const UUID::uuid& post_id,
-        std::string_view tag_id
+        const UUID::uuid& tag_id
     ) -> void {
         TIMBER_FUNC();
 
@@ -311,7 +311,7 @@ namespace minty::core {
         db->delete_related_post(post_id, related);
     }
 
-    auto api::delete_tag(std::string_view id) -> void {
+    auto api::delete_tag(const UUID::uuid& id) -> void {
         TIMBER_FUNC();
 
         db->delete_tag(id);
@@ -319,7 +319,7 @@ namespace minty::core {
     }
 
     auto api::delete_tag_alias(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view alias
     ) -> tag_name {
         TIMBER_FUNC();
@@ -330,7 +330,7 @@ namespace minty::core {
     }
 
     auto api::delete_tag_source(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view source_id
     ) -> void {
         TIMBER_FUNC();
@@ -419,7 +419,7 @@ namespace minty::core {
         };
     }
 
-    auto api::get_tag(std::string_view id) -> tag {
+    auto api::get_tag(const UUID::uuid& id) -> tag {
         TIMBER_FUNC();
 
         return tag(db->read_tag(id), db->read_tag_sources(id));
@@ -564,7 +564,7 @@ namespace minty::core {
     }
 
     auto api::set_tag_description(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view description
     ) -> std::optional<std::string> {
         TIMBER_FUNC();
@@ -576,7 +576,7 @@ namespace minty::core {
     }
 
     auto api::set_tag_name(
-        std::string_view tag_id,
+        const UUID::uuid& tag_id,
         std::string_view new_name
     ) -> tag_name {
         TIMBER_FUNC();
