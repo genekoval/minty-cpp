@@ -71,7 +71,7 @@ namespace commline {
 
         const auto value = get_value(argument.substr(0, delim));
         const auto order = delim == std::string_view::npos ?
-            default_order(value) : get_order(argument.substr(0, delim));
+            default_order(value) : get_order(argument.substr(delim + 1));
 
         return {
             .order = order,
