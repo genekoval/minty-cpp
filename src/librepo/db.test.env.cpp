@@ -19,7 +19,7 @@ namespace minty::test {
     }
 
     auto DatabaseEnvironment::database() -> repo::db::database& {
-        static auto instance = repo::db::database(connection_string());
+        static auto instance = repo::db::database(connection_string(), 1);
         return instance;
     }
 

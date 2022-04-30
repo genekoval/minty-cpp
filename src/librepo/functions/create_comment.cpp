@@ -5,7 +5,8 @@ namespace minty::repo::db {
         const UUID::uuid& post_id,
         std::string_view content
     ) -> comment {
-        auto tx = ntx();
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
 
         return entix::make_entity<comment>(
             tx,

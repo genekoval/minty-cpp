@@ -5,7 +5,8 @@ namespace minty::repo::db {
         std::string_view site_id,
         std::string_view resource
     ) -> source {
-        auto tx = ntx();
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
         return entix::make_entity<source>(
             tx,
             __FUNCTION__,

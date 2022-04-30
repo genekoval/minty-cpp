@@ -5,7 +5,8 @@ namespace minty::repo::db {
         const UUID::uuid& tag_id,
         std::string_view name
     ) -> tag_name_update {
-        auto tx = ntx();
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
         return entix::make_entity<tag_name_update>(
             tx,
             __FUNCTION__,

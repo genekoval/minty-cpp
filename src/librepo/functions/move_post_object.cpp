@@ -6,7 +6,10 @@ namespace minty::repo::db {
         unsigned int old_index,
         unsigned int new_index
     ) -> std::string {
-        return ntx().exec_prepared1(
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
+
+        return tx.exec_prepared1(
             __FUNCTION__,
             post_id,
             old_index + 1,

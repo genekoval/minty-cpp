@@ -2,7 +2,8 @@
 
 namespace minty::repo::db {
     auto database::read_tag(const UUID::uuid& tag_id) -> tag {
-        auto tx = ntx();
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
 
         try {
             return entix::make_entity<tag>(tx, __FUNCTION__, tag_id);

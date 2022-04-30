@@ -5,7 +5,10 @@ namespace minty::repo::db {
         std::string_view scheme,
         std::string_view host
     ) -> std::optional<std::string> {
-        return ntx()
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
+
+        return tx
             .exec_prepared1(__FUNCTION__, scheme, host)[0]
             .as<std::optional<std::string>>();
     }

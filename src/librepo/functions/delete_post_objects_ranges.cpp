@@ -15,7 +15,10 @@ namespace minty::repo::db {
             ));
         }
 
-        return ntx().exec_prepared1(
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
+
+        return tx.exec_prepared1(
             __FUNCTION__,
             post_id,
             arg

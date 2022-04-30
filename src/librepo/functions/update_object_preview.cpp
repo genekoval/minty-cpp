@@ -5,6 +5,9 @@ namespace minty::repo::db {
         const UUID::uuid& object_id,
         const std::optional<UUID::uuid>& preview_id
     ) -> void {
-        ntx().exec_prepared(__FUNCTION__, object_id, preview_id);
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
+
+        tx.exec_prepared(__FUNCTION__, object_id, preview_id);
     }
 }

@@ -2,6 +2,9 @@
 
 namespace minty::repo::db {
     auto database::prune() -> void {
-        ntx().exec_prepared(__FUNCTION__);
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
+
+        tx.exec_prepared(__FUNCTION__);
     }
 }

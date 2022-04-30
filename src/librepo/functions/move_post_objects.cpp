@@ -6,7 +6,10 @@ namespace minty::repo::db {
         const std::vector<UUID::uuid>& objects,
         const std::optional<UUID::uuid>& destination
     ) -> std::string {
-        return ntx().exec_prepared1(
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
+
+        return tx.exec_prepared1(
             __FUNCTION__,
             post_id,
             objects,

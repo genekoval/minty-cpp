@@ -2,7 +2,7 @@
 
 namespace minty::cli {
     api_container::api_container(const conf::settings& settings) :
-        db(settings.database.connection.str()),
+        db(settings.database.connection.str(), settings.database.connections),
         object_store(settings.fstore.connection),
         bucket(
             object_store,

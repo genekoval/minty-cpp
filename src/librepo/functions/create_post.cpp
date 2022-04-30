@@ -7,7 +7,8 @@ namespace minty::repo::db {
         const std::vector<UUID::uuid>& objects,
         const std::vector<UUID::uuid>& tags
     ) -> post_search {
-        auto tx = ntx();
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
 
         return entix::make_entity<post_search>(
             tx,

@@ -6,7 +6,8 @@ namespace minty::repo::db {
         std::string_view name,
         std::optional<UUID::uuid> icon
     ) -> site {
-        auto tx = ntx();
+        auto connection = connections.connection();
+        auto tx = pqxx::nontransaction(connection);
 
         try {
             return entix::make_entity<site>(

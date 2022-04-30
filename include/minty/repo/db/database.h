@@ -3,22 +3,17 @@
 #include <minty/repo/db/model.h>
 #include <minty/test.h>
 
+#include <entix/entix>
 #include <pqxx/pqxx>
 #include <span>
 
 namespace minty::repo::db {
     class database {
-        std::optional<pqxx::connection> connection;
-
-        auto ntx() -> pqxx::nontransaction;
+        entix::connection_pool connections;
     public:
         database() = default;
 
-        database(std::string_view connection_string);
-
-        database(const database&) = delete;
-
-        database(database&& other) = default;
+        database(std::string_view connection_string, int connection_count);
 
         VIRTUAL_DESTRUCTOR(database)
 
