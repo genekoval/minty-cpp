@@ -512,11 +512,18 @@ namespace minty::core {
     auto api::reindex() -> void {
         TIMBER_FUNC();
 
+        constexpr auto batch_size = 500;
+
         search->delete_indices();
         search->create_indices();
 
-        search->add_posts(db->read_post_search());
-        search->add_tags(db->read_tag_text());
+        db->read_tag_text(batch_size, [this](auto tags) {
+            this->search->add_tags(tags);
+        });
+
+        db->read_post_search(batch_size, [this](auto posts) {
+            this->search->add_posts(posts);
+        });
     }
 
     auto api::set_comment_content(

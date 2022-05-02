@@ -1,9 +1,14 @@
 #include "database.h"
 
 namespace minty::repo::db {
-    auto database::read_tag_text() -> std::vector<tag_text> {
+    auto database::read_tag_text(
+        int batch_size,
+        std::function<void(std::span<const tag_text>)>&& action
+    ) -> void {
         auto connection = connections.connection();
-        auto tx = pqxx::nontransaction(connection);
-        return entix::make_entities<std::vector<tag_text>>(tx, __FUNCTION__);
+        auto tx = pqxx::work(connection);
+
+        entix::stream(tx, __FUNCTION__, batch_size, action);
+        tx.commit();
     }
 }

@@ -151,7 +151,10 @@ namespace minty::repo::db {
             const UUID::uuid& post_id
         ) -> std::vector<object_preview>;
 
-        VIRTUAL auto read_post_search() -> std::vector<post_search>;
+        VIRTUAL auto read_post_search(
+            int batch_size,
+            std::function<void(std::span<const post_search>)>&& action
+        ) -> void;
 
         VIRTUAL auto read_post_tags(
             const UUID::uuid& post_id
@@ -176,7 +179,10 @@ namespace minty::repo::db {
             const UUID::uuid& tag_id
         ) -> std::vector<source>;
 
-        VIRTUAL auto read_tag_text() -> std::vector<tag_text>;
+        VIRTUAL auto read_tag_text(
+            int batch_size,
+            std::function<void(std::span<const tag_text>)>&& action
+        ) -> void;
 
         VIRTUAL auto update_comment(
             const UUID::uuid& comment_id,

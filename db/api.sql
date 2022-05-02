@@ -117,6 +117,13 @@ LEFT JOIN (
     WHERE main = true
 ) AS main USING (tag_id);
 
+CREATE VIEW tag_text AS
+SELECT
+    tag_id,
+    array_agg(value) AS names
+FROM data.tag_name
+GROUP BY tag_id;
+
 CREATE VIEW tag_view AS
 SELECT
     tag_id,
@@ -203,11 +210,6 @@ CREATE TYPE tag_name_update AS (
     name            text,
     aliases         text[],
     old_name        text
-);
-
-CREATE TYPE tag_text AS (
-    tag_id          uuid,
-    names           text[]
 );
 
 --}}}
@@ -820,11 +822,16 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post_search()
-RETURNS SETOF post_search_view AS $$
+RETURNS refcursor AS $$
+DECLARE
+    ref             refcursor;
 BEGIN
-    RETURN QUERY
+    OPEN ref FOR
     SELECT *
-    FROM post_search_view;
+    FROM post_search_view
+    ORDER BY post_id;
+
+    RETURN ref;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -942,14 +949,16 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_tag_text()
-RETURNS SETOF tag_text AS $$
+RETURNS refcursor AS $$
+DECLARE
+    ref             refcursor;
 BEGIN
-    RETURN QUERY
-    SELECT
-        t.tag_id,
-        array_agg(value)
-    FROM data.tag_name t
-    GROUP BY t.tag_id;
+    OPEN ref FOR
+    SELECT *
+    FROM tag_text
+    ORDER BY tag_id;
+
+    RETURN ref;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -146,9 +146,10 @@ namespace minty::test {
             const UUID::uuid& post_id
         ), (override));
 
-        MOCK_METHOD(
-            std::vector<repo::db::post_search>, read_post_search, (), (override)
-        );
+        MOCK_METHOD(void, read_post_search, (
+            int batch_size,
+            std::function<void(std::span<const repo::db::post_search>)>&& action
+        ), (override));
 
         MOCK_METHOD(std::vector<repo::db::tag_preview>, read_post_tags, (
             const UUID::uuid& post_id
@@ -175,9 +176,10 @@ namespace minty::test {
             const UUID::uuid& tag_id
         ), (override));
 
-        MOCK_METHOD(
-            std::vector<repo::db::tag_text>, read_tag_text, (), (override)
-        );
+        MOCK_METHOD(void, read_tag_text, (
+            int batch_size,
+            std::function<void(std::span<const repo::db::tag_text>)>&& action
+        ), (override));
 
         MOCK_METHOD(void, update_comment, (
             const UUID::uuid& comment_id,
