@@ -23,72 +23,79 @@ $(conf).type := static
 internal := repo core server conf
 internal.libs := $(addprefix lib,$(internal))
 
-define common.libs
- $(internal)
- $(graphics.libs)
- avcodec
- avformat
- avutil
- conftools
- entix
- ext++
- fmt
- fstore
- harvest
- netcore
- pqxx
- pq
- swscale
- timber
- uri
- uuid++
+common.libs := \
+ $(internal) \
+ $(graphics.libs) \
+ avcodec \
+ avformat \
+ avutil \
+ conftools \
+ entix \
+ ext++ \
+ fmt \
+ fstore \
+ harvest \
+ netcore \
+ pqxx \
+ pq \
+ swscale \
+ timber \
+ uri \
+ uuid++ \
  yaml-cpp
-endef
 
 daemon = $(project)d
 $(daemon).type = executable
 $(daemon).deps := $(internal.libs)
-define $(daemon).libs
- $(common.libs)
- commline
- dbtools
+$(daemon).libs := \
+ $(common.libs) \
+ commline \
+ dbtools \
  dmon
-endef
 
 client := lib$(project)
 $(client).type := shared
-define $(client).libs
+$(client).libs := \
  netcore
-endef
 
 cli := $(project)
 $(cli).type := executable
 $(cli).deps := $(client) $(conf)
-define $(cli).libs
- $(project)
- commline
- conftools
- conf
- date
- fmt
- fstore
- netcore
- pthread
- timber
- yaml-cpp
+$(cli).libs := \
+ $(project) \
+ commline \
+ conftools \
+ conf \
+ date \
+ fmt \
+ fstore \
+ netcore \
+ pthread \
+ timber \
+ yaml-cpp \
  uuid++
-endef
 
 install := $(cli) $(client) $(daemon)
 targets := $(install) $(internal.libs)
 
+install.directories = \
+ $(include)/minty \
+ share/minty
+
+files = \
+ $(include) \
+ $(src) \
+ mk \
+ share \
+ Makefile \
+ VERSION
+
 test.deps = $(internal.libs)
-define test.libs
- $(common.libs)
- gtest
- gmock
+test.libs := \
+ $(common.libs) \
+ gtest \
+ gmock \
  pthread
-endef
 
 include mkbuild/base.mk
 
