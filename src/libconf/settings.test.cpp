@@ -16,6 +16,7 @@ database:
         host: localhost
         user: minty
         dbname: minty
+    sqldir: /usr/share/minty/db
 
 downloader:
     host: 127.0.0.1

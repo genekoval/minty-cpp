@@ -124,8 +124,6 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DDESCRIPTION='"$(project) server"'\
  -DCONFDIR='"$(confdir)"'
 
-$(obj)/$(daemon)/db/db.o: CXXFLAGS += -DSQLDIR='"$(shell pwd)/db"'
-
 .PHONY: edit.config init migrate start
 
 edit.config:

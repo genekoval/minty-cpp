@@ -22,6 +22,7 @@ namespace minty::conf {
             int connections = 1;
             std::optional<std::string> dump;
             std::optional<std::string> restore;
+            std::string sqldir;
         };
 
         struct s_fstore {
