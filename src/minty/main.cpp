@@ -1,8 +1,8 @@
 #include "client.h"
 #include "commands/commands.h"
+#include "settings/settings.h"
 
 #include <minty/minty>
-#include <minty/conf/settings.h>
 
 #include <iostream>
 #include <filesystem>
@@ -11,40 +11,44 @@
 namespace fs = std::filesystem;
 
 namespace {
-    const auto config_directory = fs::path(CONFDIR);
-    const auto default_config = (config_directory / "minty.yml").string();
+    const auto home = fs::path(std::getenv("HOME"));
+    const auto confdir = home / ".config" / NAME;
+    const auto confpath = confdir / NAME".yml";
 
-    auto settings() -> const minty::conf::settings& {
-        static const auto instance = minty::conf::initialize(default_config);
+    auto config() -> const minty::cli::settings& {
+        static const auto instance = minty::cli::settings::load(confpath);
         return instance;
     }
 
-    auto $main(const commline::app& app, bool version) -> void {
-        if (!version) {
-            std::cout << app.name << ": " << app.description << std::endl;
-            return;
+    namespace internal {
+        auto main(const commline::app& app, bool version) -> void {
+            if (!version) {
+                std::cout << app.name << ": " << app.description << std::endl;
+                return;
+            }
+
+            commline::print_version(std::cout, app);
+
+            auto api = minty::cli::client();
+            const auto server_info = api.get_server_info();
+            std::cout << "server version: " << server_info.version << std::endl;
         }
-
-        commline::print_version(std::cout, app);
-
-        auto api = minty::cli::client();
-        const auto server_info = api.get_server_info();
-        std::cout << "server version: " << server_info.version << std::endl;
     }
 }
 
 namespace minty::cli {
     auto bucket() -> fstore::bucket {
         static auto object_store = fstore::object_store(
-            settings().fstore.connection
+            config().server.objects
         );
 
-        const auto bkt = object_store.fetch_bucket(settings().fstore.bucket);
-        return fstore::bucket(object_store, bkt.id);
+        const auto source = client().get_server_info().object_source;
+
+        return fstore::bucket(object_store, source.bucket_id);
     }
 
     auto client() -> api {
-        return api(settings().server.path.string());
+        return api(config().server.path);
     }
 }
 
@@ -65,7 +69,7 @@ auto main(int argc, const char** argv) -> int {
             )
         ),
         arguments(),
-        $main
+        internal::main
     );
 
     app.subcommand(minty::commands::object());

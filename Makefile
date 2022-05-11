@@ -65,7 +65,6 @@ $(cli).libs := \
  $(project) \
  commline \
  conftools \
- conf \
  date \
  fmt \
  fstore \
@@ -122,8 +121,7 @@ $(obj)/$(core)/preview/image.o: CXXFLAGS += $(graphics.flags)
 $(obj)/$(cli)/main.o: CXXFLAGS +=\
  -DNAME='"$(cli)"'\
  -DVERSION='"$(version)"'\
- -DDESCRIPTION='"$(summary)"'\
- -DCONFDIR='"$(confdir)"'
+ -DDESCRIPTION='"$(summary)"'
 
 $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DNAME='"$(daemon)"'\
