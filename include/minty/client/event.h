@@ -24,6 +24,7 @@ namespace minty {
         delete_tag,
         delete_tag_alias,
         delete_tag_source,
+        get_comment,
         get_comments,
         get_object,
         get_post,

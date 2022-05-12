@@ -122,6 +122,10 @@ namespace minty::test {
             std::function<bool(std::span<const UUID::uuid>)>&& on_deleted
         ), (override));
 
+        MOCK_METHOD(repo::db::comment, read_comment, (
+            const UUID::uuid& comment_id
+        ), (override));
+
         MOCK_METHOD(std::vector<repo::db::comment>, read_comments, (
             const UUID::uuid& post_id
         ), (override));

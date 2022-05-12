@@ -338,6 +338,12 @@ namespace minty::core {
         db->delete_tag_source(tag_id, source_id);
     }
 
+    auto api::get_comment(const UUID::uuid& comment_id) -> comment_detail {
+        TIMBER_FUNC();
+
+        return db->read_comment(comment_id);
+    }
+
     auto api::get_comments(const UUID::uuid& post_id) -> comment_tree {
         TIMBER_FUNC();
 

@@ -34,6 +34,7 @@ namespace {
         prepare(c, "move_post_objects", {"uuid", "uuid[]", "uuid"});
         prepare(c, "prune", {});
         prepare(c, "prune_objects", {});
+        prepare(c, "read_comment", {"uuid"});
         prepare(c, "read_comments", {"uuid"});
         prepare(c, "read_object", {"uuid"});
         prepare(c, "read_object_posts", {"uuid"});

@@ -13,6 +13,16 @@ namespace zipline {
         &minty::core::comment::date_created
     );
 
+    ZIPLINE_OBJECT(
+        minty::core::comment_detail,
+        &minty::core::comment_detail::id,
+        &minty::core::comment_detail::post_id,
+        &minty::core::comment_detail::parent_id,
+        &minty::core::comment_detail::indent,
+        &minty::core::comment_detail::content,
+        &minty::core::comment_detail::date_created
+    );
+
     template <typename Socket>
     struct transfer<Socket, minty::core::comment_node> {
         static auto write(

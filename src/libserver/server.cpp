@@ -39,6 +39,7 @@ namespace {
             &context::delete_tag,
             &context::delete_tag_alias,
             &context::delete_tag_source,
+            &context::get_comment,
             &context::get_comments,
             &context::get_object,
             &context::get_post,

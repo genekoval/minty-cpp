@@ -1,6 +1,7 @@
 #include "commands.h"
 #include "../commands.h"
 #include "../../client.h"
+#include "../../options/opts.h"
 #include "../../parser/parser.h"
 
 using namespace commline;
@@ -9,10 +10,12 @@ namespace {
     namespace internal {
         auto comment(
             const app& app,
+            std::optional<std::string_view> path,
             const UUID::uuid& id
         ) -> void {
-            // TODO Implement ability to fetch a single comment.
-            throw std::runtime_error("not implemented");
+            auto api = minty::cli::client();
+
+            minty::cli::print_comment(api, id, path);
         }
     }
 }
@@ -22,7 +25,9 @@ namespace minty::commands {
         auto cmd = command(
             __FUNCTION__,
             "Read a comment",
-            options(),
+            options(
+                cli::opts::path()
+            ),
             arguments(
                 required<UUID::uuid>("id")
             ),

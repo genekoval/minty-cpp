@@ -90,6 +90,8 @@ namespace minty {
             std::string_view source_id
         ) -> void;
 
+        auto get_comment(const UUID::uuid& comment_id) -> core::comment_detail;
+
         auto get_comments(
             const UUID::uuid& post_id
         ) -> std::vector<core::comment>;

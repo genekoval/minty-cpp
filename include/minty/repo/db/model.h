@@ -85,6 +85,8 @@ namespace minty::repo::db {
         std::int16_t indent;
         std::string content;
         std::string date_created;
+
+        auto operator==(const comment&) const -> bool = default;
     };
 
     struct post_preview : entix::entity<5, object_preview> {

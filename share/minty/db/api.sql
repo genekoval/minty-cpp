@@ -35,6 +35,16 @@ LEFT JOIN (
 ) banners USING (object_id)
 GROUP BY object_id;
 
+CREATE VIEW post_comment AS
+SELECT
+    comment_id,
+    post_id,
+    parent_id,
+    indent,
+    content,
+    date_created
+FROM data.post_comment;
+
 CREATE VIEW post_object_ref_view AS
 SELECT
     object_id,
@@ -757,13 +767,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_comments(
-    a_post_id       uuid
-) RETURNS SETOF data.post_comment AS $$
+CREATE FUNCTION read_comment(
+    a_comment_id    uuid
+) RETURNS SETOF post_comment AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM data.post_comment
+    FROM post_comment
+    WHERE comment_id = a_comment_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_comments(
+    a_post_id       uuid
+) RETURNS SETOF post_comment AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM post_comment
     WHERE post_id = a_post_id
     ORDER BY
         indent,

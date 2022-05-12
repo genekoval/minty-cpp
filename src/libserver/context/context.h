@@ -87,6 +87,8 @@ namespace minty::server {
             std::string source_id
         ) -> void;
 
+        auto get_comment(UUID::uuid comment_id) -> core::comment_detail;
+
         auto get_comments(UUID::uuid post_id) -> core::comment_tree;
 
         auto get_object(UUID::uuid object_id) -> core::object;

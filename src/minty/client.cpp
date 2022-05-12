@@ -15,6 +15,14 @@ namespace minty::cli {
         return api.add_object_local(path.string());
     }
 
+    auto print_comment(
+        minty::api& api,
+        const UUID::uuid& id,
+        std::optional<std::string_view> path
+    ) -> void {
+        cli::print(api.get_comment(id), path);
+    }
+
     auto print_post(
         minty::api& api,
         const UUID::uuid& id,

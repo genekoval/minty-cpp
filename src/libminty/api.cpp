@@ -189,6 +189,15 @@ namespace minty {
         );
     }
 
+    auto api::get_comment(
+        const UUID::uuid& comment_id
+    ) -> core::comment_detail {
+        return connect().send<core::comment_detail>(
+            event::get_comment,
+            comment_id
+        );
+    }
+
     auto api::get_comments(
         const UUID::uuid& post_id
     ) -> std::vector<core::comment> {

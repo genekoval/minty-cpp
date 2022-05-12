@@ -6,6 +6,7 @@
 #include <memory>
 
 namespace minty::core {
+    using comment_detail = repo::db::comment;
     using range = repo::db::range;
     using post_search = repo::db::post_search;
     using post_update = repo::db::post_update;

@@ -19,6 +19,29 @@ namespace YAML {
 
     auto operator<<(
         Emitter& out,
+        const minty::core::comment_detail& comment
+    ) -> Emitter& {
+        out
+            << BeginMap
+            << Key << "id" << Value << comment.id
+            << Key << "post" << Value << comment.post_id;
+
+        if (comment.parent_id) {
+            out <<
+                Key << "parent" <<
+                Value << *comment.parent_id;
+        }
+
+        out
+            << Key << "created" << Value << comment.date_created
+            << Key << "content" << Value << comment.content
+            << EndMap;
+
+        return out;
+    }
+
+    auto operator<<(
+        Emitter& out,
         const minty::core::data_size& data_size
     ) -> Emitter& {
         out

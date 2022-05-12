@@ -129,6 +129,8 @@ namespace minty::core {
             std::string_view source_id
         ) -> void;
 
+        auto get_comment(const UUID::uuid& comment_id) -> comment_detail;
+
         auto get_comments(const UUID::uuid& post_id) -> comment_tree;
 
         auto get_object(const UUID::uuid& object_id) -> object;

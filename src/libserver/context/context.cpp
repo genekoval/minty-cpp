@@ -134,6 +134,10 @@ namespace minty::server {
         api->delete_tag_source(tag_id, source_id);
     }
 
+    auto context::get_comment(UUID::uuid comment_id) -> core::comment_detail {
+        return api->get_comment(comment_id);
+    }
+
     auto context::get_comments(UUID::uuid post_id) -> core::comment_tree {
         return api->get_comments(post_id);
 	}

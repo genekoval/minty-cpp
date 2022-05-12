@@ -131,6 +131,8 @@ namespace minty::repo::db {
             std::function<bool(std::span<const UUID::uuid>)>&& on_deleted
         ) -> void;
 
+        VIRTUAL auto read_comment(const UUID::uuid& comment_id) -> comment;
+
         VIRTUAL auto read_comments(
             const UUID::uuid& post_id
         ) -> std::vector<comment>;
