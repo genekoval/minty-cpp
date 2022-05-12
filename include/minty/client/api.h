@@ -116,6 +116,11 @@ namespace minty {
             const std::optional<UUID::uuid>& destination
         ) -> std::string;
 
+        auto set_comment_content(
+            const UUID::uuid& comment_id,
+            std::string_view content
+        ) -> std::string;
+
         auto set_post_description(
             const UUID::uuid& post_id,
             std::string_view description

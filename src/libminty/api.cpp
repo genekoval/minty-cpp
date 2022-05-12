@@ -251,6 +251,17 @@ namespace minty {
         );
     }
 
+    auto api::set_comment_content(
+        const UUID::uuid& comment_id,
+        std::string_view content
+    ) -> std::string {
+        return connect().send<std::string>(
+            event::set_comment_content,
+            comment_id,
+            content
+        );
+    }
+
     auto api::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
