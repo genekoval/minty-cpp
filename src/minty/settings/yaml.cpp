@@ -13,7 +13,7 @@ namespace YAML {
     DECODE(
         conf::server,
         c::required("objects", &conf::server::objects),
-        c::required("path", &conf::server::path)
+        c::required("host", &conf::server::host)
     );
 
     DECODE(

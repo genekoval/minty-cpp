@@ -12,8 +12,8 @@ namespace minty {
     class api {
         using client = net::client<event>;
 
-        const std::string endpoint;
         const net::error_list errors;
+        const std::function<netcore::socket()> socket;
 
         auto connect() -> client;
     public:

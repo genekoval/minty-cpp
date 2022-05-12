@@ -11,7 +11,7 @@ namespace minty::cli {
 
         struct server {
             std::string objects;
-            std::string path;
+            std::string host;
         };
     }
 

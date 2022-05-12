@@ -1,11 +1,44 @@
 #include <minty/client/api.h>
+#include <minty/error.h>
 #include <minty/net/zipline/transfer.h>
 
+namespace {
+    auto get_socket_generator(
+        std::string_view endpoint
+    ) -> std::function<netcore::socket()> {
+        if (endpoint.starts_with("/")) {
+            // The endpoint is a Unix domain socket path.
+            return [path = std::string(endpoint)] {
+                return netcore::connect(path);
+            };
+        }
+
+        // The endpoint is a host and port separated by a colon.
+        const auto delim = endpoint.find(":");
+
+        if (delim == decltype(endpoint)::npos) {
+            throw minty::minty_error(
+                "port missing from endpoint: {}",
+                endpoint
+            );
+        }
+
+        return [
+            host = std::string(endpoint.substr(0, delim)),
+            port = std::string(endpoint.substr(delim + 1))
+        ] {
+            return netcore::connect(host, port);
+        };
+    }
+}
+
 namespace minty {
-    api::api(std::string_view endpoint) : endpoint(endpoint) {}
+    api::api(std::string_view endpoint) :
+        socket(get_socket_generator(endpoint))
+    {}
 
     auto api::connect() -> client {
-        return client(errors, net::socket(netcore::connect(endpoint)));
+        return client(errors, net::socket(socket()));
     }
 
     auto api::add_comment(

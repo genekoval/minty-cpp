@@ -15,8 +15,14 @@ namespace {
     const auto confdir = home / ".config" / NAME;
     const auto confpath = confdir / NAME".yml";
 
+    auto load_config() -> minty::cli::settings {
+        const auto config = minty::cli::settings::load(confpath);
+        timber::reporting_level = config.log.level;
+        return config;
+    }
+
     auto config() -> const minty::cli::settings& {
-        static const auto instance = minty::cli::settings::load(confpath);
+        static const auto instance = load_config();
         return instance;
     }
 
@@ -48,7 +54,7 @@ namespace minty::cli {
     }
 
     auto client() -> api {
-        return api(config().server.path);
+        return api(config().server.host);
     }
 }
 
