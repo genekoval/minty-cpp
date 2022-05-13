@@ -20,7 +20,7 @@ $(server).type := static
 conf := libconf
 $(conf).type := static
 
-internal := repo core server conf
+internal := core repo server conf
 internal.libs := $(addprefix lib,$(internal))
 
 common.libs := \
