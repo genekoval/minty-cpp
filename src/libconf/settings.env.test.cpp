@@ -1,4 +1,4 @@
-#include <minty/conf/settings.test.env.h>
+#include <minty/conf/settings.env.test.h>
 
 #include <filesystem>
 

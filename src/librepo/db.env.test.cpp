@@ -1,5 +1,5 @@
-#include <minty/conf/settings.test.env.h>
-#include <minty/repo/db/db.test.env.h>
+#include <minty/conf/settings.env.test.h>
+#include <minty/repo/db/db.env.test.h>
 
 namespace {
     auto connection_string() -> const std::string& {

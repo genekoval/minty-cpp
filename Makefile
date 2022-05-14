@@ -114,7 +114,7 @@ endif
 confdir = $(prefix)/etc/$(project)
 test.config = .test.conf.yaml
 
-$(obj)/$(conf)/settings.test.env.o: CXXFLAGS += -DTEST_CONFIG='"$(test.config)"'
+$(obj)/$(conf)/settings.env.test.o: CXXFLAGS += -DTEST_CONFIG='"$(test.config)"'
 
 $(obj)/$(core)/preview/image.o: CXXFLAGS += $(graphics.flags)
 

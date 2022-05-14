@@ -1,5 +1,5 @@
-#include <minty/repo/db/db.test.env.h>
-#include <minty/conf/settings.test.env.h>
+#include <minty/repo/db/db.env.test.h>
+#include <minty/conf/settings.env.test.h>
 
 #include <filesystem>
 #include <fmt/chrono.h>

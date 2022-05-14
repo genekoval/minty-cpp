@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/repo/db/db.test.env.h>
+#include <minty/repo/db/db.env.test.h>
 
 #include <entix/entix>
 
