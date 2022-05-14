@@ -42,9 +42,28 @@ namespace {
             }
 
             template <typename ...Args>
-            auto print(Args&&... args) const -> void {
+            auto print(
+                std::string_view format_string,
+                Args&&... args
+            ) const -> void {
                 indent(indent_amount);
-                fmt::print(std::forward<Args>(args)...);
+                fmt::print(
+                    fmt::runtime(format_string),
+                    std::forward<Args>(args)...
+                );
+            }
+
+            template <typename ...Args>
+            auto print_secondary(
+                std::string_view format_string,
+                Args&&... args
+            ) const -> void {
+                indent(indent_amount);
+                fmt::print(
+                    fmt::fg(color::secondary),
+                    format_string,
+                    std::forward<Args>(args)...
+                );
             }
 
             auto separator() const -> void {
@@ -94,8 +113,8 @@ namespace {
                 const auto p = printer(comment.indent, spacing);
 
                 p.separator();
-                p.print(fmt::fg(color::secondary), "{}\n", comment.id);
-                p.print(fmt::fg(color::secondary), "{}\n", format_date(
+                p.print_secondary("{}\n", comment.id);
+                p.print_secondary("{}\n", format_date(
                     comment.date_created,
                     time_zone
                 ));
