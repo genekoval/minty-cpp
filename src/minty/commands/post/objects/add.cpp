@@ -11,7 +11,7 @@ namespace {
             const app& app,
             std::int16_t index,
             const UUID::uuid& id,
-            const std::vector<UUID::uuid>& objects
+            const std::vector<std::string_view>& objects
         ) -> void {
             auto api = minty::cli::client();
 
@@ -41,7 +41,7 @@ namespace minty::subcommands::post_objects {
             ),
             arguments(
                 required<UUID::uuid>("id"),
-                variadic<UUID::uuid>("objects")
+                variadic<std::string_view>("objects")
             ),
             internal::add
         );
