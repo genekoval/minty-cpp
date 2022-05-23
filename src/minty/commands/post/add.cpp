@@ -23,11 +23,12 @@ namespace {
                 .tags = tags
             };
 
-            for (const auto& object : objects) {
-                parts.objects.emplace_back(
-                    minty::cli::add_object(api, object).id
-                );
-            }
+            const auto object_previews = api.add_objects(objects);
+            std::ranges::transform(
+                object_previews,
+                std::back_inserter(parts.objects),
+                [](const auto& obj) -> UUID::uuid { return obj.id; }
+            );
 
             const auto id = api.add_post(parts);
             std::cout << id << std::endl;

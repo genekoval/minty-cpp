@@ -2,6 +2,13 @@
 #include <minty/error.h>
 #include <minty/net/zipline/transfer.h>
 
+#include <fcntl.h>
+#include <fstore/net/zipline/transfer.h>
+#include <uri/uri>
+#include <uuid++/uuid++>
+
+namespace fs = std::filesystem;
+
 namespace {
     auto get_socket_generator(
         std::string_view endpoint
@@ -52,10 +59,68 @@ namespace minty {
         );
     }
 
+    auto api::add_object_data(const fs::path& path) -> core::object_preview {
+        const auto file = fstore::core::file {
+            .fd = open(path.c_str(), O_RDONLY),
+            .size = fs::file_size(path)
+        };
+
+        return connect().send<core::object_preview>(
+            event::add_object_data,
+            file
+        );
+    }
+
     auto api::add_object_local(std::string_view path) -> core::object_preview {
         return connect().send<core::object_preview>(
             event::add_object_local,
             path
+        );
+    }
+
+    auto api::add_objects(
+        std::span<const std::string_view> arguments
+    ) -> std::vector<core::object_preview> {
+        auto result = std::vector<core::object_preview>();
+
+        for (const auto& arg : arguments) {
+            const auto uuid = UUID::parse(arg);
+            if (uuid) {
+                const auto object = get_object(*uuid);
+
+                auto preview = core::object_preview();
+                preview.id = object.id;
+                preview.preview_id = object.preview_id;
+                preview.type = object.type;
+                preview.subtype = object.subtype;
+
+                result.push_back(std::move(preview));
+                continue;
+            }
+
+            const auto url = uri::parse(std::string(arg));
+            if (url && !url.value().scheme().empty()) {
+                const auto objects = add_objects_url(arg);
+
+                for (auto&& obj : objects) {
+                    result.push_back(std::move(obj));
+                }
+
+                continue;
+            }
+
+            result.push_back(add_object_data(arg));
+        }
+
+        return result;
+    }
+
+    auto api::add_objects_url(
+        std::string_view url
+    ) -> std::vector<core::object_preview> {
+        return connect().send<std::vector<core::object_preview>>(
+            event::add_objects_url,
+            url
         );
     }
 

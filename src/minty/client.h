@@ -5,11 +5,6 @@
 #include <yaml-cpp/yaml.h>
 
 namespace minty::cli {
-    auto add_object(
-        minty::api& api,
-        std::string_view object
-    ) -> core::object_preview;
-
     auto bucket() -> fstore::bucket;
 
     auto client() -> api;

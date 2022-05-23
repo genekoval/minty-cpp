@@ -16,10 +16,12 @@ namespace {
             auto api = minty::cli::client();
 
             auto uploaded = std::vector<UUID::uuid>();
-
-            for (const auto& object : objects) {
-                uploaded.push_back(minty::cli::add_object(api, object).id);
-            }
+            const auto object_previews = api.add_objects(objects);
+            std::ranges::transform(
+                object_previews,
+                std::back_inserter(uploaded),
+                [](const auto& obj) -> UUID::uuid { return obj.id; }
+            );
 
             if (!uploaded.empty()) api.add_post_objects(id, uploaded, index);
         }

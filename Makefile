@@ -56,7 +56,10 @@ $(daemon).libs := \
 client := lib$(project)
 $(client).type := shared
 $(client).libs := \
- netcore
+ ext++ \
+ netcore \
+ uri \
+ uuid++
 
 cli := $(project)
 $(cli).type := executable

@@ -24,7 +24,19 @@ namespace minty {
             std::string_view content
         ) -> core::comment;
 
+        auto add_object_data(
+            const std::filesystem::path& path
+        ) -> core::object_preview;
+
         auto add_object_local(std::string_view path) -> core::object_preview;
+
+        auto add_objects(
+            std::span<const std::string_view> arguments
+        ) -> std::vector<core::object_preview>;
+
+        auto add_objects_url(
+            std::string_view url
+        ) -> std::vector<core::object_preview>;
 
         auto add_post(const core::post_parts& parts) -> UUID::uuid;
 
