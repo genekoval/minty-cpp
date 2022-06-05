@@ -4,7 +4,7 @@
 #include <GraphicsMagick/Magick++.h>
 
 namespace {
-    constexpr auto thumbnail_format = "PNG";
+    constexpr auto thumbnail_format = "JPEG";
     constexpr auto thumbnail_size = 250;
 
     const auto thumbnail_geometry = Magick::Geometry(
