@@ -28,6 +28,11 @@ CREATE TABLE object (
     source_id       bigint REFERENCES source ON DELETE NO ACTION
 );
 
+CREATE TABLE object_preview_error (
+    object_id       uuid PRIMARY KEY REFERENCES object ON DELETE CASCADE,
+    message         text NOT NULL
+);
+
 CREATE TABLE post (
     post_id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     title           text,

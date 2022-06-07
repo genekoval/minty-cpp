@@ -38,6 +38,11 @@ namespace minty::repo::db {
         decltype(object::preview_id) preview_id;
     };
 
+    struct object_error : entix::entity<2> {
+        decltype(object::id) id;
+        std::string message;
+    };
+
     struct tag : entix::entity<9> {
         UUID::uuid id;
         std::string name;

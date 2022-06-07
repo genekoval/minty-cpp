@@ -5,6 +5,7 @@
 #include <minty/core/preview.h>
 #include <minty/core/search.h>
 
+#include <threadpool/threadpool>
 #include <uri/uri>
 
 namespace minty::core {
@@ -44,9 +45,18 @@ namespace minty::core {
         fstore::object_meta&& object,
         const std::optional<std::string>& src
     ) -> object_preview {
-        auto preview_id = previews.generate_preview(object);
+        auto preview_id = std::optional<UUID::uuid>();
+        auto error = std::optional<std::string>();
+
+        try {
+            preview_id = previews.generate_preview(object);
+        }
+        catch (const std::exception& ex) {
+            error = ex.what();
+        }
 
         db->create_object(object.id, preview_id, src);
+        if (error) db->create_object_preview_error(object.id, *error);
 
         return {
             std::move(object.id),
@@ -361,6 +371,12 @@ namespace minty::core {
         );
     }
 
+    auto api::get_object_preview_errors() -> std::vector<object_error> {
+        TIMBER_FUNC();
+
+        return db->read_object_preview_errors();
+    }
+
     auto api::get_post(const UUID::uuid& id) -> post {
         TIMBER_FUNC();
 
@@ -504,15 +520,73 @@ namespace minty::core {
 
     auto api::regenerate_preview(
         const UUID::uuid& object_id
-    ) -> std::optional<UUID::uuid> {
+    ) -> decltype(object::preview_id) {
         TIMBER_FUNC();
 
         const auto metadata = objects->meta(object_id);
-        const auto preview = previews.generate_preview(metadata);
 
-        db->update_object_preview(object_id, preview);
+        try {
+            const auto preview = previews.generate_preview(metadata);
+            db->update_object_preview(object_id, preview);
+            db->delete_object_preview_error(object_id);
 
-        return preview;
+            return preview;
+        }
+        catch (const std::exception& ex) {
+            db->create_object_preview_error(object_id, ex.what());
+
+            throw ex;
+        }
+
+        return {};
+    }
+
+    auto api::regenerate_preview(
+        const repo::db::object_preview& object
+    ) -> bool {
+        TIMBER_FUNC();
+
+        const auto metadata = objects->meta(object.id);
+
+        try {
+            const auto preview = previews.generate_preview(metadata);
+
+            if (preview != object.preview_id) {
+                db->update_object_preview(object.id, preview);
+            }
+
+            db->delete_object_preview_error(object.id);
+
+            return true;
+        }
+        catch (const std::exception& ex) {
+            db->create_object_preview_error(object.id, ex.what());
+        }
+
+        return false;
+    }
+
+    auto api::regenerate_previews(int jobs, progress& progress) -> std::size_t {
+        TIMBER_FUNC();
+
+        progress.total = db->read_total_objects();
+        std::atomic_ulong errors = 0;
+
+        {
+            auto workers = threadpool::pool(jobs);
+
+            db->read_objects(100, [&](auto objects) {
+                for (const auto& obj : objects) {
+                    workers.run([this, obj, &errors, &progress] {
+                        const auto success = regenerate_preview(obj);
+                        if (!success) errors += 1;
+                        progress.completed += 1;
+                    });
+                }
+            });
+        }
+
+        return errors;
     }
 
     auto api::reindex() -> void {

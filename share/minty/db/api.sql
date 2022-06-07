@@ -3,6 +3,12 @@ CREATE SCHEMA minty;
 
 --{{{( Views )
 
+CREATE VIEW object_preview_error AS
+SELECT
+    object_id,
+    message
+FROM data.object_preview_error;
+
 CREATE VIEW object_ref_view AS
 SELECT
     object_id,
@@ -264,6 +270,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_object_preview_error(
+    a_object_id     uuid,
+    a_message       text
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO data.object_preview_error (
+        object_id,
+        message
+    ) VALUES (
+        a_object_id,
+        a_message
+    ) ON CONFLICT (object_id)
+    DO UPDATE SET message = a_message;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_object_refs(
     a_objects       uuid[]
 ) RETURNS void AS $$
@@ -501,6 +523,15 @@ BEGIN
         a_tag_id,
         a_source_id
     ) ON CONFLICT DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION delete_object_preview_error(
+    a_object_id     uuid
+) RETURNS void AS $$
+BEGIN
+    DELETE FROM data.object_preview_error
+    WHERE object_id = a_object_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -793,6 +824,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION read_object_preview_errors()
+RETURNS SETOF data.object_preview_error AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM object_preview_error
+    ORDER BY object_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_objects()
+RETURNS refcursor AS $$
+DECLARE
+    ref             refcursor;
+BEGIN
+    OPEN ref FOR
+    SELECT
+        object_id,
+        preview_id
+    FROM data.object
+    ORDER BY object_id;
+
+    RETURN ref;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION read_post(
     a_post_id       uuid
 ) RETURNS SETOF data.post AS $$
@@ -980,6 +1037,14 @@ BEGIN
     ORDER BY tag_id;
 
     RETURN ref;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION read_total_objects()
+RETURNS SETOF bigint AS $$
+BEGIN
+    RETURN QUERY
+    SELECT count(*) FROM data.object;
 END;
 $$ LANGUAGE plpgsql;
 

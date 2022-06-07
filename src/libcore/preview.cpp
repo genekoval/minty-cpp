@@ -52,17 +52,6 @@ namespace minty::core {
             object.mime_type()
         );
 
-        try {
-            return generator(*objects, object);
-        }
-        catch (const std::exception& ex) {
-            TIMBER_WARNING(
-                "Failed to generate preview for object ({}): {}",
-                object.id,
-                ex.what()
-            );
-        }
-
-        return {};
+        return generator(*objects, object);
     }
 }

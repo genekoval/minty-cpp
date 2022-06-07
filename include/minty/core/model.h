@@ -8,6 +8,7 @@
 namespace minty::core {
     using comment_detail = repo::db::comment;
     using range = repo::db::range;
+    using object_error = repo::db::object_error;
     using post_search = repo::db::post_search;
     using post_update = repo::db::post_update;
     using tag_name = repo::db::tag_name;

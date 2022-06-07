@@ -21,6 +21,12 @@ namespace entix {
     );
 
     READ_ENTITY(
+        object_error,
+        &object_error::id,
+        &object_error::message
+    );
+
+    READ_ENTITY(
         object_preview,
         &object_preview::id,
         &object_preview::preview_id

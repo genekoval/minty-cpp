@@ -39,6 +39,7 @@ common.libs := \
  pqxx \
  pq \
  swscale \
+ threadpool \
  timber \
  uri \
  uuid++ \

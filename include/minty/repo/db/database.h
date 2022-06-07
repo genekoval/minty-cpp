@@ -28,6 +28,11 @@ namespace minty::repo::db {
             const std::optional<std::string_view>& source_id
         ) -> void;
 
+        VIRTUAL auto create_object_preview_error(
+            const UUID::uuid& object_id,
+            std::string_view message
+        ) -> void;
+
         VIRTUAL auto create_post(
             std::string_view title,
             std::string_view description,
@@ -77,6 +82,10 @@ namespace minty::repo::db {
         VIRTUAL auto create_tag_source(
             const UUID::uuid& tag_id,
             std::string_view source_id
+        ) -> void;
+
+        VIRTUAL auto delete_object_preview_error(
+            const UUID::uuid& object_id
         ) -> void;
 
         VIRTUAL auto delete_post(const UUID::uuid& post_id) -> void;
@@ -143,6 +152,13 @@ namespace minty::repo::db {
             const UUID::uuid& object_id
         ) -> std::vector<post_preview>;
 
+        VIRTUAL auto read_object_preview_errors() -> std::vector<object_error>;
+
+        VIRTUAL auto read_objects(
+            int batch_size,
+            std::function<void(std::span<const object_preview>)>&& action
+        ) -> void;
+
         VIRTUAL auto read_post(const UUID::uuid& post_id) -> post;
 
         VIRTUAL auto read_posts(
@@ -185,6 +201,8 @@ namespace minty::repo::db {
             int batch_size,
             std::function<void(std::span<const tag_text>)>&& action
         ) -> void;
+
+        VIRTUAL auto read_total_objects() -> std::size_t;
 
         VIRTUAL auto update_comment(
             const UUID::uuid& comment_id,

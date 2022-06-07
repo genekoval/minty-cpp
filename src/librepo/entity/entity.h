@@ -7,6 +7,7 @@
 namespace entix {
     ENTITY(minty::repo::db::comment);
     ENTITY(minty::repo::db::object);
+    ENTITY(minty::repo::db::object_error);
     ENTITY(minty::repo::db::object_preview);
     ENTITY(minty::repo::db::post);
     ENTITY(minty::repo::db::post_preview);

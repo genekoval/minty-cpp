@@ -11,6 +11,10 @@ namespace minty::cli {
         std::string_view confpath
     ) -> std::unique_ptr<commline::command_node>;
 
+    auto errors(
+        std::string_view confpath
+    ) -> std::unique_ptr<commline::command_node>;
+
     auto init(
         std::string_view confpath
     ) -> std::unique_ptr<commline::command_node>;

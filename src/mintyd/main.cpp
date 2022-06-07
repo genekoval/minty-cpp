@@ -91,6 +91,7 @@ auto main(int argc, const char** argv) -> int {
 
     app.subcommand(minty::cli::db(confpath));
     app.subcommand(minty::cli::dump(confpath));
+    app.subcommand(minty::cli::errors(confpath));
     app.subcommand(minty::cli::init(confpath));
     app.subcommand(minty::cli::migrate(confpath));
     app.subcommand(minty::cli::prune(confpath));

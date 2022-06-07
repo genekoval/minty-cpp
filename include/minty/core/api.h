@@ -8,7 +8,14 @@
 #include <minty/core/search.h>
 #include <minty/repo/db/database.h>
 
+#include <atomic>
+
 namespace minty::core {
+    struct progress {
+        std::atomic_ulong completed = 0;
+        std::size_t total = 0;
+    };
+
     struct source_parts {
         std::string site_id;
         std::string resource;
@@ -36,6 +43,8 @@ namespace minty::core {
         auto get_posts(
             std::vector<repo::db::post_preview>&& posts
         ) -> std::vector<post_preview>;
+
+        auto regenerate_preview(const repo::db::object_preview& object) -> bool;
     public:
         api(
             repo::db::database& db,
@@ -135,6 +144,8 @@ namespace minty::core {
 
         auto get_object(const UUID::uuid& object_id) -> object;
 
+        auto get_object_preview_errors() -> std::vector<object_error>;
+
         auto get_post(const UUID::uuid& id) -> post;
 
         auto get_posts(const post_query& query) -> search_result<post_preview>;
@@ -159,7 +170,9 @@ namespace minty::core {
 
         auto regenerate_preview(
             const UUID::uuid& object_id
-        ) -> std::optional<UUID::uuid>;
+        ) -> decltype(object::preview_id);
+
+        auto regenerate_previews(int jobs, progress& progress) -> std::size_t;
 
         auto reindex() -> void;
 
