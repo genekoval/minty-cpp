@@ -14,7 +14,7 @@ namespace {
         const auto settings = minty::conf::initialize(confpath);
         const auto db = minty::cli::database(settings);
 
-        db.init();
+        db.init(app.version);
         if (!skip_index) minty::cli::api_container(settings).api().reindex();
     }
 }
