@@ -11,7 +11,7 @@ namespace {
     ) -> void {
         const auto db = minty::cli::database(confpath);
 
-        db.migrate();
+        db.migrate(app.version);
     }
 }
 
