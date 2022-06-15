@@ -8,9 +8,7 @@ namespace {
 }
 
 namespace entix {
-    ENTITY(related_post);
-
-    READ_ENTITY(
+    ENTITY(
         related_post,
         &related_post::post_id,
         &related_post::related

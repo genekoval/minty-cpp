@@ -1,4 +1,4 @@
-#include "../entity/entity.h"
+#include "../entity.h"
 
 #include <minty/error.h>
 #include <minty/repo/db/database.h>

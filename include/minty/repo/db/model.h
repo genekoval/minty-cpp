@@ -1,6 +1,5 @@
 #pragma once
 
-#include <entix/entity>
 #include <optional>
 #include <string>
 #include <uuid++/uuid++>
@@ -14,36 +13,36 @@ namespace minty::repo::db {
         index_type last;
     };
 
-    struct site : entix::entity<4> {
+    struct site {
         std::string id;
         std::string scheme;
         std::string host;
         std::optional<UUID::uuid> icon;
     };
 
-    struct source : entix::entity<2, site> {
+    struct source {
         std::string id;
         std::string resource;
         site website;
     };
 
-    struct object : entix::entity<2, source> {
+    struct object {
         UUID::uuid id;
         std::optional<decltype(id)> preview_id;
         std::optional<source> src;
     };
 
-    struct object_preview : entix::entity<2> {
+    struct object_preview {
         decltype(object::id) id;
         decltype(object::preview_id) preview_id;
     };
 
-    struct object_error : entix::entity<2> {
+    struct object_error {
         decltype(object::id) id;
         std::string message;
     };
 
-    struct tag : entix::entity<9> {
+    struct tag {
         UUID::uuid id;
         std::string name;
         std::vector<decltype(name)> aliases;
@@ -54,28 +53,28 @@ namespace minty::repo::db {
         std::string date_created;
     };
 
-    struct tag_name : entix::entity<2> {
+    struct tag_name {
         decltype(tag::name) name;
         decltype(tag::aliases) aliases;
     };
 
-    struct tag_name_update : entix::entity<1, tag_name> {
+    struct tag_name_update {
         tag_name names;
         std::optional<decltype(tag::name)> old_name;
     };
 
-    struct tag_preview : entix::entity<3> {
+    struct tag_preview {
         decltype(tag::id) id;
         decltype(tag::name) name;
         decltype(tag::avatar) avatar;
     };
 
-    struct tag_text : entix::entity<2> {
+    struct tag_text {
         decltype(tag::id) id;
         std::vector<decltype(tag::name)> names;
     };
 
-    struct post : entix::entity<7> {
+    struct post {
         UUID::uuid id;
         std::optional<std::string> title;
         std::optional<std::string> description;
@@ -83,7 +82,7 @@ namespace minty::repo::db {
         std::string date_modified;
     };
 
-    struct comment : entix::entity<6> {
+    struct comment {
         UUID::uuid id;
         decltype(post::id) post_id;
         std::optional<decltype(id)> parent_id;
@@ -94,7 +93,7 @@ namespace minty::repo::db {
         auto operator==(const comment&) const -> bool = default;
     };
 
-    struct post_preview : entix::entity<5, object_preview> {
+    struct post_preview {
         decltype(post::id) id;
         std::optional<std::string> title;
         std::optional<object_preview> preview;
@@ -103,7 +102,7 @@ namespace minty::repo::db {
         std::string date_created;
     };
 
-    struct post_search : entix::entity<6> {
+    struct post_search {
         decltype(post::id) id;
         decltype(post::title) title;
         decltype(post::description) description;
@@ -119,7 +118,7 @@ namespace minty::repo::db {
         std::string date_modified;
     };
 
-    struct post_update : entix::entity<3> {
+    struct post_update {
         decltype(post::id) id;
         std::optional<std::string> new_data;
         std::string date_modified;

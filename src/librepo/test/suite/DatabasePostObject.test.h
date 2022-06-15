@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../model/model.test.h"
+#include "../model.test.h"
 #include "DatabasePost.test.h"
 
 class DatabasePostObjectTest : public DatabasePostTest {
