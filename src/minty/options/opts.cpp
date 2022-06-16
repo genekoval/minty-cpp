@@ -44,11 +44,29 @@ namespace minty::cli::opts {
         };
     }
 
+    auto output() -> option<std::optional<minty::cli::output::format>> {
+        return {
+            {"o", "output"},
+            fmt::format(
+                "Format of data printed to STDOUT ({})",
+                fmt::join(minty::cli::output::format_string, " | ")
+            ),
+            "format"
+        };
+    }
+
     auto path() -> option<std::optional<std::string_view>> {
         return {
             {"S", "select"},
             "Select YAML output",
             "path"
+        };
+    }
+
+    auto quiet() -> flag {
+        return {
+            {"q", "quiet"},
+            "Suppress human-readable output"
         };
     }
 

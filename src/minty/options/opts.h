@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../output/output.h"
+
 #include <commline/commline>
 #include <uuid++/uuid++>
 
@@ -14,7 +16,12 @@ namespace minty::cli::opts {
 
     auto links() -> commline::list<std::string_view>;
 
+    auto output() ->
+        commline::option<std::optional<minty::cli::output::format>>;
+
     auto path() -> commline::option<std::optional<std::string_view>>;
+
+    auto quiet() -> commline::flag;
 
     auto size() -> commline::option<unsigned int>;
 
