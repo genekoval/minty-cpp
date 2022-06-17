@@ -11,14 +11,6 @@ namespace minty::cli::opts {
         };
     }
 
-    auto aliases() -> list<std::string_view> {
-        return {
-            {"a", "alias"},
-            "Add a secondary name",
-            "name"
-        };
-    }
-
     auto description() -> option<std::string> {
         return {
             {"d", "description"},
@@ -36,11 +28,10 @@ namespace minty::cli::opts {
         };
     }
 
-    auto links() -> list<std::string_view> {
+    auto json() -> commline::flag {
         return {
-            {"l", "link"},
-            "Add a URL",
-            "url"
+            {"j", "json"},
+            "Print result as JSON to STDOUT"
         };
     }
 

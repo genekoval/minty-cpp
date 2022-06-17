@@ -23,14 +23,6 @@ namespace minty::cli {
         cli::print(api.get_post(id), path);
     }
 
-    auto print_tag(
-        minty::api& api,
-        const UUID::uuid& id,
-        std::optional<std::string_view> path
-    ) -> void {
-        cli::print(api.get_tag(id), path);
-    }
-
     auto print_yaml(
         const YAML::Emitter& emitter,
         std::optional<std::string_view> path

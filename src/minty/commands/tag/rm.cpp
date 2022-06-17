@@ -5,12 +5,14 @@
 using namespace commline;
 
 namespace {
-    auto $rm(
-        const app& app,
-        std::string_view id
-    ) -> void {
-        auto api = minty::cli::client();
-        api.delete_tag(id);
+    namespace internal {
+        auto rm(
+            const app& app,
+            std::string_view id
+        ) -> void {
+            auto api = minty::cli::client();
+            api.delete_tag(id);
+        }
     }
 }
 
@@ -23,7 +25,7 @@ namespace minty::subcommands::tag {
             arguments(
                 required<std::string_view>("id")
             ),
-            $rm
+            internal::rm
         );
     }
 }

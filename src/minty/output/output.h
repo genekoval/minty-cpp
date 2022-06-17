@@ -41,6 +41,16 @@ namespace minty::cli::output {
     }
 
     template <typename T>
+    auto entity(
+        const T& t,
+        bool print_json,
+        bool print_human
+    ) -> void {
+        if (print_json) json(std::cout, t);
+        if (print_human) human(t);
+    }
+
+    template <typename T>
     auto result(
         const minty::core::search_result<T>& result,
         const std::optional<format>& f,

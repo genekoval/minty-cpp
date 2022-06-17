@@ -26,4 +26,24 @@ namespace minty::core {
         j["hits"] = r.hits;
         j["total"] = r.total;
     }
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        source,
+        id,
+        url,
+        icon
+    );
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        tag,
+        id,
+        name,
+        aliases,
+        description,
+        avatar,
+        banner,
+        sources,
+        post_count,
+        date_created
+    );
 }

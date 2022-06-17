@@ -19,6 +19,8 @@ namespace minty::cli::output {
 
     MINTY_HUMAN_READABLE(repo::db::tag_preview)
 
+    MINTY_HUMAN_READABLE(core::tag)
+
     template <typename T>
     struct human_readable<core::search_result<T>> {
         static auto print(
@@ -37,7 +39,7 @@ namespace minty::cli::output {
                 const auto& hit = result.hits[i - 1];
 
                 fmt::print(f, style::index, "{:>{}}", i, digits);
-                fmt::print(f, " · ");
+                fmt::print(f, " {} ", style::interpunct);
                 human_readable<T>::print(f, hit);
                 fmt::print(f, "\n");
             }
