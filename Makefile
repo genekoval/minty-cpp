@@ -62,23 +62,7 @@ $(client).libs := \
  uri \
  uuid++
 
-cli := $(project)
-$(cli).type := executable
-$(cli).deps := $(client) $(conf)
-$(cli).libs := \
- $(project) \
- commline \
- conftools \
- date \
- fmt \
- fstore \
- netcore \
- pthread \
- timber \
- yaml-cpp \
- uuid++
-
-install := $(cli) $(client) $(daemon)
+install := $(client) $(daemon)
 targets := $(install) $(internal.libs)
 
 install.directories = \
@@ -121,11 +105,6 @@ test.config = .test.conf.yaml
 $(obj)/$(conf)/settings.env.test.o: CXXFLAGS += -DTEST_CONFIG='"$(test.config)"'
 
 $(obj)/$(core)/preview/image.o: CXXFLAGS += $(graphics.flags)
-
-$(obj)/$(cli)/main.o: CXXFLAGS +=\
- -DNAME='"$(cli)"'\
- -DVERSION='"$(version)"'\
- -DDESCRIPTION='"$(summary)"'
 
 $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DNAME='"$(daemon)"'\
