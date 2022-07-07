@@ -3,7 +3,7 @@
 #include <minty/core/api.h>
 #include <minty/core/mock_downloader.h>
 #include <minty/core/mock_object_store.h>
-#include <minty/core/mock_search.h>
+#include <minty/core/search/mock_search.h>
 #include <minty/repo/db/mock_database.h>
 
 #include <gtest/gtest.h>

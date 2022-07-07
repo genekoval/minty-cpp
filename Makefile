@@ -30,14 +30,18 @@ common.libs := \
  avformat \
  avutil \
  conftools \
+ elasticsearch \
  entix \
+ date \
  ext++ \
+ http \
  fmt \
  fstore \
  harvest \
  netcore \
  pqxx \
  pq \
+ simdjson \
  swscale \
  threadpool \
  timber \
@@ -86,18 +90,8 @@ test.libs := \
 
 include mkbuild/base.mk
 
-define defines.add
- $(addprefix -D, $(1))
-endef
-
-defines.debug = TEST TIMBER_TIMER_ACTIVE
-defines.release = TIMBER_MAX_LEVEL=info
-
-ifeq ($(environment),$(environment.develop))
- CXXFLAGS += $(call defines.add,$(defines.debug))
-else
- CXXFLAGS += $(call defines.add,$(defines.release))
-endif
+defines.develop = TEST TIMBER_TIMER_ACTIVE
+defines.release = NDEBUG TIMBER_MAX_LEVEL=info
 
 confdir = $(prefix)/etc/$(project)
 test.config = .test.conf.yaml

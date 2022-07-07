@@ -44,7 +44,7 @@ namespace minty::repo::db {
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             std::int16_t position
-        ) -> std::string;
+        ) -> decltype(post::date_modified);
 
         VIRTUAL auto create_post_tag(
             const UUID::uuid& post_id,
@@ -93,12 +93,12 @@ namespace minty::repo::db {
         VIRTUAL auto delete_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects
-        ) -> std::string;
+        ) -> decltype(post::date_modified);
 
         VIRTUAL auto delete_post_objects_ranges(
             const UUID::uuid& post_id,
             std::span<const range> ranges
-        ) -> std::string;
+        ) -> decltype(post::date_modified);
 
         VIRTUAL auto delete_post_tag(
             const UUID::uuid& post_id,
@@ -126,13 +126,13 @@ namespace minty::repo::db {
             const UUID::uuid& post_id,
             unsigned int old_index,
             unsigned int new_index
-        ) -> std::string;
+        ) -> decltype(post::date_modified);
 
         VIRTUAL auto move_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination
-        ) -> std::string;
+        ) -> decltype(post::date_modified);
 
         VIRTUAL auto prune() -> void;
 

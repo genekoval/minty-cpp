@@ -4,7 +4,7 @@ namespace minty::repo::db {
     auto database::delete_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects
-    ) -> std::string {
+    ) -> decltype(post::date_modified) {
         auto connection = connections.connection();
         auto tx = pqxx::nontransaction(connection);
 
@@ -12,6 +12,6 @@ namespace minty::repo::db {
             __FUNCTION__,
             post_id,
             objects
-        )[0].as<std::string>();
+        )[0].as<decltype(post::date_modified)>();
     }
 }

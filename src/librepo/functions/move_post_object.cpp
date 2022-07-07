@@ -5,7 +5,7 @@ namespace minty::repo::db {
         const UUID::uuid& post_id,
         unsigned int old_index,
         unsigned int new_index
-    ) -> std::string {
+    ) -> decltype(post::date_modified) {
         auto connection = connections.connection();
         auto tx = pqxx::nontransaction(connection);
 
@@ -14,6 +14,6 @@ namespace minty::repo::db {
             post_id,
             old_index + 1,
             new_index + 1
-        )[0].as<std::string>();
+        )[0].as<decltype(post::date_modified)>();
     }
 }

@@ -44,7 +44,7 @@ namespace minty {
             const UUID::uuid& post_id,
             std::span<const UUID::uuid> objects,
             std::int16_t position
-        ) -> std::string;
+        ) -> decltype(core::post::date_modified);
 
         auto add_post_tag(
             const UUID::uuid& post_id,
@@ -78,7 +78,7 @@ namespace minty {
         auto delete_post_objects(
             const UUID::uuid& post_id,
             std::span<const UUID::uuid> objects
-        ) -> std::string;
+        ) -> decltype(core::post::date_modified);
 
         auto delete_post_tag(
             const UUID::uuid& post_id,
@@ -128,7 +128,7 @@ namespace minty {
             const UUID::uuid& post_id,
             std::span<const UUID::uuid> objects,
             const std::optional<UUID::uuid>& destination
-        ) -> std::string;
+        ) -> decltype(core::post::date_modified);
 
         auto set_comment_content(
             const UUID::uuid& comment_id,

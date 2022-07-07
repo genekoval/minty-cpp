@@ -30,7 +30,7 @@ namespace minty::server {
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects,
             std::int16_t position
-        ) -> std::string;
+        ) -> decltype(core::post::date_modified);
 
         auto add_post_tag(UUID::uuid post_id, UUID::uuid tag_id) -> void;
 
@@ -58,12 +58,12 @@ namespace minty::server {
         auto delete_post_objects(
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects
-        ) -> std::string;
+        ) -> decltype(core::post::date_modified);
 
         auto delete_post_objects_ranges(
             UUID::uuid post_id,
             std::vector<core::range> ranges
-        ) -> std::string;
+        ) -> decltype(core::post::date_modified);
 
         auto delete_post_tag(
             UUID::uuid post_id,
@@ -117,7 +117,7 @@ namespace minty::server {
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects,
             std::optional<UUID::uuid> destination
-        ) -> std::string;
+        ) -> decltype(core::post::date_modified);
 
         auto set_comment_content(
             UUID::uuid comment_id,

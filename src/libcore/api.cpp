@@ -3,7 +3,7 @@
 #include <minty/core/api.h>
 #include <minty/core/downloader.h>
 #include <minty/core/preview.h>
-#include <minty/core/search.h>
+#include <minty/core/search/search.h>
 
 #include <threadpool/threadpool>
 #include <uri/uri>
@@ -136,7 +136,7 @@ namespace minty::core {
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         std::int16_t position
-    ) -> std::string {
+    ) -> decltype(post::date_modified) {
         TIMBER_FUNC();
 
         const auto date_modified =
@@ -283,7 +283,7 @@ namespace minty::core {
     auto api::delete_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects
-    ) -> std::string {
+    ) -> decltype(post::date_modified) {
         TIMBER_FUNC();
 
         const auto modified = db->delete_post_objects(post_id, objects);
@@ -294,7 +294,7 @@ namespace minty::core {
     auto api::delete_post_objects(
         const UUID::uuid& post_id,
         std::span<range> ranges
-    ) -> std::string {
+    ) -> decltype(post::date_modified) {
         TIMBER_FUNC();
 
         const auto modified = db->delete_post_objects_ranges(post_id, ranges);
@@ -474,7 +474,7 @@ namespace minty::core {
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         const std::optional<UUID::uuid>& destination
-    ) -> std::string {
+    ) -> decltype(post::date_modified) {
         TIMBER_FUNC();
 
         const auto date_modified = db->move_post_objects(
@@ -597,12 +597,22 @@ namespace minty::core {
         search->delete_indices();
         search->create_indices();
 
+        TIMBER_INFO("Reindexing tags...");
         db->read_tag_text(batch_size, [this](auto tags) {
-            this->search->add_tags(tags);
+            const auto errors = this->search->add_tags(tags);
+
+            for (const auto& error : errors) {
+                TIMBER_ERROR("tag {}", error);
+            }
         });
 
+        TIMBER_INFO("Reindexing posts...");
         db->read_post_search(batch_size, [this](auto posts) {
-            this->search->add_posts(posts);
+            const auto errors = this->search->add_posts(posts);
+
+            for (const auto& error : errors) {
+                TIMBER_ERROR("post {}", error);
+            }
         });
     }
 

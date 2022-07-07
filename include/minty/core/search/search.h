@@ -1,47 +1,50 @@
 #pragma once
 
+#include "index.h"
+
 #include <minty/core/model.h>
-#include <minty/net/zipline/protocol.h>
 #include <minty/test.h>
 
-#include <netcore/netcore>
-#include <zipline/zipline>
+#include <elasticsearch/elasticsearch>
 
 namespace minty::core {
     class search_engine {
-        enum class event : net::event_t {
-            add_post,
-            add_post_tag,
-            add_posts,
-            add_tags,
-            add_tag_alias,
-            create_indices,
-            delete_indices,
-            delete_post,
-            delete_tag,
-            delete_tag_alias,
-            find_posts,
-            find_tags,
-            remove_post_tag,
-            update_post_date_modified,
-            update_post_description,
-            update_post_title,
-            update_tag_name,
-            version
-        };
+        friend class index;
 
-        using client = net::client<event>;
+        elastic::elasticsearch client;
 
-        const std::string endpoint;
-        const net::error_list errors;
+        template <typename T>
+        auto bulk_index(
+            std::string_view index,
+            std::span<const T> documents
+        ) -> std::vector<std::string>;
 
-        auto connect() -> client;
+        auto create_index(const index& index) -> void;
 
-        auto version() -> std::string;
+        auto delete_indices(
+            std::initializer_list<std::string_view> index
+        ) -> void;
+
+        auto search(
+            std::string_view index,
+            std::string_view query
+        ) -> elastic::json;
+
+        auto search_ids(
+            std::string_view index,
+            std::string_view query
+        ) -> search_result<UUID::uuid>;
     public:
+        index post_index;
+        index tag_index;
+
         search_engine() = default;
 
-        search_engine(std::string_view endpoint);
+        search_engine(
+            std::string_view ns,
+            std::string_view host,
+            std::string_view api_key
+        );
 
         VIRTUAL_DESTRUCTOR(search_engine)
 
@@ -52,9 +55,15 @@ namespace minty::core {
             const UUID::uuid& tag_id
         ) -> void;
 
-        VIRTUAL auto add_posts(std::span<const post_search> posts) -> void;
+        [[nodiscard]]
+        VIRTUAL auto add_posts(
+            std::span<const post_search> posts
+        ) -> std::vector<std::string>;
 
-        VIRTUAL auto add_tags(std::span<const tag_text> tags) -> void;
+        [[nodiscard]]
+        VIRTUAL auto add_tags(
+            std::span<const tag_text> tags
+        ) -> std::vector<std::string>;
 
         VIRTUAL auto add_tag_alias(
             const UUID::uuid& tag_id,
@@ -89,7 +98,7 @@ namespace minty::core {
 
         VIRTUAL auto update_post_date_modified(
             const UUID::uuid& post_id,
-            std::string_view date_modified
+            decltype(post::date_modified) date_modified
         ) -> void;
 
         VIRTUAL auto update_post_description(const post_update& post) -> void;

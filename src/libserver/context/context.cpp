@@ -41,7 +41,7 @@ namespace minty::server {
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::int16_t position
-    ) -> std::string {
+    ) -> decltype(core::post::date_modified) {
         return api->add_post_objects(post_id, objects, position);
     }
 
@@ -91,14 +91,14 @@ namespace minty::server {
     auto context::delete_post_objects(
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects
-    ) -> std::string {
+    ) -> decltype(core::post::date_modified) {
         return api->delete_post_objects(post_id, objects);
     }
 
     auto context::delete_post_objects_ranges(
         UUID::uuid post_id,
         std::vector<core::range> ranges
-    ) -> std::string {
+    ) -> decltype(core::post::date_modified) {
         return api->delete_post_objects(post_id, ranges);
     }
 
@@ -182,7 +182,7 @@ namespace minty::server {
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::optional<UUID::uuid> destination
-    ) -> std::string {
+    ) -> decltype(core::post::date_modified) {
         return api->move_post_objects(post_id, objects, destination);
     }
 

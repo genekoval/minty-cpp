@@ -6,6 +6,7 @@
 #include <minty/server/server.h>
 #include <minty/server/server_info.h>
 
+#include <http/http>
 #include <dmon/dmon>
 #include <filesystem>
 #include <fmt/format.h>
@@ -67,6 +68,8 @@ namespace {
 
 auto main(int argc, const char** argv) -> int {
     timber::log_handler = &timber::console_logger;
+
+    const auto init = http::init();
 
     const auto confpath = default_config.string();
 

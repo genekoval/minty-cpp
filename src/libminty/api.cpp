@@ -132,8 +132,8 @@ namespace minty {
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         std::int16_t position
-    ) -> std::string {
-        return connect().send<std::string>(
+    ) -> decltype(core::post::date_modified) {
+        return connect().send<decltype(core::post::date_modified)>(
             event::add_post_objects,
             post_id,
             objects,
@@ -206,8 +206,8 @@ namespace minty {
     auto api::delete_post_objects(
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects
-    ) -> std::string {
-        return connect().send<std::string>(
+    ) -> decltype(core::post::date_modified) {
+        return connect().send<decltype(core::post::date_modified)>(
             event::delete_post_objects,
             post_id,
             objects
@@ -316,8 +316,8 @@ namespace minty {
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         const std::optional<UUID::uuid>& destination
-    ) -> std::string {
-        return connect().send<std::string>(
+    ) -> decltype(core::post::date_modified) {
+        return connect().send<decltype(core::post::date_modified)>(
             event::move_post_objects,
             post_id,
             objects,

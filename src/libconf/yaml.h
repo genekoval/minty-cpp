@@ -13,5 +13,4 @@ namespace YAML {
     CONVERT(minty::conf::settings::s_fstore::s_proxy);
     CONVERT(minty::conf::settings::s_log);
     CONVERT(minty::conf::settings::s_search);
-    CONVERT(minty::conf::settings::s_search::s_host);
 }

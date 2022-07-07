@@ -58,8 +58,8 @@ namespace entix {
         &minty::repo::db::post_search::id,
         &minty::repo::db::post_search::title,
         &minty::repo::db::post_search::description,
-        &minty::repo::db::post_search::date_created,
-        &minty::repo::db::post_search::date_modified,
+        &minty::repo::db::post_search::created,
+        &minty::repo::db::post_search::modified,
         &minty::repo::db::post_search::tags
     );
 

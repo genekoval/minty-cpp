@@ -1,11 +1,17 @@
 #pragma once
 
+#include <chrono>
 #include <optional>
 #include <string>
 #include <uuid++/uuid++>
 #include <vector>
 
 namespace minty::repo::db {
+    using time_point = std::chrono::time_point<
+        std::chrono::system_clock,
+        std::chrono::milliseconds
+    >;
+
     struct range {
         using index_type = int;
 
@@ -50,7 +56,7 @@ namespace minty::repo::db {
         std::optional<decltype(object::id)> avatar;
         std::optional<decltype(object::id)> banner;
         unsigned int post_count;
-        std::string date_created;
+        time_point date_created;
     };
 
     struct tag_name {
@@ -78,8 +84,8 @@ namespace minty::repo::db {
         UUID::uuid id;
         std::optional<std::string> title;
         std::optional<std::string> description;
-        std::string date_created;
-        std::string date_modified;
+        time_point date_created;
+        decltype(date_created) date_modified;
     };
 
     struct comment {
@@ -88,26 +94,26 @@ namespace minty::repo::db {
         std::optional<decltype(id)> parent_id;
         std::int16_t indent;
         std::string content;
-        std::string date_created;
+        time_point date_created;
 
         auto operator==(const comment&) const -> bool = default;
     };
 
     struct post_preview {
         decltype(post::id) id;
-        std::optional<std::string> title;
+        decltype(post::title) title;
         std::optional<object_preview> preview;
         unsigned int comment_count;
         unsigned int object_count;
-        std::string date_created;
+        decltype(post::date_created) date_created;
     };
 
     struct post_search {
         decltype(post::id) id;
         decltype(post::title) title;
         decltype(post::description) description;
-        decltype(post::date_created) date_created;
-        decltype(post::date_modified) date_modified;
+        decltype(post::date_created) created;
+        decltype(post::date_modified) modified;
         std::vector<decltype(tag::id)> tags;
 
         auto operator==(const post_search&) const -> bool = default;
@@ -115,12 +121,12 @@ namespace minty::repo::db {
 
     struct post_object_update {
         std::vector<object_preview> objects;
-        std::string date_modified;
+        decltype(post::date_modified) date_modified;
     };
 
     struct post_update {
         decltype(post::id) id;
         std::optional<std::string> new_data;
-        std::string date_modified;
+        decltype(post::date_modified) date_modified;
     };
 }

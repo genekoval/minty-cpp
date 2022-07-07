@@ -64,7 +64,7 @@ namespace minty::core {
 
     template <typename T>
     struct modification {
-        std::string date_modified;
+        repo::db::time_point date_modified;
         T new_value;
     };
 
@@ -165,20 +165,20 @@ namespace minty::core {
 
     struct post_query {
         struct sort_type {
-            sort_order order;
             post_sort_value value;
+            sort_order order;
         };
 
-        unsigned int from;
-        unsigned int size;
+        unsigned int from = 0;
+        unsigned int size = 0;
         std::optional<std::string> text;
         std::vector<decltype(tag::id)> tags;
         sort_type sort;
     };
 
     struct tag_query {
-        unsigned int from;
-        unsigned int size;
+        unsigned int from = 0;
+        unsigned int size = 0;
         decltype(tag::name) name;
         std::vector<decltype(tag::id)> exclude;
     };

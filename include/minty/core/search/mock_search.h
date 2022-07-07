@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/search.h>
+#include <minty/core/search/search.h>
 
 #include <gmock/gmock.h>
 
@@ -15,11 +15,11 @@ namespace minty::test {
             const UUID::uuid& tag_id
         ), (override));
 
-        MOCK_METHOD(void, add_posts, (
+        MOCK_METHOD(std::vector<std::string>, add_posts, (
             std::span<const core::post_search> posts
         ), (override));
 
-        MOCK_METHOD(void, add_tags, (
+        MOCK_METHOD(std::vector<std::string>, add_tags, (
             std::span<const core::tag_text> tags
         ), (override));
 
@@ -58,7 +58,7 @@ namespace minty::test {
 
         MOCK_METHOD(void, update_post_date_modified, (
             const UUID::uuid& post_id,
-            std::string_view date_modified
+            decltype(core::post::date_modified) date_modified
         ), (override));
 
         MOCK_METHOD(void, update_post_description, (

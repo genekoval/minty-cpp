@@ -39,10 +39,4 @@ namespace zipline {
         &minty::core::tag_query::name,
         &minty::core::tag_query::exclude
     );
-
-    ZIPLINE_OBJECT(
-        minty::core::tag_text,
-        &minty::core::tag_text::id,
-        &minty::core::tag_text::names
-    );
 }

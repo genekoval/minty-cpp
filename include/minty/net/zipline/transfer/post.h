@@ -58,23 +58,6 @@ namespace zipline {
     );
 
     ZIPLINE_OBJECT(
-        minty::core::post_search,
-        &minty::core::post_search::id,
-        &minty::core::post_search::title,
-        &minty::core::post_search::description,
-        &minty::core::post_search::date_created,
-        &minty::core::post_search::date_modified,
-        &minty::core::post_search::tags
-    );
-
-    ZIPLINE_OBJECT(
-        minty::core::post_update,
-        &minty::core::post_update::id,
-        &minty::core::post_update::new_data,
-        &minty::core::post_update::date_modified
-    );
-
-    ZIPLINE_OBJECT(
         minty::core::range,
         &minty::core::range::first,
         &minty::core::range::last

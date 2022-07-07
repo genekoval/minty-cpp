@@ -5,7 +5,9 @@
 #include <gmock/gmock.h>
 
 namespace minty::test {
-    struct database : repo::db::database {
+    class database : public repo::db::database {
+        using post = repo::db::post;
+    public:
         MOCK_METHOD(repo::db::comment, create_comment, (
             const UUID::uuid& post_id,
             std::string_view content
@@ -29,7 +31,7 @@ namespace minty::test {
             const std::vector<UUID::uuid>& tags
         ), (override));
 
-        MOCK_METHOD(std::string, create_post_objects, (
+        MOCK_METHOD(decltype(post::date_modified), create_post_objects, (
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             std::int16_t position
@@ -81,12 +83,12 @@ namespace minty::test {
 
         MOCK_METHOD(void, delete_post, (const UUID::uuid& post_id), (override));
 
-        MOCK_METHOD(std::string, delete_post_objects, (
+        MOCK_METHOD(decltype(post::date_modified), delete_post_objects, (
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects
         ), (override));
 
-        MOCK_METHOD(std::string, delete_post_objects_ranges, (
+        MOCK_METHOD(decltype(post::date_modified), delete_post_objects_ranges, (
             const UUID::uuid& post_id,
             std::span<const repo::db::range> ranges
         ), (override));
@@ -113,13 +115,13 @@ namespace minty::test {
             std::string_view source_id
         ), (override));
 
-        MOCK_METHOD(std::string, move_post_object, (
+        MOCK_METHOD(decltype(post::date_modified), move_post_object, (
             const UUID::uuid& post_id,
             unsigned int old_index,
             unsigned int new_index
         ), (override));
 
-        MOCK_METHOD(std::string, move_post_objects, (
+        MOCK_METHOD(decltype(post::date_modified), move_post_objects, (
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination

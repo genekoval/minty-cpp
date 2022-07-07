@@ -46,11 +46,9 @@ namespace minty::conf {
         };
 
         struct s_search {
-            struct s_host {
-                std::string path;
-            };
-
-            s_host host;
+            std::string node;
+            std::string auth;
+            std::string ns;
         };
 
         static auto load(std::string_view text) -> settings;

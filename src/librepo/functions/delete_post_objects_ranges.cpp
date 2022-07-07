@@ -4,7 +4,7 @@ namespace minty::repo::db {
     auto database::delete_post_objects_ranges(
         const UUID::uuid& post_id,
         std::span<const range> ranges
-    ) -> std::string {
+    ) -> decltype(post::date_modified) {
         auto arg = std::vector<std::string>();
 
         for (const auto& r : ranges) {
@@ -22,6 +22,6 @@ namespace minty::repo::db {
             __FUNCTION__,
             post_id,
             arg
-        )[0].as<std::string>();
+        )[0].as<decltype(post::date_modified)>();
     }
 }

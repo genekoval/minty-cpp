@@ -3,7 +3,7 @@
 #include <minty/conf/settings.h>
 #include <minty/core/api.h>
 #include <minty/core/downloader.h>
-#include <minty/core/search.h>
+#include <minty/core/search/search.h>
 #include <minty/repo/db/database.h>
 
 #include <fstore/client.h>

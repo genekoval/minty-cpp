@@ -29,8 +29,9 @@ fstore:
         port: 5000
 
 search:
-    host:
-        path: /run/minty-search.sock
+    node: https://localhost:9200
+    auth: apikey
+    namespace: minty-test
 
 server:
     path: /run/minty/minty.sock
@@ -51,7 +52,9 @@ server:
     ASSERT_EQ("minty", settings.fstore.bucket);
     ASSERT_EQ("/run/fstore/fstore.sock", settings.fstore.connection);
     ASSERT_EQ(5000, settings.fstore.proxy.port);
-    ASSERT_EQ("/run/minty-search.sock", settings.search.host.path);
+    ASSERT_EQ("https://localhost:9200", settings.search.node);
+    ASSERT_EQ("apikey", settings.search.auth);
+    ASSERT_EQ("minty-test", settings.search.ns);
 }
 
 TEST_F(ConfSettingsTest, Encode) {
