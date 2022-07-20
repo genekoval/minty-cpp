@@ -359,15 +359,11 @@ namespace minty::core {
 
         result.total = uint64_t(response["hits"]["total"]["value"]);
 
-        auto buffer = std::array<char, UUID::strlen>();
-        buffer[UUID::strlen - 1] = '\0';
-
         for (auto hit : response["hits"]["hits"].get_array()) {
             const auto id = std::string_view(hit["_id"]);
             TIMBER_DEBUG("search results: {}", id);
 
-            std::memcpy(buffer.data(), id.data(), UUID::strlen - 1);
-            result.hits.emplace_back(std::string_view(buffer.data()));
+            result.hits.emplace_back(id);
         }
 
         TIMBER_DEBUG(
