@@ -3,10 +3,7 @@
 namespace minty::core {
     downloader::downloader(std::string_view host, std::string_view port) :
         service(harvest::api(host, port))
-    {
-        const auto info = service->get_server_info();
-        TIMBER_DEBUG("Using harvest version {}", info.server);
-    }
+    {}
 
     auto downloader::fetch(
         std::string_view url,
