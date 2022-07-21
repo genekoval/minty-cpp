@@ -16,12 +16,12 @@ namespace minty::core {
 
         VIRTUAL auto fetch(
             std::string_view url,
-            std::function<void(harvest::stream_type&)> callback
+            std::function<void(harvest::data_stream&)> callback
         ) -> bool;
 
         VIRTUAL auto get_site_icon(
             std::string_view url,
-            std::function<void(harvest::stream_type&)> pipe
+            std::function<void(harvest::data_stream&)> pipe
         ) -> void;
     };
 }

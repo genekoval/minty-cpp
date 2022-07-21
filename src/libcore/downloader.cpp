@@ -7,7 +7,7 @@ namespace minty::core {
 
     auto downloader::fetch(
         std::string_view url,
-        std::function<void(harvest::stream_type&)> callback
+        std::function<void(harvest::data_stream&)> callback
     ) -> bool {
         return service->scrape_url(url, [&callback](
             auto& stream,
@@ -21,7 +21,7 @@ namespace minty::core {
 
     auto downloader::get_site_icon(
         std::string_view url,
-        std::function<void(harvest::stream_type&)> pipe
+        std::function<void(harvest::data_stream&)> pipe
     ) -> void {
         service->get_site_icon(url, pipe);
     }
