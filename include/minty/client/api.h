@@ -90,7 +90,7 @@ namespace minty {
             const UUID::uuid& related
         ) -> void;
 
-        auto delete_tag(std::string_view id) -> void;
+        auto delete_tag(const UUID::uuid& id) -> void;
 
         auto delete_tag_alias(
             const UUID::uuid& tag_id,

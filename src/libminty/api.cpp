@@ -228,7 +228,7 @@ namespace minty {
         connect().send<void>(event::delete_related_post, post_id, related);
     }
 
-    auto api::delete_tag(std::string_view id) -> void {
+    auto api::delete_tag(const UUID::uuid& id) -> void {
         connect().send<void>(event::delete_tag, id);
     }
 
