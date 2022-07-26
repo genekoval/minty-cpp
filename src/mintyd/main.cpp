@@ -89,7 +89,7 @@ auto main(int argc, const char** argv) -> int {
     );
 
     app.on_error([](const auto& e) -> void {
-        TIMBER_CRITICAL("{}", e.what());
+        TIMBER_CRITICAL(e.what());
     });
 
     app.subcommand(minty::cli::db(confpath));
