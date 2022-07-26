@@ -1,6 +1,14 @@
 DROP SCHEMA IF EXISTS minty CASCADE;
 CREATE SCHEMA minty;
 
+CREATE FUNCTION epoch_sec(
+    a_timestamp     timestamptz
+) RETURNS numeric AS $$
+BEGIN
+    RETURN extract(epoch FROM a_timestamp);
+END;
+$$ LANGUAGE plpgsql;
+
 --{{{( Views )
 
 CREATE VIEW object_preview_error AS
@@ -41,6 +49,15 @@ LEFT JOIN (
 ) banners USING (object_id)
 GROUP BY object_id;
 
+CREATE VIEW post AS
+SELECT
+    post_id,
+    title,
+    description,
+    epoch_sec(date_created) AS date_created,
+    epoch_sec(date_modified) AS date_modified
+FROM data.post;
+
 CREATE VIEW post_comment AS
 SELECT
     comment_id,
@@ -48,7 +65,7 @@ SELECT
     parent_id,
     indent,
     content,
-    date_created
+    epoch_sec(date_created) AS date_created
 FROM data.post_comment;
 
 CREATE VIEW post_object_ref_view AS
@@ -64,8 +81,8 @@ SELECT
     post_id,
     title,
     description,
-    date_created,
-    date_modified,
+    epoch_sec(date_created) AS date_created,
+    epoch_sec(date_modified) AS date_modified,
     array_agg(tag_id) AS tags
 FROM data.post
 LEFT JOIN data.post_tag USING (post_id)
@@ -149,7 +166,7 @@ SELECT
     avatar,
     banner,
     count(post_id) AS post_count,
-    date_created
+    epoch_sec(date_created) AS date_created
 FROM data.tag
 LEFT JOIN tag_name_view USING (tag_id)
 LEFT JOIN data.post_tag USING (tag_id)
@@ -176,7 +193,7 @@ SELECT
     preview_id,
     coalesce(comment_count, 0) AS comment_count,
     coalesce(object_count, 0) AS object_count,
-    post.date_created
+    epoch_sec(post.date_created) AS date_created
 FROM data.post
 LEFT JOIN (
     SELECT
@@ -214,7 +231,7 @@ CREATE TYPE object_preview AS (
 CREATE TYPE post_update AS (
     post_id         uuid,
     new_data        text,
-    date_modified   timestamptz
+    date_modified   numeric
 );
 
 CREATE TYPE tag_name AS (
@@ -235,7 +252,7 @@ CREATE TYPE tag_name_update AS (
 CREATE FUNCTION create_comment(
     a_post_id       uuid,
     a_content       text
-) RETURNS SETOF data.post_comment AS $$
+) RETURNS SETOF post_comment AS $$
 BEGIN
     RETURN QUERY
     INSERT INTO data.post_comment (
@@ -244,7 +261,13 @@ BEGIN
     ) VALUES (
         a_post_id,
         a_content
-    ) RETURNING *;
+    ) RETURNING
+        comment_id,
+        post_id,
+        parent_id,
+        indent,
+        content,
+        epoch_sec(date_created) AS date_created;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -350,7 +373,7 @@ CREATE FUNCTION create_post_objects(
     a_post_id       uuid,
     a_objects       uuid[],
     a_position      smallint
-) RETURNS timestamptz AS $$
+) RETURNS numeric AS $$
 -- Largest possible smallint
 DECLARE l_greatest_sequence CONSTANT smallint := 32767;
 DECLARE l_position smallint;
@@ -403,7 +426,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_reply(
     a_parent_id     uuid,
     a_content       text
-) RETURNS SETOF data.post_comment AS $$
+) RETURNS SETOF post_comment AS $$
 DECLARE l_parent record;
 BEGIN
     SELECT post_id, indent
@@ -422,7 +445,13 @@ BEGIN
         a_parent_id,
         l_parent.indent + 1,
         a_content
-    ) RETURNING *;
+    ) RETURNING
+        comment_id,
+        post_id,
+        parent_id,
+        indent,
+        content,
+        epoch_sec(date_created) AS date_created;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -565,7 +594,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION delete_post_objects(
     a_post_id       uuid,
     a_objects       uuid[]
-) RETURNS timestamptz AS $$
+) RETURNS numeric AS $$
 DECLARE
     l_object_id       uuid;
 BEGIN
@@ -588,7 +617,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION delete_post_objects_ranges(
     a_post_id       uuid,
     ranges          int4range[]
-) RETURNS timestamptz AS $$
+) RETURNS numeric AS $$
 DECLARE
     range           int4range;
 BEGIN
@@ -702,7 +731,7 @@ CREATE FUNCTION move_post_object(
     a_post_id       uuid,
     a_old_index     integer,
     a_new_index     integer
-) RETURNS timestamptz AS $$
+) RETURNS numeric AS $$
 BEGIN
     UPDATE data.post_object
     SET sequence = -1
@@ -734,7 +763,7 @@ CREATE FUNCTION move_post_objects(
     a_post_id       uuid,
     a_objects       uuid[],
     a_destination   uuid
-) RETURNS timestamptz AS $$
+) RETURNS numeric AS $$
 BEGIN
     PERFORM delete_post_objects(a_post_id, a_objects);
     PERFORM create_post_objects(
@@ -852,22 +881,22 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post(
     a_post_id       uuid
-) RETURNS SETOF data.post AS $$
+) RETURNS SETOF post AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM data.post
+    FROM post
     WHERE post_id = a_post_id;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post_date_modified(
     a_post_id       uuid
-) RETURNS timestamptz AS $$
+) RETURNS numeric AS $$
 DECLARE
-    l_date_modified timestamptz;
+    l_date_modified numeric;
 BEGIN
-    SELECT date_modified INTO l_date_modified
+    SELECT epoch_sec(date_modified) INTO l_date_modified
     FROM data.post
     WHERE post_id = a_post_id;
 
@@ -1115,7 +1144,7 @@ BEGIN
     RETURNING
         post_id,
         description as new_data,
-        date_modified;
+        epoch_sec(date_modified) AS date_modified;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1131,7 +1160,7 @@ BEGIN
     RETURNING
         post_id,
         title as new_data,
-        date_modified;
+        epoch_sec(date_modified) AS date_modified;
 END;
 $$ LANGUAGE plpgsql;
 
