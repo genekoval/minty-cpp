@@ -106,7 +106,10 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DDESCRIPTION='"$(project) server"'\
  -DCONFDIR='"$(confdir)"'
 
-.PHONY: edit.config init migrate start
+.PHONY: db edit.config init migrate start
+
+db:
+	$($(daemon)) db --config $(test.config)
 
 edit.config:
 	$(EDITOR) $(confdir)/minty.yml
