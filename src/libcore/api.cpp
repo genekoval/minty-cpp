@@ -18,7 +18,6 @@ namespace minty::core {
         db(&db),
         objects(&objects),
         dl(&dl),
-        previews(objects),
         search(&search)
     {}
 
@@ -42,14 +41,15 @@ namespace minty::core {
     }
 
     auto api::add_object(
+        bucket& bucket,
         fstore::object_meta&& object,
         const std::optional<std::string>& src
-    ) -> object_preview {
+    ) -> ext::task<object_preview> {
         auto preview_id = std::optional<UUID::uuid>();
         auto error = std::optional<std::string>();
 
         try {
-            preview_id = previews.generate_preview(object);
+            preview_id = co_await generate_preview(bucket, object);
         }
         catch (const std::exception& ex) {
             error = ex.what();
@@ -58,58 +58,46 @@ namespace minty::core {
         db->create_object(object.id, preview_id, src);
         if (error) db->create_object_preview_error(object.id, *error);
 
-        return {
+        co_return object_preview(
             std::move(object.id),
             std::move(preview_id),
             std::move(object.type),
             std::move(object.subtype)
-        };
-    }
-
-    auto api::add_object_data(
-        std::size_t stream_size,
-        std::function<void(fstore::part&&)> pipe
-    ) -> object_preview {
-        TIMBER_FUNC();
-
-        return add_object(objects->add({}, stream_size, pipe), {});
-    }
-
-    auto api::add_object_local(std::string_view path) -> core::object_preview {
-        TIMBER_FUNC();
-
-        return add_object(objects->add(path), {});
+        );
     }
 
     auto api::add_objects_url(
         std::string_view url
-    ) -> std::vector<core::object_preview> {
+    ) -> ext::task<std::vector<core::object_preview>> {
         TIMBER_FUNC();
 
+        auto bucket = co_await objects->connect();
         auto objects = std::vector<fstore::object_meta>();
 
-        const auto used_scraper = dl->fetch(url, [&](auto& file) {
-            objects.push_back(this->objects->add(
+        const auto used_scraper = co_await dl->fetch(url, [&](
+            auto& file
+        ) -> ext::task<> {
+            objects.push_back(co_await bucket.add(
                 {},
-                file.size(),
-                [&file](auto&& part) {
-                    file.read([&part](auto&& chunk) {
-                        part.write(chunk);
+                co_await file.size(),
+                [&file](auto&& part) -> ext::task<> {
+                    co_await file.read([&part](auto&& chunk) -> ext::task<> {
+                        co_await part.write(chunk);
                     });
                 }
             ));
         });
 
         const auto src = used_scraper ?
-            add_source(url).id : std::optional<std::string>();
+            (co_await add_source(url)).id : std::optional<std::string>();
 
         auto result = std::vector<object_preview>();
 
         for (auto&& obj : objects) {
-            result.push_back(add_object(std::move(obj), src));
+            result.push_back(co_await add_object(bucket, std::move(obj), src));
         }
 
-        return result;
+        co_return result;
     }
 
     auto api::add_post(post_parts parts) -> UUID::uuid {
@@ -185,7 +173,7 @@ namespace minty::core {
         };
     }
 
-    auto api::add_source(std::string_view url) -> source {
+    auto api::add_source(std::string_view url) -> ext::task<source> {
         constexpr auto host_prefix = std::string_view("www.");
 
         const auto uri = uri::uri(std::string(url));
@@ -197,7 +185,8 @@ namespace minty::core {
         }
 
         const auto site_opt = db->read_site(scheme, host);
-        const auto site_id = site_opt ? *site_opt : add_site(scheme, host);
+        const auto site_id = site_opt ?
+            *site_opt : co_await add_site(scheme, host);
 
         auto resource = uri.pathname();
 
@@ -208,25 +197,28 @@ namespace minty::core {
             fmt::format("#{}", uri.fragment())
         );
 
-        return db->create_source(site_id, resource);
+        co_return db->create_source(site_id, resource);
     }
 
     auto api::add_site(
         std::string_view scheme,
         std::string_view host
-    ) -> std::string {
+    ) -> ext::task<std::string> {
         auto icon_id = std::optional<UUID::uuid>();
+        auto bucket = co_await objects->connect();
 
-        dl->get_site_icon(
+        co_await dl->get_site_icon(
             fmt::format("{}://{}", scheme, host),
-            [&](auto& stream) {
-                const auto object = objects->add(
+            [&](auto& stream) -> ext::task<> {
+                const auto object = co_await bucket.add(
                     {},
-                    stream.size(),
-                    [&stream] (auto&& part) {
-                        stream.read([&part](auto&& chunk) {
-                            part.write(chunk);
-                        });
+                    co_await stream.size(),
+                    [&stream] (auto&& part) -> ext::task<> {
+                        co_await stream.read(
+                            [&part](auto&& chunk) -> ext::task<> {
+                                co_await part.write(chunk);
+                            }
+                        );
                     }
                 );
 
@@ -234,7 +226,7 @@ namespace minty::core {
             }
         );
 
-        return db->create_site(scheme, host, icon_id).id;
+        co_return db->create_site(scheme, host, icon_id).id;
     }
 
     auto api::add_tag(std::string_view name) -> UUID::uuid {
@@ -265,12 +257,12 @@ namespace minty::core {
     auto api::add_tag_source(
         const UUID::uuid& tag_id,
         std::string_view url
-    ) -> source {
+    ) -> ext::task<source> {
         TIMBER_FUNC();
 
-        const auto src = add_source(url);
+        const auto src = co_await add_source(url);
         db->create_tag_source(tag_id, src.id);
-        return src;
+        co_return src;
     }
 
     auto api::delete_post(const UUID::uuid& id) -> void {
@@ -348,6 +340,10 @@ namespace minty::core {
         db->delete_tag_source(tag_id, source_id);
     }
 
+    auto api::get_bucket_id() const noexcept -> const UUID::uuid& {
+        return objects->get_bucket_id();
+    }
+
     auto api::get_comment(const UUID::uuid& comment_id) -> comment_detail {
         TIMBER_FUNC();
 
@@ -361,13 +357,15 @@ namespace minty::core {
         return build_tree(entities);
     }
 
-    auto api::get_object(const UUID::uuid& object_id) -> object {
+    auto api::get_object(const UUID::uuid& object_id) -> ext::task<object> {
         TIMBER_FUNC();
 
-        return object(
+        auto bucket = co_await objects->connect();
+
+        co_return object(
             db->read_object(object_id),
-            objects->meta(object_id),
-            get_posts(db->read_object_posts(object_id))
+            co_await bucket.meta(object_id),
+            co_await get_posts(bucket, db->read_object_posts(object_id))
         );
     }
 
@@ -377,10 +375,12 @@ namespace minty::core {
         return db->read_object_preview_errors();
     }
 
-    auto api::get_post(const UUID::uuid& id) -> post {
+    auto api::get_post(const UUID::uuid& id) -> ext::task<post> {
         TIMBER_FUNC();
 
+        auto bucket = co_await objects->connect();
         auto data = db->read_post(id);
+        auto posts = co_await get_posts(bucket, db->read_related_posts(id));
 
         auto result = post {
             .id = data.id,
@@ -388,26 +388,27 @@ namespace minty::core {
             .description = data.description,
             .date_created = data.date_created,
             .date_modified = data.date_modified,
-            .posts = get_posts(db->read_related_posts(id)),
+            .posts = std::move(posts),
             .tags = db->read_post_tags(id)
         };
 
         auto objects = db->read_post_objects(id);
 
         for (auto&& obj : objects) {
-            auto meta = this->objects->meta(obj.id);
+            auto meta = co_await bucket.meta(obj.id);
             result.objects.emplace_back(
                 std::move(obj),
                 std::move(meta)
             );
         }
 
-        return result;
+        co_return result;
     }
 
     auto api::get_posts(
+        bucket& bucket,
         std::vector<repo::db::post_preview>&& posts
-    ) -> std::vector<post_preview> {
+    ) -> ext::task<std::vector<post_preview>> {
         auto result = std::vector<post_preview>();
 
         for (auto&& post : posts) {
@@ -415,29 +416,37 @@ namespace minty::core {
                 post.preview.value().id :
                 std::optional<UUID::uuid>();
 
+            auto preview = std::optional<object_preview>();
+
+            if (obj) {
+                auto metadata = co_await bucket.meta(*obj);
+                preview = object_preview(
+                    std::move(post.preview.value()),
+                    std::move(metadata)
+                );
+            }
+
             result.emplace_back(
                 std::move(post),
-                post.preview ?
-                    object_preview(
-                        std::move(post.preview.value()),
-                        objects->meta(obj.value())
-                    ) :
-                    std::optional<object_preview>()
+                std::move(preview)
             );
         }
 
-        return result;
+        co_return result;
     }
 
     auto api::get_posts(
         const post_query& query
-    ) -> search_result<post_preview> {
+    ) -> ext::task<search_result<post_preview>> {
         TIMBER_FUNC();
 
         const auto result = search->find_posts(query);
-        return {
+        auto bucket = co_await objects->connect();
+        auto posts = co_await get_posts(bucket, db->read_posts(result.hits));
+
+        co_return search_result<post_preview> {
             .total = result.total,
-            .hits = get_posts(db->read_posts(result.hits))
+            .hits = std::move(posts)
         };
     }
 
@@ -487,27 +496,33 @@ namespace minty::core {
         return date_modified;
     }
 
-    auto api::prune() -> void {
+    auto api::prune() -> ext::task<> {
         TIMBER_FUNC();
 
         db->prune();
 
+        auto bucket = co_await objects->connect();
         auto result = fstore::remove_result();
-        db->prune_objects([this, &result](auto objects) -> bool {
+
+        const auto on_deleted = [&bucket, &result](
+            auto objects
+        ) -> ext::task<bool> {
             try {
-                result = this->objects->remove(objects);
-                return true;
+                result = co_await bucket.remove(objects);
+                co_return true;
             }
             catch (const std::runtime_error& ex) {
                 TIMBER_ERROR("Object pruning has failed: {}", ex.what());
             }
 
-            return false;
-        });
+            co_return false;
+        };
+
+        co_await db->prune_objects(on_deleted);
 
         if (result.objects_removed == 0) {
             TIMBER_INFO("No objects to prune");
-            return;
+            co_return;
         }
 
         TIMBER_INFO(
@@ -520,17 +535,18 @@ namespace minty::core {
 
     auto api::regenerate_preview(
         const UUID::uuid& object_id
-    ) -> decltype(object::preview_id) {
+    ) -> ext::task<decltype(object::preview_id)> {
         TIMBER_FUNC();
 
-        const auto metadata = objects->meta(object_id);
+        auto bucket = co_await objects->connect();
+        const auto metadata = co_await bucket.meta(object_id);
 
         try {
-            const auto preview = previews.generate_preview(metadata);
+            const auto preview = co_await generate_preview(bucket, metadata);
             db->update_object_preview(object_id, preview);
             db->delete_object_preview_error(object_id);
 
-            return preview;
+            co_return preview;
         }
         catch (const std::exception& ex) {
             db->create_object_preview_error(object_id, ex.what());
@@ -538,18 +554,20 @@ namespace minty::core {
             throw ex;
         }
 
-        return {};
+        co_return decltype(object::preview_id){};
     }
 
     auto api::regenerate_preview(
+        bucket& bucket,
         const repo::db::object_preview& object
-    ) -> bool {
+    ) -> ext::task<bool> {
         TIMBER_FUNC();
 
-        const auto metadata = objects->meta(object.id);
+        const auto reg = bucket.register_scoped();
 
         try {
-            const auto preview = previews.generate_preview(metadata);
+            const auto metadata = co_await bucket.meta(object.id);
+            const auto preview = co_await generate_preview(bucket, metadata);
 
             if (preview != object.preview_id) {
                 db->update_object_preview(object.id, preview);
@@ -557,36 +575,66 @@ namespace minty::core {
 
             db->delete_object_preview_error(object.id);
 
-            return true;
+            co_return true;
         }
         catch (const std::exception& ex) {
             db->create_object_preview_error(object.id, ex.what());
         }
 
-        return false;
+        co_return false;
     }
 
-    auto api::regenerate_previews(int jobs, progress& progress) -> std::size_t {
+    auto api::regenerate_preview_task(
+        netcore::thread_pool& workers,
+        repo::db::object_preview obj,
+        std::size_t& errors,
+        progress& progress,
+        netcore::event& finished
+    ) -> ext::detached_task {
+        TIMBER_FUNC();
+
+        auto bucket = co_await objects->connect();
+        bucket.deregister();
+
+        const auto success =
+            co_await workers.wait(regenerate_preview(bucket, obj));
+
+        if (!success) errors += 1;
+        progress.completed += 1;
+
+        if (progress.completed == progress.total) finished.emit();
+    }
+
+    auto api::regenerate_previews(
+        int jobs,
+        progress& progress
+    ) -> ext::task<std::size_t> {
         TIMBER_FUNC();
 
         progress.total = db->read_total_objects();
-        std::atomic_ulong errors = 0;
+        std::size_t errors = 0;
 
-        {
-            auto workers = threadpool::pool(jobs);
+        auto workers = netcore::thread_pool(jobs, 32, "worker");
+        auto finished = netcore::event();
+        auto objects = db->read_objects(100);
 
-            db->read_objects(100, [&](auto objects) {
-                for (const auto& obj : objects) {
-                    workers.run([this, obj, &errors, &progress] {
-                        const auto success = regenerate_preview(obj);
-                        if (!success) errors += 1;
-                        progress.completed += 1;
-                    });
-                }
-            });
+        while (objects) {
+            for (auto&& obj : objects()) {
+                regenerate_preview_task(
+                    workers,
+                    obj,
+                    errors,
+                    progress,
+                    finished
+                );
+            }
+
+            co_await netcore::yield();
         }
 
-        return errors;
+        co_await finished.listen();
+
+        co_return errors;
     }
 
     auto api::reindex() -> void {
@@ -597,23 +645,29 @@ namespace minty::core {
         search->delete_indices();
         search->create_indices();
 
-        TIMBER_INFO("Reindexing tags...");
-        db->read_tag_text(batch_size, [this](auto tags) {
-            const auto errors = this->search->add_tags(tags);
+        {
+            TIMBER_INFO("Reindexing tags...");
+            auto tags = db->read_tag_text(batch_size);
+            while (tags) {
+                const auto errors = search->add_tags(tags());
 
-            for (const auto& error : errors) {
-                TIMBER_ERROR("tag {}", error);
+                for (const auto& error : errors) {
+                    TIMBER_ERROR("tag {}", error);
+                }
             }
-        });
+        }
 
-        TIMBER_INFO("Reindexing posts...");
-        db->read_post_search(batch_size, [this](auto posts) {
-            const auto errors = this->search->add_posts(posts);
+        {
+            TIMBER_INFO("Reindexing posts...");
+            auto posts = db->read_post_search(batch_size);
+            while (posts) {
+                const auto errors = search->add_posts(posts());
 
-            for (const auto& error : errors) {
-                TIMBER_ERROR("post {}", error);
+                for (const auto& error : errors) {
+                    TIMBER_ERROR("post {}", error);
+                }
             }
-        });
+        }
     }
 
     auto api::set_comment_content(

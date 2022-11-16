@@ -5,8 +5,7 @@ TEST_F(SearchPostTest, RemovePostTag) {
 
     search.remove_post_tag(post.id, post.tags.front());
 
-    auto res = get_post(post.id);
-    const auto tags = get_tags(res);
+    const auto tags = get_post(post.id)["tags"].get<std::vector<UUID::uuid>>();
 
     ASSERT_EQ(post.tags.size() - 1, tags.size());
 

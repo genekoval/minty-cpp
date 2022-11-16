@@ -16,6 +16,6 @@ TEST_F(SearchPostTest, UpdatePostDescription) {
 
     auto res = get_post(post.id);
 
-    ASSERT_EQ(description, std::string_view(res["description"]));
-    ASSERT_EQ(modified, get_time(res, "modified"));
+    ASSERT_EQ(description, res["description"].get<std::string>());
+    ASSERT_EQ(modified, res["modified"].get<minty::test::time_point>());
 }

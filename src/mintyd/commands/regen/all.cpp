@@ -52,13 +52,10 @@ namespace {
             int jobs,
             bool quiet
         ) -> void {
-            jobs = std::max(jobs, 0);
+            jobs = std::max(jobs, 1);
 
             auto settings = minty::conf::initialize(confpath);
             settings.database.connections = jobs + minimum_connections;
-
-            auto container = minty::cli::api_container(settings);
-            auto& api = container.api();
 
             auto progress = ::progress();
             auto running = true;
@@ -73,7 +70,15 @@ namespace {
                     std::ref(running)
                 );
 
-            const auto errors = api.regenerate_previews(jobs, progress);
+            auto errors = std::size_t(0);
+
+            minty::cli::api(settings, [
+                &errors,
+                jobs,
+                &progress
+            ](auto& api) -> ext::task<> {
+                errors = co_await api.regenerate_previews(jobs, progress);
+            });
 
             running = false;
             if (ui_thread.joinable()) ui_thread.join();
@@ -109,7 +114,7 @@ namespace minty::cli::sub::regen {
                     {"j", "jobs"},
                     "Number of additional jobs to run simultaneously",
                     "jobs",
-                    0
+                    1
                 ),
                 flag({"q", "quiet"}, "Do not print progress")
             ),

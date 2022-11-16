@@ -49,7 +49,7 @@ namespace minty::core {
     };
 
     struct comment_tree {
-        const std::size_t total;
+        std::size_t total;
         std::unique_ptr<comment_node[]> comments;
         std::vector<comment_node*> roots;
     };

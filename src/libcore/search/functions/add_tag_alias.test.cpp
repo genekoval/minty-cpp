@@ -7,7 +7,7 @@ TEST_F(SearchTagAddAlias, Create) {
 
     auto res = get_tag(tag.id);
 
-    const auto names = read_names(res);
+    const auto names = res["names"].get<std::vector<std::string>>();
 
     ASSERT_EQ(1, names.size());
     ASSERT_EQ(tag.names.front(), names.front());
@@ -22,7 +22,7 @@ TEST_F(SearchTagAddAlias, Append) {
 
     auto res = get_tag(tag.id);
 
-    const auto names = read_names(res);
+    const auto names = res["names"].get<std::vector<std::string>>();
 
     ASSERT_EQ(2, names.size());
     ASSERT_EQ(tag.names.front(), names.at(0));
@@ -36,7 +36,7 @@ TEST_F(SearchTagAddAlias, Duplicate) {
 
     auto res = get_tag(tag.id);
 
-    const auto names = read_names(res);
+    const auto names = res["names"].get<std::vector<std::string>>();
 
     ASSERT_EQ(1, names.size());
     ASSERT_EQ(tag.names.front(), names.front());

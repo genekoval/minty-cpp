@@ -3,10 +3,10 @@
 
 namespace minty::core {
     auto generate_audio_preview(
-        object_store& objects,
+        bucket& bucket,
         const fstore::object_meta& object
-    ) -> std::optional<UUID::uuid> {
-        const auto source = objects.get(object.id);
+    ) -> ext::task<std::optional<UUID::uuid>> {
+        const auto source = co_await bucket.get(object.id);
 
         auto io = video::io_context(source.span());
         auto format = video::format_context(io.data());
@@ -22,7 +22,7 @@ namespace minty::core {
                 object.id,
                 ex.what()
             );
-            return {};
+            co_return std::optional<UUID::uuid>();
         }
 
         auto packet = video::packet();
@@ -35,14 +35,20 @@ namespace minty::core {
 
             auto* pkt = packet.data();
 
-            return objects.add({}, pkt->size, [pkt](auto&& part) {
-                part.write(std::span(
-                    reinterpret_cast<const std::byte*>(pkt->data),
-                    pkt->size
-                ));
-            }).id;
+            const auto obj = co_await bucket.add(
+                {},
+                pkt->size,
+                [pkt](auto&& part) -> ext::task<> {
+                    co_await part.write(std::span(
+                        reinterpret_cast<const std::byte*>(pkt->data),
+                        pkt->size
+                    ));
+                }
+            );;
+
+            co_return obj.id;
         }
 
-        return {};
+        co_return std::optional<UUID::uuid>();
     }
 }

@@ -11,20 +11,22 @@ namespace {
             std::string_view confpath
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
-            auto container = minty::cli::api_container(settings);
-            auto& api = container.api();
 
-            const auto errors = api.get_object_preview_errors();
+            minty::cli::api(settings, [](auto& api) -> ext::task<> {
+                const auto errors = api.get_object_preview_errors();
 
-            for (const auto& error : errors) {
-                fmt::print("{}  {}\n", error.id, error.message);
-            }
+                for (const auto& error : errors) {
+                    fmt::print("{}  {}\n", error.id, error.message);
+                }
 
-            fmt::print(
-                "{} error{}\n",
-                errors.size(),
-                errors.size() == 1 ? "" : "s"
-            );
+                fmt::print(
+                    "{} error{}\n",
+                    errors.size(),
+                    errors.size() == 1 ? "" : "s"
+                );
+
+                co_return;
+            });
         }
     }
 }

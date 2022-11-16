@@ -7,10 +7,10 @@ namespace {
     constexpr auto pixel_format = AV_PIX_FMT_RGB24;
 
     auto save_image(
-        minty::core::object_store& objects,
+        minty::core::bucket& bucket,
         AVCodecContext* codec,
         AVFrame* frame
-    ) -> UUID::uuid {
+    ) -> ext::task<UUID::uuid> {
         auto frame_rgb = minty::core::video::frame();
 
         auto bytes = av_image_get_buffer_size(
@@ -39,8 +39,8 @@ namespace {
 
         sws.scale(frame, frame_rgb.data());
 
-        return minty::core::generate_image_preview(
-            objects,
+        co_return co_await minty::core::generate_image_preview(
+            bucket,
             codec->width,
             codec->height,
             frame_rgb.data()->data[0]
@@ -50,10 +50,10 @@ namespace {
 
 namespace minty::core {
     auto generate_video_preview(
-        object_store& objects,
+        bucket& bucket,
         const fstore::object_meta& object
-    ) -> std::optional<UUID::uuid> {
-        const auto source = objects.get(object.id);
+    ) -> ext::task<std::optional<UUID::uuid>> {
+        const auto source = co_await bucket.get(object.id);
 
         auto io = video::io_context(source.span());
         auto format = video::format_context(io.data());
@@ -76,7 +76,11 @@ namespace minty::core {
 
             if (codec.decode(pkt.data(), frame.data())) {
                 if (frame.data()->key_frame) {
-                    return save_image(objects, codec.data(), frame.data());
+                    co_return co_await save_image(
+                        bucket,
+                        codec.data(),
+                        frame.data()
+                    );
                 }
             }
         }

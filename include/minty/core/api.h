@@ -4,15 +4,14 @@
 #include <minty/core/downloader.h>
 #include <minty/core/object_store.h>
 #include <minty/core/model.h>
-#include <minty/core/preview.h>
 #include <minty/core/search/search.h>
 #include <minty/repo/db/database.h>
 
-#include <atomic>
+#include <ext/coroutine>
 
 namespace minty::core {
     struct progress {
-        std::atomic_ulong completed = 0;
+        std::size_t completed = 0;
         std::size_t total = 0;
     };
 
@@ -25,26 +24,38 @@ namespace minty::core {
         repo::db::database* db;
         object_store* objects;
         downloader* dl;
-        preview_service previews;
         search_engine* search;
 
         auto add_object(
+            bucket& bucket,
             fstore::object_meta&& object,
             const std::optional<std::string>& src
-        ) -> object_preview;
+        ) -> ext::task<object_preview>;
 
         auto add_site(
             std::string_view scheme,
             std::string_view host
-        ) -> std::string;
+        ) -> ext::task<std::string>;
 
-        auto add_source(std::string_view url) -> source;
+        auto add_source(std::string_view url) -> ext::task<source>;
 
         auto get_posts(
+            bucket& bucket,
             std::vector<repo::db::post_preview>&& posts
-        ) -> std::vector<post_preview>;
+        ) -> ext::task<std::vector<post_preview>>;
 
-        auto regenerate_preview(const repo::db::object_preview& object) -> bool;
+        auto regenerate_preview(
+            bucket& bucket,
+            const repo::db::object_preview& object
+        ) -> ext::task<bool>;
+
+        auto regenerate_preview_task(
+            netcore::thread_pool& workers,
+            repo::db::object_preview obj,
+            std::size_t& errors,
+            progress& progress,
+            netcore::event& finished
+        ) -> ext::detached_task;
     public:
         api(
             repo::db::database& db,
@@ -60,14 +71,18 @@ namespace minty::core {
 
         auto add_object_data(
             std::size_t stream_size,
-            std::function<void(fstore::part&&)> pipe
-        ) -> object_preview;
+            const fstore::add_object_fn auto& pipe
+        ) -> ext::task<object_preview> {
+            TIMBER_FUNC();
 
-        auto add_object_local(std::string_view path) -> object_preview;
+            auto bucket = co_await objects->connect();
+            auto metadata = co_await bucket.add({}, stream_size, pipe);
+            co_return co_await add_object(bucket, std::move(metadata), {});
+        }
 
         auto add_objects_url(
             std::string_view url
-        ) -> std::vector<object_preview>;
+        ) -> ext::task<std::vector<object_preview>>;
 
         auto add_post(post_parts parts) -> UUID::uuid;
 
@@ -102,7 +117,7 @@ namespace minty::core {
         auto add_tag_source(
             const UUID::uuid& tag_id,
             std::string_view url
-        ) -> source;
+        ) -> ext::task<source>;
 
         auto delete_post(const UUID::uuid& id) -> void;
 
@@ -138,17 +153,21 @@ namespace minty::core {
             std::string_view source_id
         ) -> void;
 
+        auto get_bucket_id() const noexcept -> const UUID::uuid&;
+
         auto get_comment(const UUID::uuid& comment_id) -> comment_detail;
 
         auto get_comments(const UUID::uuid& post_id) -> comment_tree;
 
-        auto get_object(const UUID::uuid& object_id) -> object;
+        auto get_object(const UUID::uuid& object_id) -> ext::task<object>;
 
         auto get_object_preview_errors() -> std::vector<object_error>;
 
-        auto get_post(const UUID::uuid& id) -> post;
+        auto get_post(const UUID::uuid& id) -> ext::task<post>;
 
-        auto get_posts(const post_query& query) -> search_result<post_preview>;
+        auto get_posts(
+            const post_query& query
+        ) -> ext::task<search_result<post_preview>>;
 
         auto get_tag(const UUID::uuid& id) -> tag;
 
@@ -166,13 +185,16 @@ namespace minty::core {
             const std::optional<UUID::uuid>& destination
         ) -> decltype(post::date_modified);
 
-        auto prune() -> void;
+        auto prune() -> ext::task<>;
 
         auto regenerate_preview(
             const UUID::uuid& object_id
-        ) -> decltype(object::preview_id);
+        ) -> ext::task<decltype(object::preview_id)>;
 
-        auto regenerate_previews(int jobs, progress& progress) -> std::size_t;
+        auto regenerate_previews(
+            int jobs,
+            progress& progress
+        ) -> ext::task<std::size_t>;
 
         auto reindex() -> void;
 

@@ -1,46 +1,74 @@
 #include <minty/core/object_store.h>
 
 namespace minty::core {
-    object_store::object_store(fstore::bucket& bucket) : bucket(&bucket) {}
+    object_store::object_store(std::string_view endpoint) : client(endpoint) {}
 
-    auto object_store::add(
-        std::optional<UUID::uuid> part_id,
-        std::size_t stream_size,
-        std::function<void(fstore::part&&)> pipe
-    ) -> fstore::object_meta {
-        return bucket->add(part_id, stream_size, pipe);
+    auto object_store::connect() -> ext::task<bucket> {
+        auto connection = co_await client.connect();
+        co_return bucket(std::move(connection), bucket_id);
     }
 
-    auto object_store::add(std::string_view path) -> fstore::object_meta {
-        return bucket->add(path);
+    auto object_store::get_bucket_id() const noexcept -> const UUID::uuid& {
+        return bucket_id;
     }
 
-    auto object_store::get(const UUID::uuid& object_id) -> fstore::blob {
-        return bucket->get(object_id);
-	}
+    auto object_store::init(
+            std::string_view bucket_name
+        ) -> ext::task<> {
+        auto connection = co_await client.connect();
+        const auto bucket = co_await connection
+            .value()
+            .fetch_bucket(bucket_name);
 
-    auto object_store::get(
+        bucket_id = bucket.id;
+    }
+
+    bucket::bucket(
+        fstore::client::connection&& connection,
+        const UUID::uuid& id
+    ) :
+        connection(std::forward<fstore::client::connection>(connection)),
+        id(id)
+    {}
+
+    auto bucket::deregister() -> void {
+        connection.value().deregister();
+    }
+
+    auto bucket::get(
+        const UUID::uuid& object_id
+    ) -> ext::task<fstore::blob> {
+        co_return co_await connection.value().get_object(id, object_id);
+    }
+
+    auto bucket::get(
         const UUID::uuid& object_id,
         std::byte* buffer
-    ) -> void {
-        bucket->get(object_id, buffer);
-	}
+    ) -> ext::task<> {
+        co_await connection.value().get_object(id, object_id, buffer);
+    }
 
-    auto object_store::meta(
+    auto bucket::meta(
         const UUID::uuid& object_id
-    ) -> fstore::object_meta {
-        return bucket->meta(object_id);
-	}
+    ) -> ext::task<fstore::object_meta> {
+        co_return co_await connection
+            .value()
+            .get_object_metadata(id, object_id);
+    }
 
-    auto object_store::remove(
+    auto bucket::register_scoped() -> netcore::register_guard {
+        return connection.value().register_scoped();
+    }
+
+    auto bucket::remove(
         const UUID::uuid& object_id
-    ) -> fstore::object_meta {
-        return bucket->remove(object_id);
-	}
+    ) -> ext::task<fstore::object_meta> {
+        co_return co_await connection.value().remove_object(id, object_id);
+    }
 
-    auto object_store::remove(
+    auto bucket::remove(
         std::span<const UUID::uuid> objects
-    ) -> fstore::remove_result {
-        return bucket->remove(objects);
-	}
+    ) -> ext::task<fstore::remove_result> {
+        co_return co_await connection.value().remove_objects(id, objects);
+    }
 }

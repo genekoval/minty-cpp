@@ -24,15 +24,18 @@ namespace zipline {
     );
 
     template <typename Socket>
-    struct transfer<Socket, minty::core::comment_node> {
-        static auto write(
+    struct coder<Socket, minty::core::comment_node> {
+        static auto encode(
             Socket& socket,
             const minty::core::comment_node& node
-        ) -> void {
-            transfer<Socket, minty::core::comment>::write(socket, node.data);
+        ) -> ext::task<> {
+            co_await coder<Socket, minty::core::comment>::encode(
+                socket,
+                node.data
+            );
 
             for (const auto* child : node.children) {
-                transfer<Socket, minty::core::comment_node>::write(
+                co_await coder<Socket, minty::core::comment_node>::encode(
                     socket,
                     *child
                 );
@@ -41,15 +44,15 @@ namespace zipline {
     };
 
     template <typename Socket>
-    struct transfer<Socket, minty::core::comment_tree> {
-        static auto write(
+    struct coder<Socket, minty::core::comment_tree> {
+        static auto encode(
             Socket& socket,
             const minty::core::comment_tree& tree
-        ) -> void {
-            write_size(socket, tree.total);
+        ) -> ext::task<> {
+            co_await encode_size(socket, tree.total);
 
             for (const auto* root : tree.roots) {
-                transfer<Socket, minty::core::comment_node>::write(
+                co_await coder<Socket, minty::core::comment_node>::encode(
                     socket,
                     *root
                 );

@@ -112,11 +112,4 @@ protected:
     auto find_post(const UUID::uuid& id) const -> const post&;
 
     auto get_post(const UUID::uuid& id) -> elastic::json;
-
-    auto get_tags(elastic::json json) -> std::vector<std::string_view>;
-
-    auto get_time(
-        elastic::json json,
-        std::string_view key
-    ) -> minty::test::time_point;
 };

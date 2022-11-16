@@ -10,10 +10,13 @@ auto DatabasePruneTest::create_site() -> std::string {
 
 auto DatabasePruneTest::prune_objects(bool commit) -> int {
     auto pruned = 0;
-    database.prune_objects([&](auto objects) -> bool {
-        pruned = objects.size();
-        return commit;
-    });
+
+    [&]() -> ext::detached_task {
+        co_await database.prune_objects([&](auto objects) -> ext::task<bool> {
+            pruned = objects.size();
+            co_return commit;
+        });
+    }();
 
     return pruned;
 }

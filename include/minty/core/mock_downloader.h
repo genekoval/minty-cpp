@@ -6,14 +6,14 @@
 
 namespace minty::test {
     struct downloader : core::downloader {
-        MOCK_METHOD(bool, fetch, (
+        MOCK_METHOD(ext::task<bool>, fetch, (
             std::string_view url,
-            std::function<void(harvest::data_stream&)> callback
+            std::function<ext::task<>(harvest::data_stream&)>&& callback
         ), (override));
 
-        MOCK_METHOD(void, get_site_icon, (
+        MOCK_METHOD(ext::task<>, get_site_icon, (
             std::string_view url,
-            std::function<void(harvest::data_stream&)> pipe
+            std::function<ext::task<>(harvest::data_stream&)>&& pipe
         ), (override));
     };
 }

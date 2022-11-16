@@ -129,8 +129,10 @@ namespace minty::test {
 
         MOCK_METHOD(void, prune, (), (override));
 
-        MOCK_METHOD(void, prune_objects, (
-            std::function<bool(std::span<const UUID::uuid>)>&& on_deleted
+        MOCK_METHOD(ext::task<>, prune_objects, (
+            const std::function<ext::task<bool>(
+                std::span<const UUID::uuid>
+            )>& on_deleted
         ), (override));
 
         MOCK_METHOD(repo::db::comment, read_comment, (
@@ -155,12 +157,10 @@ namespace minty::test {
             (override)
         );
 
-        MOCK_METHOD(void, read_objects, (
-            int batch_size,
-            std::function<void(
-                std::span<const repo::db::object_preview>
-            )>&& action
-        ), (override));
+        MOCK_METHOD(
+            ext::generator<std::span<repo::db::object_preview>>,
+            read_objects, (int batch_size), (override)
+        );
 
         MOCK_METHOD(repo::db::post, read_post, (
             const UUID::uuid& post_id
@@ -174,10 +174,9 @@ namespace minty::test {
             const UUID::uuid& post_id
         ), (override));
 
-        MOCK_METHOD(void, read_post_search, (
-            int batch_size,
-            std::function<void(std::span<const repo::db::post_search>)>&& action
-        ), (override));
+        MOCK_METHOD(ext::generator<std::span<repo::db::post_search>>,
+            read_post_search, (int batch_size), (override)
+        );
 
         MOCK_METHOD(std::vector<repo::db::tag_preview>, read_post_tags, (
             const UUID::uuid& post_id
@@ -204,10 +203,9 @@ namespace minty::test {
             const UUID::uuid& tag_id
         ), (override));
 
-        MOCK_METHOD(void, read_tag_text, (
-            int batch_size,
-            std::function<void(std::span<const repo::db::tag_text>)>&& action
-        ), (override));
+        MOCK_METHOD(ext::generator<std::span<repo::db::tag_text>>,
+            read_tag_text, (int batch_size), (override)
+        );
 
         MOCK_METHOD(std::size_t, read_total_objects, (), (override));
 

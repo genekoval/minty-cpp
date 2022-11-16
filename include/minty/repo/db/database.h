@@ -4,6 +4,7 @@
 #include <minty/test.h>
 
 #include <entix/entix>
+#include <ext/coroutine>
 #include <pqxx/pqxx>
 #include <span>
 
@@ -137,8 +138,10 @@ namespace minty::repo::db {
         VIRTUAL auto prune() -> void;
 
         VIRTUAL auto prune_objects(
-            std::function<bool(std::span<const UUID::uuid>)>&& on_deleted
-        ) -> void;
+            const std::function<ext::task<bool>(
+                std::span<const UUID::uuid>
+            )>& on_deleted
+        ) -> ext::task<>;
 
         VIRTUAL auto read_comment(const UUID::uuid& comment_id) -> comment;
 
@@ -155,9 +158,8 @@ namespace minty::repo::db {
         VIRTUAL auto read_object_preview_errors() -> std::vector<object_error>;
 
         VIRTUAL auto read_objects(
-            int batch_size,
-            std::function<void(std::span<const object_preview>)>&& action
-        ) -> void;
+            int batch_size
+        ) -> ext::generator<std::span<object_preview>>;
 
         VIRTUAL auto read_post(const UUID::uuid& post_id) -> post;
 
@@ -170,9 +172,8 @@ namespace minty::repo::db {
         ) -> std::vector<object_preview>;
 
         VIRTUAL auto read_post_search(
-            int batch_size,
-            std::function<void(std::span<const post_search>)>&& action
-        ) -> void;
+            int batch_size
+        ) -> ext::generator<std::span<post_search>>;
 
         VIRTUAL auto read_post_tags(
             const UUID::uuid& post_id
@@ -198,9 +199,8 @@ namespace minty::repo::db {
         ) -> std::vector<source>;
 
         VIRTUAL auto read_tag_text(
-            int batch_size,
-            std::function<void(std::span<const tag_text>)>&& action
-        ) -> void;
+            int batch_size
+        ) -> ext::generator<std::span<tag_text>>;
 
         VIRTUAL auto read_total_objects() -> std::size_t;
 

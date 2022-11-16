@@ -10,8 +10,7 @@ TEST_F(SearchTagTest, UpdateName) {
 
     search.update_tag_name(tag.id, old_name, new_name);
 
-    auto res = get_tag(tag.id);
-    const auto names = read_names(res);
+    const auto names = get_tag(tag.id)["names"].get<std::vector<std::string>>();
 
     const auto contains = [names](std::string_view name) -> bool {
         return std::find(names.begin(), names.end(), name) != names.end();

@@ -6,7 +6,7 @@
 
 namespace minty::core {
     class downloader {
-        std::optional<harvest::api> service;
+        harvest::client client;
     public:
         downloader() = default;
 
@@ -16,12 +16,12 @@ namespace minty::core {
 
         VIRTUAL auto fetch(
             std::string_view url,
-            std::function<void(harvest::data_stream&)> callback
-        ) -> bool;
+            std::function<ext::task<>(harvest::data_stream&)>&& callback
+        ) -> ext::task<bool>;
 
         VIRTUAL auto get_site_icon(
             std::string_view url,
-            std::function<void(harvest::data_stream&)> pipe
-        ) -> void;
+            std::function<ext::task<>(harvest::data_stream&)>&& pipe
+        ) -> ext::task<>;
     };
 }

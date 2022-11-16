@@ -10,9 +10,11 @@ namespace {
         std::string_view confpath
     ) -> void {
         const auto settings = minty::conf::initialize(confpath);
-        auto container = minty::cli::api_container(settings);
 
-        container.api().reindex();
+        minty::cli::api(settings, [](auto& api) -> ext::task<> {
+            api.reindex();
+            co_return;
+        });
 
         std::cout << "Minty search reindex complete" << std::endl;
     }

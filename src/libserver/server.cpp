@@ -1,27 +1,34 @@
 #include "context/context.h"
 
-#include <minty/net/zipline/transfer.h>
+#include <minty/net/zipline/coder.h>
 #include <minty/net/zipline/protocol.h>
 #include <minty/server/server.h>
 
 using minty::server::context;
 
-template <typename ...Routes>
-using router = zipline::router<
-    minty::net::socket,
-    minty::net::event_t,
-    minty::net::error_list,
-    context,
-    Routes...
->;
-
 namespace {
-    auto make_router(context& ctx) {
-        return router(
-            ctx,
+    template <typename ...Routes>
+    auto make_router(context&& ctx, Routes&&... routes) {
+        return zipline::router<
+            minty::net::socket,
+            minty::net::event_t,
+            minty::net::error_list,
+            context,
+            Routes...
+        >(
+            std::move(ctx),
+            routes...
+        );
+    }
+
+    auto make_router(
+        minty::core::api& api,
+        const minty::server::server_info& info
+    ) {
+        return make_router(
+            context(api, info),
             &context::add_comment,
             &context::add_object_data,
-            &context::add_object_local,
             &context::add_objects_url,
             &context::add_post,
             &context::add_post_objects,
@@ -59,20 +66,15 @@ namespace {
 }
 
 namespace minty::server {
-    auto listen(
+    auto create(
         core::api& api,
-        const server_info& info,
-        const netcore::unix_socket& unix_socket,
-        std::function<void()>&& callback
-    ) -> void {
-        auto ctx = context(api, info);
-        auto routes = make_router(ctx);
-
-        auto server = netcore::server([&routes](netcore::socket&& sock) {
-            auto socket = net::socket(std::move(sock));
-            routes.route(socket);
+        const server_info& info
+    ) -> netcore::server {
+        return netcore::server([
+            routes = make_router(api, info)
+        ](netcore::socket&& socket) mutable -> ext::task<> {
+            auto client = net::socket(std::forward<netcore::socket>(socket));
+            co_await routes.route(client);
         });
-
-        server.listen(unix_socket, callback);
     }
 }

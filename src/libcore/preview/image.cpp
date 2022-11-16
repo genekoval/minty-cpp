@@ -1,5 +1,7 @@
 #include "preview.h"
 
+#include <minty/core/preview.h>
+
 #include <cstring>
 #include <GraphicsMagick/Magick++.h>
 
@@ -12,10 +14,10 @@ namespace {
         thumbnail_size
     );
 
-    auto generate_preview(
-        minty::core::object_store& objects,
+    auto generate(
+        minty::core::bucket& bucket,
         Magick::Image&& image
-    ) -> UUID::uuid {
+    ) -> ext::task<UUID::uuid> {
         const auto width = image.size().width();
         const auto height = image.size().height();
 
@@ -53,23 +55,29 @@ namespace {
         auto out = Magick::Blob();
         image.write(&out);
 
-        return objects.add({}, out.length(), [&out](auto&& part) {
-            part.write(std::span(
-                reinterpret_cast<const std::byte*>(out.data()),
-                out.length()
-            ));
-        }).id;
+        const auto obj = co_await bucket.add(
+            {},
+            out.length(),
+            [&out](auto&& part) -> ext::task<> {
+                co_await part.write(std::span(
+                    reinterpret_cast<const std::byte*>(out.data()),
+                    out.length()
+                ));
+            }
+        );
+
+        co_return obj.id;
     }
 }
 
 namespace minty::core {
     auto generate_image_preview(
-        object_store& objects,
+        bucket& bucket,
         unsigned int width,
         unsigned int height,
         const void* pixels
-    ) -> UUID::uuid {
-        return generate_preview(objects, Magick::Image(
+    ) -> ext::task<UUID::uuid> {
+        co_return co_await generate(bucket, Magick::Image(
             width,
             height,
             "RGB",
@@ -79,16 +87,16 @@ namespace minty::core {
     }
 
     auto generate_image_preview(
-        object_store& objects,
+        bucket& bucket,
         const fstore::object_meta& object
-    ) -> std::optional<UUID::uuid> {
+    ) -> ext::task<std::optional<UUID::uuid>> {
         auto* source = new std::byte[object.size];
-        objects.get(object.id, source);
+        co_await bucket.get(object.id, source);
 
         auto blob = Magick::Blob();
         blob.updateNoCopy(source, object.size);
 
-        return generate_preview(objects, Magick::Image(blob));
+        co_return co_await generate(bucket, Magick::Image(blob));
     }
 
     auto initialize_image_previews() -> void {

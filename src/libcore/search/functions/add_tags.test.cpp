@@ -1,4 +1,3 @@
-#include "../json/json.h"
 #include "search.test.h"
 
 using SearchTagAddTags = SearchTagTest;
@@ -15,10 +14,12 @@ TEST_F(SearchTagAddTags, Add) {
         }).dump())
         .send();
 
-    const auto total = uint64_t(res["hits"]["total"]["value"]);
+    const auto total = res["hits"]["total"]["value"].get<unsigned int>();
 
-    auto hits = std::vector<std::string_view>();
-    for (auto hit : res["hits"]["hits"]) hits.emplace_back(hit["_id"]);
+    auto hits = std::vector<UUID::uuid>();
+    for (auto hit : res["hits"]["hits"]) {
+        hits.push_back(hit["_id"].get<UUID::uuid>());
+    }
 
     EXPECT_EQ(tags.size(), total);
     EXPECT_EQ(total, hits.size());

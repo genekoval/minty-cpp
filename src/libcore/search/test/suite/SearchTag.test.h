@@ -66,6 +66,4 @@ protected:
     auto add_tag(std::string_view name) -> const tag&;
 
     auto get_tag(const UUID::uuid& id) -> elastic::json;
-
-    auto read_names(elastic::json& json) -> std::vector<std::string_view>;
 };

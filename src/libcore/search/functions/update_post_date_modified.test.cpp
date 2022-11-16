@@ -6,8 +6,8 @@ TEST_F(SearchPostTest, UpdatePostDateModified) {
 
     search.update_post_date_modified(post.id, modified);
 
-    auto res = get_post(post.id);
-    const auto result = get_time(res, "modified");
+    const auto result =
+        get_post(post.id)["modified"].get<minty::test::time_point>();
 
     ASSERT_EQ(modified, result);
 }

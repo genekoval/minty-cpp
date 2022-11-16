@@ -7,14 +7,17 @@
 using namespace commline;
 
 namespace {
-    auto $prune(
-        const app& app,
-        std::string_view confpath
-    ) -> void {
-        const auto settings = minty::conf::initialize(confpath);
+    namespace internal {
+        auto prune(
+            const app& app,
+            std::string_view confpath
+        ) -> void {
+            const auto settings = minty::conf::initialize(confpath);
 
-        auto container = minty::cli::api_container(settings);
-        container.api().prune();
+            minty::cli::api(settings, [](auto& api) -> ext::task<> {
+                co_await api.prune();
+            });
+        }
     }
 }
 
@@ -29,7 +32,7 @@ namespace minty::cli {
                 opts::config(confpath)
             ),
             arguments(),
-            $prune
+            internal::prune
         );
     }
 }

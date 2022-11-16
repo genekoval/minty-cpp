@@ -7,8 +7,7 @@ TEST_F(SearchTagDeleteAlias, Delete) {
 
     search.delete_tag_alias(tag.id, tag.names.front());
 
-    auto res = get_tag(tag.id);
-    const auto names = read_names(res);
+    const auto names = get_tag(tag.id)["names"].get<std::vector<std::string>>();
 
     EXPECT_EQ(tag.names.size() - 1, names.size());
 

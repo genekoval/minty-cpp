@@ -15,7 +15,13 @@ namespace {
         const auto db = minty::cli::database(settings);
 
         db.init(app.version);
-        if (!skip_index) minty::cli::api_container(settings).api().reindex();
+
+        if (skip_index) return;
+
+        minty::cli::api(settings, [](auto& api) -> ext::task<> {
+            api.reindex();
+            co_return;
+        });
     }
 }
 

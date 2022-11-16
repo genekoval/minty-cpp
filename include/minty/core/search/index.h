@@ -8,7 +8,7 @@ namespace minty::core {
     class index {
         using config_type = auto () -> std::string;
 
-        const config_type* config;
+        config_type* config;
         search_engine* const search;
     public:
         const std::string name;

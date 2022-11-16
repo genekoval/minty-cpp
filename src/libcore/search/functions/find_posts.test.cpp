@@ -9,7 +9,6 @@ constexpr auto desc = sort_order::descending;
 
 constexpr auto created = sort_value::date_created;
 constexpr auto modified = sort_value::date_modified;
-constexpr auto relevance = sort_value::relevance;
 constexpr auto title = sort_value::title;
 
 class SearchPostFind : public SearchPostTest {

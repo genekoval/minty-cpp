@@ -4,15 +4,15 @@ TEST_F(SearchPostTest, AddPost) {
     const auto& post = add_post();
     auto res = get_post(post.id);
 
-    const auto title = std::string_view(res["title"]);
-    const auto description = std::string_view(res["description"]);
+    const auto title = res["title"].get<std::string>();
+    const auto description = res["description"].get<std::string>();
 
-    const auto created = get_time(res, "created");
-    const auto modified = get_time(res, "modified");
+    const auto created = res["created"].get<minty::test::time_point>();
+    const auto modified = res["modified"].get<minty::test::time_point>();
 
-    auto tags = std::vector<std::string_view>();
-    for (auto tag : res["tags"].get_array()) {
-        tags.emplace_back(tag);
+    auto tags = std::vector<UUID::uuid>();
+    for (const auto& tag : res["tags"]) {
+        tags.push_back(tag.get<UUID::uuid>());
     }
 
     ASSERT_EQ(post.title, title);

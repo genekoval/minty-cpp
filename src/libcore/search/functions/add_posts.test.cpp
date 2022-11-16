@@ -1,9 +1,5 @@
 #include "search.test.h"
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
 TEST_F(SearchPostTest, AddPosts) {
     const auto errors = search.add_posts(posts);
     EXPECT_TRUE(errors.empty());

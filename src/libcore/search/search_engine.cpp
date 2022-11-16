@@ -136,12 +136,11 @@ namespace minty::core {
 
         auto errors = std::vector<std::string>();
 
-        auto items = response.find_field("items");
-        if (items.error() == simdjson::SUCCESS) {
-            for (auto item : items.get_array()) {
+        auto items = response.find("items");
+        if (items != response.end()) {
+            for (auto& item : *items) {
                 auto error = item[action::name]["error"];
-                const auto reason = std::string_view(error["reason"]);
-                errors.emplace_back(reason);
+                errors.emplace_back(error["reason"].get<std::string>());
             }
         }
 
@@ -357,10 +356,10 @@ namespace minty::core {
         auto response = search(index, query);
         auto result = search_result<UUID::uuid>();
 
-        result.total = uint64_t(response["hits"]["total"]["value"]);
+        response["hits"]["total"]["value"].get_to(result.total);
 
-        for (auto hit : response["hits"]["hits"].get_array()) {
-            const auto id = std::string_view(hit["_id"]);
+        for (auto& hit : response["hits"]["hits"]) {
+            const auto id = hit["_id"].get<std::string>();
             TIMBER_DEBUG("search results: {}", id);
 
             result.hits.emplace_back(id);

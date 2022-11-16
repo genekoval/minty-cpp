@@ -3,6 +3,7 @@
 #include "commands/options/opts.h"
 
 #include <minty/conf/settings.h>
+#include <minty/core/preview.h>
 #include <minty/server/server.h>
 #include <minty/server/server_info.h>
 
@@ -14,64 +15,79 @@
 namespace fs = std::filesystem;
 
 namespace {
-    const auto default_config = fs::path(CONFDIR) / "minty.yml";
+    namespace internal {
+        const auto default_config = fs::path(CONFDIR) / "minty.yml";
 
-    auto $main(
-        const commline::app& app,
-        std::string_view confpath,
-        bool daemon
-    ) -> void {
-        const auto settings = minty::conf::initialize(confpath);
+        auto main(
+            const commline::app& app,
+            std::string_view confpath,
+            bool daemon
+        ) -> void {
+            const auto settings = minty::conf::initialize(confpath);
 
-        if (daemon && !dmon::daemonize({
-            .group = settings.daemon.group,
-            .identifier = app.name,
-            .pidfile = settings.daemon.pidfile,
-            .user = settings.daemon.user
-        })) return;
+            if (daemon && !dmon::daemonize({
+                .group = settings.daemon.group,
+                .identifier = app.name,
+                .pidfile = settings.daemon.pidfile,
+                .user = settings.daemon.user
+            })) return;
 
-        auto startup_timer = timber::timer(
-            "Server started in",
-            timber::level::info
-        );
+            auto startup_timer = timber::timer(
+                "Server started in",
+                timber::level::info
+            );
 
-        TIMBER_NOTICE("{} version {} starting up", app.name, app.version);
+            auto uptime_timer = timber::timer(
+                "Server shutting down. Up",
+                timber::level::notice
+            );
 
-        auto container = minty::cli::api_container(settings);
-        auto info = minty::server::server_info {
-            .version = std::string(app.version),
-            .object_source = {
-                .host = settings.fstore.proxy.host,
-                .port = settings.fstore.proxy.port,
-                .bucket_id = UUID::uuid(container.bucket_id())
-            }
-        };
+            TIMBER_NOTICE("{} version {} starting up", app.name, app.version);
 
-        auto uptime_timer = timber::timer(
-            "Server shutting down. Up",
-            timber::level::notice
-        );
+            minty::cli::api(settings, [
+                &settings,
+                &startup_timer,
+                &uptime_timer,
+                version = app.version
+            ](auto& api) -> ext::task<> {
+                const auto info = minty::server::server_info {
+                    .version = std::string(version),
+                    .object_source = {
+                        .host = settings.fstore.proxy.host,
+                        .port = settings.fstore.proxy.port,
+                        .bucket_id = api.get_bucket_id()
+                    }
+                };
 
-        minty::server::listen(
-            container.api(),
-            info,
-            settings.server,
-            [&startup_timer, &uptime_timer]() {
-                startup_timer.stop();
-                uptime_timer.reset();
-            }
-        );
+                auto server = minty::server::create(
+                    api,
+                    info
+                );
 
-        uptime_timer.stop();
+                co_await server.listen(settings.server, [
+                    &startup_timer,
+                    &uptime_timer
+                ]() {
+                    startup_timer.stop();
+                    uptime_timer.reset();
+                });
+            });
+
+            uptime_timer.stop();
+        }
     }
 }
 
 auto main(int argc, const char** argv) -> int {
+    std::locale::global(std::locale(""));
+
+    timber::thread_name = "main";
     timber::log_handler = &timber::console_logger;
 
+    minty::core::initialize_image_previews();
     const auto init = http::init();
 
-    const auto confpath = default_config.string();
+    const auto confpath = internal::default_config.string();
 
     auto app = commline::application(
         NAME,
@@ -85,7 +101,7 @@ auto main(int argc, const char** argv) -> int {
             )
         ),
         commline::arguments(),
-        $main
+        internal::main
     );
 
     app.on_error([](const auto& e) -> void {
@@ -101,7 +117,6 @@ auto main(int argc, const char** argv) -> int {
     app.subcommand(minty::cli::regen(confpath));
     app.subcommand(minty::cli::reindex(confpath));
     app.subcommand(minty::cli::restore(confpath));
-    app.subcommand(minty::cli::stop(confpath));
 
     return app.run(argc, argv);
 }

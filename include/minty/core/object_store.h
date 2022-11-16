@@ -5,36 +5,72 @@
 #include <fstore/client.h>
 
 namespace minty::core {
-    class object_store {
-        fstore::bucket* bucket = nullptr;
+    class bucket {
+        fstore::client::connection connection;
+        UUID::uuid id;
     public:
-        object_store() = default;
+        bucket() = default;
 
-        object_store(fstore::bucket& bucket);
+        bucket(fstore::client::connection&& connection, const UUID::uuid& id);
 
-        VIRTUAL_DESTRUCTOR(object_store)
+        bucket(bucket&) = delete;
 
-        VIRTUAL auto add(
+        bucket(bucket&&) = default;
+
+        VIRTUAL_DESTRUCTOR(bucket)
+
+        auto operator=(const bucket&) -> bucket& = delete;
+
+        auto operator=(bucket&&) -> bucket& = default;
+
+        auto add(
             std::optional<UUID::uuid> part_id,
             std::size_t stream_size,
-            std::function<void(fstore::part&&)> pipe
-        ) -> fstore::object_meta;
+            const fstore::add_object_fn auto& pipe
+        ) -> ext::task<fstore::object_meta> {
+            co_return co_await connection
+                .value()
+                .add_object(id, part_id, stream_size, pipe);
+        }
 
-        VIRTUAL auto add(std::string_view path) -> fstore::object_meta;
+        auto deregister() -> void;
 
-        VIRTUAL auto get(const UUID::uuid& object_id) -> fstore::blob;
+        VIRTUAL auto get(
+            const UUID::uuid& object_id
+        ) -> ext::task<fstore::blob>;
 
         VIRTUAL auto get(
             const UUID::uuid& object_id,
             std::byte* buffer
-        ) -> void;
+        ) -> ext::task<>;
 
-        VIRTUAL auto meta(const UUID::uuid& object_id) -> fstore::object_meta;
+        VIRTUAL auto meta(
+            const UUID::uuid& object_id
+        ) -> ext::task<fstore::object_meta>;
 
-        VIRTUAL auto remove(const UUID::uuid& object_id) -> fstore::object_meta;
+        auto register_scoped() -> netcore::register_guard;
+
+        VIRTUAL auto remove(
+            const UUID::uuid& object_id
+        ) -> ext::task<fstore::object_meta>;
 
         VIRTUAL auto remove(
             std::span<const UUID::uuid> objects
-        ) -> fstore::remove_result;
+        ) -> ext::task<fstore::remove_result>;
+    };
+
+    class object_store {
+        UUID::uuid bucket_id;
+        fstore::client client;
+    public:
+        object_store() = default;
+
+        object_store(std::string_view endpoint);
+
+        VIRTUAL auto connect() -> ext::task<bucket>;
+
+        auto get_bucket_id() const noexcept -> const UUID::uuid&;
+
+        auto init(std::string_view bucket_name) -> ext::task<>;
     };
 }

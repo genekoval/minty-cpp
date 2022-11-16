@@ -3,13 +3,10 @@
 #include <minty/core/object_store.h>
 
 namespace minty::core {
-    class preview_service {
-        object_store* objects;
-    public:
-        preview_service(object_store& objects);
+    auto generate_preview(
+        bucket& bucket,
+        const fstore::object_meta& object
+    ) -> ext::task<std::optional<UUID::uuid>>;
 
-        auto generate_preview(
-            const fstore::object_meta& object
-        ) -> std::optional<UUID::uuid>;
-    };
+    auto initialize_image_previews() -> void;
 }

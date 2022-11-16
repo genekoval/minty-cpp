@@ -41,7 +41,6 @@ common.libs := \
  netcore \
  pqxx \
  pq \
- simdjson \
  swscale \
  threadpool \
  timber \
@@ -62,6 +61,7 @@ client := lib$(project)
 $(client).type := shared
 $(client).libs := \
  ext++ \
+ fstore \
  netcore \
  uri \
  uuid++
@@ -98,7 +98,7 @@ test.config = .test.conf.yaml
 
 $(obj)/$(conf)/settings.env.test.o: CXXFLAGS += -DTEST_CONFIG='"$(test.config)"'
 
-$(obj)/$(core)/preview/image.o: CXXFLAGS += $(graphics.flags)
+$(obj)/$(core)/preview/image.%: CXXFLAGS += $(graphics.flags)
 
 $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DNAME='"$(daemon)"'\
@@ -115,7 +115,7 @@ edit.config:
 	$(EDITOR) $(confdir)/minty.yml
 
 init:
-	$($(daemon)) init --skip-index --config $(test.config)
+	$($(daemon)) init --config $(test.config)
 
 migrate:
 	$($(daemon)) migrate --config $(test.config)

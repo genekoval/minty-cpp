@@ -15,11 +15,13 @@ namespace {
             const UUID::uuid& id
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
-            auto container = minty::cli::api_container(settings);
-            auto& api = container.api();
 
-            const auto preview = api.regenerate_preview(id);
-            if (preview) std::cout << *preview;
+            minty::cli::api(settings, [&id](auto& api) -> ext::task<> {
+                const auto preview =
+                    co_await api.regenerate_preview(id);
+
+                if (preview) fmt::print("{}\n", *preview);
+            });
         }
     }
 }

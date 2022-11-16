@@ -6,9 +6,9 @@
 
 namespace {
     using preview_generator = auto (*)(
-        minty::core::object_store&,
+        minty::core::bucket&,
         const fstore::object_meta&
-    ) -> std::optional<UUID::uuid>;
+    ) -> ext::task<std::optional<UUID::uuid>>;
 
     const auto generators =
         std::unordered_map<std::string_view, preview_generator> {
@@ -28,15 +28,10 @@ namespace {
 }
 
 namespace minty::core {
-    preview_service::preview_service(
-        object_store& objects
-    ) : objects(&objects) {
-        initialize_image_previews();
-    }
-
-    auto preview_service::generate_preview(
+    auto generate_preview(
+        bucket& bucket,
         const fstore::object_meta& object
-    ) -> std::optional<UUID::uuid> {
+    ) -> ext::task<std::optional<UUID::uuid>> {
         auto* generator = get_preview_generator(object);
 
         if (!generator) {
@@ -44,7 +39,7 @@ namespace minty::core {
                 "No preview generator for type: {}",
                 object.mime_type()
             );
-            return {};
+            co_return std::optional<UUID::uuid>();
         }
 
         TIMBER_DEBUG(
@@ -52,6 +47,6 @@ namespace minty::core {
             object.mime_type()
         );
 
-        return generator(*objects, object);
+        co_return co_await generator(bucket, object);
     }
 }

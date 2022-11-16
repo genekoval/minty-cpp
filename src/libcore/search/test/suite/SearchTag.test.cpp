@@ -57,13 +57,3 @@ auto SearchTagTest::add_tag(std::string_view name) -> const tag& {
 
     return tag;
 }
-
-auto SearchTagTest::read_names(
-    elastic::json& json
-) -> std::vector<std::string_view> {
-    auto names = std::vector<std::string_view>();
-
-    for (auto name : json["names"]) names.emplace_back(name);
-
-    return names;
-}

@@ -66,24 +66,3 @@ auto SearchPostTest::get_post(const UUID::uuid& id) -> elastic::json {
         .get_doc_source(index, id)
         .send();
 }
-
-auto SearchPostTest::get_tags(
-    elastic::json json
-) -> std::vector<std::string_view> {
-    auto tags = std::vector<std::string_view>();
-
-    for (auto tag : json["tags"].get_array()) {
-        tags.emplace_back(tag);
-    }
-
-    return tags;
-}
-
-auto SearchPostTest::get_time(
-    elastic::json json,
-    std::string_view key
-) -> minty::test::time_point {
-    const auto value = int64_t(json[key]);
-    const auto duration = minty::test::time_point::duration(value);
-    return minty::test::time_point(duration);
-}
