@@ -3,32 +3,32 @@
 #include <minty/error.h>
 
 SearchTagTest::SearchTagTest() {
-    index.refresh();
-    index.clear();
+    netcore::run([&]() -> ext::task<> {
+        co_await index.refresh();
+        co_await index.clear();
+    }());
 }
 
 auto SearchTagTest::SetUpTestSuite() -> void {
-    auto& search = minty::test::SearchEnvironment::engine();
-    auto& index = search.*index_member;
+    netcore::run([]() -> ext::task<> {
+        auto& search = minty::test::SearchEnvironment::engine();
+        auto& index = search.*index_member;
 
-    if (!index.exists()) index.create();
+        if (!co_await index.exists()) co_await index.create();
+    }());
 }
 
-auto SearchTagTest::add_tag() -> const tag& {
+auto SearchTagTest::add_tag() -> ext::task<std::reference_wrapper<const tag>> {
     const auto& tag = tags.front();
 
-    search.add_tag_alias(tag.id, tag.names.front());
+    co_await search.add_tag_alias(tag.id, tag.names.front());
 
-    return tag;
+    co_return tag;
 }
 
-auto SearchTagTest::get_tag(const UUID::uuid& id) -> elastic::json {
-    return client
-        .get_doc_source(index, id)
-        .send();
-}
-
-auto SearchTagTest::add_tag(std::string_view name) -> const tag& {
+auto SearchTagTest::add_tag(
+    std::string_view name
+) -> ext::task<std::reference_wrapper<const tag>> {
     const auto result = std::find_if(
         tags.begin(),
         tags.end(),
@@ -45,7 +45,7 @@ auto SearchTagTest::add_tag(std::string_view name) -> const tag& {
         throw minty::minty_error("no tag with name '{}'", name);
     }
 
-    const auto errors = search.add_tags(
+    const auto errors = co_await search.add_tags(
         std::span<const tag>(result, result + 1)
     );
 
@@ -55,5 +55,11 @@ auto SearchTagTest::add_tag(std::string_view name) -> const tag& {
 
     TIMBER_DEBUG("Found tag with name '{}': {}", name, tag.id);
 
-    return tag;
+    co_return tag;
+}
+
+auto SearchTagTest::get_tag(const UUID::uuid& id) -> ext::task<elastic::json> {
+    co_return co_await client
+        .get_doc_source(index, id)
+        .send();
 }

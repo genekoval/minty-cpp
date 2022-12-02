@@ -6,12 +6,15 @@
 
 namespace minty::core {
     class bucket {
-        fstore::client::connection connection;
+        ext::pool_item<fstore::object_store> connection;
         UUID::uuid id;
     public:
         bucket() = default;
 
-        bucket(fstore::client::connection&& connection, const UUID::uuid& id);
+        bucket(
+            ext::pool_item<fstore::object_store>&& connection,
+            const UUID::uuid& id
+        );
 
         bucket(bucket&) = delete;
 
@@ -28,9 +31,12 @@ namespace minty::core {
             std::size_t stream_size,
             const fstore::add_object_fn auto& pipe
         ) -> ext::task<fstore::object_meta> {
-            co_return co_await connection
-                .value()
-                .add_object(id, part_id, stream_size, pipe);
+            co_return co_await connection->add_object(
+                id,
+                part_id,
+                stream_size,
+                pipe
+            );
         }
 
         auto deregister() -> void;

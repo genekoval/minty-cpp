@@ -1,18 +1,29 @@
 #include "search.test.h"
 
+using search_result = minty::core::search_result<UUID::uuid>;
+using optional_tag =
+    std::optional<std::reference_wrapper<const minty::core::tag_text>>;
+
 using SearchTagFind = SearchTagTest;
 
 // NOTE: Right now, the results are sorted by insertion order.
 
 TEST_F(SearchTagFind, FindOne) {
-    const auto& tag = add_tag("Python");
+    auto opt = optional_tag();
+    auto result = search_result();
 
-    index.refresh();
+    netcore::run([&]() -> ext::task<> {
+        opt = co_await add_tag("Python");
 
-    const auto result = search.find_tags({
-        .size = 10,
-        .name = "Python"
-    });
+        co_await index.refresh();
+
+        result = co_await search.find_tags({
+            .size = 10,
+            .name = "Python"
+        });
+    }());
+
+    const auto& tag = opt->get();
 
     ASSERT_EQ(1, result.total);
     ASSERT_EQ(result.total, result.hits.size());
@@ -20,15 +31,24 @@ TEST_F(SearchTagFind, FindOne) {
 }
 
 TEST_F(SearchTagFind, FindMultiple) {
-    const auto& java = add_tag("Java");
-    const auto& js = add_tag("JavaScript");
+    auto java_opt = optional_tag();
+    auto js_opt = optional_tag();
+    auto result = search_result();
 
-    index.refresh();
+    netcore::run([&]() -> ext::task<> {
+        java_opt = co_await add_tag("Java");
+        js_opt = co_await add_tag("JavaScript");
 
-    const auto result = search.find_tags({
-        .size = 10,
-        .name = "Java"
-    });
+        co_await index.refresh();
+
+        result = co_await search.find_tags({
+            .size = 10,
+            .name = "Java"
+        });
+    }());
+
+    const auto& java = java_opt->get();
+    const auto& js = js_opt->get();
 
     ASSERT_EQ(2, result.total);
     ASSERT_EQ(result.total, result.hits.size());
@@ -37,15 +57,22 @@ TEST_F(SearchTagFind, FindMultiple) {
 }
 
 TEST_F(SearchTagFind, LimitResults) {
-    const auto& java = add_tag("Java");
-    add_tag("JavaScript");
+    auto opt = optional_tag();
+    auto result = search_result();
 
-    index.refresh();
+    netcore::run([&]() -> ext::task<> {
+        opt = co_await add_tag("Java");
+        co_await add_tag("JavaScript");
 
-    const auto result = search.find_tags({
-        .size = 1,
-        .name = "Java"
-    });
+        co_await index.refresh();
+
+        result = co_await search.find_tags({
+            .size = 1,
+            .name = "Java"
+        });
+    }());
+
+    const auto& java = opt->get();
 
     ASSERT_EQ(2, result.total);
     ASSERT_EQ(1, result.hits.size());
@@ -53,16 +80,23 @@ TEST_F(SearchTagFind, LimitResults) {
 }
 
 TEST_F(SearchTagFind, ResultWindow) {
-    add_tag("Java");
-    const auto& js = add_tag("JavaScript");
+    auto opt = optional_tag();
+    auto result = search_result();
 
-    index.refresh();
+    netcore::run([&]() -> ext::task<> {
+        co_await add_tag("Java");
+        opt = co_await add_tag("JavaScript");
 
-    const auto result = search.find_tags({
-        .from = 1,
-        .size = 1,
-        .name = "Java"
-    });
+        co_await index.refresh();
+
+        result = co_await search.find_tags({
+            .from = 1,
+            .size = 1,
+            .name = "Java"
+        });
+    }());
+
+    const auto& js = opt->get();
 
     ASSERT_EQ(2, result.total);
     ASSERT_EQ(1, result.hits.size());

@@ -4,18 +4,20 @@ TEST_F(SearchPostTest, UpdatePostDescription) {
     constexpr auto description = "A new description.";
     const auto modified = minty::test::now();
 
-    const auto& post = add_post();
+    netcore::run([&]() -> ext::task<> {
+        const auto& post = (co_await add_post()).get();
 
-    const auto update = minty::core::post_update {
-        .id = post.id,
-        .new_data = description,
-        .date_modified = modified
-    };
+        const auto update = minty::core::post_update {
+            .id = post.id,
+            .new_data = description,
+            .date_modified = modified
+        };
 
-    search.update_post_description(update);
+        co_await search.update_post_description(update);
 
-    auto res = get_post(post.id);
+        const auto res = co_await get_post(post.id);
 
-    ASSERT_EQ(description, res["description"].get<std::string>());
-    ASSERT_EQ(modified, res["modified"].get<minty::test::time_point>());
+        EXPECT_EQ(description, res["description"].get<std::string>());
+        EXPECT_EQ(modified, res["modified"].get<minty::test::time_point>());
+    }());
 }

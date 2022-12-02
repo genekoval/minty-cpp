@@ -54,7 +54,7 @@ namespace minty::core {
             repo::db::object_preview obj,
             std::size_t& errors,
             progress& progress,
-            netcore::event& finished
+            netcore::event<>& finished
         ) -> ext::detached_task;
     public:
         api(
@@ -84,18 +84,18 @@ namespace minty::core {
             std::string_view url
         ) -> ext::task<std::vector<object_preview>>;
 
-        auto add_post(post_parts parts) -> UUID::uuid;
+        auto add_post(post_parts parts) -> ext::task<UUID::uuid>;
 
         auto add_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             std::int16_t position
-        ) -> decltype(post::date_modified);
+        ) -> ext::task<decltype(post::date_modified)>;
 
         auto add_post_tag(
             const UUID::uuid& post_id,
             const UUID::uuid& tag_id
-        ) -> void;
+        ) -> ext::task<>;
 
         auto add_related_post(
             const UUID::uuid& post_id,
@@ -107,46 +107,46 @@ namespace minty::core {
             std::string_view content
         ) -> comment;
 
-        auto add_tag(std::string_view name) -> UUID::uuid;
+        auto add_tag(std::string_view name) -> ext::task<UUID::uuid>;
 
         auto add_tag_alias(
             const UUID::uuid& tag_id,
             std::string_view alias
-        ) -> tag_name;
+        ) -> ext::task<tag_name>;
 
         auto add_tag_source(
             const UUID::uuid& tag_id,
             std::string_view url
         ) -> ext::task<source>;
 
-        auto delete_post(const UUID::uuid& id) -> void;
+        auto delete_post(const UUID::uuid& id) -> ext::task<>;
 
         auto delete_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects
-        ) -> decltype(post::date_modified);
+        ) -> ext::task<decltype(post::date_modified)>;
 
         auto delete_post_objects(
             const UUID::uuid& post_id,
             std::span<range> ranges
-        ) -> decltype(post::date_modified);
+        ) -> ext::task<decltype(post::date_modified)>;
 
         auto delete_post_tag(
             const UUID::uuid& post_id,
             const UUID::uuid& tag_id
-        ) -> void;
+        ) -> ext::task<>;
 
         auto delete_related_post(
             const UUID::uuid& post_id,
             const UUID::uuid& related
         ) -> void;
 
-        auto delete_tag(const UUID::uuid& id) -> void;
+        auto delete_tag(const UUID::uuid& id) -> ext::task<>;
 
         auto delete_tag_alias(
             const UUID::uuid& tag_id,
             std::string_view alias
-        ) -> tag_name;
+        ) -> ext::task<tag_name>;
 
         auto delete_tag_source(
             const UUID::uuid& tag_id,
@@ -171,19 +171,21 @@ namespace minty::core {
 
         auto get_tag(const UUID::uuid& id) -> tag;
 
-        auto get_tags(const tag_query& query) -> search_result<tag_preview>;
+        auto get_tags(
+            const tag_query& query
+        ) -> ext::task<search_result<tag_preview>>;
 
         auto move_post_object(
             const UUID::uuid& post_id,
             unsigned int old_index,
             unsigned int new_index
-        ) -> void;
+        ) -> ext::task<>;
 
         auto move_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination
-        ) -> decltype(post::date_modified);
+        ) -> ext::task<decltype(post::date_modified)>;
 
         auto prune() -> ext::task<>;
 
@@ -196,7 +198,7 @@ namespace minty::core {
             progress& progress
         ) -> ext::task<std::size_t>;
 
-        auto reindex() -> void;
+        auto reindex() -> ext::task<>;
 
         auto set_comment_content(
             const UUID::uuid& comment_id,
@@ -206,12 +208,12 @@ namespace minty::core {
         auto set_post_description(
             const UUID::uuid& post_id,
             std::string_view description
-        ) -> modification<std::optional<std::string>>;
+        ) -> ext::task<modification<std::optional<std::string>>>;
 
         auto set_post_title(
             const UUID::uuid& post_id,
             std::string_view title
-        ) -> modification<std::optional<std::string>>;
+        ) -> ext::task<modification<std::optional<std::string>>>;
 
         auto set_tag_description(
             const UUID::uuid& tag_id,
@@ -221,6 +223,6 @@ namespace minty::core {
         auto set_tag_name(
             const UUID::uuid& tag_id,
             std::string_view new_name
-        ) -> tag_name;
+        ) -> ext::task<tag_name>;
     };
 }

@@ -100,7 +100,7 @@ namespace minty::core {
         co_return result;
     }
 
-    auto api::add_post(post_parts parts) -> UUID::uuid {
+    auto api::add_post(post_parts parts) -> ext::task<UUID::uuid> {
         TIMBER_FUNC();
 
         const auto result = db->create_post(
@@ -111,38 +111,38 @@ namespace minty::core {
         );
 
         try {
-            search->add_post(result);
+            co_await search->add_post(result);
         }
         catch (const std::runtime_error& ex) {
             TIMBER_ERROR("Failed to index post ({}): {}", result.id, ex.what());
         }
 
-        return result.id;
+        co_return result.id;
     }
 
     auto api::add_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         std::int16_t position
-    ) -> decltype(post::date_modified) {
+    ) -> ext::task<decltype(post::date_modified)> {
         TIMBER_FUNC();
 
         const auto date_modified =
             db->create_post_objects(post_id, objects, position);
 
-        search->update_post_date_modified(post_id, date_modified);
+        co_await search->update_post_date_modified(post_id, date_modified);
 
-        return date_modified;
+        co_return date_modified;
     }
 
     auto api::add_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
-    ) -> void {
+    ) -> ext::task<> {
         TIMBER_FUNC();
 
         db->create_post_tag(post_id, tag_id);
-        search->add_post_tag(post_id, tag_id);
+        co_await search->add_post_tag(post_id, tag_id);
     }
 
     auto api::add_related_post(
@@ -229,29 +229,29 @@ namespace minty::core {
         co_return db->create_site(scheme, host, icon_id).id;
     }
 
-    auto api::add_tag(std::string_view name) -> UUID::uuid {
+    auto api::add_tag(std::string_view name) -> ext::task<UUID::uuid> {
         TIMBER_FUNC();
 
         const auto formatted = format_tag(name);
         const auto id = db->create_tag(formatted);
 
-        search->add_tag_alias(id, formatted);
+        co_await search->add_tag_alias(id, formatted);
 
-        return id;
+        co_return id;
     }
 
     auto api::add_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
-    ) -> tag_name {
+    ) -> ext::task<tag_name> {
         TIMBER_FUNC();
 
         const auto formatted = format_tag(alias);
         const auto name = db->create_tag_alias(tag_id, formatted);
 
-        search->add_tag_alias(tag_id, formatted);
+        co_await search->add_tag_alias(tag_id, formatted);
 
-        return name;
+        co_return name;
     }
 
     auto api::add_tag_source(
@@ -265,43 +265,43 @@ namespace minty::core {
         co_return src;
     }
 
-    auto api::delete_post(const UUID::uuid& id) -> void {
+    auto api::delete_post(const UUID::uuid& id) -> ext::task<> {
         TIMBER_FUNC();
 
         db->delete_post(id);
-        search->delete_post(id);
+        co_await search->delete_post(id);
     }
 
     auto api::delete_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects
-    ) -> decltype(post::date_modified) {
+    ) -> ext::task<decltype(post::date_modified)> {
         TIMBER_FUNC();
 
         const auto modified = db->delete_post_objects(post_id, objects);
-        search->update_post_date_modified(post_id, modified);
-        return modified;
+        co_await search->update_post_date_modified(post_id, modified);
+        co_return modified;
     }
 
     auto api::delete_post_objects(
         const UUID::uuid& post_id,
         std::span<range> ranges
-    ) -> decltype(post::date_modified) {
+    ) -> ext::task<decltype(post::date_modified)> {
         TIMBER_FUNC();
 
         const auto modified = db->delete_post_objects_ranges(post_id, ranges);
-        search->update_post_date_modified(post_id, modified);
-        return modified;
+        co_await search->update_post_date_modified(post_id, modified);
+        co_return modified;
     }
 
     auto api::delete_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
-    ) -> void {
+    ) -> ext::task<> {
         TIMBER_FUNC();
 
         db->delete_post_tag(post_id, tag_id);
-        search->remove_post_tag(post_id, tag_id);
+        co_await search->remove_post_tag(post_id, tag_id);
     }
 
     auto api::delete_related_post(
@@ -313,22 +313,22 @@ namespace minty::core {
         db->delete_related_post(post_id, related);
     }
 
-    auto api::delete_tag(const UUID::uuid& id) -> void {
+    auto api::delete_tag(const UUID::uuid& id) -> ext::task<> {
         TIMBER_FUNC();
 
         db->delete_tag(id);
-        search->delete_tag(id);
+        co_await search->delete_tag(id);
     }
 
     auto api::delete_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
-    ) -> tag_name {
+    ) -> ext::task<tag_name> {
         TIMBER_FUNC();
 
         const auto name = db->delete_tag_alias(tag_id, alias);
-        search->delete_tag_alias(tag_id, alias);
-        return name;
+        co_await search->delete_tag_alias(tag_id, alias);
+        co_return name;
     }
 
     auto api::delete_tag_source(
@@ -440,7 +440,7 @@ namespace minty::core {
     ) -> ext::task<search_result<post_preview>> {
         TIMBER_FUNC();
 
-        const auto result = search->find_posts(query);
+        const auto result = co_await search->find_posts(query);
         auto bucket = co_await objects->connect();
         auto posts = co_await get_posts(bucket, db->read_posts(result.hits));
 
@@ -456,11 +456,13 @@ namespace minty::core {
         return tag(db->read_tag(id), db->read_tag_sources(id));
     }
 
-    auto api::get_tags(const tag_query& query) -> search_result<tag_preview> {
+    auto api::get_tags(
+        const tag_query& query
+    ) -> ext::task<search_result<tag_preview>> {
         TIMBER_FUNC();
 
-        const auto result = search->find_tags(query);
-        return {
+        const auto result = co_await search->find_tags(query);
+        co_return search_result<tag_preview> {
             .total = result.total,
             .hits = db->read_tag_previews(result.hits)
         };
@@ -470,10 +472,10 @@ namespace minty::core {
         const UUID::uuid& post_id,
         unsigned int old_index,
         unsigned int new_index
-    ) -> void {
+    ) -> ext::task<> {
         TIMBER_FUNC();
 
-        search->update_post_date_modified(
+        co_await search->update_post_date_modified(
             post_id,
             db->move_post_object(post_id, old_index, new_index)
         );
@@ -483,7 +485,7 @@ namespace minty::core {
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         const std::optional<UUID::uuid>& destination
-    ) -> decltype(post::date_modified) {
+    ) -> ext::task<decltype(post::date_modified)> {
         TIMBER_FUNC();
 
         const auto date_modified = db->move_post_objects(
@@ -492,8 +494,8 @@ namespace minty::core {
             destination
         );
 
-        search->update_post_date_modified(post_id, date_modified);
-        return date_modified;
+        co_await search->update_post_date_modified(post_id, date_modified);
+        co_return date_modified;
     }
 
     auto api::prune() -> ext::task<> {
@@ -589,7 +591,7 @@ namespace minty::core {
         repo::db::object_preview obj,
         std::size_t& errors,
         progress& progress,
-        netcore::event& finished
+        netcore::event<>& finished
     ) -> ext::detached_task {
         TIMBER_FUNC();
 
@@ -637,19 +639,19 @@ namespace minty::core {
         co_return errors;
     }
 
-    auto api::reindex() -> void {
+    auto api::reindex() -> ext::task<> {
         TIMBER_FUNC();
 
         constexpr auto batch_size = 500;
 
-        search->delete_indices();
-        search->create_indices();
+        co_await search->delete_indices();
+        co_await search->create_indices();
 
         {
             TIMBER_INFO("Reindexing tags...");
             auto tags = db->read_tag_text(batch_size);
             while (tags) {
-                const auto errors = search->add_tags(tags());
+                const auto errors = co_await search->add_tags(tags());
 
                 for (const auto& error : errors) {
                     TIMBER_ERROR("tag {}", error);
@@ -661,7 +663,7 @@ namespace minty::core {
             TIMBER_INFO("Reindexing posts...");
             auto posts = db->read_post_search(batch_size);
             while (posts) {
-                const auto errors = search->add_posts(posts());
+                const auto errors = co_await search->add_posts(posts());
 
                 for (const auto& error : errors) {
                     TIMBER_ERROR("post {}", error);
@@ -685,15 +687,15 @@ namespace minty::core {
     auto api::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
-    ) -> modification<std::optional<std::string>> {
+    ) -> ext::task<modification<std::optional<std::string>>> {
         TIMBER_FUNC();
 
         const auto update = db->update_post_description(
             post_id,
             format_description(description)
         );
-        search->update_post_description(update);
-        return {
+        co_await search->update_post_description(update);
+        co_return modification<std::optional<std::string>> {
             .date_modified = update.date_modified,
             .new_value = update.new_data
         };
@@ -702,13 +704,13 @@ namespace minty::core {
     auto api::set_post_title(
         const UUID::uuid& post_id,
         std::string_view title
-    ) -> modification<std::optional<std::string>> {
+    ) -> ext::task<modification<std::optional<std::string>>> {
         TIMBER_FUNC();
 
         const auto update = db->update_post_title(post_id, format_title(title));
-        search->update_post_title(update);
+        co_await search->update_post_title(update);
 
-        return {
+        co_return modification<std::optional<std::string>> {
             .date_modified = update.date_modified,
             .new_value = update.new_data
         };
@@ -729,20 +731,20 @@ namespace minty::core {
     auto api::set_tag_name(
         const UUID::uuid& tag_id,
         std::string_view new_name
-    ) -> tag_name {
+    ) -> ext::task<tag_name> {
         TIMBER_FUNC();
 
         const auto formatted = format_tag(new_name);
         const auto update  = db->update_tag_name(tag_id, formatted);
 
         if (update.old_name) {
-            search->update_tag_name(
+            co_await search->update_tag_name(
                 tag_id,
                 update.old_name.value(),
                 formatted
             );
         }
 
-        return update.names;
+        co_return update.names;
     }
 }

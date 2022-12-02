@@ -22,26 +22,34 @@ namespace minty::test {
 }
 
 SearchPostTest::SearchPostTest() {
-    index.refresh();
-    index.clear();
+    netcore::run([&]() -> ext::task<> {
+        co_await index.refresh();
+        co_await index.clear();
+    }());
 }
 
 auto SearchPostTest::SetUpTestSuite() -> void {
-    auto& search = minty::test::SearchEnvironment::engine();
+    netcore::run([]() -> ext::task<> {
+        auto& search = minty::test::SearchEnvironment::engine();
 
-    if (!search.post_index.exists()) {
-        search.post_index.create();
-    }
+        if (!co_await search.post_index.exists()) {
+            co_await search.post_index.create();
+        }
+    }());
 }
 
-auto SearchPostTest::add_post() -> const post& {
+auto SearchPostTest::add_post() ->
+    ext::task<std::reference_wrapper<const post>>
+{
     return add_post(cpp);
 }
 
-auto SearchPostTest::add_post(const UUID::uuid& id) -> const post& {
+auto SearchPostTest::add_post(
+    const UUID::uuid& id
+) -> ext::task<std::reference_wrapper<const post>> {
     const auto& post = find_post(id);
-    search.add_post(post);
-    return post;
+    co_await search.add_post(post);
+    co_return post;
 }
 
 auto SearchPostTest::find_post(const UUID::uuid& id) const -> const post& {
@@ -61,8 +69,10 @@ auto SearchPostTest::find_post(const UUID::uuid& id) const -> const post& {
     return *result;
 }
 
-auto SearchPostTest::get_post(const UUID::uuid& id) -> elastic::json {
-    return client
+auto SearchPostTest::get_post(
+    const UUID::uuid& id
+) -> ext::task<elastic::json> {
+    co_return co_await client
         .get_doc_source(index, id)
         .send();
 }

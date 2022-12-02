@@ -2,8 +2,6 @@
 
 using minty::test::trimmed_text;
 using minty::test::whitespace_text;
-using testing::Eq;
-using testing::Optional;
 using testing::Return;
 
 namespace {
@@ -12,7 +10,7 @@ namespace {
     };
 }
 
-class CorePostTest : public CoreTest { };
+using CorePostTest = CoreTest;
 
 TEST_F(CorePostTest, AddPostWhitespaceTitle) {
     EXPECT_CALL(db, create_post(
@@ -22,9 +20,12 @@ TEST_F(CorePostTest, AddPostWhitespaceTitle) {
         std::vector<UUID::uuid>()
     )).WillOnce(Return(post_search));
 
-    EXPECT_CALL(search, add_post(post_search));
+    EXPECT_CALL(search, add_post(post_search))
+        .WillOnce(Return(ext::make_task()));
 
-    api.add_post({ .title = whitespace_text });
+    netcore::run([&]() -> ext::task<> {
+        co_await api.add_post({ .title = whitespace_text });
+    }());
 }
 
 TEST_F(CorePostTest, AddPostWhitespaceDescription) {
@@ -35,7 +36,10 @@ TEST_F(CorePostTest, AddPostWhitespaceDescription) {
         std::vector<UUID::uuid>()
     )).WillOnce(Return(post_search));
 
-    EXPECT_CALL(search, add_post(post_search));
+    EXPECT_CALL(search, add_post(post_search))
+        .WillOnce(Return(ext::make_task()));
 
-    api.add_post({ .description = whitespace_text });
+    netcore::run([&]() -> ext::task<> {
+        co_await api.add_post({ .description = whitespace_text });
+    }());
 }

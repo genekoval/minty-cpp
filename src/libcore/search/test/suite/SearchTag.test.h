@@ -61,9 +61,11 @@ protected:
 
     SearchTagTest();
 
-    auto add_tag() -> const tag&;
+    auto add_tag() -> ext::task<std::reference_wrapper<const tag>>;
 
-    auto add_tag(std::string_view name) -> const tag&;
+    auto add_tag(
+        std::string_view name
+    ) -> ext::task<std::reference_wrapper<const tag>>;
 
-    auto get_tag(const UUID::uuid& id) -> elastic::json;
+    auto get_tag(const UUID::uuid& id) -> ext::task<elastic::json>;
 };

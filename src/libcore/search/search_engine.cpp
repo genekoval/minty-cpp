@@ -24,11 +24,21 @@ namespace minty::core {
         )
     {}
 
+    auto search_engine::add_post(const post_search& post) -> ext::task<> {
+        co_await client
+            .create_doc(
+                post_index,
+                post.id,
+                json(post).dump()
+            )
+            .send();
+    }
+
     auto search_engine::add_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 post_index,
                 post_id,
@@ -49,27 +59,17 @@ namespace minty::core {
             .send();
     }
 
-    auto search_engine::add_post(const post_search& post) -> void {
-        client
-            .create_doc(
-                post_index,
-                post.id,
-                json(post).dump()
-            )
-            .send();
-    }
-
     auto search_engine::add_posts(
         std::span<const post_search> posts
-    ) -> std::vector<std::string> {
+    ) -> ext::task<std::vector<std::string>> {
         return bulk_index(post_index, posts);
     }
 
     auto search_engine::add_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 tag_index,
                 tag_id,
@@ -95,7 +95,7 @@ namespace minty::core {
 
     auto search_engine::add_tags(
         std::span<const tag_text> tags
-    ) -> std::vector<std::string> {
+    ) -> ext::task<std::vector<std::string>> {
         return bulk_index(tag_index, tags);
     }
 
@@ -103,33 +103,32 @@ namespace minty::core {
     auto search_engine::bulk_index(
         std::string_view index,
         std::span<const T> documents
-    ) -> std::vector<std::string> {
+    ) -> ext::task<std::vector<std::string>> {
         namespace ranges = std::ranges;
 
-        using action = elastic::bulk::create;
+        using action = elastic::bulk::action;
+        using create = elastic::bulk::create;
 
         TIMBER_FUNC();
-        TIMBER_DEBUG("bulk {} {} documents", action::name, documents.size());
+        TIMBER_DEBUG("bulk {} {} documents", create::name, documents.size());
 
-        if (documents.empty()) return {};
+        if (documents.empty()) co_return std::vector<std::string>();
 
-        auto actions = std::vector<elastic::bulk::action>();
+        auto actions = std::vector<action>();
         actions.reserve(documents.size());
 
         ranges::transform(
             documents,
             std::back_inserter(actions),
             [](const auto& document) {
-                return action(
-                    {
-                        .id = std::string(document.id)
-                    },
+                return create(
+                    { .id = std::string(document.id) },
                     json(document).dump()
                 );
             }
         );
 
-        auto response = client
+        auto response = co_await client
             .bulk(index, actions)
             .filter_path({"items.*.error"})
             .send();
@@ -139,46 +138,46 @@ namespace minty::core {
         auto items = response.find("items");
         if (items != response.end()) {
             for (auto& item : *items) {
-                auto error = item[action::name]["error"];
-                errors.emplace_back(error["reason"].get<std::string>());
+                auto error = item[create::name]["error"];
+                errors.emplace_back(error["reason"].template get<std::string>());
             }
         }
 
-        return errors;
+        co_return errors;
     }
 
-    auto search_engine::create_indices() -> void {
+    auto search_engine::create_indices() -> ext::task<> {
         for (auto* idx : {
             &post_index,
             &tag_index
-        }) idx->create();
+        }) co_await idx->create();
     }
 
     auto search_engine::delete_indices(
         std::initializer_list<std::string_view> index
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .delete_index(index)
             .ignore_unavailable(true)
             .send();
     }
 
-    auto search_engine::delete_indices() -> void {
-        delete_indices({
+    auto search_engine::delete_indices() -> ext::task<> {
+        return delete_indices({
             post_index,
             tag_index
         });
      }
 
-    auto search_engine::delete_post(const UUID::uuid& post_id) -> void {
-        client.delete_doc(post_index, post_id).send();
+    auto search_engine::delete_post(const UUID::uuid& post_id) -> ext::task<> {
+        co_await client.delete_doc(post_index, post_id).send();
     }
 
     auto search_engine::delete_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 tag_index,
                 tag_id,
@@ -201,13 +200,13 @@ namespace minty::core {
             .send();
     }
 
-    auto search_engine::delete_tag(const UUID::uuid& tag_id) -> void {
-        client.delete_doc(tag_index, tag_id).send();
+    auto search_engine::delete_tag(const UUID::uuid& tag_id) -> ext::task<> {
+        co_await client.delete_doc(tag_index, tag_id).send();
     }
 
     auto search_engine::find_posts(
         const post_query& query
-    ) -> search_result<UUID::uuid> {
+    ) -> ext::task<search_result<UUID::uuid>> {
         using minty::core::sort_order;
         using minty::core::post_sort_value;
 
@@ -268,13 +267,13 @@ namespace minty::core {
             {value, order}
         };
 
-        return search_ids(post_index, result.dump());
+        co_return co_await search_ids(post_index, result.dump());
     }
 
     auto search_engine::find_tags(
         const tag_query& query
-    ) -> search_result<UUID::uuid> {
-        return search_ids(tag_index, json({
+    ) -> ext::task<search_result<UUID::uuid>> {
+        co_return co_await search_ids(tag_index, json({
             {"_source", false},
             {"from", query.from},
             {"size", query.size},
@@ -304,8 +303,8 @@ namespace minty::core {
     auto search_engine::remove_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 post_index,
                 post_id,
@@ -331,11 +330,11 @@ namespace minty::core {
     auto search_engine::search(
         std::string_view index,
         std::string_view query
-    ) -> elastic::json {
+    ) -> ext::task<elastic::json> {
         TIMBER_FUNC();
 
         try {
-            return client.search(index, query).send();
+           co_return co_await client.search(index, query).send();
         }
         catch (const elastic::es_error& ex) {
             TIMBER_ERROR(
@@ -352,8 +351,8 @@ namespace minty::core {
     auto search_engine::search_ids(
         std::string_view index,
         std::string_view query
-    ) -> search_result<UUID::uuid> {
-        auto response = search(index, query);
+    ) -> ext::task<search_result<UUID::uuid>> {
+        auto response = co_await search(index, query);
         auto result = search_result<UUID::uuid>();
 
         response["hits"]["total"]["value"].get_to(result.total);
@@ -371,14 +370,14 @@ namespace minty::core {
             result.total
         );
 
-        return result;
+        co_return result;
     }
 
     auto search_engine::update_post_date_modified(
         const UUID::uuid& post_id,
         decltype(post::date_modified) date_modified
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 post_index,
                 post_id,
@@ -393,8 +392,8 @@ namespace minty::core {
 
     auto search_engine::update_post_description(
         const post_update& post
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 post_index,
                 post.id,
@@ -410,8 +409,8 @@ namespace minty::core {
 
     auto search_engine::update_post_title(
         const post_update& post
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 post_index,
                 post.id,
@@ -429,8 +428,8 @@ namespace minty::core {
         const UUID::uuid& tag_id,
         std::string_view old_name,
         std::string_view new_name
-    ) -> void {
-        client
+    ) -> ext::task<> {
+        co_await client
             .update_doc(
                 tag_index,
                 tag_id,

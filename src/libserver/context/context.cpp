@@ -35,7 +35,7 @@ namespace minty::server {
     }
 
     auto context::add_post(core::post_parts parts) -> ext::task<UUID::uuid> {
-        co_return api->add_post(parts);
+        co_return co_await api->add_post(parts);
     }
 
     auto context::add_post_objects(
@@ -43,15 +43,14 @@ namespace minty::server {
         std::vector<UUID::uuid> objects,
         std::int16_t position
     ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return api->add_post_objects(post_id, objects, position);
+        co_return co_await api->add_post_objects(post_id, objects, position);
     }
 
     auto context::add_post_tag(
         UUID::uuid post_id,
         UUID::uuid tag_id
     ) -> ext::task<> {
-        api->add_post_tag(post_id, tag_id);
-        co_return;
+        co_await api->add_post_tag(post_id, tag_id);
     }
 
     auto context::add_related_post(
@@ -70,14 +69,14 @@ namespace minty::server {
     }
 
     auto context::add_tag(std::string name) -> ext::task<UUID::uuid> {
-        co_return api->add_tag(name);
+        co_return co_await api->add_tag(name);
     }
 
     auto context::add_tag_alias(
         UUID::uuid tag_id,
         std::string alias
     ) -> ext::task<core::tag_name> {
-        co_return api->add_tag_alias(tag_id, alias);
+        co_return co_await api->add_tag_alias(tag_id, alias);
     }
 
     auto context::add_tag_source(
@@ -88,30 +87,28 @@ namespace minty::server {
     }
 
     auto context::delete_post(UUID::uuid post_id) -> ext::task<> {
-        api->delete_post(post_id);
-        co_return;
+        co_await api->delete_post(post_id);
     }
 
     auto context::delete_post_objects(
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects
     ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return api->delete_post_objects(post_id, objects);
+        co_return co_await api->delete_post_objects(post_id, objects);
     }
 
     auto context::delete_post_objects_ranges(
         UUID::uuid post_id,
         std::vector<core::range> ranges
     ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return api->delete_post_objects(post_id, ranges);
+        co_return co_await api->delete_post_objects(post_id, ranges);
     }
 
     auto context::delete_post_tag(
         UUID::uuid post_id,
         UUID::uuid tag_id
     ) -> ext::task<> {
-        api->delete_post_tag(post_id, tag_id);
-        co_return;
+        co_await api->delete_post_tag(post_id, tag_id);
     }
 
     auto context::delete_related_post(
@@ -123,15 +120,14 @@ namespace minty::server {
     }
 
     auto context::delete_tag(UUID::uuid tag_id) -> ext::task<> {
-        api->delete_tag(tag_id);
-        co_return;
+        co_await api->delete_tag(tag_id);
     }
 
     auto context::delete_tag_alias(
         UUID::uuid tag_id,
         std::string alias
     ) -> ext::task<core::tag_name> {
-        co_return api->delete_tag_alias(tag_id, alias);
+        co_return co_await api->delete_tag_alias(tag_id, alias);
     }
 
     auto context::delete_tag_source(
@@ -179,7 +175,7 @@ namespace minty::server {
     auto context::get_tags(
         core::tag_query query
     ) -> ext::task<core::search_result<core::tag_preview>> {
-        co_return api->get_tags(query);
+        co_return co_await api->get_tags(query);
     }
 
     auto context::move_post_object(
@@ -187,8 +183,7 @@ namespace minty::server {
         std::uint32_t old_index,
         std::uint32_t new_index
     ) -> ext::task<> {
-        api->move_post_object(post_id, old_index, new_index);
-        co_return;
+        co_await api->move_post_object(post_id, old_index, new_index);
     }
 
     auto context::move_post_objects(
@@ -196,7 +191,7 @@ namespace minty::server {
         std::vector<UUID::uuid> objects,
         std::optional<UUID::uuid> destination
     ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return api->move_post_objects(post_id, objects, destination);
+        co_return co_await api->move_post_objects(post_id, objects, destination);
     }
 
     auto context::set_comment_content(
@@ -210,14 +205,14 @@ namespace minty::server {
         UUID::uuid post_id,
         std::string description
     ) -> ext::task<core::modification<std::optional<std::string>>> {
-        co_return api->set_post_description(post_id, description);
+        co_return co_await api->set_post_description(post_id, description);
     }
 
     auto context::set_post_title(
         UUID::uuid post_id,
         std::string title
     ) -> ext::task<core::modification<std::optional<std::string>>> {
-        co_return api->set_post_title(post_id, title);
+        co_return co_await api->set_post_title(post_id, title);
     }
 
     auto context::set_tag_description(
@@ -231,6 +226,6 @@ namespace minty::server {
         UUID::uuid tag_id,
         std::string new_name
     ) -> ext::task<core::tag_name> {
-        co_return api->set_tag_name(tag_id, new_name);
+        co_return co_await api->set_tag_name(tag_id, new_name);
     }
 }

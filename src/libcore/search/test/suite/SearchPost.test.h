@@ -105,11 +105,13 @@ protected:
 
     SearchPostTest();
 
-    auto add_post() -> const post&;
+    auto add_post() -> ext::task<std::reference_wrapper<const post>>;
 
-    auto add_post(const UUID::uuid& id) -> const post&;
+    auto add_post(
+        const UUID::uuid& id
+    ) -> ext::task<std::reference_wrapper<const post>>;
 
     auto find_post(const UUID::uuid& id) const -> const post&;
 
-    auto get_post(const UUID::uuid& id) -> elastic::json;
+    auto get_post(const UUID::uuid& id) -> ext::task<elastic::json>;
 };

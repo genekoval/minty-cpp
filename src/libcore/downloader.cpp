@@ -14,7 +14,7 @@ namespace minty::core {
     ) -> ext::task<bool> {
         auto api = co_await client.connect();
 
-        co_return co_await api.value().scrape_url(url, [&callback](
+        co_return co_await api->scrape_url(url, [&callback](
             auto& stream,
             auto current,
             auto total
@@ -30,6 +30,6 @@ namespace minty::core {
     ) -> ext::task<> {
         auto api = co_await client.connect();
 
-        co_await api.value().get_site_icon(url, pipe);
+        co_await api->get_site_icon(url, pipe);
     }
 }

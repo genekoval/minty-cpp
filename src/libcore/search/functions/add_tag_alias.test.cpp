@@ -3,11 +3,20 @@
 using SearchTagAddAlias = SearchTagTest;
 
 TEST_F(SearchTagAddAlias, Create) {
-    const auto& tag = add_tag();
+    auto tag_opt = std::optional<std::reference_wrapper<const tag>>();
+    auto names = std::vector<std::string>();
 
-    auto res = get_tag(tag.id);
+    netcore::run([&]() -> ext::task<> {
+        tag_opt = co_await add_tag();
 
-    const auto names = res["names"].get<std::vector<std::string>>();
+        const auto& tag = tag_opt->get();
+
+        auto res = co_await get_tag(tag.id);
+
+        names = res["names"].get<std::vector<std::string>>();
+    }());
+
+    const auto& tag = tag_opt->get();
 
     ASSERT_EQ(1, names.size());
     ASSERT_EQ(tag.names.front(), names.front());
@@ -16,28 +25,43 @@ TEST_F(SearchTagAddAlias, Create) {
 TEST_F(SearchTagAddAlias, Append) {
     constexpr auto name = "Foo Bar";
 
-    const auto& tag = add_tag();
+    auto tag_opt = std::optional<std::reference_wrapper<const tag>>();
+    auto names = std::vector<std::string>();
 
-    search.add_tag_alias(tag.id, name);
+    netcore::run([&]() -> ext::task<> {
+        tag_opt = co_await add_tag();
+        const auto& tag = tag_opt->get();
 
-    auto res = get_tag(tag.id);
+        co_await search.add_tag_alias(tag.id, name);
 
-    const auto names = res["names"].get<std::vector<std::string>>();
+        auto res = co_await get_tag(tag.id);
+        names = res["names"].get<std::vector<std::string>>();
+
+    }());
+
+    const auto& tag = tag_opt->get();
 
     ASSERT_EQ(2, names.size());
-    ASSERT_EQ(tag.names.front(), names.at(0));
-    ASSERT_EQ(name, names.at(1));
+    EXPECT_EQ(tag.names.front(), names.at(0));
+    EXPECT_EQ(name, names.at(1));
 }
 
 TEST_F(SearchTagAddAlias, Duplicate) {
-    const auto& tag = add_tag();
+    auto tag_opt = std::optional<std::reference_wrapper<const tag>>();
+    auto names = std::vector<std::string>();
 
-    search.add_tag_alias(tag.id, tag.names.front());
+    netcore::run([&]() -> ext::task<> {
+        tag_opt = co_await add_tag();
+        const auto& tag = tag_opt->get();
 
-    auto res = get_tag(tag.id);
+        co_await search.add_tag_alias(tag.id, tag.names.front());
 
-    const auto names = res["names"].get<std::vector<std::string>>();
+        auto res = co_await get_tag(tag.id);
+        names = res["names"].get<std::vector<std::string>>();
+    }());
+
+    const auto& tag = tag_opt->get();
 
     ASSERT_EQ(1, names.size());
-    ASSERT_EQ(tag.names.front(), names.front());
+    EXPECT_EQ(tag.names.front(), names.front());
 }

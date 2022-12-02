@@ -1,15 +1,17 @@
 #include "search.test.h"
 
 TEST_F(SearchPostTest, DeletePost) {
-    const auto& post = add_post();
+    netcore::run([&]() -> ext::task<> {
+        const auto& post = (co_await add_post()).get();
 
-    const auto exists = [&]() -> bool {
-        return client.doc_exists(index, post.id).send();
-    };
+        const auto exists = [&]() -> ext::task<bool> {
+            co_return co_await client.doc_exists(index, post.id).send();
+        };
 
-    ASSERT_TRUE(exists());
+        EXPECT_TRUE(co_await exists());
 
-    search.delete_post(post.id);
+        co_await search.delete_post(post.id);
 
-    ASSERT_FALSE(exists());
+        EXPECT_FALSE(co_await exists());
+    }());
 }

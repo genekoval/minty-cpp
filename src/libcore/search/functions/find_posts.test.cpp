@@ -16,13 +16,18 @@ protected:
     virtual auto SetUp() -> void override {
         SearchPostTest::SetUp();
 
-        const auto errors = search.add_posts(posts);
+        auto empty = false;
 
-        for (const auto& error : errors) TIMBER_ERROR(error);
+        netcore::run([&]() -> ext::task<> {
+            const auto errors = co_await search.add_posts(posts);
 
-        ASSERT_TRUE(errors.empty());
+            for (const auto& error : errors) TIMBER_ERROR(error);
 
-        index.refresh();
+            empty = errors.empty();
+            if (empty) co_await index.refresh();
+        }());
+
+        ASSERT_TRUE(empty);
     }
 
     auto find(
@@ -39,7 +44,11 @@ protected:
     ) -> void {
         if (query.size == 0) query.size = expected.size();
 
-        const auto result = search.find_posts(query);
+        auto result = minty::core::search_result<UUID::uuid>();
+
+        netcore::run([&]() -> ext::task<> {
+            result = co_await search.find_posts(query);
+        }());
 
         ASSERT_EQ(expected.size(), result.hits.size());
         ASSERT_EQ(total, result.total);

@@ -1,15 +1,17 @@
 #include "search.test.h"
 
 TEST_F(SearchTagTest, DeleteTag) {
-    const auto& tag = add_tag();
+    netcore::run([&]() -> ext::task<> {
+        const auto& tag = (co_await add_tag()).get();
 
-    const auto exists = [&]() -> bool {
-        return client.doc_exists(index, tag.id).send();
-    };
+        const auto exists = [&]() -> ext::task<bool> {
+            co_return co_await client.doc_exists(index, tag.id).send();
+        };
 
-    ASSERT_TRUE(exists());
+        EXPECT_TRUE(co_await exists());
 
-    search.delete_tag(tag.id);
+        co_await search.delete_tag(tag.id);
 
-    ASSERT_FALSE(exists());
+        EXPECT_FALSE(co_await exists());
+    }());
 }

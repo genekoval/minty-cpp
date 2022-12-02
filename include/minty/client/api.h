@@ -5,7 +5,7 @@
 #include <minty/core/model.h>
 #include <minty/server/server_info.h>
 
-#include <ext/async_pool>
+#include <ext/pool>
 #include <netcore/netcore>
 #include <zipline/zipline>
 
@@ -154,7 +154,6 @@ namespace minty {
     };
 
     class client {
-    public:
         struct domain {
             std::string path;
         };
@@ -178,12 +177,7 @@ namespace minty {
 
             auto provide() -> ext::task<api>;
         };
-
-        using connection_pool = ext::async_pool<api, provider>;
-        using connection = connection_pool::item;
-
-    private:
-        connection_pool pool;
+        ext::async_pool<api, provider> pool;
         fstore::client object_client;
         UUID::uuid bucket_id;
     public:
@@ -196,8 +190,8 @@ namespace minty {
             fstore::object_store& object_store
         ) -> ext::task<fstore::bucket>;
 
-        auto connect() -> ext::task<connection>;
+        auto connect() -> ext::task<ext::pool_item<api>>;
 
-        auto object_store() -> ext::task<fstore::client::connection>;
+        auto object_store() -> ext::task<ext::pool_item<fstore::object_store>>;
     };
 }

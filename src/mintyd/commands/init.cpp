@@ -6,22 +6,23 @@
 using namespace commline;
 
 namespace {
-    auto $init(
-        const app& app,
-        std::string_view confpath,
-        bool skip_index
-    ) -> void {
-        const auto settings = minty::conf::initialize(confpath);
-        const auto db = minty::cli::database(settings);
+    namespace internal {
+        auto init(
+            const app& app,
+            std::string_view confpath,
+            bool skip_index
+        ) -> void {
+            const auto settings = minty::conf::initialize(confpath);
+            const auto db = minty::cli::database(settings);
 
-        db.init(app.version);
+            db.init(app.version);
 
-        if (skip_index) return;
+            if (skip_index) return;
 
-        minty::cli::api(settings, [](auto& api) -> ext::task<> {
-            api.reindex();
-            co_return;
-        });
+            minty::cli::api(settings, [](auto& api) -> ext::task<> {
+                co_await api.reindex();
+            });
+        }
     }
 }
 
@@ -37,7 +38,7 @@ namespace minty::cli {
                 flag({"skip-index"}, "Skip search engine index operation")
             ),
             arguments(),
-            $init
+            internal::init
         );
     }
 }

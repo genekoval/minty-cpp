@@ -6,9 +6,7 @@ namespace minty {
         std::string_view endpoint,
         std::string_view object_host
     ) :
-        pool(connection_pool::options {
-            .provider = provider(parse_endpoint(endpoint))
-        }),
+        pool(provider(parse_endpoint(endpoint))),
         object_client(object_host)
     {}
 
@@ -17,7 +15,7 @@ namespace minty {
     ) -> ext::task<fstore::bucket> {
         if (!bucket_id) {
             auto api = co_await connect();
-            const auto info = co_await api.value().get_server_info();
+            const auto info = co_await api->get_server_info();
 
             bucket_id = info.object_source.bucket_id;
         }
@@ -25,11 +23,13 @@ namespace minty {
         co_return fstore::bucket(object_store, bucket_id);
     }
 
-    auto client::connect() -> ext::task<connection> {
+    auto client::connect() -> ext::task<ext::pool_item<api>> {
         co_return co_await pool.checkout();
     }
 
-    auto client::object_store() -> ext::task<fstore::client::connection> {
+    auto client::object_store() ->
+        ext::task<ext::pool_item<fstore::object_store>>
+    {
         co_return co_await object_client.connect();
     }
 

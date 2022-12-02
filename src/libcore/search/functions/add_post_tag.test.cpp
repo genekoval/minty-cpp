@@ -1,11 +1,21 @@
 #include "search.test.h"
 
 TEST_F(SearchPostTest, AddPostTag) {
-    const auto& post = add_post();
+    auto post_opt =
+        std::optional<std::reference_wrapper<const post>>();
+    auto tags = std::vector<UUID::uuid>();
 
-    search.add_post_tag(post.id, tag);
+    netcore::run([&]() -> ext::task<> {
+        post_opt = co_await add_post();
+        const auto& post = post_opt->get();
 
-    const auto tags = get_post(post.id)["tags"].get<std::vector<UUID::uuid>>();
+        co_await search.add_post_tag(post.id, tag);
+
+        const auto res = co_await get_post(post.id);
+        tags = res["tags"].get<std::vector<UUID::uuid>>();
+    }());
+
+    const auto& post = post_opt->get();
 
     ASSERT_EQ(post.tags.size() + 1, tags.size());
 

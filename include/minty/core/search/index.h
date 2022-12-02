@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ext/coroutine>
 #include <string>
 
 namespace minty::core {
@@ -24,14 +25,14 @@ namespace minty::core {
 
         operator std::string_view() const noexcept;
 
-        auto clear() -> void;
+        auto clear() -> ext::task<>;
 
-        auto create() -> void;
+        auto create() -> ext::task<>;
 
-        auto exists() -> bool;
+        auto exists() -> ext::task<bool>;
 
-        auto refresh() -> void;
+        auto refresh() -> ext::task<>;
 
-        auto remove() -> void;
+        auto remove() -> ext::task<>;
     };
 }

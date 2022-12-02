@@ -5,18 +5,19 @@
 using namespace commline;
 
 namespace {
-    auto $reindex(
-        const app& app,
-        std::string_view confpath
-    ) -> void {
-        const auto settings = minty::conf::initialize(confpath);
+    namespace internal {
+        auto reindex(
+            const app& app,
+            std::string_view confpath
+        ) -> void {
+            const auto settings = minty::conf::initialize(confpath);
 
-        minty::cli::api(settings, [](auto& api) -> ext::task<> {
-            api.reindex();
-            co_return;
-        });
+            minty::cli::api(settings, [](auto& api) -> ext::task<> {
+                co_await api.reindex();
+            });
 
-        std::cout << "Minty search reindex complete" << std::endl;
+            std::cout << "Minty search reindex complete" << std::endl;
+        }
     }
 }
 
@@ -31,7 +32,7 @@ namespace minty::cli {
                 opts::config(confpath)
             ),
             arguments(),
-            $reindex
+            internal::reindex
         );
     }
 }
