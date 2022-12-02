@@ -16,6 +16,7 @@ namespace fs = std::filesystem;
 
 namespace {
     namespace internal {
+        constexpr auto crash_log_level = timber::level::critical;
         const auto default_config = fs::path(CONFDIR) / "minty.yml";
 
         auto main(
@@ -83,6 +84,7 @@ auto main(int argc, const char** argv) -> int {
 
     timber::thread_name = "main";
     timber::log_handler = &timber::console_logger;
+    timber::set_terminate(internal::crash_log_level);
 
     minty::core::initialize_image_previews();
     const auto init = http::init();
@@ -104,8 +106,8 @@ auto main(int argc, const char** argv) -> int {
         internal::main
     );
 
-    app.on_error([](const auto& e) -> void {
-        TIMBER_CRITICAL(e.what());
+    app.on_error([](const auto& ex) -> void {
+        TIMBER_LOG(internal::crash_log_level, ex.what());
     });
 
     app.subcommand(minty::cli::db(confpath));
