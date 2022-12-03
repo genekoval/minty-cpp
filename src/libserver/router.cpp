@@ -1,19 +1,19 @@
-#include "context.h"
+#include <minty/server/router.hpp>
 
 namespace minty::server {
-    context::context(core::api& api, const server_info& info) :
+    router_context::router_context(core::api& api, const server_info& info) :
         api(&api),
         info(&info)
    {}
 
-    auto context::add_comment(
+    auto router_context::add_comment(
         UUID::uuid post_id,
         std::string content
     ) -> ext::task<core::comment> {
         co_return api->add_comment(post_id, content);
     }
 
-    auto context::add_object_data(
+    auto router_context::add_object_data(
         net::data_stream stream
     ) -> ext::task<core::object_preview> {
         const auto size = co_await stream.size();
@@ -28,17 +28,19 @@ namespace minty::server {
         co_return co_await api->add_object_data(size, pipe);
     }
 
-    auto context::add_objects_url(
+    auto router_context::add_objects_url(
         std::string url
     ) -> ext::task<std::vector<core::object_preview>> {
         co_return co_await api->add_objects_url(url);
     }
 
-    auto context::add_post(core::post_parts parts) -> ext::task<UUID::uuid> {
+    auto router_context::add_post(
+        core::post_parts parts
+    ) -> ext::task<UUID::uuid> {
         co_return co_await api->add_post(parts);
     }
 
-    auto context::add_post_objects(
+    auto router_context::add_post_objects(
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::int16_t position
@@ -46,14 +48,14 @@ namespace minty::server {
         co_return co_await api->add_post_objects(post_id, objects, position);
     }
 
-    auto context::add_post_tag(
+    auto router_context::add_post_tag(
         UUID::uuid post_id,
         UUID::uuid tag_id
     ) -> ext::task<> {
         co_await api->add_post_tag(post_id, tag_id);
     }
 
-    auto context::add_related_post(
+    auto router_context::add_related_post(
         UUID::uuid post_id,
         UUID::uuid related
     ) -> ext::task<> {
@@ -61,57 +63,57 @@ namespace minty::server {
         co_return;
     }
 
-    auto context::add_reply(
+    auto router_context::add_reply(
         UUID::uuid parent_id,
         std::string content
     ) -> ext::task<core::comment> {
         co_return api->add_reply(parent_id, content);
     }
 
-    auto context::add_tag(std::string name) -> ext::task<UUID::uuid> {
+    auto router_context::add_tag(std::string name) -> ext::task<UUID::uuid> {
         co_return co_await api->add_tag(name);
     }
 
-    auto context::add_tag_alias(
+    auto router_context::add_tag_alias(
         UUID::uuid tag_id,
         std::string alias
     ) -> ext::task<core::tag_name> {
         co_return co_await api->add_tag_alias(tag_id, alias);
     }
 
-    auto context::add_tag_source(
+    auto router_context::add_tag_source(
         UUID::uuid tag_id,
         std::string url
     ) -> ext::task<core::source> {
         co_return co_await api->add_tag_source(tag_id, url);
     }
 
-    auto context::delete_post(UUID::uuid post_id) -> ext::task<> {
+    auto router_context::delete_post(UUID::uuid post_id) -> ext::task<> {
         co_await api->delete_post(post_id);
     }
 
-    auto context::delete_post_objects(
+    auto router_context::delete_post_objects(
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects
     ) -> ext::task<decltype(core::post::date_modified)> {
         co_return co_await api->delete_post_objects(post_id, objects);
     }
 
-    auto context::delete_post_objects_ranges(
+    auto router_context::delete_post_objects_ranges(
         UUID::uuid post_id,
         std::vector<core::range> ranges
     ) -> ext::task<decltype(core::post::date_modified)> {
         co_return co_await api->delete_post_objects(post_id, ranges);
     }
 
-    auto context::delete_post_tag(
+    auto router_context::delete_post_tag(
         UUID::uuid post_id,
         UUID::uuid tag_id
     ) -> ext::task<> {
         co_await api->delete_post_tag(post_id, tag_id);
     }
 
-    auto context::delete_related_post(
+    auto router_context::delete_related_post(
         UUID::uuid post_id,
         UUID::uuid related
     ) -> ext::task<> {
@@ -119,18 +121,18 @@ namespace minty::server {
         co_return;
     }
 
-    auto context::delete_tag(UUID::uuid tag_id) -> ext::task<> {
+    auto router_context::delete_tag(UUID::uuid tag_id) -> ext::task<> {
         co_await api->delete_tag(tag_id);
     }
 
-    auto context::delete_tag_alias(
+    auto router_context::delete_tag_alias(
         UUID::uuid tag_id,
         std::string alias
     ) -> ext::task<core::tag_name> {
         co_return co_await api->delete_tag_alias(tag_id, alias);
     }
 
-    auto context::delete_tag_source(
+    auto router_context::delete_tag_source(
         UUID::uuid tag_id,
         std::string source_id
     ) -> ext::task<> {
@@ -138,47 +140,49 @@ namespace minty::server {
         co_return;
     }
 
-    auto context::get_comment(
+    auto router_context::get_comment(
         UUID::uuid comment_id
     ) -> ext::task<core::comment_detail> {
         co_return api->get_comment(comment_id);
     }
 
-    auto context::get_comments(
+    auto router_context::get_comments(
         UUID::uuid post_id
     ) -> ext::task<core::comment_tree> {
         co_return api->get_comments(post_id);
     }
 
-    auto context::get_object(UUID::uuid object_id) -> ext::task<core::object> {
+    auto router_context::get_object(
+        UUID::uuid object_id
+    ) -> ext::task<core::object> {
         co_return co_await api->get_object(object_id);
     }
 
-    auto context::get_post(UUID::uuid post_id) -> ext::task<core::post> {
+    auto router_context::get_post(UUID::uuid post_id) -> ext::task<core::post> {
         co_return co_await api->get_post(post_id);
     }
 
-    auto context::get_posts(
+    auto router_context::get_posts(
         core::post_query query
     ) -> ext::task<core::search_result<core::post_preview>> {
         co_return co_await api->get_posts(query);
     }
 
-    auto context::get_server_info() -> ext::task<server_info> {
+    auto router_context::get_server_info() -> ext::task<server_info> {
         co_return *info;
     }
 
-    auto context::get_tag(UUID::uuid tag_id) -> ext::task<core::tag> {
+    auto router_context::get_tag(UUID::uuid tag_id) -> ext::task<core::tag> {
         co_return api->get_tag(tag_id);
     }
 
-    auto context::get_tags(
+    auto router_context::get_tags(
         core::tag_query query
     ) -> ext::task<core::search_result<core::tag_preview>> {
         co_return co_await api->get_tags(query);
     }
 
-    auto context::move_post_object(
+    auto router_context::move_post_object(
         UUID::uuid post_id,
         std::uint32_t old_index,
         std::uint32_t new_index
@@ -186,43 +190,47 @@ namespace minty::server {
         co_await api->move_post_object(post_id, old_index, new_index);
     }
 
-    auto context::move_post_objects(
+    auto router_context::move_post_objects(
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::optional<UUID::uuid> destination
     ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return co_await api->move_post_objects(post_id, objects, destination);
+        co_return co_await api->move_post_objects(
+            post_id,
+            objects,
+            destination
+        );
     }
 
-    auto context::set_comment_content(
+    auto router_context::set_comment_content(
         UUID::uuid comment_id,
         std::string content
     ) -> ext::task<std::string> {
         co_return api->set_comment_content(comment_id, content);
     }
 
-    auto context::set_post_description(
+    auto router_context::set_post_description(
         UUID::uuid post_id,
         std::string description
     ) -> ext::task<core::modification<std::optional<std::string>>> {
         co_return co_await api->set_post_description(post_id, description);
     }
 
-    auto context::set_post_title(
+    auto router_context::set_post_title(
         UUID::uuid post_id,
         std::string title
     ) -> ext::task<core::modification<std::optional<std::string>>> {
         co_return co_await api->set_post_title(post_id, title);
     }
 
-    auto context::set_tag_description(
+    auto router_context::set_tag_description(
         UUID::uuid tag_id,
         std::string description
     ) -> ext::task<std::optional<std::string>> {
         co_return api->set_tag_description(tag_id, description);
     }
 
-    auto context::set_tag_name(
+    auto router_context::set_tag_name(
         UUID::uuid tag_id,
         std::string new_name
     ) -> ext::task<core::tag_name> {

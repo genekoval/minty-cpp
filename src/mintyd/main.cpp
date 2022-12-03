@@ -24,15 +24,6 @@ namespace {
             std::string_view confpath,
             bool daemon
         ) -> void {
-            const auto settings = minty::conf::initialize(confpath);
-
-            if (daemon && !dmon::daemonize({
-                .group = settings.daemon.group,
-                .identifier = app.name,
-                .pidfile = settings.daemon.pidfile,
-                .user = settings.daemon.user
-            })) return;
-
             auto startup_timer = timber::timer(
                 "Server started in",
                 timber::level::info
@@ -43,16 +34,22 @@ namespace {
                 timber::level::notice
             );
 
+            const auto settings = minty::conf::initialize(confpath);
+
+            if (daemon && !dmon::daemonize({
+                .group = settings.daemon.group,
+                .identifier = app.name,
+                .pidfile = settings.daemon.pidfile,
+                .user = settings.daemon.user
+            })) return;
+
             TIMBER_NOTICE("{} version {} starting up", app.name, app.version);
 
-            minty::cli::api(settings, [
-                &settings,
-                &startup_timer,
-                &uptime_timer,
-                version = app.version
-            ](auto& api) -> ext::task<> {
+            minty::cli::api(settings, [&](
+                minty::core::api& api
+            ) -> ext::task<> {
                 const auto info = minty::server::server_info {
-                    .version = std::string(version),
+                    .version = std::string(app.version),
                     .object_source = {
                         .host = settings.fstore.proxy.host,
                         .port = settings.fstore.proxy.port,
@@ -62,19 +59,13 @@ namespace {
 
                 auto server = minty::server::create(
                     api,
-                    info
+                    info,
+                    startup_timer,
+                    uptime_timer
                 );
 
-                co_await server.listen(settings.server, [
-                    &startup_timer,
-                    &uptime_timer
-                ]() {
-                    startup_timer.stop();
-                    uptime_timer.reset();
-                });
+                co_await server.listen(settings.server);
             });
-
-            uptime_timer.stop();
         }
     }
 }

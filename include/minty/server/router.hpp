@@ -5,11 +5,11 @@
 #include <minty/server/server_info.h>
 
 namespace minty::server {
-    class context {
+    class router_context {
         core::api* api;
         const server_info* info;
     public:
-        context(core::api& api, const server_info& info);
+        router_context(core::api& api, const server_info& info);
 
         auto add_comment(
             UUID::uuid post_id,
