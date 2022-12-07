@@ -5,8 +5,15 @@
 #include <zipline/zipline>
 
 namespace zipline {
-    template <typename Socket, typename T>
-    ZIPLINE_OBJECT_TEMPLATE(
+    template <typename T, io::reader Reader>
+    ZIPLINE_OBJECT_DECODER_TEMPLATE(
+        minty::core::modification<T>,
+        &minty::core::modification<T>::date_modified,
+        &minty::core::modification<T>::new_value
+    );
+
+    template <typename T, io::writer Writer>
+    ZIPLINE_OBJECT_ENCODER_TEMPLATE(
         minty::core::modification<T>,
         &minty::core::modification<T>::date_modified,
         &minty::core::modification<T>::new_value

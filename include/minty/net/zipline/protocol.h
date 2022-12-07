@@ -8,8 +8,8 @@ namespace minty::net {
     using namespace ext::literals;
 
     using event_t = unsigned int;
-    using socket = zipline::buffered_socket<netcore::socket, 8_KiB>;
-    using data_stream = zipline::data_stream<socket>;
+    using socket = zipline::io::buffered<netcore::socket, 8_KiB>;
+    using data_stream = zipline::stream<socket>;
     using error_list = zipline::error_list<socket>;
 
     template <typename Event>

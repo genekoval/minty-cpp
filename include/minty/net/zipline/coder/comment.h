@@ -23,41 +23,31 @@ namespace zipline {
         &minty::core::comment_detail::date_created
     );
 
-    template <typename Socket>
-    struct coder<Socket, minty::core::comment_node> {
+    template <io::writer Writer>
+    struct encoder<minty::core::comment_node, Writer> {
         static auto encode(
-            Socket& socket,
-            const minty::core::comment_node& node
+            const minty::core::comment_node& node,
+            Writer& writer
         ) -> ext::task<> {
-            co_await coder<Socket, minty::core::comment>::encode(
-                socket,
-                node.data
-            );
+            co_await zipline::encode(node.data, writer);
 
             for (const auto* child : node.children) {
-                co_await coder<Socket, minty::core::comment_node>::encode(
-                    socket,
-                    *child
-                );
+                co_await zipline::encode(*child, writer);
             }
         }
     };
 
-    template <typename Socket>
-    struct coder<Socket, minty::core::comment_tree> {
+    template <io::writer Writer>
+    struct encoder<minty::core::comment_tree, Writer> {
         static auto encode(
-            Socket& socket,
-            const minty::core::comment_tree& tree
+            const minty::core::comment_tree& tree,
+            Writer& writer
         ) -> ext::task<> {
-            co_await encode_size(socket, tree.total);
+            co_await zipline::encode(tree.total, writer);
 
             for (const auto* root : tree.roots) {
-                co_await coder<Socket, minty::core::comment_node>::encode(
-                    socket,
-                    *root
-                );
+                co_await zipline::encode(*root, writer);
             }
         }
     };
-
 }
