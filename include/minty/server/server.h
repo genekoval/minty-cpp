@@ -12,12 +12,12 @@ namespace minty::server {
         auto make_router(router_context&& context, Routes&&... routes) {
             return zipline::router<
                 net::socket,
-                net::event_t,
-                net::error_list,
+                std::underlying_type_t<event>,
                 router_context,
                 Routes...
             >(
                 std::forward<router_context>(context),
+                net::error_list::codes(),
                 std::forward<Routes>(routes)...
             );
         }

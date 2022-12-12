@@ -10,7 +10,7 @@ namespace minty::core {
 
     auto downloader::fetch(
         std::string_view url,
-        std::function<ext::task<>(harvest::data_stream&)>&& callback
+        std::function<ext::task<>(harvest::stream&)>&& callback
     ) -> ext::task<bool> {
         auto api = co_await client.connect();
 
@@ -26,7 +26,7 @@ namespace minty::core {
 
     auto downloader::get_site_icon(
         std::string_view url,
-        std::function<ext::task<>(harvest::data_stream&)>&& pipe
+        std::function<ext::task<>(harvest::stream&)>&& pipe
     ) -> ext::task<> {
         auto api = co_await client.connect();
 

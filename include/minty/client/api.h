@@ -1,8 +1,7 @@
 #pragma once
 
-#include "event.h"
-
 #include <minty/core/model.h>
+#include <minty/net/zipline/protocol.h>
 #include <minty/server/server_info.h>
 
 #include <ext/pool>
@@ -11,12 +10,11 @@
 
 namespace minty {
     class api {
-        std::unique_ptr<net::socket> socket;
-        net::client<event> client;
+        std::unique_ptr<net::client_type> client;
     public:
         api() = default;
 
-        api(netcore::socket&& socket, const net::error_list& errors);
+        api(netcore::socket&& socket);
 
         auto add_comment(
             const UUID::uuid& post_id,
@@ -168,8 +166,7 @@ namespace minty {
         static auto parse_endpoint(std::string_view endpoint) -> socket_type;
 
         class provider {
-            const socket_type endpoint;
-            const net::error_list errors;
+            socket_type endpoint;
         public:
             provider();
 
@@ -177,6 +174,7 @@ namespace minty {
 
             auto provide() -> ext::task<api>;
         };
+
         ext::async_pool<api, provider> pool;
         fstore::client object_client;
         UUID::uuid bucket_id;

@@ -46,7 +46,8 @@ common.libs := \
  timber \
  uri \
  uuid++ \
- yaml-cpp
+ yaml-cpp \
+ zipline
 
 daemon = $(project)d
 $(daemon).type = executable

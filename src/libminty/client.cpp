@@ -73,6 +73,6 @@ namespace minty {
             );
         }
 
-        co_return api(std::move(socket), errors);
+        co_return api(std::move(socket));
     }
 }

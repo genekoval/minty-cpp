@@ -1,17 +1,15 @@
 #pragma once
 
-#include <ext/data_size.h>
-#include <netcore/netcore>
-#include <zipline/zipline>
+#include "event.hpp"
+
+#include <fstore/client.h>
 
 namespace minty::net {
-    using namespace ext::literals;
+    using socket = fstore::net::socket;
 
-    using event_t = unsigned int;
-    using socket = zipline::io::buffered<netcore::socket, 8_KiB>;
-    using data_stream = zipline::stream<socket>;
-    using error_list = zipline::error_list<socket>;
+    using error_list = zipline::error_list<>;
 
-    template <typename Event>
-    using client = zipline::client<socket, Event, error_list>;
+    using stream = zipline::stream<socket>;
+
+    using client_type = zipline::client<socket, event>;
 }

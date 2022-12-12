@@ -17,7 +17,7 @@ namespace minty::server {
         ) -> ext::task<core::comment>;
 
         auto add_object_data(
-            net::data_stream stream
+            net::stream stream
         ) -> ext::task<core::object_preview>;
 
         auto add_objects_url(

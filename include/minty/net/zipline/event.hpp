@@ -1,9 +1,9 @@
 #pragma once
 
-#include <minty/net/zipline/protocol.h>
+#include <cstdint>
 
 namespace minty {
-    enum class event : net::event_t {
+    enum class event : std::uint32_t {
         add_comment,
         add_object_data,
         add_objects_url,
