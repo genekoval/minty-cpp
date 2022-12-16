@@ -2,8 +2,9 @@
 
 #include "index.h"
 
+#include <internal/test.hpp>
+
 #include <minty/core/model.h>
-#include <minty/test.h>
 
 #include <elasticsearch/elasticsearch>
 

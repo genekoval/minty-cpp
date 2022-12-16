@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/test.h>
+#include <internal/test.hpp>
 
 #include <harvest/harvest>
 

@@ -1,7 +1,8 @@
 #pragma once
 
+#include <internal/test.hpp>
+
 #include <minty/repo/db/model.h>
-#include <minty/test.h>
 
 #include <entix/entix>
 #include <ext/coroutine>
