@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/conf/settings.h>
+#include <internal/conf/settings.hpp>
 
 #include <conftools/yaml.h>
 

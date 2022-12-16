@@ -1,6 +1,7 @@
-#include "yaml.h"
+#include "yaml.hpp"
 
-#include <minty/conf/settings.h>
+#include <internal/conf/settings.hpp>
+
 #include <minty/error.h>
 
 namespace minty::conf {

@@ -1,4 +1,4 @@
-#include <minty/conf/settings.env.test.h>
+#include <internal/conf/settings.env.test.hpp>
 #include <minty/repo/db/db.env.test.h>
 
 namespace {

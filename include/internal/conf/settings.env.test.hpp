@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/conf/settings.h>
+#include "settings.hpp"
 
 #include <gtest/gtest.h>
 

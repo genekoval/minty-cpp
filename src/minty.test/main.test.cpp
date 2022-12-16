@@ -1,7 +1,8 @@
 #include "runtime.env.test.hpp"
 
+#include <internal/conf/settings.env.test.hpp>
+
 #include <minty/repo/db/db.env.test.h>
-#include <minty/conf/settings.env.test.h>
 #include <minty/core/search/search.env.test.h>
 
 #include <filesystem>

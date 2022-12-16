@@ -2,7 +2,8 @@
 #include "commands/commands.h"
 #include "commands/options/opts.h"
 
-#include <minty/conf/settings.h>
+#include <internal/conf/settings.hpp>
+
 #include <minty/core/preview.h>
 #include <minty/server/server.h>
 #include <minty/server/server_info.h>
