@@ -2,7 +2,7 @@
 
 #include "event.hpp"
 
-#include <fstore/client.h>
+#include <fstore/fstore>
 
 namespace minty::net {
     using socket = fstore::net::socket;

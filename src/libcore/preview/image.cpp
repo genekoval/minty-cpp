@@ -88,7 +88,7 @@ namespace minty::core {
 
     auto generate_image_preview(
         bucket& bucket,
-        const fstore::object_meta& object
+        const fstore::object& object
     ) -> ext::task<std::optional<UUID::uuid>> {
         auto* source = new std::byte[object.size];
         co_await bucket.get(object.id, source);

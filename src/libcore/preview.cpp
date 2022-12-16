@@ -7,7 +7,7 @@
 namespace {
     using preview_generator = auto (*)(
         minty::core::bucket&,
-        const fstore::object_meta&
+        const fstore::object&
     ) -> ext::task<std::optional<UUID::uuid>>;
 
     const auto generators =
@@ -18,7 +18,7 @@ namespace {
         };
 
     auto get_preview_generator(
-        const fstore::object_meta& object
+        const fstore::object& object
     ) -> preview_generator {
         auto generator = generators.find(object.type);
 
@@ -30,7 +30,7 @@ namespace {
 namespace minty::core {
     auto generate_preview(
         bucket& bucket,
-        const fstore::object_meta& object
+        const fstore::object& object
     ) -> ext::task<std::optional<UUID::uuid>> {
         auto* generator = get_preview_generator(object);
 

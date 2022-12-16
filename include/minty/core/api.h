@@ -28,7 +28,7 @@ namespace minty::core {
 
         auto add_object(
             bucket& bucket,
-            fstore::object_meta&& object,
+            fstore::object&& object,
             const std::optional<std::string>& src
         ) -> ext::task<object_preview>;
 

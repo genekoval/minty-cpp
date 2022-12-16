@@ -8,7 +8,7 @@ namespace minty::core {
 
     object::object(
         repo::db::object&& obj,
-        fstore::object_meta&& meta,
+        fstore::object&& meta,
         std::vector<post_preview>&& posts
     ) :
         id(std::move(meta.id)),
@@ -24,7 +24,7 @@ namespace minty::core {
 
     object_preview::object_preview(
         repo::db::object_preview&& obj,
-        fstore::object_meta&& meta
+        fstore::object&& meta
     ) :
         id(std::move(obj.id)),
         preview_id(std::move(obj.preview_id)),

@@ -42,7 +42,7 @@ namespace minty::core {
 
     auto api::add_object(
         bucket& bucket,
-        fstore::object_meta&& object,
+        fstore::object&& object,
         const std::optional<std::string>& src
     ) -> ext::task<object_preview> {
         auto preview_id = std::optional<UUID::uuid>();
@@ -72,7 +72,7 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto bucket = co_await objects->connect();
-        auto objects = std::vector<fstore::object_meta>();
+        auto objects = std::vector<fstore::object>();
 
         const auto used_scraper = co_await dl->fetch(url, [&](
             auto& file

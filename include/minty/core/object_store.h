@@ -2,7 +2,7 @@
 
 #include <minty/test.h>
 
-#include <fstore/client.h>
+#include <fstore/fstore>
 
 namespace minty::core {
     class bucket {
@@ -30,7 +30,7 @@ namespace minty::core {
             std::optional<UUID::uuid> part_id,
             std::size_t stream_size,
             const fstore::add_object_fn auto& pipe
-        ) -> ext::task<fstore::object_meta> {
+        ) -> ext::task<fstore::object> {
             co_return co_await connection->add_object(
                 id,
                 part_id,
@@ -52,13 +52,13 @@ namespace minty::core {
 
         VIRTUAL auto meta(
             const UUID::uuid& object_id
-        ) -> ext::task<fstore::object_meta>;
+        ) -> ext::task<fstore::object>;
 
         auto register_scoped() -> netcore::register_guard;
 
         VIRTUAL auto remove(
             const UUID::uuid& object_id
-        ) -> ext::task<fstore::object_meta>;
+        ) -> ext::task<fstore::object>;
 
         VIRTUAL auto remove(
             std::span<const UUID::uuid> objects

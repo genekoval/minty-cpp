@@ -176,20 +176,9 @@ namespace minty {
         };
 
         ext::async_pool<api, provider> pool;
-        fstore::client object_client;
-        UUID::uuid bucket_id;
     public:
-        client(
-            std::string_view endpoint,
-            std::string_view object_host
-        );
-
-        auto bucket(
-            fstore::object_store& object_store
-        ) -> ext::task<fstore::bucket>;
+        client(std::string_view endpoint);
 
         auto connect() -> ext::task<ext::pool_item<api>>;
-
-        auto object_store() -> ext::task<ext::pool_item<fstore::object_store>>;
     };
 }

@@ -51,7 +51,7 @@ namespace {
 namespace minty::core {
     auto generate_video_preview(
         bucket& bucket,
-        const fstore::object_meta& object
+        const fstore::object& object
     ) -> ext::task<std::optional<UUID::uuid>> {
         const auto source = co_await bucket.get(object.id);
 

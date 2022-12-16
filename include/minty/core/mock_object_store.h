@@ -15,11 +15,11 @@ namespace minty::test {
             std::byte* buffer
         ), (override));
 
-        MOCK_METHOD(ext::task<fstore::object_meta>, meta, (
+        MOCK_METHOD(ext::task<fstore::object>, meta, (
             const UUID::uuid& object_id
         ), (override));
 
-        MOCK_METHOD(ext::task<fstore::object_meta>, remove, (
+        MOCK_METHOD(ext::task<fstore::object>, remove, (
             const UUID::uuid& object_id
         ), (override));
 

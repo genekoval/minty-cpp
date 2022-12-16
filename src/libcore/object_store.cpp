@@ -50,7 +50,7 @@ namespace minty::core {
 
     auto bucket::meta(
         const UUID::uuid& object_id
-    ) -> ext::task<fstore::object_meta> {
+    ) -> ext::task<fstore::object> {
         co_return co_await connection->get_object_metadata(id, object_id);
     }
 
@@ -60,7 +60,7 @@ namespace minty::core {
 
     auto bucket::remove(
         const UUID::uuid& object_id
-    ) -> ext::task<fstore::object_meta> {
+    ) -> ext::task<fstore::object> {
         co_return co_await connection->remove_object(id, object_id);
     }
 

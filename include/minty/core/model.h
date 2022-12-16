@@ -2,7 +2,7 @@
 
 #include <minty/repo/db/model.h>
 
-#include <fstore/client.h>
+#include <fstore/fstore>
 #include <memory>
 
 namespace minty::core {
@@ -71,13 +71,13 @@ namespace minty::core {
     struct object_preview {
         decltype(repo::db::object_preview::id) id;
         decltype(repo::db::object_preview::preview_id) preview_id;
-        decltype(fstore::object_meta::type) type;
-        decltype(fstore::object_meta::subtype) subtype;
+        decltype(fstore::object::type) type;
+        decltype(fstore::object::subtype) subtype;
 
         object_preview() = default;
         object_preview(
             repo::db::object_preview&& obj,
-            fstore::object_meta&& meta
+            fstore::object&& meta
         );
         object_preview(
             UUID::uuid&& id,
@@ -140,11 +140,11 @@ namespace minty::core {
 
     struct object {
         decltype(repo::db::object::id) id;
-        decltype(fstore::object_meta::hash) hash;
+        decltype(fstore::object::hash) hash;
         data_size size;
-        decltype(fstore::object_meta::type) type;
-        decltype(fstore::object_meta::subtype) subtype;
-        decltype(fstore::object_meta::date_added) date_added;
+        decltype(fstore::object::type) type;
+        decltype(fstore::object::subtype) subtype;
+        decltype(fstore::object::date_added) date_added;
         decltype(repo::db::object::preview_id) preview_id;
         std::optional<source> src;
         std::vector<post_preview> posts;
@@ -152,7 +152,7 @@ namespace minty::core {
         object() = default;
         object(
             repo::db::object&& obj,
-            fstore::object_meta&& meta,
+            fstore::object&& meta,
             std::vector<post_preview>&& posts
         );
     };

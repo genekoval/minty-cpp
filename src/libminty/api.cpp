@@ -2,7 +2,6 @@
 #include <minty/net/zipline/coder.h>
 
 #include <fcntl.h>
-#include <fstore/net/zipline/coder.h>
 #include <uri/uri>
 #include <uuid++/uuid++>
 
@@ -30,7 +29,7 @@ namespace minty {
     auto api::add_object_data(
         const fs::path& path
     ) -> ext::task<core::object_preview> {
-        const auto file = fstore::core::file {
+        const auto file = fstore::file {
             .fd = open(path.c_str(), O_RDONLY),
             .size = fs::file_size(path)
         };
