@@ -9,13 +9,13 @@ namespace minty::server {
     auto router_context::add_comment(
         UUID::uuid post_id,
         std::string content
-    ) -> ext::task<core::comment> {
+    ) -> ext::task<comment_data> {
         co_return api->add_comment(post_id, content);
     }
 
     auto router_context::add_object_data(
         net::stream stream
-    ) -> ext::task<core::object_preview> {
+    ) -> ext::task<object_preview> {
         const auto size = co_await stream.size();
         const auto pipe = [&stream](auto& part) -> ext::task<> {
             const auto writer = [&part](auto&& chunk) -> ext::task<> {
@@ -30,12 +30,12 @@ namespace minty::server {
 
     auto router_context::add_objects_url(
         std::string url
-    ) -> ext::task<std::vector<core::object_preview>> {
+    ) -> ext::task<std::vector<object_preview>> {
         co_return co_await api->add_objects_url(url);
     }
 
     auto router_context::add_post(
-        core::post_parts parts
+        post_parts parts
     ) -> ext::task<UUID::uuid> {
         co_return co_await api->add_post(parts);
     }
@@ -44,7 +44,7 @@ namespace minty::server {
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::int16_t position
-    ) -> ext::task<decltype(core::post::date_modified)> {
+    ) -> ext::task<time_point> {
         co_return co_await api->add_post_objects(post_id, objects, position);
     }
 
@@ -66,7 +66,7 @@ namespace minty::server {
     auto router_context::add_reply(
         UUID::uuid parent_id,
         std::string content
-    ) -> ext::task<core::comment> {
+    ) -> ext::task<comment_data> {
         co_return api->add_reply(parent_id, content);
     }
 
@@ -77,14 +77,14 @@ namespace minty::server {
     auto router_context::add_tag_alias(
         UUID::uuid tag_id,
         std::string alias
-    ) -> ext::task<core::tag_name> {
+    ) -> ext::task<tag_name> {
         co_return co_await api->add_tag_alias(tag_id, alias);
     }
 
     auto router_context::add_tag_source(
         UUID::uuid tag_id,
         std::string url
-    ) -> ext::task<core::source> {
+    ) -> ext::task<source> {
         co_return co_await api->add_tag_source(tag_id, url);
     }
 
@@ -95,14 +95,14 @@ namespace minty::server {
     auto router_context::delete_post_objects(
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects
-    ) -> ext::task<decltype(core::post::date_modified)> {
+    ) -> ext::task<time_point> {
         co_return co_await api->delete_post_objects(post_id, objects);
     }
 
     auto router_context::delete_post_objects_ranges(
         UUID::uuid post_id,
-        std::vector<core::range> ranges
-    ) -> ext::task<decltype(core::post::date_modified)> {
+        std::vector<range> ranges
+    ) -> ext::task<time_point> {
         co_return co_await api->delete_post_objects(post_id, ranges);
     }
 
@@ -128,7 +128,7 @@ namespace minty::server {
     auto router_context::delete_tag_alias(
         UUID::uuid tag_id,
         std::string alias
-    ) -> ext::task<core::tag_name> {
+    ) -> ext::task<tag_name> {
         co_return co_await api->delete_tag_alias(tag_id, alias);
     }
 
@@ -142,29 +142,29 @@ namespace minty::server {
 
     auto router_context::get_comment(
         UUID::uuid comment_id
-    ) -> ext::task<core::comment_detail> {
+    ) -> ext::task<comment> {
         co_return api->get_comment(comment_id);
     }
 
     auto router_context::get_comments(
         UUID::uuid post_id
-    ) -> ext::task<core::comment_tree> {
+    ) -> ext::task<comment_tree> {
         co_return api->get_comments(post_id);
     }
 
     auto router_context::get_object(
         UUID::uuid object_id
-    ) -> ext::task<core::object> {
+    ) -> ext::task<object> {
         co_return co_await api->get_object(object_id);
     }
 
-    auto router_context::get_post(UUID::uuid post_id) -> ext::task<core::post> {
+    auto router_context::get_post(UUID::uuid post_id) -> ext::task<post> {
         co_return co_await api->get_post(post_id);
     }
 
     auto router_context::get_posts(
-        core::post_query query
-    ) -> ext::task<core::search_result<core::post_preview>> {
+        post_query query
+    ) -> ext::task<search_result<post_preview>> {
         co_return co_await api->get_posts(query);
     }
 
@@ -172,13 +172,13 @@ namespace minty::server {
         co_return *info;
     }
 
-    auto router_context::get_tag(UUID::uuid tag_id) -> ext::task<core::tag> {
+    auto router_context::get_tag(UUID::uuid tag_id) -> ext::task<tag> {
         co_return api->get_tag(tag_id);
     }
 
     auto router_context::get_tags(
-        core::tag_query query
-    ) -> ext::task<core::search_result<core::tag_preview>> {
+        tag_query query
+    ) -> ext::task<search_result<tag_preview>> {
         co_return co_await api->get_tags(query);
     }
 
@@ -194,7 +194,7 @@ namespace minty::server {
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
         std::optional<UUID::uuid> destination
-    ) -> ext::task<decltype(core::post::date_modified)> {
+    ) -> ext::task<time_point> {
         co_return co_await api->move_post_objects(
             post_id,
             objects,
@@ -212,14 +212,14 @@ namespace minty::server {
     auto router_context::set_post_description(
         UUID::uuid post_id,
         std::string description
-    ) -> ext::task<core::modification<std::optional<std::string>>> {
+    ) -> ext::task<modification<std::optional<std::string>>> {
         co_return co_await api->set_post_description(post_id, description);
     }
 
     auto router_context::set_post_title(
         UUID::uuid post_id,
         std::string title
-    ) -> ext::task<core::modification<std::optional<std::string>>> {
+    ) -> ext::task<modification<std::optional<std::string>>> {
         co_return co_await api->set_post_title(post_id, title);
     }
 
@@ -233,7 +233,7 @@ namespace minty::server {
     auto router_context::set_tag_name(
         UUID::uuid tag_id,
         std::string new_name
-    ) -> ext::task<core::tag_name> {
+    ) -> ext::task<tag_name> {
         co_return co_await api->set_tag_name(tag_id, new_name);
     }
 }

@@ -18,8 +18,8 @@ namespace minty {
     auto api::add_comment(
         const UUID::uuid& post_id,
         std::string_view content
-    ) -> ext::task<core::comment> {
-        co_return co_await client->send<core::comment>(
+    ) -> ext::task<comment_data> {
+        co_return co_await client->send<comment_data>(
             event::add_comment,
             post_id,
             content
@@ -28,13 +28,13 @@ namespace minty {
 
     auto api::add_object_data(
         const fs::path& path
-    ) -> ext::task<core::object_preview> {
+    ) -> ext::task<object_preview> {
         const auto file = fstore::file {
             .fd = open(path.c_str(), O_RDONLY),
             .size = fs::file_size(path)
         };
 
-        co_return co_await client->send<core::object_preview>(
+        co_return co_await client->send<object_preview>(
             event::add_object_data,
             file
         );
@@ -42,15 +42,15 @@ namespace minty {
 
     auto api::add_objects(
         std::span<const std::string_view> arguments
-    ) -> ext::task<std::vector<core::object_preview>> {
-        auto result = std::vector<core::object_preview>();
+    ) -> ext::task<std::vector<object_preview>> {
+        auto result = std::vector<object_preview>();
 
         for (const auto& arg : arguments) {
             const auto uuid = UUID::parse(arg);
             if (uuid) {
                 const auto object = co_await get_object(*uuid);
 
-                auto preview = core::object_preview();
+                auto preview = object_preview();
                 preview.id = object.id;
                 preview.preview_id = object.preview_id;
                 preview.type = object.type;
@@ -79,14 +79,14 @@ namespace minty {
 
     auto api::add_objects_url(
         std::string_view url
-    ) -> ext::task<std::vector<core::object_preview>> {
-        co_return co_await client->send<std::vector<core::object_preview>>(
+    ) -> ext::task<std::vector<object_preview>> {
+        co_return co_await client->send<std::vector<object_preview>>(
             event::add_objects_url,
             url
         );
     }
 
-    auto api::add_post(const core::post_parts& parts) -> ext::task<UUID::uuid> {
+    auto api::add_post(const post_parts& parts) -> ext::task<UUID::uuid> {
         co_return co_await client->send<UUID::uuid>(event::add_post, parts);
     }
 
@@ -94,8 +94,8 @@ namespace minty {
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         std::int16_t position
-    ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return co_await client->send<decltype(core::post::date_modified)>(
+    ) -> ext::task<time_point> {
+        co_return co_await client->send<time_point>(
             event::add_post_objects,
             post_id,
             objects,
@@ -124,8 +124,8 @@ namespace minty {
     auto api::add_reply(
         const UUID::uuid& parent_id,
         std::string_view content
-    ) -> ext::task<core::comment> {
-        co_return co_await client->send<core::comment>(
+    ) -> ext::task<comment_data> {
+        co_return co_await client->send<comment_data>(
             event::add_reply,
             parent_id,
             content
@@ -142,8 +142,8 @@ namespace minty {
     auto api::add_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
-    ) -> ext::task<core::tag_name> {
-        co_return co_await client->send<core::tag_name>(
+    ) -> ext::task<tag_name> {
+        co_return co_await client->send<tag_name>(
             event::add_tag_alias,
             tag_id,
             alias
@@ -153,8 +153,8 @@ namespace minty {
     auto api::add_tag_source(
         const UUID::uuid& tag_id,
         std::string_view url
-    ) -> ext::task<core::source> {
-        co_return co_await client->send<core::source>(
+    ) -> ext::task<source> {
+        co_return co_await client->send<source>(
             event::add_tag_source,
             tag_id,
             url
@@ -168,8 +168,8 @@ namespace minty {
     auto api::delete_post_objects(
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects
-    ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return co_await client->send<decltype(core::post::date_modified)>(
+    ) -> ext::task<time_point> {
+        co_return co_await client->send<time_point>(
             event::delete_post_objects,
             post_id,
             objects
@@ -201,8 +201,8 @@ namespace minty {
     auto api::delete_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
-    ) -> ext::task<core::tag_name> {
-        co_return co_await client->send<core::tag_name>(
+    ) -> ext::task<tag_name> {
+        co_return co_await client->send<tag_name>(
             event::delete_tag_alias,
             tag_id,
             alias
@@ -222,8 +222,8 @@ namespace minty {
 
     auto api::get_comment(
         const UUID::uuid& comment_id
-    ) -> ext::task<core::comment_detail> {
-        co_return co_await client->send<core::comment_detail>(
+    ) -> ext::task<comment> {
+        co_return co_await client->send<comment>(
             event::get_comment,
             comment_id
         );
@@ -231,48 +231,48 @@ namespace minty {
 
     auto api::get_comments(
         const UUID::uuid& post_id
-    ) -> ext::task<std::vector<core::comment>> {
-        co_return co_await client->send<std::vector<core::comment>>(
+    ) -> ext::task<std::vector<comment_data>> {
+        co_return co_await client->send<std::vector<comment_data>>(
             event::get_comments,
             post_id
         );
     }
 
-    auto api::get_object(const UUID::uuid& object_id) -> ext::task<core::object> {
-        co_return co_await client->send<core::object>(event::get_object, object_id);
+    auto api::get_object(const UUID::uuid& object_id) -> ext::task<object> {
+        co_return co_await client->send<object>(event::get_object, object_id);
     }
 
-    auto api::get_post(const UUID::uuid& id) -> ext::task<core::post> {
-        co_return co_await client->send<core::post>(
+    auto api::get_post(const UUID::uuid& id) -> ext::task<post> {
+        co_return co_await client->send<post>(
             event::get_post,
             id
         );
     }
 
     auto api::get_posts(
-        const core::post_query& query
-    ) -> ext::task<core::search_result<core::post_preview>> {
-        co_return co_await client->send<core::search_result<core::post_preview>>(
+        const post_query& query
+    ) -> ext::task<search_result<post_preview>> {
+        co_return co_await client->send<search_result<post_preview>>(
             event::get_posts,
             query
         );
     }
 
-    auto api::get_server_info() -> ext::task<server::server_info> {
-        co_return co_await client->send<server::server_info>(event::get_server_info);
+    auto api::get_server_info() -> ext::task<server_info> {
+        co_return co_await client->send<server_info>(event::get_server_info);
     }
 
-    auto api::get_tag(const UUID::uuid& id) -> ext::task<core::tag> {
-        co_return co_await client->send<core::tag>(
+    auto api::get_tag(const UUID::uuid& id) -> ext::task<tag> {
+        co_return co_await client->send<tag>(
             event::get_tag,
             id
         );
     }
 
     auto api::get_tags(
-        const core::tag_query& query
-    ) -> ext::task<core::search_result<core::tag_preview>> {
-        co_return co_await client->send<core::search_result<core::tag_preview>>(
+        const tag_query& query
+    ) -> ext::task<search_result<tag_preview>> {
+        co_return co_await client->send<search_result<tag_preview>>(
             event::get_tags,
             query
         );
@@ -282,8 +282,8 @@ namespace minty {
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         const std::optional<UUID::uuid>& destination
-    ) -> ext::task<decltype(core::post::date_modified)> {
-        co_return co_await client->send<decltype(core::post::date_modified)>(
+    ) -> ext::task<time_point> {
+        co_return co_await client->send<time_point>(
             event::move_post_objects,
             post_id,
             objects,
@@ -305,8 +305,8 @@ namespace minty {
     auto api::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
-    ) -> ext::task<core::modification<std::optional<std::string>>> {
-        co_return co_await client->send<core::modification<std::optional<std::string>>>(
+    ) -> ext::task<modification<std::optional<std::string>>> {
+        co_return co_await client->send<modification<std::optional<std::string>>>(
             event::set_post_description,
             post_id,
             description
@@ -316,8 +316,8 @@ namespace minty {
     auto api::set_post_title(
         const UUID::uuid& post_id,
         std::string_view title
-    ) -> ext::task<core::modification<std::optional<std::string>>> {
-        co_return co_await client->send<core::modification<std::optional<std::string>>>(
+    ) -> ext::task<modification<std::optional<std::string>>> {
+        co_return co_await client->send<modification<std::optional<std::string>>>(
             event::set_post_title,
             post_id,
             title
@@ -338,8 +338,8 @@ namespace minty {
     auto api::set_tag_name(
         const UUID::uuid& tag_id,
         std::string_view new_name
-    ) -> ext::task<core::tag_name> {
-        co_return co_await client->send<core::tag_name>(
+    ) -> ext::task<tag_name> {
+        co_return co_await client->send<tag_name>(
             event::set_tag_name,
             tag_id,
             new_name

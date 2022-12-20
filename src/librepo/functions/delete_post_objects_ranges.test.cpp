@@ -6,8 +6,8 @@ TEST_F(DatabasePostObjectTest, DeleteSingleObjectRange) {
 
     const auto id = database.create_post("", "", {object}, {}).id;
 
-    const auto range = minty::repo::db::range { .first = 0, .last = 0 };
-    const auto ranges = std::vector<minty::repo::db::range> { range };
+    const auto range = minty::range { .first = 0, .last = 0 };
+    const auto ranges = std::vector<minty::range> { range };
     database.delete_post_objects_ranges(id, ranges);
 
     const auto objects = database.read_post_objects(id);
@@ -28,8 +28,8 @@ TEST_F(DatabasePostObjectTest, DeleteObjectRange) {
 
     const auto id = database.create_post("", "", objects, {}).id;
 
-    const auto range = minty::repo::db::range { .first = 0, .last = 1 };
-    const auto ranges = std::vector<minty::repo::db::range> { range };
+    const auto range = minty::range { .first = 0, .last = 1 };
+    const auto ranges = std::vector<minty::range> { range };
     database.delete_post_objects_ranges(id, ranges);
 
     const auto result = database.read_post_objects(id);
@@ -53,10 +53,10 @@ TEST_F(DatabasePostObjectTest, DeleteMultipleObjectsRange) {
 
     const auto id = database.create_post("", "", objects, {}).id;
 
-    const auto first = minty::repo::db::range { .first = 0, .last = 0 };
-    const auto third = minty::repo::db::range { .first = 2, .last = 2 };
-    const auto fifth = minty::repo::db::range { .first = 4, .last = 4 };
-    const auto ranges = std::vector<minty::repo::db::range> {
+    const auto first = minty::range { .first = 0, .last = 0 };
+    const auto third = minty::range { .first = 2, .last = 2 };
+    const auto fifth = minty::range { .first = 4, .last = 4 };
+    const auto ranges = std::vector<minty::range> {
         first,
         third,
         fifth

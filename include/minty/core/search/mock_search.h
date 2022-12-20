@@ -7,7 +7,7 @@
 namespace minty::test {
     struct search_engine : core::search_engine {
         MOCK_METHOD(ext::task<>, add_post, (
-            const core::post_search& post
+            const repo::db::post_search& post
         ), (override));
 
         MOCK_METHOD(ext::task<>, add_post_tag, (
@@ -16,11 +16,11 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(ext::task<std::vector<std::string>>, add_posts, (
-            std::span<const core::post_search> posts
+            std::span<const repo::db::post_search> posts
         ), (override));
 
         MOCK_METHOD(ext::task<std::vector<std::string>>, add_tags, (
-            std::span<const core::tag_text> tags
+            std::span<const repo::db::tag_search> tags
         ), (override));
 
         MOCK_METHOD(ext::task<>, add_tag_alias, (
@@ -43,12 +43,12 @@ namespace minty::test {
             std::string_view alias
         ), (override));
 
-        MOCK_METHOD(ext::task<core::search_result<UUID::uuid>>, find_posts, (
-            const core::post_query& query
+        MOCK_METHOD(ext::task<search_result<UUID::uuid>>, find_posts, (
+            const post_query& query
         ), (override));
 
-        MOCK_METHOD(ext::task<core::search_result<UUID::uuid>>, find_tags, (
-            const core::tag_query& query
+        MOCK_METHOD(ext::task<search_result<UUID::uuid>>, find_tags, (
+            const tag_query& query
         ), (override));
 
         MOCK_METHOD(ext::task<>, remove_post_tag, (
@@ -58,15 +58,15 @@ namespace minty::test {
 
         MOCK_METHOD(ext::task<>, update_post_date_modified, (
             const UUID::uuid& post_id,
-            decltype(core::post::date_modified) date_modified
+            time_point date_modified
         ), (override));
 
         MOCK_METHOD(ext::task<>, update_post_description, (
-            const core::post_update& post
+            const repo::db::post_update& post
         ), (override));
 
         MOCK_METHOD(ext::task<>, update_post_title, (
-            const core::post_update& post
+            const repo::db::post_update& post
         ), (override));
 
         MOCK_METHOD(ext::task<>, update_tag_name, (

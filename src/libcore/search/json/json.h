@@ -1,7 +1,8 @@
 #pragma once
 
-#include <minty/repo/db/model.h>
 #include <minty/error.h>
+#include <minty/repo/db/model/post_search.hpp>
+#include <minty/repo/db/model/tag_search.hpp>
 
 #include <nlohmann/json.hpp>
 #include <uuid++/uuid++>
@@ -53,7 +54,7 @@ namespace minty::repo::db {
     )
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tag_text,
+        tag_search,
         names
     )
 }

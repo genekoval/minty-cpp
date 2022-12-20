@@ -1,18 +1,30 @@
 #pragma once
 
-#include <minty/repo/db/model.h>
+#include <minty/model/comment.hpp>
+#include <minty/model/object_error.hpp>
+#include <minty/model/tag_name.hpp>
+#include <minty/model/tag_preview.hpp>
+#include <minty/repo/db/model/object.hpp>
+#include <minty/repo/db/model/object_preview.hpp>
+#include <minty/repo/db/model/post.hpp>
+#include <minty/repo/db/model/post_preview.hpp>
+#include <minty/repo/db/model/post_search.hpp>
+#include <minty/repo/db/model/post_update.hpp>
+#include <minty/repo/db/model/tag.hpp>
+#include <minty/repo/db/model/tag_search.hpp>
+#include <minty/repo/db/model/tag_name_update.hpp>
 
 #include <entix/entix>
 
 namespace entix {
     ENTITY(
-        minty::repo::db::comment,
-        &minty::repo::db::comment::id,
-        &minty::repo::db::comment::post_id,
-        &minty::repo::db::comment::parent_id,
-        &minty::repo::db::comment::indent,
-        &minty::repo::db::comment::content,
-        &minty::repo::db::comment::date_created
+        minty::comment,
+        &minty::comment::id,
+        &minty::comment::post_id,
+        &minty::comment::parent_id,
+        &minty::comment::indent,
+        &minty::comment::content,
+        &minty::comment::date_created
     );
 
     ENTITY(
@@ -23,9 +35,9 @@ namespace entix {
     );
 
     ENTITY(
-        minty::repo::db::object_error,
-        &minty::repo::db::object_error::id,
-        &minty::repo::db::object_error::message
+        minty::object_error,
+        &minty::object_error::id,
+        &minty::object_error::message
     );
 
     ENTITY(
@@ -98,9 +110,9 @@ namespace entix {
     );
 
     ENTITY(
-        minty::repo::db::tag_name,
-        &minty::repo::db::tag_name::name,
-        &minty::repo::db::tag_name::aliases
+        minty::tag_name,
+        &minty::tag_name::name,
+        &minty::tag_name::aliases
     );
 
     ENTITY(
@@ -110,15 +122,15 @@ namespace entix {
     );
 
     ENTITY(
-        minty::repo::db::tag_preview,
-        &minty::repo::db::tag_preview::id,
-        &minty::repo::db::tag_preview::name,
-        &minty::repo::db::tag_preview::avatar
+        minty::tag_preview,
+        &minty::tag_preview::id,
+        &minty::tag_preview::name,
+        &minty::tag_preview::avatar
     );
 
     ENTITY(
-        minty::repo::db::tag_text,
-        &minty::repo::db::tag_text::id,
-        &minty::repo::db::tag_text::names
+        minty::repo::db::tag_search,
+        &minty::repo::db::tag_search::id,
+        &minty::repo::db::tag_search::names
     );
 }

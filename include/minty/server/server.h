@@ -4,7 +4,6 @@
 
 #include <minty/core/api.h>
 #include <minty/net/zipline/coder.h>
-#include <minty/server/server_info.h>
 
 namespace minty::server {
     namespace detail {

@@ -8,7 +8,7 @@ TEST_F(SearchPostTest, UpdatePostDateModified) {
         co_await search.update_post_date_modified(post.id, modified);
 
         const auto res = co_await get_post(post.id);
-        const auto result = res["modified"].get<minty::test::time_point>();
+        const auto result = res["modified"].get<minty::time_point>();
 
         EXPECT_EQ(modified, result);
     }());

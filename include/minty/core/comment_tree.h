@@ -1,11 +1,9 @@
 #pragma once
 
-#include <minty/core/model.h>
+#include <minty/model/comment.hpp>
 
 #include <span>
 
 namespace minty::core {
-    auto build_tree(
-        std::span<const repo::db::comment> entities
-    ) -> comment_tree;
+    auto build_tree(std::span<const comment> entities) -> comment_tree;
 }

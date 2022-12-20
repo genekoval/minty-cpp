@@ -8,8 +8,8 @@ TEST_F(SearchPostTest, AddPost) {
         const auto title = res["title"].get<std::string>();
         const auto description = res["description"].get<std::string>();
 
-        const auto created = res["created"].get<minty::test::time_point>();
-        const auto modified = res["modified"].get<minty::test::time_point>();
+        const auto created = res["created"].get<minty::time_point>();
+        const auto modified = res["modified"].get<minty::time_point>();
 
         auto tags = std::vector<UUID::uuid>();
         for (const auto& tag : res["tags"]) {

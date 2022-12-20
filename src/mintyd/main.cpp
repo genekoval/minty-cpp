@@ -6,7 +6,6 @@
 
 #include <minty/core/preview.h>
 #include <minty/server/server.h>
-#include <minty/server/server_info.h>
 
 #include <http/http>
 #include <dmon/dmon>
@@ -49,7 +48,7 @@ namespace {
             minty::cli::api(settings, [&](
                 minty::core::api& api
             ) -> ext::task<> {
-                const auto info = minty::server::server_info {
+                const auto info = minty::server_info {
                     .version = std::string(app.version),
                     .object_source = {
                         .host = settings.fstore.proxy.host,

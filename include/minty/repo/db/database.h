@@ -2,7 +2,21 @@
 
 #include <internal/test.hpp>
 
-#include <minty/repo/db/model.h>
+#include <minty/model/comment.hpp>
+#include <minty/model/object_error.hpp>
+#include <minty/model/range.hpp>
+#include <minty/model/tag_name.hpp>
+#include <minty/model/tag_preview.hpp>
+#include <minty/repo/db/model/object.hpp>
+#include <minty/repo/db/model/post.hpp>
+#include <minty/repo/db/model/post_preview.hpp>
+#include <minty/repo/db/model/post_search.hpp>
+#include <minty/repo/db/model/post_update.hpp>
+#include <minty/repo/db/model/site.hpp>
+#include <minty/repo/db/model/source.hpp>
+#include <minty/repo/db/model/tag.hpp>
+#include <minty/repo/db/model/tag_name_update.hpp>
+#include <minty/repo/db/model/tag_search.hpp>
 
 #include <entix/entix>
 #include <ext/coroutine>
@@ -46,7 +60,7 @@ namespace minty::repo::db {
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             std::int16_t position
-        ) -> decltype(post::date_modified);
+        ) -> time_point;
 
         VIRTUAL auto create_post_tag(
             const UUID::uuid& post_id,
@@ -128,13 +142,13 @@ namespace minty::repo::db {
             const UUID::uuid& post_id,
             unsigned int old_index,
             unsigned int new_index
-        ) -> decltype(post::date_modified);
+        ) -> time_point;
 
         VIRTUAL auto move_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination
-        ) -> decltype(post::date_modified);
+        ) -> time_point;
 
         VIRTUAL auto prune() -> void;
 
@@ -201,7 +215,7 @@ namespace minty::repo::db {
 
         VIRTUAL auto read_tag_text(
             int batch_size
-        ) -> ext::generator<std::span<tag_text>>;
+        ) -> ext::generator<std::span<tag_search>>;
 
         VIRTUAL auto read_total_objects() -> std::size_t;
 

@@ -4,7 +4,7 @@
 
 namespace minty::core {
     auto build_tree(
-        std::span<const repo::db::comment> entities
+        std::span<const comment> entities
     ) -> comment_tree {
         auto tree = comment_tree {
             .total = entities.size(),

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <minty/core/api.h>
+#include <minty/model/server_info.hpp>
 #include <minty/net/zipline/protocol.h>
-#include <minty/server/server_info.h>
 
 namespace minty::server {
     class router_context {
@@ -14,23 +14,23 @@ namespace minty::server {
         auto add_comment(
             UUID::uuid post_id,
             std::string content
-        ) -> ext::task<core::comment>;
+        ) -> ext::task<comment_data>;
 
         auto add_object_data(
             net::stream stream
-        ) -> ext::task<core::object_preview>;
+        ) -> ext::task<object_preview>;
 
         auto add_objects_url(
             std::string url
-        ) -> ext::task<std::vector<core::object_preview>>;
+        ) -> ext::task<std::vector<object_preview>>;
 
-        auto add_post(core::post_parts parts) -> ext::task<UUID::uuid>;
+        auto add_post(post_parts parts) -> ext::task<UUID::uuid>;
 
         auto add_post_objects(
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects,
             std::int16_t position
-        ) -> ext::task<decltype(core::post::date_modified)>;
+        ) -> ext::task<time_point>;
 
         auto add_post_tag(UUID::uuid post_id, UUID::uuid tag_id) -> ext::task<>;
 
@@ -42,31 +42,31 @@ namespace minty::server {
         auto add_reply(
             UUID::uuid parent_id,
             std::string content
-        ) -> ext::task<core::comment>;
+        ) -> ext::task<comment_data>;
 
         auto add_tag(std::string name) -> ext::task<UUID::uuid>;
 
         auto add_tag_alias(
             UUID::uuid tag_id,
             std::string alias
-        ) -> ext::task<core::tag_name>;
+        ) -> ext::task<tag_name>;
 
         auto add_tag_source(
             UUID::uuid tag_id,
             std::string url
-        ) -> ext::task<core::source>;
+        ) -> ext::task<source>;
 
         auto delete_post(UUID::uuid post_id) -> ext::task<>;
 
         auto delete_post_objects(
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects
-        ) -> ext::task<decltype(core::post::date_modified)>;
+        ) -> ext::task<time_point>;
 
         auto delete_post_objects_ranges(
             UUID::uuid post_id,
-            std::vector<core::range> ranges
-        ) -> ext::task<decltype(core::post::date_modified)>;
+            std::vector<range> ranges
+        ) -> ext::task<time_point>;
 
         auto delete_post_tag(
             UUID::uuid post_id,
@@ -83,7 +83,7 @@ namespace minty::server {
         auto delete_tag_alias(
             UUID::uuid tag_id,
             std::string alias
-        ) -> ext::task<core::tag_name>;
+        ) -> ext::task<tag_name>;
 
         auto delete_tag_source(
             UUID::uuid tag_id,
@@ -92,25 +92,25 @@ namespace minty::server {
 
         auto get_comment(
             UUID::uuid comment_id
-        ) -> ext::task<core::comment_detail>;
+        ) -> ext::task<comment>;
 
-        auto get_comments(UUID::uuid post_id) -> ext::task<core::comment_tree>;
+        auto get_comments(UUID::uuid post_id) -> ext::task<comment_tree>;
 
-        auto get_object(UUID::uuid object_id) -> ext::task<core::object>;
+        auto get_object(UUID::uuid object_id) -> ext::task<object>;
 
-        auto get_post(UUID::uuid post_id) -> ext::task<core::post>;
+        auto get_post(UUID::uuid post_id) -> ext::task<post>;
 
         auto get_posts(
-            core::post_query query
-        ) -> ext::task<core::search_result<core::post_preview>>;
+            post_query query
+        ) -> ext::task<search_result<post_preview>>;
 
         auto get_server_info() -> ext::task<server_info>;
 
-        auto get_tag(UUID::uuid tag_id) -> ext::task<core::tag>;
+        auto get_tag(UUID::uuid tag_id) -> ext::task<tag>;
 
         auto get_tags(
-            core::tag_query query
-        ) -> ext::task<core::search_result<core::tag_preview>>;
+            tag_query query
+        ) -> ext::task<search_result<tag_preview>>;
 
         auto move_post_object(
             UUID::uuid post_id,
@@ -122,7 +122,7 @@ namespace minty::server {
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects,
             std::optional<UUID::uuid> destination
-        ) -> ext::task<decltype(core::post::date_modified)>;
+        ) -> ext::task<time_point>;
 
         auto set_comment_content(
             UUID::uuid comment_id,
@@ -132,12 +132,12 @@ namespace minty::server {
         auto set_post_description(
             UUID::uuid post_id,
             std::string description
-        ) -> ext::task<core::modification<std::optional<std::string>>>;
+        ) -> ext::task<modification<std::optional<std::string>>>;
 
         auto set_post_title(
             UUID::uuid post_id,
             std::string title
-        ) -> ext::task<core::modification<std::optional<std::string>>>;
+        ) -> ext::task<modification<std::optional<std::string>>>;
 
         auto set_tag_description(
             UUID::uuid tag_id,
@@ -147,6 +147,6 @@ namespace minty::server {
         auto set_tag_name(
             UUID::uuid tag_id,
             std::string new_name
-        ) -> ext::task<core::tag_name>;
+        ) -> ext::task<tag_name>;
     };
 }

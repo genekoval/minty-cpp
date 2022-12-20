@@ -1,8 +1,8 @@
 #include "search.test.h"
 
-using minty::core::post_query;
-using minty::core::sort_order;
-using sort_value = minty::core::post_sort_value;
+using minty::post_query;
+using minty::sort_order;
+using sort_value = minty::post_sort_value;
 
 constexpr auto asc = sort_order::ascending;
 constexpr auto desc = sort_order::descending;
@@ -44,7 +44,7 @@ protected:
     ) -> void {
         if (query.size == 0) query.size = expected.size();
 
-        auto result = minty::core::search_result<UUID::uuid>();
+        auto result = minty::search_result<UUID::uuid>();
 
         netcore::run([&]() -> ext::task<> {
             result = co_await search.find_posts(query);

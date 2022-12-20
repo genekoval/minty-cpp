@@ -7,7 +7,7 @@ TEST_F(SearchPostTest, UpdatePostTitle) {
     netcore::run([&]() -> ext::task<> {
         const auto& post = (co_await add_post()).get();
 
-        const auto update = minty::core::post_update {
+        const auto update = minty::repo::db::post_update {
             .id = post.id,
             .new_data = title,
             .date_modified = modified
@@ -18,6 +18,6 @@ TEST_F(SearchPostTest, UpdatePostTitle) {
         const auto res = co_await get_post(post.id);
 
         EXPECT_EQ(title, res["title"].get<std::string>());
-        EXPECT_EQ(modified, res["modified"].get<minty::test::time_point>());
+        EXPECT_EQ(modified, res["modified"].get<minty::time_point>());
     }());
 }

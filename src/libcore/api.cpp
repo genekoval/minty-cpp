@@ -1,6 +1,7 @@
 #include "utility.h"
 
 #include <minty/core/api.h>
+#include <minty/core/comment_tree.h>
 #include <minty/core/downloader.h>
 #include <minty/core/preview.h>
 #include <minty/core/search/search.h>
@@ -24,7 +25,7 @@ namespace minty::core {
     auto api::add_comment(
         const UUID::uuid& post_id,
         std::string_view content
-    ) -> comment {
+    ) -> comment_data {
         TIMBER_FUNC();
 
         const auto comment = db->create_comment(
@@ -58,17 +59,17 @@ namespace minty::core {
         db->create_object(object.id, preview_id, src);
         if (error) db->create_object_preview_error(object.id, *error);
 
-        co_return object_preview(
+        co_return object_preview {
             std::move(object.id),
             std::move(preview_id),
             std::move(object.type),
             std::move(object.subtype)
-        );
+        };
     }
 
     auto api::add_objects_url(
         std::string_view url
-    ) -> ext::task<std::vector<core::object_preview>> {
+    ) -> ext::task<std::vector<object_preview>> {
         TIMBER_FUNC();
 
         auto bucket = co_await objects->connect();
@@ -157,7 +158,7 @@ namespace minty::core {
     auto api::add_reply(
         const UUID::uuid& parent_id,
         std::string_view content
-    ) -> comment {
+    ) -> comment_data {
         TIMBER_FUNC();
 
         const auto comment = db->create_reply(
@@ -344,7 +345,7 @@ namespace minty::core {
         return objects->get_bucket_id();
     }
 
-    auto api::get_comment(const UUID::uuid& comment_id) -> comment_detail {
+    auto api::get_comment(const UUID::uuid& comment_id) -> comment {
         TIMBER_FUNC();
 
         return db->read_comment(comment_id);
@@ -362,11 +363,23 @@ namespace minty::core {
 
         auto bucket = co_await objects->connect();
 
-        co_return object(
-            db->read_object(object_id),
-            co_await bucket.meta(object_id),
-            co_await get_posts(bucket, db->read_object_posts(object_id))
-        );
+        const auto obj = db->read_object(object_id);
+        const auto metadata = co_await bucket.meta(object_id);
+
+        co_return object {
+            .id = object_id,
+            .hash = metadata.hash,
+            .size = data_size(metadata.size),
+            .type = metadata.type,
+            .subtype = metadata.subtype,
+            .date_added = metadata.date_added,
+            .preview_id = obj.preview_id,
+            .src = obj.src,
+            .posts = co_await get_posts(
+                bucket,
+                db->read_object_posts(object_id)
+            )
+        };
     }
 
     auto api::get_object_preview_errors() -> std::vector<object_error> {
@@ -396,10 +409,12 @@ namespace minty::core {
 
         for (auto&& obj : objects) {
             auto meta = co_await bucket.meta(obj.id);
-            result.objects.emplace_back(
-                std::move(obj),
-                std::move(meta)
-            );
+            result.objects.push_back(object_preview {
+                .id = std::move(obj.id),
+                .preview_id = std::move(obj.preview_id),
+                .type = std::move(meta.type),
+                .subtype = std::move(meta.subtype)
+            });
         }
 
         co_return result;
@@ -413,23 +428,30 @@ namespace minty::core {
 
         for (auto&& post : posts) {
             const auto obj = post.preview ?
-                post.preview.value().id :
+                post.preview->id :
                 std::optional<UUID::uuid>();
 
             auto preview = std::optional<object_preview>();
 
             if (obj) {
                 auto metadata = co_await bucket.meta(*obj);
-                preview = object_preview(
-                    std::move(post.preview.value()),
-                    std::move(metadata)
-                );
+
+                preview = object_preview {
+                    .id = std::move(metadata.id),
+                    .preview_id = post.preview->preview_id,
+                    .type = std::move(metadata.type),
+                    .subtype = std::move(metadata.subtype)
+                };
             }
 
-            result.emplace_back(
-                std::move(post),
-                std::move(preview)
-            );
+            result.push_back(post_preview {
+                .id = std::move(post.id),
+                .title = std::move(post.title),
+                .preview = std::move(preview),
+                .comment_count = post.comment_count,
+                .object_count = post.object_count,
+                .date_created = post.date_created
+            });
         }
 
         co_return result;
@@ -453,7 +475,25 @@ namespace minty::core {
     auto api::get_tag(const UUID::uuid& id) -> tag {
         TIMBER_FUNC();
 
-        return tag(db->read_tag(id), db->read_tag_sources(id));
+        auto tag = db->read_tag(id);
+        auto sources = db->read_tag_sources(id);
+
+        auto result = minty::tag {
+            .id = std::move(tag.id),
+            .name = std::move(tag.name),
+            .aliases = std::move(tag.aliases),
+            .description = std::move(tag.description),
+            .avatar = std::move(tag.avatar),
+            .banner = std::move(tag.banner),
+            .post_count = tag.post_count,
+            .date_created = tag.date_created
+        };
+
+        for (const auto& src : sources) {
+            result.sources.emplace_back(src);
+        }
+
+        return result;
     }
 
     auto api::get_tags(

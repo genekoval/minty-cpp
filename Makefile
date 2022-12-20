@@ -26,6 +26,7 @@ internal.libs := $(addprefix lib,$(internal))
 common.libs := \
  $(internal) \
  $(graphics.libs) \
+ $(project) \
  avcodec \
  avformat \
  avutil \

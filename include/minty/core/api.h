@@ -1,10 +1,15 @@
 #pragma once
 
-#include <minty/core/comment_tree.h>
 #include <minty/core/downloader.h>
 #include <minty/core/object_store.h>
-#include <minty/core/model.h>
 #include <minty/core/search/search.h>
+#include <minty/model/modification.hpp>
+#include <minty/model/object.hpp>
+#include <minty/model/object_preview.hpp>
+#include <minty/model/post.hpp>
+#include <minty/model/post_parts.hpp>
+#include <minty/model/post_preview.hpp>
+#include <minty/model/tag.hpp>
 #include <minty/repo/db/database.h>
 
 #include <ext/coroutine>
@@ -67,7 +72,7 @@ namespace minty::core {
         auto add_comment(
             const UUID::uuid& post_id,
             std::string_view content
-        ) -> comment;
+        ) -> comment_data;
 
         auto add_object_data(
             std::size_t stream_size,
@@ -90,7 +95,7 @@ namespace minty::core {
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             std::int16_t position
-        ) -> ext::task<decltype(post::date_modified)>;
+        ) -> ext::task<time_point>;
 
         auto add_post_tag(
             const UUID::uuid& post_id,
@@ -105,7 +110,7 @@ namespace minty::core {
         auto add_reply(
             const UUID::uuid& parent_id,
             std::string_view content
-        ) -> comment;
+        ) -> comment_data;
 
         auto add_tag(std::string_view name) -> ext::task<UUID::uuid>;
 
@@ -124,7 +129,7 @@ namespace minty::core {
         auto delete_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects
-        ) -> ext::task<decltype(post::date_modified)>;
+        ) -> ext::task<time_point>;
 
         auto delete_post_objects(
             const UUID::uuid& post_id,
@@ -155,7 +160,7 @@ namespace minty::core {
 
         auto get_bucket_id() const noexcept -> const UUID::uuid&;
 
-        auto get_comment(const UUID::uuid& comment_id) -> comment_detail;
+        auto get_comment(const UUID::uuid& comment_id) -> comment;
 
         auto get_comments(const UUID::uuid& post_id) -> comment_tree;
 
@@ -185,13 +190,13 @@ namespace minty::core {
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination
-        ) -> ext::task<decltype(post::date_modified)>;
+        ) -> ext::task<time_point>;
 
         auto prune() -> ext::task<>;
 
         auto regenerate_preview(
             const UUID::uuid& object_id
-        ) -> ext::task<decltype(object::preview_id)>;
+        ) -> ext::task<std::optional<UUID::uuid>>;
 
         auto regenerate_previews(
             int jobs,

@@ -1,8 +1,8 @@
 #include "search.test.h"
 
-using search_result = minty::core::search_result<UUID::uuid>;
+using search_result = minty::search_result<UUID::uuid>;
 using optional_tag =
-    std::optional<std::reference_wrapper<const minty::core::tag_text>>;
+    std::optional<std::reference_wrapper<const minty::repo::db::tag_search>>;
 
 using SearchTagFind = SearchTagTest;
 

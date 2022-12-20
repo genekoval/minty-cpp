@@ -2,7 +2,7 @@
 
 #include <gmock/gmock.h>
 
-using minty::repo::db::comment;
+using minty::comment;
 using testing::_;
 using testing::Return;
 
@@ -17,7 +17,7 @@ TEST_F(CoreCommentTest, AddRootComment) {
     EXPECT_CALL(db, create_comment(
         post_id,
         content)
-    ).WillOnce(Return(minty::repo::db::comment { .content = content }));
+    ).WillOnce(Return(comment { .content = content }));
 
     const auto comment = api.add_comment(post_id, content);
 

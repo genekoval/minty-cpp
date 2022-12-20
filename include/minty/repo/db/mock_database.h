@@ -8,7 +8,7 @@ namespace minty::test {
     class database : public repo::db::database {
         using post = repo::db::post;
     public:
-        MOCK_METHOD(repo::db::comment, create_comment, (
+        MOCK_METHOD(comment, create_comment, (
             const UUID::uuid& post_id,
             std::string_view content
         ), (override));
@@ -47,7 +47,7 @@ namespace minty::test {
             const UUID::uuid& related
         ), (override));
 
-        MOCK_METHOD(repo::db::comment, create_reply, (
+        MOCK_METHOD(comment, create_reply, (
             const UUID::uuid& parent_id,
             std::string_view content
         ), (override));
@@ -67,7 +67,7 @@ namespace minty::test {
             std::string_view name
         ), (override));
 
-        MOCK_METHOD(repo::db::tag_name, create_tag_alias, (
+        MOCK_METHOD(tag_name, create_tag_alias, (
             const UUID::uuid& tag_id,
             std::string_view alias
         ), (override));
@@ -88,9 +88,9 @@ namespace minty::test {
             const std::vector<UUID::uuid>& objects
         ), (override));
 
-        MOCK_METHOD(decltype(post::date_modified), delete_post_objects_ranges, (
+        MOCK_METHOD(time_point, delete_post_objects_ranges, (
             const UUID::uuid& post_id,
-            std::span<const repo::db::range> ranges
+            std::span<const range> ranges
         ), (override));
 
         MOCK_METHOD(void, delete_post_tag, (
@@ -105,7 +105,7 @@ namespace minty::test {
 
         MOCK_METHOD(void, delete_tag, (const UUID::uuid& tag_id), (override));
 
-        MOCK_METHOD(repo::db::tag_name, delete_tag_alias, (
+        MOCK_METHOD(tag_name, delete_tag_alias, (
             const UUID::uuid& tag_id,
             std::string_view alias
         ), (override));
@@ -135,11 +135,11 @@ namespace minty::test {
             )>& on_deleted
         ), (override));
 
-        MOCK_METHOD(repo::db::comment, read_comment, (
+        MOCK_METHOD(comment, read_comment, (
             const UUID::uuid& comment_id
         ), (override));
 
-        MOCK_METHOD(std::vector<repo::db::comment>, read_comments, (
+        MOCK_METHOD(std::vector<comment>, read_comments, (
             const UUID::uuid& post_id
         ), (override));
 
@@ -152,7 +152,7 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(
-            std::vector<repo::db::object_error>,
+            std::vector<object_error>,
             read_object_preview_errors, (),
             (override)
         );
@@ -178,7 +178,7 @@ namespace minty::test {
             read_post_search, (int batch_size), (override)
         );
 
-        MOCK_METHOD(std::vector<repo::db::tag_preview>, read_post_tags, (
+        MOCK_METHOD(std::vector<tag_preview>, read_post_tags, (
             const UUID::uuid& post_id
         ), (override));
 
@@ -195,7 +195,7 @@ namespace minty::test {
             const UUID::uuid& tag_id
         ), (override));
 
-        MOCK_METHOD(std::vector<repo::db::tag_preview>, read_tag_previews, (
+        MOCK_METHOD(std::vector<tag_preview>, read_tag_previews, (
             const std::vector<UUID::uuid>& tags
         ), (override));
 
@@ -203,7 +203,7 @@ namespace minty::test {
             const UUID::uuid& tag_id
         ), (override));
 
-        MOCK_METHOD(ext::generator<std::span<repo::db::tag_text>>,
+        MOCK_METHOD(ext::generator<std::span<repo::db::tag_search>>,
             read_tag_text, (int batch_size), (override)
         );
 

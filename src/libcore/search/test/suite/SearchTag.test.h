@@ -2,12 +2,10 @@
 
 #include "Search.test.h"
 
-#include <minty/core/model.h>
-
 class SearchTagTest : public SearchTest {
     static constexpr auto index_member = &minty::core::search_engine::tag_index;
 protected:
-    using tag = minty::core::tag_text;
+    using tag = minty::repo::db::tag_search;
 
     static auto SetUpTestSuite() -> void;
 
