@@ -8,9 +8,6 @@ STD := c++20
 db.user := $(project)
 db.name := $(project)
 
-repo := librepo
-$(repo).type := static
-
 core := libcore
 $(core).type := static
 
@@ -20,7 +17,7 @@ $(server).type := static
 conf := libconf
 $(conf).type := static
 
-internal := core repo server conf
+internal := core server conf
 internal.libs := $(addprefix lib,$(internal))
 
 common.libs := \

@@ -5,7 +5,7 @@ using minty::test::whitespace_text;
 using testing::Return;
 
 namespace {
-    const auto post_search = minty::repo::db::post_search {
+    const auto post_search = minty::core::db::post_search {
         .id = "d589757b-40a8-4bfa-a44a-502d690a8d2b"
     };
 }

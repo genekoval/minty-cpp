@@ -1,10 +1,10 @@
 #pragma once
 
 #include <internal/core/api.hpp>
+#include <internal/core/db/mock_database.hpp>
 #include <internal/core/downloader/mock_downloader.hpp>
 #include <internal/core/object_store/mock_object_store.hpp>
 #include <internal/core/search/mock_search.hpp>
-#include <minty/repo/db/mock_database.h>
 
 #include <gtest/gtest.h>
 

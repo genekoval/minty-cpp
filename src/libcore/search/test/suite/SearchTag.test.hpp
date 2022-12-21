@@ -5,7 +5,7 @@
 class SearchTagTest : public SearchTest {
     static constexpr auto index_member = &minty::core::search_engine::tag_index;
 protected:
-    using tag = minty::repo::db::tag_search;
+    using tag = minty::core::db::tag_search;
 
     static auto SetUpTestSuite() -> void;
 

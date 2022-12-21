@@ -1,5 +1,6 @@
 #pragma once
 
+#include <internal/core/db/database.hpp>
 #include <internal/core/downloader/downloader.hpp>
 #include <internal/core/object_store/object_store.hpp>
 #include <internal/core/search/search.hpp>
@@ -10,7 +11,6 @@
 #include <minty/model/post_parts.hpp>
 #include <minty/model/post_preview.hpp>
 #include <minty/model/tag.hpp>
-#include <minty/repo/db/database.h>
 
 #include <ext/coroutine>
 
@@ -26,7 +26,7 @@ namespace minty::core {
     };
 
     class api {
-        repo::db::database* db;
+        db::database* database;
         object_store* objects;
         downloader* dl;
         search_engine* search;
@@ -46,24 +46,24 @@ namespace minty::core {
 
         auto get_posts(
             bucket& bucket,
-            std::vector<repo::db::post_preview>&& posts
+            std::vector<db::post_preview>&& posts
         ) -> ext::task<std::vector<post_preview>>;
 
         auto regenerate_preview(
             bucket& bucket,
-            const repo::db::object_preview& object
+            const db::object_preview& object
         ) -> ext::task<bool>;
 
         auto regenerate_preview_task(
             netcore::thread_pool& workers,
-            repo::db::object_preview obj,
+            db::object_preview obj,
             std::size_t& errors,
             progress& progress,
             netcore::event<>& finished
         ) -> ext::detached_task;
     public:
         api(
-            repo::db::database& db,
+            db::database& database,
             object_store& objects,
             downloader& dl,
             search_engine& search

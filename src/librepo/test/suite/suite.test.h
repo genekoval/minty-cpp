@@ -1,6 +1,0 @@
-#include "DatabaseObject.test.h"
-#include "DatabasePostObject.test.h"
-#include "DatabasePostTag.test.h"
-#include "DatabasePrune.test.h"
-#include "DatabaseSite.test.h"
-#include "DatabaseTag.test.h"

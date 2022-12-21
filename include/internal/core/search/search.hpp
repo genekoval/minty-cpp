@@ -2,13 +2,13 @@
 
 #include "index.hpp"
 
+#include <internal/core/db/model/post_search.hpp>
+#include <internal/core/db/model/post_update.hpp>
+#include <internal/core/db/model/tag_search.hpp>
 #include <internal/test.hpp>
 #include <minty/model/post_query.hpp>
 #include <minty/model/search_result.hpp>
 #include <minty/model/tag_query.hpp>
-#include <minty/repo/db/model/post_search.hpp>
-#include <minty/repo/db/model/post_update.hpp>
-#include <minty/repo/db/model/tag_search.hpp>
 
 #include <elasticsearch/elasticsearch>
 
@@ -53,7 +53,7 @@ namespace minty::core {
 
         VIRTUAL_DESTRUCTOR(search_engine)
 
-        VIRTUAL auto add_post(const repo::db::post_search& post) -> ext::task<>;
+        VIRTUAL auto add_post(const db::post_search& post) -> ext::task<>;
 
         VIRTUAL auto add_post_tag(
             const UUID::uuid& post_id,
@@ -61,11 +61,11 @@ namespace minty::core {
         ) -> ext::task<>;
 
         VIRTUAL auto add_posts(
-            std::span<const repo::db::post_search> posts
+            std::span<const db::post_search> posts
         ) -> ext::task<std::vector<std::string>>;
 
         VIRTUAL auto add_tags(
-            std::span<const repo::db::tag_search> tags
+            std::span<const db::tag_search> tags
         ) -> ext::task<std::vector<std::string>>;
 
         VIRTUAL auto add_tag_alias(
@@ -105,11 +105,11 @@ namespace minty::core {
         ) -> ext::task<>;
 
         VIRTUAL auto update_post_description(
-            const repo::db::post_update& post
+            const db::post_update& post
         ) -> ext::task<>;
 
         VIRTUAL auto update_post_title(
-            const repo::db::post_update& post
+            const db::post_update& post
         ) -> ext::task<>;
 
         VIRTUAL auto update_tag_name(

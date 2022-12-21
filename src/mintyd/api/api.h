@@ -5,7 +5,7 @@
 
 namespace minty::cli {
     class api_container {
-        minty::repo::db::database db;
+        minty::core::db::database db;
         minty::core::object_store objects;
         minty::core::downloader downloader;
         minty::core::search_engine search;

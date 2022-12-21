@@ -10,7 +10,7 @@ namespace minty::test {
 
 class SearchPostTest : public SearchTest {
 protected:
-    using post = minty::repo::db::post_search;
+    using post = minty::core::db::post_search;
 
     const UUID::uuid c = "2c78211d-f765-4dd8-b4d1-f3ea6b0d7b7f";
     const UUID::uuid cpp = "defa9484-99a8-437d-9c80-c6c3cb335cfb";

@@ -1,0 +1,6 @@
+#include "DatabaseObject.test.hpp"
+#include "DatabasePostObject.test.hpp"
+#include "DatabasePostTag.test.hpp"
+#include "DatabasePrune.test.hpp"
+#include "DatabaseSite.test.hpp"
+#include "DatabaseTag.test.hpp"

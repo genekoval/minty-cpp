@@ -25,7 +25,7 @@ namespace minty::core {
     {}
 
     auto search_engine::add_post(
-        const repo::db::post_search& post
+        const db::post_search& post
     ) -> ext::task<> {
         co_await client
             .create_doc(
@@ -62,7 +62,7 @@ namespace minty::core {
     }
 
     auto search_engine::add_posts(
-        std::span<const repo::db::post_search> posts
+        std::span<const db::post_search> posts
     ) -> ext::task<std::vector<std::string>> {
         return bulk_index(post_index, posts);
     }
@@ -96,7 +96,7 @@ namespace minty::core {
     }
 
     auto search_engine::add_tags(
-        std::span<const repo::db::tag_search> tags
+        std::span<const db::tag_search> tags
     ) -> ext::task<std::vector<std::string>> {
         return bulk_index(tag_index, tags);
     }
@@ -390,7 +390,7 @@ namespace minty::core {
     }
 
     auto search_engine::update_post_description(
-        const repo::db::post_update& post
+        const db::post_update& post
     ) -> ext::task<> {
         co_await client
             .update_doc(
@@ -407,7 +407,7 @@ namespace minty::core {
     }
 
     auto search_engine::update_post_title(
-        const repo::db::post_update& post
+        const db::post_update& post
     ) -> ext::task<> {
         co_await client
             .update_doc(

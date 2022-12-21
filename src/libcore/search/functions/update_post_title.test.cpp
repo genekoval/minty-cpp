@@ -7,7 +7,7 @@ TEST_F(SearchPostTest, UpdatePostTitle) {
     netcore::run([&]() -> ext::task<> {
         const auto& post = (co_await add_post()).get();
 
-        const auto update = minty::repo::db::post_update {
+        const auto update = minty::core::db::post_update {
             .id = post.id,
             .new_data = title,
             .date_modified = modified

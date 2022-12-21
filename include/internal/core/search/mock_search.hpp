@@ -7,7 +7,7 @@
 namespace minty::test {
     struct search_engine : core::search_engine {
         MOCK_METHOD(ext::task<>, add_post, (
-            const repo::db::post_search& post
+            const core::db::post_search& post
         ), (override));
 
         MOCK_METHOD(ext::task<>, add_post_tag, (
@@ -16,11 +16,11 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(ext::task<std::vector<std::string>>, add_posts, (
-            std::span<const repo::db::post_search> posts
+            std::span<const core::db::post_search> posts
         ), (override));
 
         MOCK_METHOD(ext::task<std::vector<std::string>>, add_tags, (
-            std::span<const repo::db::tag_search> tags
+            std::span<const core::db::tag_search> tags
         ), (override));
 
         MOCK_METHOD(ext::task<>, add_tag_alias, (
@@ -62,11 +62,11 @@ namespace minty::test {
         ), (override));
 
         MOCK_METHOD(ext::task<>, update_post_description, (
-            const repo::db::post_update& post
+            const core::db::post_update& post
         ), (override));
 
         MOCK_METHOD(ext::task<>, update_post_title, (
-            const repo::db::post_update& post
+            const core::db::post_update& post
         ), (override));
 
         MOCK_METHOD(ext::task<>, update_tag_name, (

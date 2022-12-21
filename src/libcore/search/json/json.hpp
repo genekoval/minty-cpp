@@ -1,8 +1,8 @@
 #pragma once
 
+#include <internal/core/db/model/post_search.hpp>
+#include <internal/core/db/model/tag_search.hpp>
 #include <minty/error.h>
-#include <minty/repo/db/model/post_search.hpp>
-#include <minty/repo/db/model/tag_search.hpp>
 
 #include <nlohmann/json.hpp>
 #include <uuid++/uuid++>
@@ -43,7 +43,7 @@ namespace UUID {
     auto to_json(nlohmann::json& j, const uuid& u) -> void;
 }
 
-namespace minty::repo::db {
+namespace minty::core::db {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         post_search,
         title,

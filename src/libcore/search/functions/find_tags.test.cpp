@@ -2,7 +2,7 @@
 
 using search_result = minty::search_result<UUID::uuid>;
 using optional_tag =
-    std::optional<std::reference_wrapper<const minty::repo::db::tag_search>>;
+    std::optional<std::reference_wrapper<const minty::core::db::tag_search>>;
 
 using SearchTagFind = SearchTagTest;
 
