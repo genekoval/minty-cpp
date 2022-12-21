@@ -1,10 +1,11 @@
 #pragma once
 
 #include <internal/core/api.hpp>
-#include <minty/model/server_info.hpp>
-#include <minty/net/zipline/protocol.h>
+#include <minty/api.hpp>
 
 namespace minty::server {
+    using stream = zipline::stream<socket>;
+
     class router_context {
         core::api* api;
         const server_info* info;
@@ -16,9 +17,7 @@ namespace minty::server {
             std::string content
         ) -> ext::task<comment_data>;
 
-        auto add_object_data(
-            net::stream stream
-        ) -> ext::task<object_preview>;
+        auto add_object_data(stream stream) -> ext::task<object_preview>;
 
         auto add_objects_url(
             std::string url

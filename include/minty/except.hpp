@@ -3,6 +3,7 @@
 #include <ext/string.h>
 #include <fmt/format.h>
 #include <stdexcept>
+#include <zipline/zipline>
 
 namespace minty {
     class minty_error : public std::runtime_error {
@@ -39,4 +40,6 @@ namespace minty {
         {}
 
     };
+
+    using error_list = zipline::error_list<>;
 }

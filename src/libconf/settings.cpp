@@ -2,7 +2,7 @@
 
 #include <internal/conf/settings.hpp>
 
-#include <minty/error.h>
+#include <minty/except.hpp>
 
 namespace minty::conf {
     auto settings::encode() const -> std::string {

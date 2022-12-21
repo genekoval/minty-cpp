@@ -1,6 +1,6 @@
 #include "SearchPost.test.hpp"
 
-#include <minty/error.h>
+#include <minty/except.hpp>
 
 #include <date/date.h>
 

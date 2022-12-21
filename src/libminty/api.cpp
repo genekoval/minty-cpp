@@ -1,5 +1,5 @@
-#include <minty/client/api.h>
-#include <minty/net/zipline/coder.h>
+#include <minty/api.hpp>
+#include <minty/except.hpp>
 
 #include <fcntl.h>
 #include <uri/uri>
@@ -7,10 +7,22 @@
 
 namespace fs = std::filesystem;
 
+namespace zipline {
+    template <>
+    struct encoder<fstore::file, minty::client_type> {
+        static auto encode(
+            const fstore::file& file,
+            minty::client_type& client
+        ) -> ext::task<> {
+            return zipline::encode(file, client.inner);
+        }
+    };
+}
+
 namespace minty {
     api::api(netcore::socket&& socket) :
-        client(new net::client_type(
-            net::error_list::thrower(),
+        client(new client_type(
+            error_list::thrower(),
             std::forward<netcore::socket>(socket)
         ))
     {}

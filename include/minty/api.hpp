@@ -1,5 +1,7 @@
 #pragma once
 
+#include "event.hpp"
+
 #include <minty/model/comment.hpp>
 #include <minty/model/modification.hpp>
 #include <minty/model/object.hpp>
@@ -14,15 +16,16 @@
 #include <minty/model/tag_name.hpp>
 #include <minty/model/tag_preview.hpp>
 #include <minty/model/tag_query.hpp>
-#include <minty/net/zipline/protocol.h>
 
-#include <ext/pool>
-#include <netcore/netcore>
-#include <zipline/zipline>
+#include <fstore/fstore>
 
 namespace minty {
+    using socket = fstore::net::socket;
+
+    using client_type = zipline::client<socket, event>;
+
     class api {
-        std::unique_ptr<net::client_type> client;
+        std::unique_ptr<client_type> client;
     public:
         api() = default;
 
@@ -161,36 +164,5 @@ namespace minty {
             const UUID::uuid& tag_id,
             std::string_view new_name
         ) -> ext::task<tag_name>;
-    };
-
-    class client {
-        struct domain {
-            std::string path;
-        };
-
-        struct network {
-            std::string host;
-            std::string port;
-        };
-
-        using socket_type = std::variant<std::monostate, domain, network>;
-
-        static auto parse_endpoint(std::string_view endpoint) -> socket_type;
-
-        class provider {
-            socket_type endpoint;
-        public:
-            provider();
-
-            provider(socket_type&& endpoint);
-
-            auto provide() -> ext::task<api>;
-        };
-
-        ext::async_pool<api, provider> pool;
-    public:
-        client(std::string_view endpoint);
-
-        auto connect() -> ext::task<ext::pool_item<api>>;
     };
 }

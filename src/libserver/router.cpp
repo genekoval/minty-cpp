@@ -14,7 +14,7 @@ namespace minty::server {
     }
 
     auto router_context::add_object_data(
-        net::stream stream
+        stream stream
     ) -> ext::task<object_preview> {
         const auto size = co_await stream.size();
         const auto pipe = [&stream](auto& part) -> ext::task<> {

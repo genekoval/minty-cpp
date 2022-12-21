@@ -2,7 +2,7 @@
 #include "entity.hpp"
 
 #include <internal/core/db/database.hpp>
-#include <minty/error.h>
+#include <minty/except.hpp>
 
 #include <fmt/format.h>
 

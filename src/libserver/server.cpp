@@ -1,6 +1,4 @@
 #include <internal/server/server.hpp>
-#include <minty/net/zipline/coder.h>
-#include <minty/net/zipline/protocol.h>
 
 namespace minty::server {
     server_context::server_context(
@@ -18,7 +16,7 @@ namespace minty::server {
     }
 
     auto server_context::connection(netcore::socket&& client) -> ext::task<> {
-        auto socket = net::socket(std::forward<netcore::socket>(client));
+        auto socket = minty::socket(std::forward<netcore::socket>(client));
         co_await router.route(socket);
     }
 

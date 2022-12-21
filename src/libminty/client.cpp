@@ -1,5 +1,5 @@
-#include <minty/client/api.h>
-#include <minty/error.h>
+#include <minty/client.hpp>
+#include <minty/except.hpp>
 
 namespace minty {
     client::client(std::string_view endpoint) :

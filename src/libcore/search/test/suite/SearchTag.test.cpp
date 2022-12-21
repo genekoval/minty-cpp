@@ -1,6 +1,6 @@
 #include "SearchTag.test.hpp"
 
-#include <minty/error.h>
+#include <minty/except.hpp>
 
 SearchTagTest::SearchTagTest() {
     netcore::run([&]() -> ext::task<> {

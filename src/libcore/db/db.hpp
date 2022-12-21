@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/error.h>
+#include <minty/except.hpp>
 
 #include <pqxx/pqxx>
 

@@ -2,7 +2,7 @@
 
 #include <internal/core/db/model/post_search.hpp>
 #include <internal/core/db/model/tag_search.hpp>
-#include <minty/error.h>
+#include <minty/except.hpp>
 
 #include <nlohmann/json.hpp>
 #include <uuid++/uuid++>

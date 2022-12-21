@@ -1,6 +1,6 @@
 #include "database.test.hpp"
 
-#include <minty/error.h>
+#include <minty/except.hpp>
 
 TEST_F(DatabaseSiteTest, CreateSite) {
     constexpr auto scheme = "https";
