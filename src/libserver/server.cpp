@@ -1,6 +1,6 @@
+#include <internal/server/server.hpp>
 #include <minty/net/zipline/coder.h>
 #include <minty/net/zipline/protocol.h>
-#include <minty/server/server.h>
 
 namespace minty::server {
     server_context::server_context(

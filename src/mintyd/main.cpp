@@ -3,7 +3,7 @@
 #include "commands/options/opts.h"
 
 #include <internal/core/preview.hpp>
-#include <minty/server/server.h>
+#include <internal/server/server.hpp>
 
 #include <http/http>
 #include <dmon/dmon>
