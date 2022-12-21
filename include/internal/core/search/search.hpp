@@ -1,6 +1,6 @@
 #pragma once
 
-#include "index.h"
+#include "index.hpp"
 
 #include <internal/test.hpp>
 #include <minty/model/post_query.hpp>

@@ -1,4 +1,4 @@
-#include "search.test.h"
+#include "search.test.hpp"
 
 TEST_F(SearchPostTest, AddPosts) {
     netcore::run([&]() -> ext::task<> {

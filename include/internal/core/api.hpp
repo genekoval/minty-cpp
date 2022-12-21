@@ -1,8 +1,8 @@
 #pragma once
 
-#include <minty/core/downloader.h>
-#include <minty/core/object_store.h>
-#include <minty/core/search/search.h>
+#include <internal/core/downloader/downloader.hpp>
+#include <internal/core/object_store/object_store.hpp>
+#include <internal/core/search/search.hpp>
 #include <minty/model/modification.hpp>
 #include <minty/model/object.hpp>
 #include <minty/model/object_preview.hpp>

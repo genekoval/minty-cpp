@@ -1,10 +1,8 @@
-#include "utility.h"
+#include "utility.hpp"
 
-#include <minty/core/api.h>
-#include <minty/core/comment_tree.h>
-#include <minty/core/downloader.h>
-#include <minty/core/preview.h>
-#include <minty/core/search/search.h>
+#include <internal/core/api.hpp>
+#include <internal/core/comment_tree.hpp>
+#include <internal/core/preview.hpp>
 
 #include <threadpool/threadpool>
 #include <uri/uri>

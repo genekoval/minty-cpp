@@ -1,4 +1,4 @@
-#include <minty/core/downloader.h>
+#include <internal/core/downloader/downloader.hpp>
 
 namespace minty::core {
     downloader::downloader(

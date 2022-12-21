@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/search/search.h>
+#include "search.hpp"
 
 #include <gmock/gmock.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/object_store.h>
+#include "object_store.hpp"
 
 #include <gmock/gmock.h>
 

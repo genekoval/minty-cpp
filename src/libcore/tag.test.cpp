@@ -1,4 +1,4 @@
-#include "core.test.h"
+#include "core.test.hpp"
 
 using minty::test::trimmed_text;
 using minty::test::whitespace_text;

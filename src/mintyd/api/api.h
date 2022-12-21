@@ -1,11 +1,7 @@
 #pragma once
 
 #include <internal/conf/settings.hpp>
-
-#include <minty/core/api.h>
-#include <minty/core/downloader.h>
-#include <minty/core/search/search.h>
-#include <minty/repo/db/database.h>
+#include <internal/core/api.hpp>
 
 namespace minty::cli {
     class api_container {

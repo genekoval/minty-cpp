@@ -1,6 +1,5 @@
 #include <internal/conf/settings.env.test.hpp>
-
-#include <minty/core/search/search.env.test.h>
+#include <internal/core/search/search.env.test.hpp>
 
 namespace {
     auto config() -> const minty::conf::settings::s_search& {

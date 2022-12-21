@@ -1,4 +1,4 @@
-#include <minty/core/object_store.h>
+#include <internal/core/object_store/object_store.hpp>
 
 namespace minty::core {
     object_store::object_store(std::string_view endpoint) : client(endpoint) {}

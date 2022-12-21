@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Search.test.h"
+#include "Search.test.hpp"
 
 namespace minty::test {
     auto now() -> time_point;

@@ -1,6 +1,5 @@
-#include "index.h"
-
-#include "type/type.h"
+#include "index.hpp"
+#include "type/type.hpp"
 
 namespace minty::core::search::config {
     auto tag() -> std::string {

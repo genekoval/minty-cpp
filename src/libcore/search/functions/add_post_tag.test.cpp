@@ -1,4 +1,4 @@
-#include "search.test.h"
+#include "search.test.hpp"
 
 TEST_F(SearchPostTest, AddPostTag) {
     auto post_opt =

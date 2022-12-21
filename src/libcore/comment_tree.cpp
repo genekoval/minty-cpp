@@ -1,4 +1,4 @@
-#include <minty/core/comment_tree.h>
+#include <internal/core/comment_tree.hpp>
 
 #include <unordered_map>
 

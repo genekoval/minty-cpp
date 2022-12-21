@@ -1,4 +1,4 @@
-#include "search.test.h"
+#include "search.test.hpp"
 
 TEST_F(SearchPostTest, RemovePostTag) {
     auto opt = std::optional<std::reference_wrapper<const post>>();

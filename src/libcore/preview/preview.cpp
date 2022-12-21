@@ -1,6 +1,4 @@
-#include "preview/preview.h"
-
-#include <minty/core/preview.h>
+#include "preview.hpp"
 
 #include <unordered_map>
 

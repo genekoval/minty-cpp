@@ -1,5 +1,5 @@
-#include "preview.h"
-#include "video/video.h"
+#include "preview.hpp"
+#include "video/video.hpp"
 
 namespace {
     constexpr auto align = 1;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Search.test.h"
+#include "Search.test.hpp"
 
 class SearchTagTest : public SearchTest {
     static constexpr auto index_member = &minty::core::search_engine::tag_index;

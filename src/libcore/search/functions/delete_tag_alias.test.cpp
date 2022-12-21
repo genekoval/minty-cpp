@@ -1,4 +1,4 @@
-#include "search.test.h"
+#include "search.test.hpp"
 
 using SearchTagDeleteAlias = SearchTagTest;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/api.h>
+#include <internal/core/api.hpp>
 #include <minty/model/server_info.hpp>
 #include <minty/net/zipline/protocol.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/object_store.h>
+#include <internal/core/preview.hpp>
 
 namespace minty::core {
     auto generate_audio_preview(

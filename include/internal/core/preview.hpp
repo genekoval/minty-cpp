@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/object_store.h>
+#include <internal/core/object_store/object_store.hpp>
 
 namespace minty::core {
     auto generate_preview(

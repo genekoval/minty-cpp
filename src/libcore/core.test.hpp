@@ -1,9 +1,9 @@
 #pragma once
 
-#include <minty/core/api.h>
-#include <minty/core/mock_downloader.h>
-#include <minty/core/mock_object_store.h>
-#include <minty/core/search/mock_search.h>
+#include <internal/core/api.hpp>
+#include <internal/core/downloader/mock_downloader.hpp>
+#include <internal/core/object_store/mock_object_store.hpp>
+#include <internal/core/search/mock_search.hpp>
 #include <minty/repo/db/mock_database.h>
 
 #include <gtest/gtest.h>

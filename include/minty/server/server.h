@@ -2,7 +2,6 @@
 
 #include "router.hpp"
 
-#include <minty/core/api.h>
 #include <minty/net/zipline/coder.h>
 
 namespace minty::server {

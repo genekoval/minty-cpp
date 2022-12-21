@@ -1,4 +1,4 @@
-#include <minty/core/search/search.h>
+#include <internal/core/search/search.hpp>
 
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>

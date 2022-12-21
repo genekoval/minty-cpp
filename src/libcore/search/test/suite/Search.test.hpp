@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/search/search.env.test.h>
+#include <internal/core/search/search.env.test.hpp>
 
 class SearchTest : public testing::Test {
 protected:

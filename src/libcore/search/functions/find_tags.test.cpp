@@ -1,4 +1,4 @@
-#include "search.test.h"
+#include "search.test.hpp"
 
 using search_result = minty::search_result<UUID::uuid>;
 using optional_tag =

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <minty/core/downloader.h>
+#include "downloader.hpp"
 
 #include <gmock/gmock.h>
 

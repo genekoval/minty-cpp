@@ -1,7 +1,7 @@
-#include "index/index.h"
-#include "json/json.h"
+#include "index/index.hpp"
+#include "json/json.hpp"
 
-#include <minty/core/search/search.h>
+#include <internal/core/search/search.hpp>
 
 namespace minty::core {
     search_engine::search_engine(

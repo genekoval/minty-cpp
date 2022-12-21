@@ -1,6 +1,4 @@
-#include "preview.h"
-
-#include <minty/core/preview.h>
+#include "preview.hpp"
 
 #include <cstring>
 #include <GraphicsMagick/Magick++.h>

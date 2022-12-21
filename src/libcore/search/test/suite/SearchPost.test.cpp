@@ -1,4 +1,4 @@
-#include "SearchPost.test.h"
+#include "SearchPost.test.hpp"
 
 #include <minty/error.h>
 
