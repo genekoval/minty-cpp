@@ -1,20 +1,24 @@
 #include "database.test.hpp"
 
 TEST_F(DatabasePostObjectTest, ReadObjects) {
-    auto found = std::vector<UUID::uuid>();
+    run([&]() -> ext::task<> {
+        auto found = std::vector<UUID::uuid>();
 
-    auto objects = database.read_objects(2);
+        auto portal = co_await db->read_objects(2);
 
-    while (objects) {
-        for (auto&& object : objects()) {
-            found.push_back(object.id);
+        while (portal) {
+            const auto objects = co_await portal.next();
+
+            for (const auto& object : objects) {
+                found.push_back(object.id);
+            }
         }
-    }
 
-    ASSERT_EQ(4, found.size());
+        EXPECT_EQ(4, found.size());
 
-    ASSERT_EQ(this->objects[0], found[0]);
-    ASSERT_EQ(this->objects[1], found[1]);
-    ASSERT_EQ(new_object, found[2]);
-    ASSERT_EQ(this->objects[2], found[3]);
+        EXPECT_EQ(objects[0], found.at(0));
+        EXPECT_EQ(objects[1], found.at(1));
+        EXPECT_EQ(new_object, found.at(2));
+        EXPECT_EQ(objects[2], found.at(3));
+    }());
 }

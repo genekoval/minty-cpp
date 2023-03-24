@@ -3,15 +3,17 @@
 TEST_F(DatabaseTagTest, DeleteTagAlias) {
     constexpr auto alias = "Alias";
 
-    const auto id = create_tag();
+    run([&]() -> ext::task<> {
+        const auto id = co_await create_tag();
 
-    database.create_tag_alias(id, alias);
-    auto tag = database.read_tag(id);
+        co_await db->create_tag_alias(id, alias);
+        auto tag = co_await db->read_tag(id);
 
-    ASSERT_EQ(1, tag.aliases.size());
+        EXPECT_EQ(1, tag.aliases.size());
 
-    database.delete_tag_alias(id, alias);
-    tag = database.read_tag(id);
+        co_await db->delete_tag_alias(id, alias);
+        tag = co_await db->read_tag(id);
 
-    ASSERT_TRUE(tag.aliases.empty());
+        EXPECT_TRUE(tag.aliases.empty());
+    }());
 }

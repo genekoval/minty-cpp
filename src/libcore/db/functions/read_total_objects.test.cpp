@@ -1,12 +1,16 @@
 #include "database.test.hpp"
 
 TEST_F(DatabaseObjectTest, ReadTotalObjectsNone) {
-    auto total = database.read_total_objects();
-    ASSERT_EQ(0, total);
+    run([&]() -> ext::task<> {
+        const auto total = co_await db->read_total_objects();
+        EXPECT_EQ(0, total);
+    }());
 }
 
 TEST_F(DatabasePostObjectTest, ReadTotalObjectsMultiple) {
-    auto total = database.read_total_objects();
-    // Add one to account for 'new_object' being added.
-    ASSERT_EQ(objects.size() + 1, total);
+    run([&]() -> ext::task<> {
+        const auto total = co_await db->read_total_objects();
+        // Add one to account for 'new_object' being added.
+        EXPECT_EQ(objects.size() + 1, total);
+    }());
 }

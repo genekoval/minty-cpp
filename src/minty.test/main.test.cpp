@@ -1,6 +1,5 @@
 #include "runtime.env.test.hpp"
 
-#include <internal/core/db/db.env.test.hpp>
 #include <internal/conf/settings.env.test.hpp>
 #include <internal/core/search/search.env.test.hpp>
 
@@ -79,7 +78,6 @@ auto main(int argc, char** argv) -> int {
     AddGlobalTestEnvironment(new minty::test::RuntimeEnvironment);
     AddGlobalTestEnvironment(new minty::test::SearchEnvironment);
     AddGlobalTestEnvironment(new minty::test::SettingsEnvironment);
-    AddGlobalTestEnvironment(new minty::test::DatabaseEnvironment);
 
     return RUN_ALL_TESTS();
 }

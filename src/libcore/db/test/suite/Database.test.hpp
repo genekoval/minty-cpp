@@ -1,66 +1,22 @@
 #pragma once
 
-#include <internal/core/db/db.env.test.hpp>
+#include <internal/core/db/database.hpp>
 
-#include <entix/entix>
+#include <gtest/gtest.h>
 
 class DatabaseTest : public testing::Test {
-    pqxx::connection& connection =
-        minty::test::DatabaseEnvironment::connection();
+    auto run_async(ext::task<>&& task) -> ext::task<>;
+
+    auto truncate(std::string_view table) -> ext::task<>;
+
+    auto truncate_tables() -> ext::task<>;
 protected:
-    minty::core::db::database& database =
-        minty::test::DatabaseEnvironment::database();
+    pg::client* client = nullptr;
+    minty::core::db::connection_wrapper* db = nullptr;
 
-    virtual auto SetUp() -> void;
+    auto count(std::string_view table) -> ext::task<std::int64_t>;
 
-    auto count(std::string_view table) -> int;
-
-    template <typename ...Args>
-    auto exec0(std::string_view query, Args&&... args) -> void {
-        const auto q = pqxx::zview(query);
-        auto tx = pqxx::nontransaction(connection);
-
-        if constexpr (sizeof...(args) > 0) tx.exec_params0(q, args...);
-        else tx.exec0(q);
-    }
-
-    template <typename Result, typename ...Args>
-    auto exec1(std::string_view query, Args&&... args) -> Result {
-        const auto q = pqxx::zview(query);
-        auto tx = pqxx::nontransaction(connection);
-
-        auto row = pqxx::row();
-
-        if constexpr (sizeof...(args) > 0) row = tx.exec_params1(q, args...);
-        else row = tx.exec1(q);
-
-        auto it = row.begin();
-        return entix::field_parser<Result>::read(it);
-    }
-
-    template <typename Result, typename ...Args>
-    auto exec(std::string_view query, Args&&... args) -> std::vector<Result> {
-        const auto q = pqxx::zview(query);
-        auto tx = pqxx::nontransaction(connection);
-
-        auto rows = pqxx::result();
-
-        if constexpr (sizeof...(args) > 0) rows = tx.exec_params(q, args...);
-        else rows = tx.exec(q);
-
-        auto result = std::vector<Result>();
-
-        for (const auto& row : rows) {
-            auto it = row.begin();
-            result.push_back(entix::field_parser<Result>::read(it));
-        }
-
-        return result;
-    }
+    auto run(ext::task<>&& task) -> void;
 
     virtual auto tables() -> std::vector<std::string> = 0;
-
-    auto truncate(std::string_view table) -> void;
-
-    auto truncate_tables() -> void;
 };

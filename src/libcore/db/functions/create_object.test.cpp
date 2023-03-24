@@ -1,15 +1,17 @@
 #include "database.test.hpp"
 
 TEST_F(DatabaseObjectTest, CreateObject) {
-    database.create_object(object_id, {}, {});
-    ASSERT_EQ(1, count("object"));
+    run([&]() -> ext::task<> {
+        co_await db->create_object(object_id, {}, {});
+        EXPECT_EQ(1, co_await count("object"));
 
-    database.create_object(object_id, {}, {});
-    ASSERT_EQ(1, count("object"));
+        co_await db->create_object(object_id, {}, {});
+        EXPECT_EQ(1, co_await count("object"));
 
-    const auto object = database.read_object(object_id);
+        const auto object = co_await db->read_object(object_id);
 
-    ASSERT_EQ(object_id, object.id);
-    ASSERT_FALSE(object.preview_id.has_value());
-    ASSERT_FALSE(object.src.has_value());
+        EXPECT_EQ(object_id, object.id);
+        EXPECT_FALSE(object.preview_id.has_value());
+        EXPECT_FALSE(object.src.has_value());
+    }());
 }

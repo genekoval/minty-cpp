@@ -1,6 +1,8 @@
 #pragma once
 
-#include <minty/model/tag_name.hpp>
+#include "tag_name.hpp"
+
+#include <pg++/pg++>
 
 namespace minty::core::db {
     struct tag_name_update {
@@ -8,3 +10,5 @@ namespace minty::core::db {
         std::optional<std::string> old_name;
     };
 }
+
+PGCPP_COMPOSITE_DECL(minty::core::db::tag_name_update, "tag_name_update");

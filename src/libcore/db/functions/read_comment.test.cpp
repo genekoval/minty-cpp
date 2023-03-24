@@ -3,10 +3,12 @@
 TEST_F(DatabasePostTest, ReadComment) {
     constexpr auto text = "A comment.";
 
-    const auto post_id = create_post();
+    run([&]() -> ext::task<> {
+        const auto post_id = co_await create_post();
 
-    const auto comment = database.create_comment(post_id, text);
-    const auto result = database.read_comment(comment.id);
+        const auto comment = co_await db->create_comment(post_id, text);
+        const auto result = co_await db->read_comment(comment.id);
 
-    ASSERT_EQ(comment, result);
+        EXPECT_EQ(comment, result);
+    }());
 }

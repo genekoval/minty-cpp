@@ -62,11 +62,6 @@ namespace minty::server {
             std::vector<UUID::uuid> objects
         ) -> ext::task<time_point>;
 
-        auto delete_post_objects_ranges(
-            UUID::uuid post_id,
-            std::vector<range> ranges
-        ) -> ext::task<time_point>;
-
         auto delete_post_tag(
             UUID::uuid post_id,
             UUID::uuid tag_id
@@ -86,7 +81,7 @@ namespace minty::server {
 
         auto delete_tag_source(
             UUID::uuid tag_id,
-            std::string source_id
+            std::int64_t source_id
         ) -> ext::task<>;
 
         auto get_comment(
@@ -110,12 +105,6 @@ namespace minty::server {
         auto get_tags(
             tag_query query
         ) -> ext::task<search_result<tag_preview>>;
-
-        auto move_post_object(
-            UUID::uuid post_id,
-            std::uint32_t old_index,
-            std::uint32_t new_index
-        ) -> ext::task<>;
 
         auto move_post_objects(
             UUID::uuid post_id,

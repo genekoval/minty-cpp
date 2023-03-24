@@ -1,15 +1,17 @@
 #include "database.test.hpp"
 
 TEST_F(DatabasePostTest, DeletePost) {
-    const auto post1 = create_post();
-    const auto post2 = create_post();
+    run([&]() -> ext::task<> {
+        const auto post1 = co_await create_post();
+        const auto post2 = co_await create_post();
 
-    ASSERT_EQ(2, count("post"));
+        EXPECT_EQ(2, co_await count("post"));
 
-    database.delete_post(post1);
+        co_await db->delete_post(post1);
 
-    ASSERT_EQ(1, count("post"));
+        EXPECT_EQ(1, co_await count("post"));
 
-    const auto remaining = database.read_post(post2);
-    ASSERT_EQ(post2, remaining.id);
+        const auto remaining = co_await db->read_post(post2);
+        EXPECT_EQ(post2, remaining.id);
+    }());
 }

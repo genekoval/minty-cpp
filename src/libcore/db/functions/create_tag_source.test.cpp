@@ -3,22 +3,24 @@
 TEST_F(DatabaseTagTest, CreateTagSource) {
     constexpr auto resource = "/cats?v=100";
 
-    const auto id = create_tag();
-    const auto site = database.create_site(
-        "https",
-        "example.com",
-        "937900e4-54a0-40fb-8ac8-315e5d3b2ae1"
-    );
+    run([&]() -> ext::task<> {
+        const auto id = co_await create_tag();
+        const auto site = co_await db->create_site(
+            "https",
+            "example.com",
+            "937900e4-54a0-40fb-8ac8-315e5d3b2ae1"
+        );
 
-    const auto source = database.create_source(site.id, resource);
-    database.create_tag_source(id, source.id);
+        const auto source = co_await db->create_source(site.id, resource);
+        co_await db->create_tag_source(id, source.id);
 
-    const auto sources = database.read_tag_sources(id);
+        const auto sources = co_await db->read_tag_sources(id);
 
-    ASSERT_EQ(1, sources.size());
+        EXPECT_EQ(1, sources.size());
 
-    const auto& src = sources.front();
+        const auto& src = sources.at(0);
 
-    ASSERT_EQ(resource, src.resource);
-    ASSERT_EQ(site.id, src.website.id);
+        EXPECT_EQ(resource, src.resource);
+        EXPECT_EQ(site.id, src.website.id);
+    }());
 }

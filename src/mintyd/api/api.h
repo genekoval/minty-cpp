@@ -5,12 +5,14 @@
 
 namespace minty::cli {
     class api_container {
-        minty::core::db::database db;
-        minty::core::object_store objects;
-        minty::core::downloader downloader;
-        minty::core::search_engine search;
+        pg::parameters db_params;
+
+        core::db::database database;
+        core::object_store objects;
+        core::downloader downloader;
+        core::search_engine search;
     public:
-        minty::core::api api;
+        core::api api;
 
         api_container(const minty::conf::settings& settings);
 

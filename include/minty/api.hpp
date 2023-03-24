@@ -109,7 +109,7 @@ namespace minty {
 
         auto delete_tag_source(
             const UUID::uuid& tag_id,
-            std::string_view source_id
+            std::int64_t source_id
         ) -> ext::task<>;
 
         auto get_comment(const UUID::uuid& comment_id) -> ext::task<comment>;

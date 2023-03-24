@@ -1,22 +1,27 @@
 #include "commands.h"
 #include "options/opts.h"
 #include "../api/api.h"
-#include "../db/db.h"
+#include "../db/db.hpp"
 
 using namespace commline;
 
 namespace {
-    auto $restore(
-        const app& app,
-        std::string_view confpath,
-        std::optional<std::string_view> user,
-        std::string_view filename
-    ) -> void {
-        auto settings = minty::conf::initialize(confpath);
-        if (user) settings.database.connection.parameters["user"] = *user;
+    namespace internal {
+        auto restore(
+            const app& app,
+            std::string_view confpath,
+            std::optional<std::string_view> user,
+            std::string_view filename
+        ) -> void {
+            auto settings = minty::conf::initialize(confpath);
+            if (user) settings.database.connection.parameters["user"] = *user;
 
-        const auto db = minty::cli::database(settings);
-        db.restore(filename);
+            minty::cli::database(settings, [filename](
+                dbtools::postgresql& db
+            ) -> ext::task<> {
+                co_await db.restore(filename);
+            });
+        }
     }
 }
 
@@ -38,7 +43,7 @@ namespace minty::cli {
             arguments(
                 required<std::string_view>("filename")
             ),
-            $restore
+            internal::restore
         );
     }
 }

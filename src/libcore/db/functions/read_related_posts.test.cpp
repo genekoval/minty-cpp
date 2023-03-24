@@ -1,13 +1,15 @@
 #include "database.test.hpp"
 
 TEST_F(DatabasePostTest, ReadRelatedPosts) {
-    const auto post = create_post();
-    const auto related = create_post();
+    run([&]() -> ext::task<> {
+        const auto post = co_await create_post();
+        const auto related = co_await create_post();
 
-    database.create_related_post(post, related);
+        co_await db->create_related_post(post, related);
 
-    const auto posts = database.read_related_posts(post);
+        const auto posts = co_await db->read_related_posts(post);
 
-    ASSERT_EQ(1, posts.size());
-    ASSERT_EQ(related, posts.front().id);
+        EXPECT_EQ(1, posts.size());
+        EXPECT_EQ(related, posts.at(0).id);
+    }());
 }

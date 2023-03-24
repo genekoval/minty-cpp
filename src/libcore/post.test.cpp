@@ -13,33 +13,33 @@ namespace {
 using CorePostTest = CoreTest;
 
 TEST_F(CorePostTest, AddPostWhitespaceTitle) {
-    EXPECT_CALL(db, create_post(
+    EXPECT_CALL(*db, create_post(
         std::string_view(trimmed_text),
         std::string_view(),
         std::vector<UUID::uuid>(),
         std::vector<UUID::uuid>()
-    )).WillOnce(Return(post_search));
+    )).WillOnce(Return(ext::make_task(post_search)));
 
     EXPECT_CALL(search, add_post(post_search))
         .WillOnce(Return(ext::make_task()));
 
-    netcore::run([&]() -> ext::task<> {
+    [&]() -> ext::detached_task {
         co_await api.add_post({ .title = whitespace_text });
-    }());
+    }();
 }
 
 TEST_F(CorePostTest, AddPostWhitespaceDescription) {
-    EXPECT_CALL(db, create_post(
+    EXPECT_CALL(*db, create_post(
         std::string_view(),
         std::string_view(trimmed_text),
         std::vector<UUID::uuid>(),
         std::vector<UUID::uuid>()
-    )).WillOnce(Return(post_search));
+    )).WillOnce(Return(ext::make_task(post_search)));
 
     EXPECT_CALL(search, add_post(post_search))
         .WillOnce(Return(ext::make_task()));
 
-    netcore::run([&]() -> ext::task<> {
+    [&]() -> ext::detached_task {
         co_await api.add_post({ .description = whitespace_text });
-    }());
+    }();
 }

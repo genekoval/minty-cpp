@@ -1,4 +1,4 @@
-#include "db.h"
+#include "db.hpp"
 
 namespace minty::cli {
     auto database(std::string_view confpath) -> dbtools::postgresql {

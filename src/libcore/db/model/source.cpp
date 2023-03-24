@@ -14,3 +14,10 @@ namespace minty::core::db {
         };
     }
 }
+
+PGCPP_COMPOSITE_DEFINE(
+    minty::core::db::source,
+    &minty::core::db::source::id,
+    &minty::core::db::source::resource,
+    &minty::core::db::source::website
+);

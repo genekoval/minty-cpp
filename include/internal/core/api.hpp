@@ -12,8 +12,6 @@
 #include <minty/model/post_preview.hpp>
 #include <minty/model/tag.hpp>
 
-#include <ext/coroutine>
-
 namespace minty::core {
     struct progress {
         std::size_t completed = 0;
@@ -32,17 +30,22 @@ namespace minty::core {
         search_engine* search;
 
         auto add_object(
+            db::connection_type& db,
             bucket& bucket,
             fstore::object&& object,
-            const std::optional<std::string>& src
+            const std::optional<std::int64_t>& src
         ) -> ext::task<object_preview>;
 
         auto add_site(
+            db::connection_type& db,
             std::string_view scheme,
             std::string_view host
-        ) -> ext::task<std::string>;
+        ) -> ext::task<std::int64_t>;
 
-        auto add_source(std::string_view url) -> ext::task<source>;
+        auto add_source(
+            db::connection_type& db,
+            std::string_view url
+        ) -> ext::task<source>;
 
         auto get_posts(
             bucket& bucket,
@@ -52,7 +55,7 @@ namespace minty::core {
         auto regenerate_preview(
             bucket& bucket,
             const db::object_preview& object
-        ) -> ext::task<bool>;
+        ) -> ext::task<std::optional<UUID::uuid>>;
 
         auto regenerate_preview_task(
             netcore::thread_pool& workers,
@@ -72,7 +75,7 @@ namespace minty::core {
         auto add_comment(
             const UUID::uuid& post_id,
             std::string_view content
-        ) -> comment_data;
+        ) -> ext::task<comment_data>;
 
         auto add_object_data(
             std::size_t stream_size,
@@ -80,9 +83,12 @@ namespace minty::core {
         ) -> ext::task<object_preview> {
             TIMBER_FUNC();
 
+            auto db = co_await database->connect();
             auto bucket = co_await objects->connect();
+
             auto metadata = co_await bucket.add({}, stream_size, pipe);
-            co_return co_await add_object(bucket, std::move(metadata), {});
+
+            co_return co_await add_object(db, bucket, std::move(metadata), {});
         }
 
         auto add_objects_url(
@@ -105,12 +111,12 @@ namespace minty::core {
         auto add_related_post(
             const UUID::uuid& post_id,
             const UUID::uuid& related
-        ) -> void;
+        ) -> ext::task<>;
 
         auto add_reply(
             const UUID::uuid& parent_id,
             std::string_view content
-        ) -> comment_data;
+        ) -> ext::task<comment_data>;
 
         auto add_tag(std::string_view name) -> ext::task<UUID::uuid>;
 
@@ -131,11 +137,6 @@ namespace minty::core {
             const std::vector<UUID::uuid>& objects
         ) -> ext::task<time_point>;
 
-        auto delete_post_objects(
-            const UUID::uuid& post_id,
-            std::span<range> ranges
-        ) -> ext::task<decltype(post::date_modified)>;
-
         auto delete_post_tag(
             const UUID::uuid& post_id,
             const UUID::uuid& tag_id
@@ -144,7 +145,7 @@ namespace minty::core {
         auto delete_related_post(
             const UUID::uuid& post_id,
             const UUID::uuid& related
-        ) -> void;
+        ) -> ext::task<>;
 
         auto delete_tag(const UUID::uuid& id) -> ext::task<>;
 
@@ -155,18 +156,19 @@ namespace minty::core {
 
         auto delete_tag_source(
             const UUID::uuid& tag_id,
-            std::string_view source_id
-        ) -> void;
+            std::int64_t source_id
+        ) -> ext::task<>;
 
         auto get_bucket_id() const noexcept -> const UUID::uuid&;
 
-        auto get_comment(const UUID::uuid& comment_id) -> comment;
+        auto get_comment(const UUID::uuid& comment_id) -> ext::task<comment>;
 
-        auto get_comments(const UUID::uuid& post_id) -> comment_tree;
+        auto get_comments(const UUID::uuid& post_id) -> ext::task<comment_tree>;
 
         auto get_object(const UUID::uuid& object_id) -> ext::task<object>;
 
-        auto get_object_preview_errors() -> std::vector<object_error>;
+        auto get_object_preview_errors() ->
+            ext::task<std::vector<object_error>>;
 
         auto get_post(const UUID::uuid& id) -> ext::task<post>;
 
@@ -174,17 +176,11 @@ namespace minty::core {
             const post_query& query
         ) -> ext::task<search_result<post_preview>>;
 
-        auto get_tag(const UUID::uuid& id) -> tag;
+        auto get_tag(const UUID::uuid& id) -> ext::task<tag>;
 
         auto get_tags(
             const tag_query& query
         ) -> ext::task<search_result<tag_preview>>;
-
-        auto move_post_object(
-            const UUID::uuid& post_id,
-            unsigned int old_index,
-            unsigned int new_index
-        ) -> ext::task<>;
 
         auto move_post_objects(
             const UUID::uuid& post_id,
@@ -208,7 +204,7 @@ namespace minty::core {
         auto set_comment_content(
             const UUID::uuid& comment_id,
             std::string_view content
-        ) -> std::string;
+        ) -> ext::task<std::string>;
 
         auto set_post_description(
             const UUID::uuid& post_id,
@@ -223,7 +219,7 @@ namespace minty::core {
         auto set_tag_description(
             const UUID::uuid& tag_id,
             std::string_view description
-        ) -> std::optional<std::string>;
+        ) -> ext::task<std::optional<std::string>>;
 
         auto set_tag_name(
             const UUID::uuid& tag_id,

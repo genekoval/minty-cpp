@@ -1,12 +1,14 @@
 #include "database.test.hpp"
 
 TEST_F(DatabasePostTest, DeleteRelatedPost) {
-    const auto post = create_post();
-    const auto related = create_post();
+    run([&]() -> ext::task<> {
+        const auto post = co_await create_post();
+        const auto related = co_await create_post();
 
-    database.create_related_post(post, related);
-    database.delete_related_post(post, related);
+        co_await db->create_related_post(post, related);
+        co_await db->delete_related_post(post, related);
 
-    ASSERT_EQ(0, count("related_post"));
-    ASSERT_EQ(2, count("post"));
+        EXPECT_EQ(0, co_await count("related_post"));
+        EXPECT_EQ(2, co_await count("post"));
+    }());
 }

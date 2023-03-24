@@ -1,7 +1,8 @@
 #pragma once
 
 #include <internal/core/api.hpp>
-#include <internal/core/db/mock_database.hpp>
+#include <internal/core/db/mock_connection.hpp>
+#include <internal/core/db/test_database.hpp>
 #include <internal/core/downloader/mock_downloader.hpp>
 #include <internal/core/object_store/mock_object_store.hpp>
 #include <internal/core/search/mock_search.hpp>
@@ -15,9 +16,12 @@ namespace minty::test {
 
 class CoreTest : public testing::Test {
 protected:
-    minty::test::database db;
+    std::shared_ptr<minty::core::db::mock_connection> db;
+    minty::core::db::test_database database;
     minty::test::object_store objects;
     minty::test::downloader downloader;
     minty::test::search_engine search;
-    minty::core::api api = minty::core::api(db, objects, downloader, search);
+    minty::core::api api;
+
+    CoreTest();
 };

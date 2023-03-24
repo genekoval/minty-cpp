@@ -1,24 +1,12 @@
 #include "DatabasePrune.test.hpp"
 
-auto DatabasePruneTest::create_site() -> std::string {
-    return database.create_site(
-        "https",
-        "example.com",
-        icon_id
-    ).id;
+auto DatabasePruneTest::create_site() -> ext::task<std::int64_t> {
+    co_return (co_await db->create_site("https", "example.com", icon_id)).id;
 }
 
-auto DatabasePruneTest::prune_objects(bool commit) -> int {
-    auto pruned = 0;
-
-    [&]() -> ext::detached_task {
-        co_await database.prune_objects([&](auto objects) -> ext::task<bool> {
-            pruned = objects.size();
-            co_return commit;
-        });
-    }();
-
-    return pruned;
+auto DatabasePruneTest::prune_objects() -> ext::task<std::size_t> {
+    const auto objects = co_await db->prune_objects();
+    co_return objects.size();
 }
 
 auto DatabasePruneTest::tables() -> std::vector<std::string> {

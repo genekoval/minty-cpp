@@ -5,7 +5,7 @@
 
 namespace minty {
     struct source {
-        std::string id;
+        std::int64_t id;
         std::string url;
         std::optional<UUID::uuid> icon;
     };

@@ -12,8 +12,8 @@ namespace {
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
 
-            minty::cli::api(settings, [](auto& api) -> ext::task<> {
-                const auto errors = api.get_object_preview_errors();
+            minty::cli::api(settings, [](minty::core::api& api) -> ext::task<> {
+                const auto errors = co_await api.get_object_preview_errors();
 
                 for (const auto& error : errors) {
                     fmt::print("{}  {}\n", error.id, error.message);

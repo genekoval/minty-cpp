@@ -1,15 +1,17 @@
 #include "database.test.hpp"
 
 TEST_F(DatabaseTagTest, DeleteTag) {
-    const auto tag1 = create_tag();
-    const auto tag2 = create_tag();
+    run([&]() -> ext::task<> {
+        const auto tag1 = co_await create_tag();
+        const auto tag2 = co_await create_tag();
 
-    ASSERT_EQ(2, count("tag"));
+        EXPECT_EQ(2, co_await count("tag"));
 
-    database.delete_tag(tag1);
+        co_await db->delete_tag(tag1);
 
-    ASSERT_EQ(1, count("tag"));
+        EXPECT_EQ(1, co_await count("tag"));
 
-    const auto remaining = database.read_tag(tag2);
-    ASSERT_EQ(tag2, remaining.id);
+        const auto remaining = co_await db->read_tag(tag2);
+        EXPECT_EQ(tag2, remaining.id);
+    }());
 }

@@ -9,3 +9,5 @@ namespace minty::core::db {
         std::optional<source> src;
     };
 }
+
+PGCPP_COMPOSITE_DECL(minty::core::db::object, "object");

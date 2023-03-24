@@ -1,17 +1,23 @@
 #include "commands.h"
 #include "options/opts.h"
-#include "../db/db.h"
+#include "../db/db.hpp"
 
 using namespace commline;
 
 namespace {
-    auto $migrate(
-        const app& app,
-        std::string_view confpath
-    ) -> void {
-        const auto db = minty::cli::database(confpath);
+    namespace internal {
+        auto migrate(
+            const app& app,
+            std::string_view confpath
+        ) -> void {
+            const auto settings = minty::conf::initialize(confpath);
 
-        db.migrate(app.version);
+            minty::cli::database(settings, [&app](
+                dbtools::postgresql& db
+            ) -> ext::task<> {
+                co_await db.migrate(app.version);
+            });
+        }
     }
 }
 
@@ -26,7 +32,7 @@ namespace minty::cli {
                 opts::config(confpath)
             ),
             arguments(),
-            $migrate
+            internal::migrate
         );
     }
 }

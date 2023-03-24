@@ -1,7 +1,7 @@
 #include "commands.h"
 #include "options/opts.h"
 #include "../api/api.h"
-#include "../db/db.h"
+#include "../db/db.hpp"
 
 using namespace commline;
 
@@ -13,13 +13,16 @@ namespace {
             bool skip_index
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
-            const auto db = minty::cli::database(settings);
 
-            db.init(app.version);
+            minty::cli::database(settings, [&app](
+                dbtools::postgresql& db
+            ) -> ext::task<> {
+                co_await db.init(app.version);
+            });
 
             if (skip_index) return;
 
-            minty::cli::api(settings, [](auto& api) -> ext::task<> {
+            minty::cli::api(settings, [](minty::core::api& api) -> ext::task<> {
                 co_await api.reindex();
             });
         }

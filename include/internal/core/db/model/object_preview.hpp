@@ -1,6 +1,6 @@
 #pragma once
 
-#include <uuid++/uuid++>
+#include <pg++/pg++>
 
 namespace minty::core::db {
     struct object_preview {
@@ -8,3 +8,5 @@ namespace minty::core::db {
         std::optional<UUID::uuid> preview_id;
     };
 }
+
+PGCPP_COMPOSITE_DECL(minty::core::db::object_preview, "object_preview");

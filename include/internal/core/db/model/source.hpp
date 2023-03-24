@@ -6,10 +6,12 @@
 
 namespace minty::core::db {
     struct source {
-        std::string id;
+        std::int64_t id;
         std::string resource;
         site website;
 
         operator minty::source() const;
     };
 }
+
+PGCPP_COMPOSITE_DECL(minty::core::db::source, "source");

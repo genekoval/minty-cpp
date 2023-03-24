@@ -8,7 +8,7 @@ protected:
     static constexpr auto preview_id = "033d3aac-d27e-473c-b553-2d6b7aab9e88";
     static constexpr auto source_url = "https://example.com/hello.jpg";
 
-    auto create_site() -> minty::core::db::site;
+    auto create_site() -> ext::task<minty::core::db::site>;
 
     virtual auto tables() -> std::vector<std::string> override;
 };

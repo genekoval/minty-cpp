@@ -2,8 +2,7 @@
 
 #include <minty/model/time_point.hpp>
 
-#include <uuid++/uuid++>
-#include <vector>
+#include <pg++/pg++>
 
 namespace minty::core::db {
     struct post_search {
@@ -17,3 +16,5 @@ namespace minty::core::db {
         auto operator==(const post_search&) const -> bool = default;
     };
 }
+
+PGCPP_COMPOSITE_DECL(minty::core::db::post_search, "post_search");

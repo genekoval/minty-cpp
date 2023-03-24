@@ -1,24 +1,26 @@
 #include "database.test.hpp"
 
 TEST_F(DatabaseTagTest, CreateTagAliases) {
-    const auto aliases = std::vector<std::string>{
+    constexpr auto aliases = std::array<std::string_view, 3> {
         "banana",
         "citrus",
         "apple"
     };
 
-    const auto id = create_tag();
+    run([&]() -> ext::task<> {
+        const auto id = co_await create_tag();
 
-    for (const auto& alias : aliases) {
-        database.create_tag_alias(id, alias);
-    }
+        for (const auto& alias : aliases) {
+            co_await db->create_tag_alias(id, alias);
+        }
 
-    const auto tag = database.read_tag(id);
+        const auto tag = co_await db->read_tag(id);
 
-    ASSERT_EQ(tag_name, tag.name);
-    ASSERT_EQ(aliases.size(), tag.aliases.size());
+        EXPECT_EQ(tag_name, tag.name);
+        EXPECT_EQ(aliases.size(), tag.aliases.size());
 
-    ASSERT_EQ("apple", tag.aliases[0]);
-    ASSERT_EQ("banana", tag.aliases[1]);
-    ASSERT_EQ("citrus", tag.aliases[2]);
+        EXPECT_EQ("apple", tag.aliases.at(0));
+        EXPECT_EQ("banana", tag.aliases.at(1));
+        EXPECT_EQ("citrus", tag.aliases.at(2));
+    }());
 }

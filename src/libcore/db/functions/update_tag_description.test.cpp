@@ -3,27 +3,30 @@
 TEST_F(DatabaseTagTest, UpdateTagDescription) {
     constexpr auto description = "This is a test description.";
 
-    const auto id = create_tag();
+    run([&]() -> ext::task<> {
+        const auto id = co_await create_tag();
+        auto tag = co_await db->read_tag(id);
 
-    auto tag = database.read_tag(id);
+        const auto desc = co_await db->update_tag_description(id, description);
+        EXPECT_TRUE(desc.has_value());
+        EXPECT_EQ(description, desc.value());
 
-    const auto desc = database.update_tag_description(id, description);
-    ASSERT_TRUE(desc.has_value());
-    ASSERT_EQ(description, desc.value());
-
-    tag = database.read_tag(id);
-    ASSERT_TRUE(tag.description.has_value());
-    ASSERT_EQ(description, tag.description.value());
+        tag = co_await db->read_tag(id);
+        EXPECT_TRUE(tag.description.has_value());
+        EXPECT_EQ(description, tag.description.value());
+    }());
 }
 
 TEST_F(DatabaseTagTest, UpdateTagDescriptionEmpty) {
     constexpr auto description = "";
 
-    const auto id = create_tag();
+    run([&]() -> ext::task<> {
+        const auto id = co_await create_tag();
 
-    const auto desc = database.update_tag_description(id, description);
-    ASSERT_FALSE(desc.has_value());
+        const auto desc = co_await db->update_tag_description(id, description);
+        EXPECT_FALSE(desc.has_value());
 
-    const auto tag = database.read_tag(id);
-    ASSERT_FALSE(tag.description.has_value());
+        const auto tag = co_await db->read_tag(id);
+        EXPECT_FALSE(tag.description.has_value());
+    }());
 }

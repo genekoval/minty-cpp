@@ -65,14 +65,23 @@ namespace {
                 co_await server.listen(settings.server);
             });
         }
+
+        auto handle_error(std::exception_ptr eptr) -> void {
+            try {
+                if (eptr) std::rethrow_exception(eptr);
+            }
+            catch (const std::exception& ex) {
+                TIMBER_LOG(internal::crash_log_level, ex.what());
+            }
+        }
     }
 }
 
-auto main(int argc, const char** argv) -> int {
+auto main(int argc, char** argv) -> int {
     std::locale::global(std::locale(""));
 
     timber::thread_name = "main";
-    timber::log_handler = &timber::console_logger;
+    timber::log_handler = timber::console::logger;
     timber::set_terminate(internal::crash_log_level);
 
     minty::core::initialize_image_previews();
@@ -95,11 +104,8 @@ auto main(int argc, const char** argv) -> int {
         internal::main
     );
 
-    app.on_error([](const auto& ex) -> void {
-        TIMBER_LOG(internal::crash_log_level, ex.what());
-    });
+    app.on_error(internal::handle_error);
 
-    app.subcommand(minty::cli::db(confpath));
     app.subcommand(minty::cli::dump(confpath));
     app.subcommand(minty::cli::errors(confpath));
     app.subcommand(minty::cli::init(confpath));

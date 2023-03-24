@@ -14,14 +14,15 @@ protected:
 TEST_F(CoreCommentTest, AddRootComment) {
     constexpr auto content = "First comment.";
 
-    EXPECT_CALL(db, create_comment(
+    EXPECT_CALL(*db, create_comment(
         post_id,
         content)
-    ).WillOnce(Return(comment { .content = content }));
+    ).WillOnce(Return(ext::make_task(comment { .content = content })));
 
-    const auto comment = api.add_comment(post_id, content);
-
-    ASSERT_EQ(content, comment.content);
+    [&]() -> ext::detached_task {
+        const auto comment = co_await api.add_comment(post_id, content);
+        EXPECT_EQ(content, comment.content);
+    }();
 }
 
 TEST_F(CoreCommentTest, ReadCommentChain) {
@@ -53,8 +54,8 @@ TEST_F(CoreCommentTest, ReadCommentChain) {
     const auto c6 = comment { .id = id6, .parent_id = id5 };
     const auto c7 = comment { .id = id7 };
 
-    EXPECT_CALL(db, read_comments(_))
-        .WillOnce(Return(std::vector<comment> {
+    EXPECT_CALL(*db, read_comments(_))
+        .WillOnce(Return(ext::make_task(std::vector<comment> {
             c7,
             c5,
             c1,
@@ -62,9 +63,14 @@ TEST_F(CoreCommentTest, ReadCommentChain) {
             c2,
             c6,
             c3
-        }));
+        })));
 
-    auto comments = api.get_comments(post_id);
+    auto comments = minty::comment_tree();
+
+    [&]() -> ext::detached_task {
+        comments = co_await api.get_comments(post_id);
+    }();
+
     const auto& roots = comments.roots;
 
     ASSERT_EQ(3, roots.size());

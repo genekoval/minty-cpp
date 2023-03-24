@@ -1,17 +1,24 @@
 #include "commands.h"
 #include "options/opts.h"
-#include "../db/db.h"
+#include "../db/db.hpp"
 
 using namespace commline;
 
 namespace {
-    auto $dump(
-        const app& app,
-        std::string_view confpath,
-        std::string_view filename
-    ) -> void {
-        const auto db = minty::cli::database(confpath);
-        db.dump(filename);
+    namespace internal {
+        auto dump(
+            const app& app,
+            std::string_view confpath,
+            std::string_view filename
+        ) -> void {
+            const auto settings = minty::conf::initialize(confpath);
+
+            minty::cli::database(settings, [filename](
+                dbtools::postgresql& db
+            ) -> ext::task<> {
+                co_await db.dump(filename);
+            });
+        }
     }
 }
 
@@ -32,7 +39,7 @@ namespace minty::cli {
                 )
             ),
             arguments(),
-            $dump
+            internal::dump
         );
     }
 }

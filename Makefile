@@ -29,7 +29,6 @@ common.libs := \
  avutil \
  conftools \
  elasticsearch \
- entix \
  date \
  ext++ \
  http \
@@ -37,8 +36,7 @@ common.libs := \
  fstore \
  harvest \
  netcore \
- pqxx \
- pq \
+ pg++ \
  swscale \
  threadpool \
  timber \
@@ -106,9 +104,6 @@ $(obj)/$(daemon)/main.o: CXXFLAGS +=\
  -DCONFDIR='"$(confdir)"'
 
 .PHONY: db edit.config init migrate start
-
-db:
-	$($(daemon)) db --config $(test.config)
 
 edit.config:
 	$(EDITOR) $(confdir)/minty.yml

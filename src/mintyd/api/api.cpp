@@ -2,10 +2,10 @@
 
 namespace minty::cli {
     api_container::api_container(const minty::conf::settings& settings) :
-        db(
-            settings.database.connection.str(),
-            settings.database.connections
-        ),
+        db_params(pg::parameters::parse(
+            settings.database.connection.parameters
+        )),
+        database(db_params),
         objects(settings.fstore.connection),
         downloader(
             settings.downloader.host,
@@ -16,7 +16,7 @@ namespace minty::cli {
             settings.search.node,
             settings.search.auth
         ),
-        api(db, objects, downloader, search)
+        api(database, objects, downloader, search)
     {}
 
     auto api_container::init(const conf::settings& settings) -> ext::task<> {

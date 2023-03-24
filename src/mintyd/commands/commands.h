@@ -3,10 +3,6 @@
 #include <commline/commline>
 
 namespace minty::cli {
-    auto db(
-        std::string_view confpath
-    ) -> std::unique_ptr<commline::command_node>;
-
     auto dump(
         std::string_view confpath
     ) -> std::unique_ptr<commline::command_node>;

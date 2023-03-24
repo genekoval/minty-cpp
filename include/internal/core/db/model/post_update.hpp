@@ -4,17 +4,12 @@
 
 #include <minty/model/time_point.hpp>
 
-#include <vector>
-
 namespace minty::core::db {
     struct post_update {
         UUID::uuid id;
         std::optional<std::string> new_data;
         time_point date_modified;
     };
-
-    struct post_object_update {
-        std::vector<object_preview> objects;
-        time_point date_modified;
-    };
 }
+
+PGCPP_COMPOSITE_DECL(minty::core::db::post_update, "post_update");

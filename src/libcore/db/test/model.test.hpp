@@ -1,18 +1,12 @@
 #pragma once
 
-#include <entix/entix>
+#include <pg++/pg++>
 
 namespace minty::test {
     struct sequence_object {
         UUID::uuid id;
-        unsigned int sequence;
+        std::int16_t sequence;
     };
 }
 
-namespace entix {
-    ENTITY(
-        minty::test::sequence_object,
-        &minty::test::sequence_object::id,
-        &minty::test::sequence_object::sequence
-    );
-}
+PGCPP_COMPOSITE_DECL(minty::test::sequence_object, "sequence_object");

@@ -1,40 +1,46 @@
 #include "database.test.hpp"
 
 TEST_F(DatabasePostTest, ReadZeroComments) {
-    const auto post_id = create_post();
-    const auto comments = database.read_comments(post_id);
+    run([&]() -> ext::task<> {
+        const auto post_id = co_await create_post();
+        const auto comments = co_await db->read_comments(post_id);
 
-    ASSERT_TRUE(comments.empty());
+        EXPECT_TRUE(comments.empty());
+    }());
 }
 
 TEST_F(DatabasePostTest, ReadOneComment) {
     constexpr auto text = "First post.";
 
-    const auto post_id = create_post();
-    const auto comment = database.create_comment(post_id, text);
+    run([&]() -> ext::task<> {
+        const auto post_id = co_await create_post();
+        const auto comment = co_await db->create_comment(post_id, text);
 
-    auto comments = database.read_comments(post_id);
+        auto comments = co_await db->read_comments(post_id);
 
-    ASSERT_EQ(1, comments.size());
-    ASSERT_EQ(comment, comments.front());
+        EXPECT_EQ(1, comments.size());
+        EXPECT_EQ(comment, comments.at(0));
+    }());
 }
 
 TEST_F(DatabasePostTest, ReadNestedComments) {
-    const auto post_id = create_post();
+    run([&]() -> ext::task<> {
+        const auto post_id = co_await create_post();
 
-    const auto root1 = database.create_comment(post_id, "Root 1");
-    const auto child1 = database.create_reply(root1.id, "Child 1");
+        const auto root1 = co_await db->create_comment(post_id, "Root 1");
+        const auto child1 = co_await db->create_reply(root1.id, "Child 1");
 
-    const auto root2 = database.create_comment(post_id, "Root 2");
-    const auto child2 = database.create_reply(root2.id, "Child 2");
+        const auto root2 = co_await db->create_comment(post_id, "Root 2");
+        const auto child2 = co_await db->create_reply(root2.id, "Child 2");
 
-    const auto comments = database.read_comments(post_id);
+        const auto comments = co_await db->read_comments(post_id);
 
-    ASSERT_EQ(4, comments.size());
+        EXPECT_EQ(4, comments.size());
 
-    ASSERT_EQ(root2, comments[0]);
-    ASSERT_EQ(root1, comments[1]);
+        EXPECT_EQ(root2, comments.at(0));
+        EXPECT_EQ(root1, comments.at(1));
 
-    ASSERT_TRUE(comments[2] == child1 || comments[2] == child2);
-    ASSERT_TRUE(comments[3] == child1 || comments[3] == child2);
+        EXPECT_TRUE(comments.at(2) == child1 || comments.at(2) == child2);
+        EXPECT_TRUE(comments.at(3) == child1 || comments.at(3) == child2);
+    }());
 }

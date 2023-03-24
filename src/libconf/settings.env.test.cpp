@@ -9,6 +9,14 @@ namespace {
 }
 
 namespace minty::test {
+    auto SettingsEnvironment::db_params() -> const pg::parameters& {
+        static const auto instance = pg::parameters::parse(
+            settings().database.connection.parameters
+        );
+
+        return instance;
+    }
+
     auto SettingsEnvironment::settings() -> const conf::settings& {
         static auto instance = conf::initialize(settings_path.string());
         return instance;

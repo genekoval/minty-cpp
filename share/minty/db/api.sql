@@ -1,13 +1,30 @@
 DROP SCHEMA IF EXISTS minty CASCADE;
 CREATE SCHEMA minty;
 
-CREATE FUNCTION epoch_sec(
-    a_timestamp     timestamptz
-) RETURNS numeric AS $$
-BEGIN
-    RETURN extract(epoch FROM a_timestamp);
-END;
-$$ LANGUAGE plpgsql;
+--{{{( Types )
+
+CREATE TYPE object_preview AS (
+    object_id       uuid,
+    preview_id      uuid
+);
+
+CREATE TYPE post_update AS (
+    post_id         uuid,
+    new_data        text,
+    date_modified   timestamptz
+);
+
+CREATE TYPE tag_name AS (
+    name            text,
+    aliases         text[]
+);
+
+CREATE TYPE tag_name_update AS (
+    names           tag_name,
+    old_name        text
+);
+
+--}}}
 
 --{{{( Views )
 
@@ -54,8 +71,8 @@ SELECT
     post_id,
     title,
     description,
-    epoch_sec(date_created) AS date_created,
-    epoch_sec(date_modified) AS date_modified
+    date_created,
+    date_modified
 FROM data.post;
 
 CREATE VIEW post_comment AS
@@ -65,7 +82,7 @@ SELECT
     parent_id,
     indent,
     content,
-    epoch_sec(date_created) AS date_created
+    date_created
 FROM data.post_comment;
 
 CREATE VIEW post_object_ref_view AS
@@ -76,14 +93,14 @@ FROM data.object
 LEFT JOIN data.post_object post_objects USING (object_id)
 GROUP BY object_id;
 
-CREATE VIEW post_search_view AS
+CREATE VIEW post_search AS
 SELECT
     post_id,
     title,
     description,
-    epoch_sec(date_created) AS date_created,
-    epoch_sec(date_modified) AS date_modified,
-    array_agg(tag_id) AS tags
+    date_created,
+    date_modified,
+    array_agg(tag_id) FILTER (WHERE tag_id IS NOT NULL) AS tags
 FROM data.post
 LEFT JOIN data.post_tag USING (post_id)
 GROUP BY post_id;
@@ -105,16 +122,13 @@ LEFT JOIN data.object object USING (source_id)
 LEFT JOIN data.tag_source tag USING (source_id)
 GROUP BY source_id;
 
-CREATE VIEW source_view AS
+CREATE VIEW source AS
 SELECT
     source_id,
     resource,
-    site_id,
-    scheme,
-    host,
-    icon
+    site
 FROM data.source
-JOIN data.site USING (site_id);
+JOIN data.site site USING (site_id);
 
 CREATE VIEW tag_name_view AS
 SELECT
@@ -129,8 +143,9 @@ FROM (
     WHERE main = true
 ) AS main
 LEFT JOIN (
-    SELECT tag_id,
-    array_agg(value ORDER BY value) AS aliases
+    SELECT
+        tag_id,
+        array_agg(value ORDER BY value) AS aliases
     FROM data.tag_name
     WHERE main = false
     GROUP BY tag_id
@@ -150,7 +165,7 @@ LEFT JOIN (
     WHERE main = true
 ) AS main USING (tag_id);
 
-CREATE VIEW tag_text AS
+CREATE VIEW tag_search AS
 SELECT
     tag_id,
     array_agg(value) AS names
@@ -165,35 +180,29 @@ SELECT
     description,
     avatar,
     banner,
-    count(post_id) AS post_count,
-    epoch_sec(date_created) AS date_created
+    count(post_id)::int4 AS post_count,
+    date_created
 FROM data.tag
 LEFT JOIN tag_name_view USING (tag_id)
 LEFT JOIN data.post_tag USING (tag_id)
 GROUP BY tag_id, name, aliases;
 
-CREATE VIEW object_view AS
+CREATE VIEW object AS
 SELECT
     object_id,
     preview_id,
-    source_id,
-    resource,
-    site_id,
-    scheme,
-    host,
-    icon
+    source
 FROM data.object
-LEFT JOIN source_view USING (source_id);
+LEFT JOIN source USING (source_id);
 
 CREATE VIEW post_preview AS
 SELECT
     post_id,
     title,
-    object_id,
-    preview_id,
-    coalesce(comment_count, 0) AS comment_count,
-    coalesce(object_count, 0) AS object_count,
-    epoch_sec(post.date_created) AS date_created
+    preview,
+    coalesce(comment_count, 0)::int4 AS comment_count,
+    coalesce(object_count, 0)::int4 AS object_count,
+    post.date_created AS date_created
 FROM data.post
 LEFT JOIN (
     SELECT
@@ -212,38 +221,11 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT
         post_id,
-        object_id,
-        preview_id
+        ROW(object_id, preview_id)::object_preview AS preview
     FROM data.object
     JOIN data.post_object USING (object_id)
     WHERE sequence = 1
 ) previews USING (post_id);
-
---}}}
-
---{{{( Types )
-
-CREATE TYPE object_preview AS (
-    object_id       uuid,
-    preview_id      uuid
-);
-
-CREATE TYPE post_update AS (
-    post_id         uuid,
-    new_data        text,
-    date_modified   numeric
-);
-
-CREATE TYPE tag_name AS (
-    name            text,
-    aliases         text[]
-);
-
-CREATE TYPE tag_name_update AS (
-    name            text,
-    aliases         text[],
-    old_name        text
-);
 
 --}}}
 
@@ -267,7 +249,7 @@ BEGIN
         parent_id,
         indent,
         content,
-        epoch_sec(date_created) AS date_created;
+        date_created AS date_created;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -330,7 +312,7 @@ CREATE FUNCTION create_post(
     a_description   text,
     a_objects       uuid[],
     a_tags          uuid[]
-) RETURNS SETOF post_search_view AS $$
+) RETURNS SETOF post_search AS $$
 DECLARE
     l_post_id       uuid;
 BEGIN
@@ -364,7 +346,7 @@ BEGIN
 
     RETURN QUERY
     SELECT *
-    FROM post_search_view
+    FROM post_search
     WHERE post_id = l_post_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -373,7 +355,7 @@ CREATE FUNCTION create_post_objects(
     a_post_id       uuid,
     a_objects       uuid[],
     a_position      smallint
-) RETURNS numeric AS $$
+) RETURNS timestamptz AS $$
 -- Largest possible smallint
 DECLARE l_greatest_sequence CONSTANT smallint := 32767;
 DECLARE l_position smallint;
@@ -451,7 +433,7 @@ BEGIN
         parent_id,
         indent,
         content,
-        epoch_sec(date_created) AS date_created;
+        date_created;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -479,7 +461,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION create_source(
     a_site_id       bigint,
     a_resource      text
-) RETURNS SETOF source_view AS $$
+) RETURNS SETOF source AS $$
 BEGIN
     INSERT INTO data.source (
         site_id,
@@ -491,8 +473,8 @@ BEGIN
 
     RETURN QUERY
     SELECT *
-    FROM source_view
-    WHERE site_id = a_site_id AND resource = a_resource;
+    FROM source
+    WHERE (site).site_id = a_site_id AND resource = a_resource;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -594,7 +576,7 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION delete_post_objects(
     a_post_id       uuid,
     a_objects       uuid[]
-) RETURNS numeric AS $$
+) RETURNS timestamptz AS $$
 DECLARE
     l_object_id       uuid;
 BEGIN
@@ -611,42 +593,6 @@ BEGIN
     END LOOP;
 
     RETURN read_post_date_modified(a_post_id);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION delete_post_objects_ranges(
-    a_post_id       uuid,
-    ranges          int4range[]
-) RETURNS numeric AS $$
-DECLARE
-    range           int4range;
-BEGIN
-    FOR range IN
-        SELECT unnest AS range
-        FROM unnest(ranges)
-        ORDER BY range DESC
-    LOOP
-        PERFORM delete_post_objects_range(a_post_id, range);
-    END LOOP;
-
-    RETURN read_post_date_modified(a_post_id);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION delete_post_objects_range(
-    a_post_id       uuid,
-    range           int4range
-) RETURNS void AS $$
-BEGIN
-    DELETE FROM data.post_object
-    WHERE
-        post_id = a_post_id AND
-        sequence >= lower(range) AND
-        sequence < upper(range);
-
-    UPDATE data.post_object
-    SET sequence = sequence - (upper(range) - lower(range))
-    WHERE sequence >= upper(range);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -727,43 +673,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION move_post_object(
-    a_post_id       uuid,
-    a_old_index     integer,
-    a_new_index     integer
-) RETURNS numeric AS $$
-BEGIN
-    UPDATE data.post_object
-    SET sequence = -1
-    WHERE post_id = a_post_id AND sequence = a_old_index;
-
-    UPDATE data.post_object
-    SET sequence = sequence + (
-        SELECT
-            CASE
-                WHEN a_new_index < a_old_index THEN 1
-                WHEN a_new_index > a_old_index THEN -1
-            END
-    )
-    WHERE post_id = a_post_id AND sequence::integer <@ int4range(
-        least(a_old_index, a_new_index),
-        greatest(a_old_index, a_new_index),
-        '[]'
-    );
-
-    UPDATE data.post_object
-    SET sequence = a_new_index
-    WHERE post_id = a_post_id AND sequence = -1;
-
-    RETURN read_post_date_modified(a_post_id);
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE FUNCTION move_post_objects(
     a_post_id       uuid,
     a_objects       uuid[],
     a_destination   uuid
-) RETURNS numeric AS $$
+) RETURNS timestamptz AS $$
 BEGIN
     PERFORM delete_post_objects(a_post_id, a_objects);
     PERFORM create_post_objects(
@@ -864,18 +778,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_objects()
-RETURNS refcursor AS $$
-DECLARE
-    ref             refcursor;
+RETURNS SETOF object_preview AS $$
 BEGIN
-    OPEN ref FOR
+    RETURN QUERY
     SELECT
         object_id,
         preview_id
     FROM data.object
     ORDER BY object_id;
-
-    RETURN ref;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -892,11 +802,11 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_post_date_modified(
     a_post_id       uuid
-) RETURNS numeric AS $$
+) RETURNS timestamptz AS $$
 DECLARE
-    l_date_modified numeric;
+    l_date_modified timestamptz;
 BEGIN
-    SELECT epoch_sec(date_modified) INTO l_date_modified
+    SELECT date_modified INTO l_date_modified
     FROM data.post
     WHERE post_id = a_post_id;
 
@@ -909,14 +819,7 @@ CREATE FUNCTION read_posts(
 ) RETURNS SETOF post_preview AS $$
 BEGIN
     RETURN QUERY
-    SELECT
-        post_id,
-        title,
-        object_id,
-        preview_id,
-        comment_count,
-        object_count,
-        date_created
+    SELECT post_preview.*
     FROM (
         SELECT
             ordinality,
@@ -928,17 +831,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_post_search()
-RETURNS refcursor AS $$
-DECLARE
-    ref             refcursor;
+CREATE FUNCTION read_post_search() RETURNS SETOF post_search AS $$
 BEGIN
-    OPEN ref FOR
+    RETURN QUERY
     SELECT *
-    FROM post_search_view
+    FROM post_search
     ORDER BY post_id;
-
-    RETURN ref;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -962,14 +860,7 @@ CREATE FUNCTION read_related_posts(
 ) RETURNS SETOF post_preview AS $$
 BEGIN
     RETURN QUERY
-    SELECT
-        preview.post_id,
-        title,
-        object_id,
-        preview_id,
-        comment_count,
-        object_count,
-        date_created
+    SELECT preview.*
     FROM post_preview preview
     JOIN data.related_post post ON post.related = preview.post_id
     WHERE post.post_id = a_post_id
@@ -982,7 +873,7 @@ CREATE FUNCTION read_post_tags(
 ) RETURNS SETOF tag_preview AS $$
 BEGIN
     RETURN QUERY
-    SELECT tag_id, name, avatar
+    SELECT tag_preview.*
     FROM tag_preview
     JOIN data.post_tag USING (tag_id)
     WHERE post_id = a_post_id
@@ -1021,10 +912,7 @@ CREATE FUNCTION read_tag_previews(
 ) RETURNS SETOF tag_preview AS $$
 BEGIN
     RETURN QUERY
-    SELECT
-        tag_id,
-        name,
-        avatar
+    SELECT tag_preview.*
     FROM (
         SELECT
             ordinality,
@@ -1038,34 +926,24 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_tag_sources(
     a_tag_id        uuid
-) RETURNS SETOF source_view AS $$
+) RETURNS SETOF source AS $$
 BEGIN
     RETURN QUERY
-    SELECT
-        source_id,
-        resource,
-        site_id,
-        scheme,
-        host,
-        icon
+    SELECT source.*
     FROM data.tag_source
-    JOIN source_view USING (source_id)
+    JOIN source USING (source_id)
     WHERE tag_id = a_tag_id
-    ORDER BY host;
+    ORDER BY (site).host;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION read_tag_text()
-RETURNS refcursor AS $$
-DECLARE
-    ref             refcursor;
+CREATE FUNCTION read_tag_search()
+RETURNS SETOF tag_search AS $$
 BEGIN
-    OPEN ref FOR
+    RETURN QUERY
     SELECT *
-    FROM tag_text
+    FROM tag_search
     ORDER BY tag_id;
-
-    RETURN ref;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1079,11 +957,11 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_object(
     a_object_id     uuid
-) RETURNS SETOF object_view AS $$
+) RETURNS SETOF object AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM object_view
+    FROM object
     WHERE object_id = a_object_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -1093,15 +971,8 @@ CREATE FUNCTION read_object_posts(
 ) RETURNS SETOF post_preview AS $$
 BEGIN
     RETURN QUERY
-    SELECT
-        post_id,
-        title,
-        post.object_id,
-        preview_id,
-        comment_count,
-        object_count,
-        date_created
-    FROM post_preview post
+    SELECT post_preview.*
+    FROM post_preview
     JOIN data.post_object post_object USING (post_id)
     WHERE post_object.object_id = a_object_id
     ORDER BY date_created DESC;
@@ -1144,7 +1015,7 @@ BEGIN
     RETURNING
         post_id,
         description as new_data,
-        epoch_sec(date_modified) AS date_modified;
+        date_modified;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1160,7 +1031,7 @@ BEGIN
     RETURNING
         post_id,
         title as new_data,
-        epoch_sec(date_modified) AS date_modified;
+        date_modified;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1220,7 +1091,9 @@ BEGIN
     END IF;
 
     RETURN QUERY
-    SELECT t.name, t.aliases, l_old_name
+    SELECT
+        ROW(t.name, t.aliases)::tag_name,
+        l_old_name
     FROM tag_name_view t
     WHERE tag_id = a_tag_id;
 END;

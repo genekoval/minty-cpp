@@ -1,31 +1,36 @@
 #include "DatabasePostObject.test.hpp"
 
-auto DatabasePostObjectTest::SetUp() -> void {
-    DatabasePostTest::SetUp();
-    database.create_object(new_object, {}, {});
-    post_id = create_post_with_objects();
-}
-
-auto DatabasePostObjectTest::create_post_with_objects() -> UUID::uuid {
+auto DatabasePostObjectTest::create_post_with_objects() ->
+    ext::task<UUID::uuid>
+{
     for (const auto& object : objects) {
-        database.create_object(object, {}, {});
+        co_await db->create_object(object, {}, {});
     }
 
-    return database.create_post("", "", objects, {}).id;
+    co_return (co_await db->create_post("", "", objects, {})).id;
 }
 
 auto DatabasePostObjectTest::insert_object(
     std::int16_t position
-) -> std::vector<minty::test::sequence_object> {
-    return insert_objects({new_object}, position);
+) -> ext::task<std::vector<minty::test::sequence_object>> {
+    co_return co_await insert_objects({new_object}, position);
 }
 
 auto DatabasePostObjectTest::insert_objects(
     const std::vector<UUID::uuid>& objects,
     std::int16_t position
-) -> std::vector<minty::test::sequence_object> {
-    database.create_post_objects(post_id, objects, position);
-    return with_sequence();
+) -> ext::task<std::vector<minty::test::sequence_object>> {
+    co_await db->create_post_objects(post_id, objects, position);
+    co_return co_await with_sequence();
+}
+
+auto DatabasePostObjectTest::run(ext::task<>&& task) -> void {
+    DatabasePostTest::run([this](ext::task<>&& task) -> ext::task<> {
+        co_await db->create_object(new_object, {}, {});
+        post_id = co_await create_post_with_objects();
+
+        co_await std::forward<ext::task<>>(task);
+    }(std::forward<ext::task<>>(task)));
 }
 
 auto DatabasePostObjectTest::tables() -> std::vector<std::string> {
@@ -36,9 +41,10 @@ auto DatabasePostObjectTest::tables() -> std::vector<std::string> {
     return base;
 }
 
-auto DatabasePostObjectTest::with_sequence()
--> std::vector<minty::test::sequence_object> {
-    return exec<minty::test::sequence_object>(
+auto DatabasePostObjectTest::with_sequence() ->
+    ext::task<std::vector<minty::test::sequence_object>>
+{
+    co_return co_await client->fetch_rows<minty::test::sequence_object>(
         "SELECT object_id, sequence "
         "FROM data.post_object "
         "WHERE post_id = $1 "

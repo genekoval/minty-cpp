@@ -10,7 +10,7 @@ namespace minty::server {
         UUID::uuid post_id,
         std::string content
     ) -> ext::task<comment_data> {
-        co_return api->add_comment(post_id, content);
+        co_return co_await api->add_comment(post_id, content);
     }
 
     auto router_context::add_object_data(
@@ -59,15 +59,14 @@ namespace minty::server {
         UUID::uuid post_id,
         UUID::uuid related
     ) -> ext::task<> {
-        api->add_related_post(post_id, related);
-        co_return;
+        co_await api->add_related_post(post_id, related);
     }
 
     auto router_context::add_reply(
         UUID::uuid parent_id,
         std::string content
     ) -> ext::task<comment_data> {
-        co_return api->add_reply(parent_id, content);
+        co_return co_await api->add_reply(parent_id, content);
     }
 
     auto router_context::add_tag(std::string name) -> ext::task<UUID::uuid> {
@@ -99,13 +98,6 @@ namespace minty::server {
         co_return co_await api->delete_post_objects(post_id, objects);
     }
 
-    auto router_context::delete_post_objects_ranges(
-        UUID::uuid post_id,
-        std::vector<range> ranges
-    ) -> ext::task<time_point> {
-        co_return co_await api->delete_post_objects(post_id, ranges);
-    }
-
     auto router_context::delete_post_tag(
         UUID::uuid post_id,
         UUID::uuid tag_id
@@ -117,8 +109,7 @@ namespace minty::server {
         UUID::uuid post_id,
         UUID::uuid related
     ) -> ext::task<> {
-        api->delete_related_post(post_id, related);
-        co_return;
+        co_await api->delete_related_post(post_id, related);
     }
 
     auto router_context::delete_tag(UUID::uuid tag_id) -> ext::task<> {
@@ -134,22 +125,21 @@ namespace minty::server {
 
     auto router_context::delete_tag_source(
         UUID::uuid tag_id,
-        std::string source_id
+        std::int64_t source_id
     ) -> ext::task<> {
-        api->delete_tag_source(tag_id, source_id);
-        co_return;
+        co_await api->delete_tag_source(tag_id, source_id);
     }
 
     auto router_context::get_comment(
         UUID::uuid comment_id
     ) -> ext::task<comment> {
-        co_return api->get_comment(comment_id);
+        co_return co_await api->get_comment(comment_id);
     }
 
     auto router_context::get_comments(
         UUID::uuid post_id
     ) -> ext::task<comment_tree> {
-        co_return api->get_comments(post_id);
+        co_return co_await api->get_comments(post_id);
     }
 
     auto router_context::get_object(
@@ -173,21 +163,13 @@ namespace minty::server {
     }
 
     auto router_context::get_tag(UUID::uuid tag_id) -> ext::task<tag> {
-        co_return api->get_tag(tag_id);
+        co_return co_await api->get_tag(tag_id);
     }
 
     auto router_context::get_tags(
         tag_query query
     ) -> ext::task<search_result<tag_preview>> {
         co_return co_await api->get_tags(query);
-    }
-
-    auto router_context::move_post_object(
-        UUID::uuid post_id,
-        std::uint32_t old_index,
-        std::uint32_t new_index
-    ) -> ext::task<> {
-        co_await api->move_post_object(post_id, old_index, new_index);
     }
 
     auto router_context::move_post_objects(
@@ -206,7 +188,7 @@ namespace minty::server {
         UUID::uuid comment_id,
         std::string content
     ) -> ext::task<std::string> {
-        co_return api->set_comment_content(comment_id, content);
+        co_return co_await api->set_comment_content(comment_id, content);
     }
 
     auto router_context::set_post_description(
@@ -227,7 +209,7 @@ namespace minty::server {
         UUID::uuid tag_id,
         std::string description
     ) -> ext::task<std::optional<std::string>> {
-        co_return api->set_tag_description(tag_id, description);
+        co_return co_await api->set_tag_description(tag_id, description);
     }
 
     auto router_context::set_tag_name(

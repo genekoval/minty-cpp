@@ -13,20 +13,21 @@ protected:
     };
     UUID::uuid post_id;
 
-    virtual auto SetUp() -> void override;
-
-    auto create_post_with_objects() -> UUID::uuid;
+    auto create_post_with_objects() -> ext::task<UUID::uuid>;
 
     auto insert_object(
         std::int16_t position
-    ) -> std::vector<minty::test::sequence_object>;
+    ) -> ext::task<std::vector<minty::test::sequence_object>>;
 
     auto insert_objects(
         const std::vector<UUID::uuid>& objects,
         std::int16_t position
-    ) -> std::vector<minty::test::sequence_object>;
+    ) -> ext::task<std::vector<minty::test::sequence_object>>;
+
+    auto run(ext::task<>&& task) -> void;
 
     virtual auto tables() -> std::vector<std::string> override;
 
-    auto with_sequence() -> std::vector<minty::test::sequence_object>;
+    auto with_sequence() ->
+        ext::task<std::vector<minty::test::sequence_object>>;
 };

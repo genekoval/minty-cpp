@@ -223,7 +223,7 @@ namespace minty {
 
     auto api::delete_tag_source(
         const UUID::uuid& tag_id,
-        std::string_view source_id
+        std::int64_t source_id
     ) -> ext::task<> {
         co_await client->send<void>(
             event::delete_tag_source,

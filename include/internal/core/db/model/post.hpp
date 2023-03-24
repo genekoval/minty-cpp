@@ -2,7 +2,7 @@
 
 #include <minty/model/time_point.hpp>
 
-#include <uuid++/uuid++>
+#include <pg++/pg++>
 
 namespace minty::core::db {
     struct post {
@@ -13,3 +13,5 @@ namespace minty::core::db {
         time_point date_modified;
     };
 }
+
+PGCPP_COMPOSITE_DECL(minty::core::db::post, "post");

@@ -1,11 +1,11 @@
 #include "database.test.hpp"
 
 TEST_F(DatabasePostTest, UpdatePostDescriptionDateModified) {
-    const auto id = create_post();
+    run([&]() -> ext::task<> {
+        const auto id = co_await create_post();
+        co_await db->update_post_description(id, "New description.");
+        const auto post = co_await db->read_post(id);
 
-    database.update_post_description(id, "New description.");
-
-    const auto post = database.read_post(id);
-
-    ASSERT_NE(post.date_created, post.date_modified);
+        EXPECT_NE(post.date_created, post.date_modified);
+    }());
 }
