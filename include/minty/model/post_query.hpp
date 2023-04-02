@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sort_order.hpp"
+#include "visibility.hpp"
 
 #include <uuid++/uuid++>
 #include <zipline/zipline>
@@ -23,6 +24,7 @@ namespace minty {
         std::uint32_t size = 0;
         std::optional<std::string> text;
         std::vector<UUID::uuid> tags;
+        visibility visibility = visibility::pub;
         post_sort sort;
     };
 }
@@ -40,6 +42,7 @@ namespace zipline {
         &minty::post_query::size,
         &minty::post_query::text,
         &minty::post_query::tags,
+        &minty::post_query::visibility,
         &minty::post_query::sort
     );
 }

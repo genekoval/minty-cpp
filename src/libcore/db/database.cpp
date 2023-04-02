@@ -39,6 +39,10 @@ namespace minty::core::db {
             &connection::create_post
         );
         co_await client.prepare_fn(
+            "create_post_draft",
+            &connection::create_post_draft
+        );
+        co_await client.prepare_fn(
             "create_post_objects",
             &connection::create_post_objects
         );

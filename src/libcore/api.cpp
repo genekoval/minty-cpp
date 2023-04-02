@@ -106,28 +106,6 @@ namespace minty::core {
         co_return result;
     }
 
-    auto api::add_post(post_parts parts) -> ext::task<UUID::uuid> {
-        TIMBER_FUNC();
-
-        auto db = co_await database->connect();
-
-        const auto result = co_await db.create_post(
-            format_title(parts.title),
-            format_description(parts.description),
-            parts.objects,
-            parts.tags
-        );
-
-        try {
-            co_await search->add_post(result);
-        }
-        catch (const std::runtime_error& ex) {
-            TIMBER_ERROR("Failed to index post ({}): {}", result.id, ex.what());
-        }
-
-        co_return result.id;
-    }
-
     auto api::add_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
@@ -292,6 +270,31 @@ namespace minty::core {
         co_return src;
     }
 
+    auto api::create_post(const UUID::uuid& post_id) -> ext::task<> {
+        TIMBER_FUNC();
+
+        auto db = co_await database->connect();
+        auto tx = co_await db.begin();
+
+        const auto timestamp = co_await db.create_post(post_id);
+        co_await search->publish_post(post_id, timestamp);
+
+        co_await tx.commit();
+    }
+
+    auto api::create_post_draft() -> ext::task<UUID::uuid> {
+        TIMBER_FUNC();
+
+        auto db = co_await database->connect();
+        auto tx = co_await db.begin();
+
+        const auto post = co_await db.create_post_draft();
+        co_await search->add_post(post);
+
+        co_await tx.commit();
+        co_return post.id;
+    }
+
     auto api::delete_post(const UUID::uuid& id) -> ext::task<> {
         TIMBER_FUNC();
 
@@ -444,6 +447,7 @@ namespace minty::core {
             .id = data.id,
             .title = data.title,
             .description = data.description,
+            .visibility = data.visibility,
             .date_created = data.date_created,
             .date_modified = data.date_modified,
             .posts = std::move(posts),

@@ -45,7 +45,8 @@ TEST_F(DatabasePruneTest, PrunePostObject) {
         co_await db->create_object(object_id, {}, source);
 
         const auto objects = std::vector<UUID::uuid> { object_id };
-        const auto post = (co_await db->create_post({}, {}, objects, {})).id;
+        const auto draft = co_await db->create_post_draft();
+        co_await db->create_post_objects(draft.id, objects, -1);
 
         EXPECT_EQ(1, co_await count("object"));
         EXPECT_EQ(2, co_await count("object_ref")); // object and site icon
@@ -62,7 +63,7 @@ TEST_F(DatabasePruneTest, PrunePostObject) {
         EXPECT_EQ(1, co_await count("site"));
         EXPECT_EQ(1, co_await count("source"));
 
-        co_await db->delete_post(post);
+        co_await db->delete_post(draft.id);
 
         EXPECT_EQ(1, co_await count("object"));
         EXPECT_EQ(2, co_await count("object_ref"));

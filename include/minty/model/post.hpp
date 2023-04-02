@@ -4,6 +4,7 @@
 #include "post_preview.hpp"
 #include "tag_preview.hpp"
 #include "time_point.hpp"
+#include "visibility.hpp"
 
 #include <uuid++/uuid++>
 #include <vector>
@@ -14,6 +15,7 @@ namespace minty {
         UUID::uuid id;
         std::optional<std::string> title;
         std::optional<std::string> description;
+        visibility visibility;
         time_point date_created;
         time_point date_modified;
         std::vector<object_preview> objects;
@@ -28,6 +30,7 @@ namespace zipline {
         &minty::post::id,
         &minty::post::title,
         &minty::post::description,
+        &minty::post::visibility,
         &minty::post::date_created,
         &minty::post::date_modified,
         &minty::post::objects,

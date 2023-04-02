@@ -32,12 +32,7 @@ namespace minty::core {
 
         auto search(
             std::string_view index,
-            std::string_view query
-        ) -> ext::task<elastic::json>;
-
-        auto search_ids(
-            std::string_view index,
-            std::string_view query
+            const elastic::json& query
         ) -> ext::task<search_result<UUID::uuid>>;
     public:
         index post_index;
@@ -93,6 +88,11 @@ namespace minty::core {
         VIRTUAL auto find_tags(
             const tag_query& query
         ) -> ext::task<search_result<UUID::uuid>>;
+
+        VIRTUAL auto publish_post(
+            const UUID::uuid& post_id,
+            time_point timestamp
+        ) -> ext::task<>;
 
         VIRTUAL auto remove_post_tag(
             const UUID::uuid& post_id,

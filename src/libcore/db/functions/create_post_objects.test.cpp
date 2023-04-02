@@ -80,7 +80,7 @@ TEST_F(DatabasePostObjectTest, InsertMultiplePostObjects) {
 
 TEST_F(DatabasePostObjectTest, AddPostObjectsDateModified) {
     run([&]() -> ext::task<> {
-        const auto id = co_await create_post();
+        const auto id = co_await create_draft();
 
         co_await db->create_object(new_object, {}, {});
         co_await db->create_post_objects(id, {new_object}, 0);

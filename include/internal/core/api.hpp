@@ -8,7 +8,6 @@
 #include <minty/model/object.hpp>
 #include <minty/model/object_preview.hpp>
 #include <minty/model/post.hpp>
-#include <minty/model/post_parts.hpp>
 #include <minty/model/post_preview.hpp>
 #include <minty/model/tag.hpp>
 
@@ -95,8 +94,6 @@ namespace minty::core {
             std::string_view url
         ) -> ext::task<std::vector<object_preview>>;
 
-        auto add_post(post_parts parts) -> ext::task<UUID::uuid>;
-
         auto add_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
@@ -129,6 +126,10 @@ namespace minty::core {
             const UUID::uuid& tag_id,
             std::string_view url
         ) -> ext::task<source>;
+
+        auto create_post(const UUID::uuid& post_id) -> ext::task<>;
+
+        auto create_post_draft() -> ext::task<UUID::uuid>;
 
         auto delete_post(const UUID::uuid& id) -> ext::task<>;
 

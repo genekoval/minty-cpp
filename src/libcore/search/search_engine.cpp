@@ -165,7 +165,7 @@ namespace minty::core {
     }
 
     auto search_engine::delete_indices() -> ext::task<> {
-        return delete_indices({
+        co_await delete_indices({
             post_index,
             tag_index
         });
@@ -212,14 +212,21 @@ namespace minty::core {
         auto result = json({
             {"_source", false},
             {"from", query.from},
-            {"size", query.size}
+            {"size", query.size},
+            {"query", {
+                {"bool", {
+                    {"filter", {
+                        {
+                            {"term", {
+                                {"visibility", query.visibility}
+                            }}
+                        }
+                    }}
+                }}
+            }}
         });
 
         if (query.text || !query.tags.empty()) {
-            result["query"] = {
-                {"bool", {}}
-            };
-
             auto& b = result["query"]["bool"];
 
             if (query.text) {
@@ -235,7 +242,7 @@ namespace minty::core {
             }
 
             if (!query.tags.empty()) {
-                b["filter"] = json({
+                b["filter"].push_back({
                     {"terms_set", {
                         {"tags", {
                             {"terms", query.tags},
@@ -266,13 +273,13 @@ namespace minty::core {
             {value, order}
         };
 
-        co_return co_await search_ids(post_index, result.dump());
+        co_return co_await search(post_index, result);
     }
 
     auto search_engine::find_tags(
         const tag_query& query
     ) -> ext::task<search_result<UUID::uuid>> {
-        co_return co_await search_ids(tag_index, json({
+        co_return co_await search(tag_index, json({
             {"_source", false},
             {"from", query.from},
             {"size", query.size},
@@ -296,7 +303,26 @@ namespace minty::core {
                     }}
                 }}
             }}
-        }).dump());
+        }));
+    }
+
+    auto search_engine::publish_post(
+        const UUID::uuid& post_id,
+        time_point timestamp
+    ) -> ext::task<> {
+        co_await client
+            .update_doc(
+                post_index,
+                post_id,
+                json({
+                    {"doc", {
+                        {"visibility", visibility::pub},
+                        {"created", timestamp},
+                        {"modified", timestamp}
+                    }}
+                }).dump()
+            )
+            .send();
     }
 
     auto search_engine::remove_post_tag(
@@ -328,46 +354,23 @@ namespace minty::core {
 
     auto search_engine::search(
         std::string_view index,
-        std::string_view query
-    ) -> ext::task<elastic::json> {
+        const elastic::json& query
+    ) -> ext::task<search_result<UUID::uuid>> {
         TIMBER_FUNC();
 
-        try {
-           co_return co_await client.search(index, query).send();
-        }
-        catch (const elastic::es_error& ex) {
-            TIMBER_ERROR(
-                "{} search ({}): {}",
-                index,
-                ex.status(),
-                ex.what()
-            );
+        TIMBER_DEBUG("search {}: {}", index, query.dump(2));
 
-            throw minty::minty_error("internal search error");
-        }
-    }
+        auto response = co_await client.search(index, query.dump()).send();
 
-    auto search_engine::search_ids(
-        std::string_view index,
-        std::string_view query
-    ) -> ext::task<search_result<UUID::uuid>> {
-        auto response = co_await search(index, query);
+        TIMBER_DEBUG("response: {}", response.dump(2));
+
         auto result = search_result<UUID::uuid>();
 
         response["hits"]["total"]["value"].get_to(result.total);
 
-        for (auto& hit : response["hits"]["hits"]) {
-            const auto id = hit["_id"].get<std::string>();
-            TIMBER_DEBUG("search results: {}", id);
-
-            result.hits.emplace_back(id);
+        for (const auto& hit : response["hits"]["hits"]) {
+            result.hits.emplace_back(hit["_id"].get<UUID::uuid>());
         }
-
-        TIMBER_DEBUG(
-            "search results: {} hits out of {} total",
-            result.hits.size(),
-            result.total
-        );
 
         co_return result;
     }

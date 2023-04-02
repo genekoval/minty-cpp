@@ -2,8 +2,8 @@
 
 TEST_F(DatabasePostTest, ReadRelatedPosts) {
     run([&]() -> ext::task<> {
-        const auto post = co_await create_post();
-        const auto related = co_await create_post();
+        const auto post = co_await create_draft();
+        const auto related = co_await create_draft();
 
         co_await db->create_related_post(post, related);
 

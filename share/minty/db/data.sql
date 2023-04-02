@@ -3,6 +3,11 @@ CREATE SCHEMA data;
 
 SET search_path TO data;
 
+CREATE TYPE visibility AS ENUM (
+    'draft',
+    'public'
+);
+
 CREATE TABLE object_ref (
     object_id       uuid PRIMARY KEY
 );
@@ -37,6 +42,7 @@ CREATE TABLE post (
     post_id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     title           text,
     description     text,
+    visibility      visibility NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW(),
     date_modified   timestamptz NOT NULL DEFAULT NOW()
 );

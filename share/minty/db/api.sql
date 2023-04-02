@@ -71,6 +71,7 @@ SELECT
     post_id,
     title,
     description,
+    visibility,
     date_created,
     date_modified
 FROM data.post;
@@ -98,6 +99,7 @@ SELECT
     post_id,
     title,
     description,
+    visibility,
     date_created,
     date_modified,
     array_agg(tag_id) FILTER (WHERE tag_id IS NOT NULL) AS tags
@@ -307,47 +309,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION create_post(
-    a_title         text,
-    a_description   text,
-    a_objects       uuid[],
-    a_tags          uuid[]
-) RETURNS SETOF post_search AS $$
+CREATE FUNCTION create_post(draft_id uuid) RETURNS timestamptz AS $$
 DECLARE
-    l_post_id       uuid;
+    created CONSTANT timestamptz = now();
 BEGIN
-    WITH new_post AS (
-        INSERT INTO data.post (
-            title,
-            description
-        ) VALUES (
-            nullif(a_title, ''),
-            nullif(a_description, '')
-        ) RETURNING *
-    )
-    SELECT INTO l_post_id
-        post_id
-    FROM new_post;
+    UPDATE data.post
+    SET
+        visibility = 'public',
+        date_created = created,
+        date_modified = created
+    WHERE post_id = draft_id AND visibility = 'draft';
 
-    PERFORM insert_post_objects(l_post_id, a_objects);
+    IF NOT FOUND THEN
+        RAISE 'Draft with ID (%) does not exist', draft_id
+        USING ERRCODE = 'no_data_found';
+    END IF;
 
-    WITH tag_table AS (
-        SELECT unnest AS tag_id
-        FROM unnest(a_tags)
-    )
-    INSERT INTO data.post_tag (
-        post_id,
-        tag_id
-    )
-    SELECT
-        l_post_id,
-        tag_table.tag_id
-    FROM tag_table;
+    RETURN created;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_post_draft()
+RETURNS TABLE (id uuid, created timestamptz) AS $$
+BEGIN
     RETURN QUERY
-    SELECT *
-    FROM post_search
-    WHERE post_id = l_post_id;
+    INSERT INTO data.post (visibility) VALUES ('draft')
+    RETURNING post_id, date_created;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -368,7 +355,7 @@ BEGIN
 
     l_position := (
         SELECT least(l_position, (
-            SELECT max(sequence)
+            SELECT coalesce(max(sequence), 0)
             FROM data.post_object
             WHERE post_id = a_post_id
         ))

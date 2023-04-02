@@ -4,6 +4,10 @@
 #include <internal/core/db/model/tag_name.hpp>
 #include <internal/core/db/model/tag_preview.hpp>
 
+#include <minty/except.hpp>
+
+using pg::sqlstate;
+
 namespace minty::core::db {
     connection::connection(ext::pool_item<pg::client>&& client) :
         client(std::forward<ext::pool_item<pg::client>>(client))
@@ -45,18 +49,34 @@ namespace minty::core::db {
     }
 
     auto connection::create_post(
-        std::string_view title,
-        std::string_view description,
-        const std::vector<UUID::uuid>& objects,
-        const std::vector<UUID::uuid>& tags
-    ) -> ext::task<post_search> {
-        co_return co_await client->fetch_prepared<post_search>(
-            __FUNCTION__,
-            title,
-            description,
-            objects,
-            tags
-        );
+        const UUID::uuid& post_id
+    ) -> ext::task<time_point> {
+        try {
+            co_return co_await client->fetch_prepared<time_point>(
+                __FUNCTION__,
+                post_id
+            );
+        }
+        catch (const pg::sql_error& error) {
+            if (error.sqlstate(sqlstate::no_data_found)) {
+                throw not_found(error.fields().message);
+            }
+
+            throw;
+        }
+    }
+
+    auto connection::create_post_draft() -> ext::task<post_search> {
+        const auto [id, created] = co_await client->fetch_prepared<
+            std::tuple<UUID::uuid, time_point>
+        >(__FUNCTION__);
+
+        co_return post_search {
+            .id = id,
+            .visibility = visibility::draft,
+            .created = created,
+            .modified = created
+        };
     }
 
     auto connection::create_post_objects(

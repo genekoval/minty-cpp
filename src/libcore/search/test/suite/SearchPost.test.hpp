@@ -30,6 +30,7 @@ protected:
                 "A general-purpose programming language created by Danish "
                 "computer scientist Bjarne Stroustrup as an extension of the "
                 "C programming language, or \"C with Classes\".",
+            .visibility = minty::visibility::pub,
             .created = minty::test::parse_date("1985-01-01 12:00:00.0-04"),
             .modified = minty::test::parse_date("2020-12-15 12:00:00.0-04"),
             .tags = {
@@ -44,6 +45,7 @@ protected:
                 "A successor to the programming language B, C was originally "
                 "developed at Bell Labs by Dennis Ritchie between 1972 and "
                 "1973 to construct utilities running on Unix.",
+            .visibility = minty::visibility::pub,
             .created = minty::test::parse_date("1972-01-01 12:00:00.0-04"),
             .modified = minty::test::parse_date("2018-06-01 12:00:00.0-04"),
             .tags = {
@@ -58,6 +60,7 @@ protected:
                 "Java is a high-level, class-based, object-oriented "
                 "programming language that is designed to have as few "
                 "implementation dependencies as possible.",
+            .visibility = minty::visibility::pub,
             .created = minty::test::parse_date("1995-05-23 12:00:00.0-04"),
             .modified = minty::test::parse_date("2022-03-22 12:00:00.0-04"),
             .tags = {
@@ -71,6 +74,7 @@ protected:
             .description =
                 "A programming language that is one of the core technologies "
                 "of the World Wide Web, alongside HTML and CSS.",
+            .visibility = minty::visibility::pub,
             .created = minty::test::parse_date("1995-12-04 12:00:00.0-04"),
             .modified = minty::test::parse_date("2021-07-22 12:00:00.0-04"),
             .tags = {
@@ -86,6 +90,7 @@ protected:
                 "point to valid memory — without requiring the use of a "
                 "garbage collector or reference counting present in other "
                 "memory-safe languages.",
+            .visibility = minty::visibility::pub,
             .created = minty::test::parse_date("2010-07-07 12:00:00.0-04"),
             .modified = minty::test::parse_date("2022-06-30 12:00:00.0-04"),
             .tags = {

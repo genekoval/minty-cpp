@@ -13,6 +13,7 @@ namespace minty::core::search::config {
                         }}
                     }},
                     {"description", type::text()},
+                    {"visibility", type::keyword()},
                     {"created", type::date()},
                     {"modified", type::date()},
                     {"tags", type::keyword()}

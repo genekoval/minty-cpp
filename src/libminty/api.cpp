@@ -98,10 +98,6 @@ namespace minty {
         );
     }
 
-    auto api::add_post(const post_parts& parts) -> ext::task<UUID::uuid> {
-        co_return co_await client->send<UUID::uuid>(event::add_post, parts);
-    }
-
     auto api::add_post_objects(
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
@@ -171,6 +167,14 @@ namespace minty {
             tag_id,
             url
         );
+    }
+
+    auto api::create_post(const UUID::uuid& post_id) -> ext::task<> {
+        co_await client->send<void>(event::create_post, post_id);
+    }
+
+    auto api::create_post_draft() -> ext::task<UUID::uuid> {
+        co_return co_await client->send<UUID::uuid>(event::create_post_draft);
     }
 
     auto api::delete_post(const UUID::uuid& id) -> ext::task<> {

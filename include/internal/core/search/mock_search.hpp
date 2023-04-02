@@ -51,6 +51,11 @@ namespace minty::test {
             const tag_query& query
         ), (override));
 
+        MOCK_METHOD(ext::task<>, publish_post, (
+            const UUID::uuid& post_id,
+            time_point timestamp
+        ), (override));
+
         MOCK_METHOD(ext::task<>, remove_post_tag, (
             const UUID::uuid& post_id,
             const UUID::uuid& tag_id

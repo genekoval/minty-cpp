@@ -17,27 +17,22 @@ namespace minty::server {
         stream stream
     ) -> ext::task<object_preview> {
         const auto size = co_await stream.size();
-        const auto pipe = [&stream](auto& part) -> ext::task<> {
-            const auto writer = [&part](auto&& chunk) -> ext::task<> {
+
+        co_return co_await api->add_object_data(size, [&stream](
+            fstore::part& part
+        ) -> ext::task<> {
+            co_await stream.read([&part](
+                std::span<const std::byte> chunk
+            ) -> ext::task<> {
                 co_await part.write(chunk);
-            };
-
-            co_await stream.read(writer);
-        };
-
-        co_return co_await api->add_object_data(size, pipe);
+            });
+        });
     }
 
     auto router_context::add_objects_url(
         std::string url
     ) -> ext::task<std::vector<object_preview>> {
         co_return co_await api->add_objects_url(url);
-    }
-
-    auto router_context::add_post(
-        post_parts parts
-    ) -> ext::task<UUID::uuid> {
-        co_return co_await api->add_post(parts);
     }
 
     auto router_context::add_post_objects(
@@ -85,6 +80,14 @@ namespace minty::server {
         std::string url
     ) -> ext::task<source> {
         co_return co_await api->add_tag_source(tag_id, url);
+    }
+
+    auto router_context::create_post(UUID::uuid post_id) -> ext::task<> {
+        co_await api->create_post(post_id);
+    }
+
+    auto router_context::create_post_draft() -> ext::task<UUID::uuid> {
+        co_return co_await api->create_post_draft();
     }
 
     auto router_context::delete_post(UUID::uuid post_id) -> ext::task<> {

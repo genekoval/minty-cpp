@@ -2,8 +2,8 @@
 
 TEST_F(DatabasePostTest, DeletePost) {
     run([&]() -> ext::task<> {
-        const auto post1 = co_await create_post();
-        const auto post2 = co_await create_post();
+        const auto post1 = co_await create_draft();
+        const auto post2 = co_await create_draft();
 
         EXPECT_EQ(2, co_await count("post"));
 

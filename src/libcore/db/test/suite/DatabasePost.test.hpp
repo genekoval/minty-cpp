@@ -13,7 +13,7 @@ PGCPP_COMPOSITE_DECL(minty::test::related_post, "related_post");
 
 class DatabasePostTest : public DatabaseTest {
 protected:
-    auto create_post() -> ext::task<UUID::uuid>;
+    auto create_draft() -> ext::task<UUID::uuid>;
 
     auto read_related_posts() ->
         ext::task<std::vector<minty::test::related_post>>;

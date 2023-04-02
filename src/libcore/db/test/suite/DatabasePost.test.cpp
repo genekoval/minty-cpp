@@ -8,8 +8,9 @@ PGCPP_COMPOSITE_DEFINE(
     &related_post::related
 );
 
-auto DatabasePostTest::create_post() -> ext::task<UUID::uuid> {
-    co_return (co_await db->create_post("", "", {}, {})).id;
+auto DatabasePostTest::create_draft() -> ext::task<UUID::uuid> {
+    const auto draft = co_await db->create_post_draft();
+    co_return draft.id;
 }
 
 auto DatabasePostTest::read_related_posts() ->

@@ -58,11 +58,10 @@ namespace minty::core::db {
         ) -> ext::task<>;
 
         VIRTUAL auto create_post(
-            std::string_view title,
-            std::string_view description,
-            const std::vector<UUID::uuid>& objects,
-            const std::vector<UUID::uuid>& tags
-        ) -> ext::task<post_search>;
+            const UUID::uuid& post_id
+        ) -> ext::task<time_point>;
+
+        VIRTUAL auto create_post_draft() -> ext::task<post_search>;
 
         VIRTUAL auto create_post_objects(
             const UUID::uuid& post_id,

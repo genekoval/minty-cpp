@@ -23,8 +23,6 @@ namespace minty::server {
             std::string url
         ) -> ext::task<std::vector<object_preview>>;
 
-        auto add_post(post_parts parts) -> ext::task<UUID::uuid>;
-
         auto add_post_objects(
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects,
@@ -54,6 +52,10 @@ namespace minty::server {
             UUID::uuid tag_id,
             std::string url
         ) -> ext::task<source>;
+
+        auto create_post(UUID::uuid post_id) -> ext::task<>;
+
+        auto create_post_draft() -> ext::task<UUID::uuid>;
 
         auto delete_post(UUID::uuid post_id) -> ext::task<>;
 

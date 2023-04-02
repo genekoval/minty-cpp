@@ -26,12 +26,11 @@ namespace minty::core::db {
             std::string_view message
         ), (override));
 
-        MOCK_METHOD(ext::task<post_search>, create_post, (
-            std::string_view title,
-            std::string_view description,
-            const std::vector<UUID::uuid>& objects,
-            const std::vector<UUID::uuid>& tags
+        MOCK_METHOD(ext::task<time_point>, create_post, (
+            const UUID::uuid& post_id
         ), (override));
+
+        MOCK_METHOD(ext::task<post_search>, create_post_draft, (), (override));
 
         MOCK_METHOD(ext::task<time_point>, create_post_objects, (
             const UUID::uuid& post_id,

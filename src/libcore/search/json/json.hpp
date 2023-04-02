@@ -9,6 +9,14 @@
 
 using json = nlohmann::json;
 
+namespace minty {
+    NLOHMANN_JSON_SERIALIZE_ENUM(visibility, {
+        {visibility::invalid, nullptr},
+        {visibility::draft, "draft"},
+        {visibility::pub, "public"}
+    })
+}
+
 namespace nlohmann {
     template <typename Clock, typename Duration>
     struct adl_serializer<std::chrono::time_point<Clock, Duration>> {
@@ -48,6 +56,7 @@ namespace minty::core::db {
         post_search,
         title,
         description,
+        visibility,
         created,
         modified,
         tags

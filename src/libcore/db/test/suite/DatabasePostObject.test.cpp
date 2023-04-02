@@ -7,7 +7,9 @@ auto DatabasePostObjectTest::create_post_with_objects() ->
         co_await db->create_object(object, {}, {});
     }
 
-    co_return (co_await db->create_post("", "", objects, {})).id;
+    const auto draft = co_await create_draft();
+    co_await db->create_post_objects(draft, objects, -1);
+    co_return draft;
 }
 
 auto DatabasePostObjectTest::insert_object(

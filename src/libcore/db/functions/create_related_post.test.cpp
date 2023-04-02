@@ -3,8 +3,8 @@
 TEST_F(DatabasePostTest, CreateRelatedPost) {
 
     run([&]() -> ext::task<> {
-        const auto post = co_await create_post();
-        const auto related = co_await create_post();
+        const auto post = co_await create_draft();
+        const auto related = co_await create_draft();
 
         co_await db->create_related_post(post, related);
 
@@ -21,8 +21,8 @@ TEST_F(DatabasePostTest, CreateRelatedPost) {
 
 TEST_F(DatabasePostTest, CreateRelatedPostIdempotent) {
     run([&]() -> ext::task<> {
-        const auto post = co_await create_post();
-        const auto related = co_await create_post();
+        const auto post = co_await create_draft();
+        const auto related = co_await create_draft();
 
         for (auto i = 0; i < 2; ++i) {
             co_await db->create_related_post(post, related);

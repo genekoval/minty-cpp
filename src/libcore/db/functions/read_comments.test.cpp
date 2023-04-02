@@ -2,7 +2,7 @@
 
 TEST_F(DatabasePostTest, ReadZeroComments) {
     run([&]() -> ext::task<> {
-        const auto post_id = co_await create_post();
+        const auto post_id = co_await create_draft();
         const auto comments = co_await db->read_comments(post_id);
 
         EXPECT_TRUE(comments.empty());
@@ -13,7 +13,7 @@ TEST_F(DatabasePostTest, ReadOneComment) {
     constexpr auto text = "First post.";
 
     run([&]() -> ext::task<> {
-        const auto post_id = co_await create_post();
+        const auto post_id = co_await create_draft();
         const auto comment = co_await db->create_comment(post_id, text);
 
         auto comments = co_await db->read_comments(post_id);
@@ -25,7 +25,7 @@ TEST_F(DatabasePostTest, ReadOneComment) {
 
 TEST_F(DatabasePostTest, ReadNestedComments) {
     run([&]() -> ext::task<> {
-        const auto post_id = co_await create_post();
+        const auto post_id = co_await create_draft();
 
         const auto root1 = co_await db->create_comment(post_id, "Root 1");
         const auto child1 = co_await db->create_reply(root1.id, "Child 1");

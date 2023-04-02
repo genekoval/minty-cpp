@@ -4,7 +4,7 @@ TEST_F(DatabasePostTest, CreateComment) {
     constexpr auto content = "First comment.";
 
     run([&]() -> ext::task<> {
-        const auto post_id = co_await create_post();
+        const auto post_id = co_await create_draft();
         const auto comment = co_await db->create_comment(post_id, content);
 
         EXPECT_EQ(post_id, comment.post_id);
