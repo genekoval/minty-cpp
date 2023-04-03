@@ -8,21 +8,21 @@ auto DatabasePostObjectTest::create_post_with_objects() ->
     }
 
     const auto draft = co_await create_draft();
-    co_await db->create_post_objects(draft, objects, -1);
+    co_await db->create_post_objects(draft, objects, std::nullopt);
     co_return draft;
 }
 
 auto DatabasePostObjectTest::insert_object(
-    std::int16_t position
+    const std::optional<UUID::uuid>& destination
 ) -> ext::task<std::vector<minty::test::sequence_object>> {
-    co_return co_await insert_objects({new_object}, position);
+    co_return co_await insert_objects({new_object}, destination);
 }
 
 auto DatabasePostObjectTest::insert_objects(
     const std::vector<UUID::uuid>& objects,
-    std::int16_t position
+    const std::optional<UUID::uuid>& destination
 ) -> ext::task<std::vector<minty::test::sequence_object>> {
-    co_await db->create_post_objects(post_id, objects, position);
+    co_await db->create_post_objects(post_id, objects, destination);
     co_return co_await with_sequence();
 }
 

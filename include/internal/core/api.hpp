@@ -97,7 +97,7 @@ namespace minty::core {
         auto add_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
-            std::int16_t position
+            const std::optional<UUID::uuid>& destination
         ) -> ext::task<time_point>;
 
         auto add_post_tag(

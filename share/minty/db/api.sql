@@ -371,6 +371,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION create_post_objects(
+    post_id uuid,
+    objects uuid[],
+    destination uuid
+) RETURNS timestamptz AS $$
+BEGIN
+    RETURN create_post_objects(post_id, objects, (
+        CASE
+            WHEN destination IS NULL THEN (
+                SELECT max(sequence)
+                FROM data.post_object obj
+                WHERE obj.post_id = create_post_objects.post_id
+            )
+        ELSE (
+            SELECT sequence - 1
+            FROM data.post_object obj
+            WHERE
+                obj.post_id = create_post_objects.post_id AND
+                object_id = destination
+        )
+        END
+    )::smallint);
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION create_post_tag(
     a_post_id       uuid,
     a_tag_id        uuid
@@ -667,26 +692,7 @@ CREATE FUNCTION move_post_objects(
 ) RETURNS timestamptz AS $$
 BEGIN
     PERFORM delete_post_objects(a_post_id, a_objects);
-    PERFORM create_post_objects(
-        a_post_id,
-        a_objects,
-        (
-            CASE
-                WHEN a_destination IS NULL THEN (
-                    SELECT max(sequence)
-                    FROM data.post_object
-                    WHERE post_id = a_post_id
-                )
-                ELSE (
-                    SELECT sequence - 1
-                    FROM data.post_object
-                    WHERE post_id = a_post_id AND object_id = a_destination
-                )
-            END
-        )::smallint
-    );
-
-    RETURN read_post_date_modified(a_post_id);
+    RETURN create_post_objects(a_post_id, a_objects, a_destination);
 END;
 $$ LANGUAGE plpgsql;
 

@@ -101,13 +101,13 @@ namespace minty {
     auto api::add_post_objects(
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
-        std::int16_t position
+        const std::optional<UUID::uuid>& destination
     ) -> ext::task<time_point> {
         co_return co_await client->send<time_point>(
             event::add_post_objects,
             post_id,
             objects,
-            position
+            destination
         );
     }
 

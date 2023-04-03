@@ -2,7 +2,7 @@
 
 TEST_F(DatabasePostObjectTest, AppendPostObject) {
     run([&]() -> ext::task<> {
-        const auto results = co_await insert_object(objects.size());
+        const auto results = co_await insert_object(std::nullopt);
 
         EXPECT_EQ(4, results.size());
 
@@ -19,28 +19,11 @@ TEST_F(DatabasePostObjectTest, AppendPostObject) {
     }());
 }
 
-TEST_F(DatabasePostObjectTest, AppendPostObjectLargeSequence) {
-    run([&]() -> ext::task<> {
-        const auto results = co_await insert_object(
-            std::numeric_limits<std::int16_t>::max()
-        );
-
-        EXPECT_EQ(4, results.back().sequence);
-    }());
-}
-
-TEST_F(DatabasePostObjectTest, AppendPostObjectNegativeSequence) {
-    run([&]() -> ext::task<> {
-        const auto results = co_await insert_object(-1);
-        EXPECT_EQ(4, results.back().sequence);
-    }());
-}
-
 TEST_F(DatabasePostObjectTest, InsertPostObject) {
     auto results = std::vector<minty::test::sequence_object>();
 
     run([&]() -> ext::task<> {
-        results = co_await insert_object(1);
+        results = co_await insert_object(objects.at(1));
     }());
 
     ASSERT_EQ(4, results.size());
@@ -62,7 +45,10 @@ TEST_F(DatabasePostObjectTest, InsertMultiplePostObjects) {
 
     run([&]() -> ext::task<> {
         co_await db->create_object(additional, {}, {});
-        results = co_await insert_objects({new_object, additional}, 0);
+        results = co_await insert_objects(
+            {new_object, additional},
+            objects.at(0)
+        );
     }());
 
     ASSERT_EQ(5, results.size());
@@ -83,7 +69,7 @@ TEST_F(DatabasePostObjectTest, AddPostObjectsDateModified) {
         const auto id = co_await create_draft();
 
         co_await db->create_object(new_object, {}, {});
-        co_await db->create_post_objects(id, {new_object}, 0);
+        co_await db->create_post_objects(id, {new_object}, std::nullopt);
 
         const auto post = co_await db->read_post(id);
 

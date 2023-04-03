@@ -16,12 +16,12 @@ protected:
     auto create_post_with_objects() -> ext::task<UUID::uuid>;
 
     auto insert_object(
-        std::int16_t position
+        const std::optional<UUID::uuid>& destination
     ) -> ext::task<std::vector<minty::test::sequence_object>>;
 
     auto insert_objects(
         const std::vector<UUID::uuid>& objects,
-        std::int16_t position
+        const std::optional<UUID::uuid>& destination
     ) -> ext::task<std::vector<minty::test::sequence_object>>;
 
     auto run(ext::task<>&& task) -> void;

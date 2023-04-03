@@ -26,7 +26,7 @@ namespace minty::server {
         auto add_post_objects(
             UUID::uuid post_id,
             std::vector<UUID::uuid> objects,
-            std::int16_t position
+            std::optional<UUID::uuid> destination
         ) -> ext::task<time_point>;
 
         auto add_post_tag(UUID::uuid post_id, UUID::uuid tag_id) -> ext::task<>;

@@ -35,7 +35,7 @@ namespace minty::core::db {
         MOCK_METHOD(ext::task<time_point>, create_post_objects, (
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
-            std::int16_t position
+            const std::optional<UUID::uuid>& destination
         ), (override));
 
         MOCK_METHOD(ext::task<>, create_post_tag, (

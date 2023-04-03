@@ -109,14 +109,14 @@ namespace minty::core {
     auto api::add_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
-        std::int16_t position
+        const std::optional<UUID::uuid>& destination
     ) -> ext::task<decltype(post::date_modified)> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
 
         const auto date_modified =
-            co_await db.create_post_objects(post_id, objects, position);
+            co_await db.create_post_objects(post_id, objects, destination);
 
         co_await search->update_post_date_modified(post_id, date_modified);
 

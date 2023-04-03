@@ -46,7 +46,7 @@ TEST_F(DatabasePruneTest, PrunePostObject) {
 
         const auto objects = std::vector<UUID::uuid> { object_id };
         const auto draft = co_await db->create_post_draft();
-        co_await db->create_post_objects(draft.id, objects, -1);
+        co_await db->create_post_objects(draft.id, objects, std::nullopt);
 
         EXPECT_EQ(1, co_await count("object"));
         EXPECT_EQ(2, co_await count("object_ref")); // object and site icon

@@ -51,7 +51,7 @@ namespace minty {
         auto add_post_objects(
             const UUID::uuid& post_id,
             std::span<const UUID::uuid> objects,
-            std::int16_t position
+            const std::optional<UUID::uuid>& destination
         ) -> ext::task<time_point>;
 
         auto add_post_tag(

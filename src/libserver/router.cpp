@@ -38,9 +38,9 @@ namespace minty::server {
     auto router_context::add_post_objects(
         UUID::uuid post_id,
         std::vector<UUID::uuid> objects,
-        std::int16_t position
+        std::optional<UUID::uuid> destination
     ) -> ext::task<time_point> {
-        co_return co_await api->add_post_objects(post_id, objects, position);
+        co_return co_await api->add_post_objects(post_id, objects, destination);
     }
 
     auto router_context::add_post_tag(

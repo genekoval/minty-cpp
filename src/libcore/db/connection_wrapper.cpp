@@ -46,9 +46,9 @@ namespace minty::core::db {
     auto connection_wrapper::create_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
-        std::int16_t position
+        const std::optional<UUID::uuid>& destination
     ) -> ext::task<time_point> {
-        return inner->create_post_objects(post_id, objects, position);
+        return inner->create_post_objects(post_id, objects, destination);
     }
 
     auto connection_wrapper::create_post_tag(

@@ -82,13 +82,13 @@ namespace minty::core::db {
     auto connection::create_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
-        std::int16_t position
+        const std::optional<UUID::uuid>& destination
     ) -> ext::task<time_point> {
         co_return co_await client->fetch_prepared<time_point>(
             __FUNCTION__,
             post_id,
             objects,
-            position
+            destination
         );
     }
 
