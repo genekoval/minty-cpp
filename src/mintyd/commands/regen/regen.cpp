@@ -1,5 +1,5 @@
 #include "commands.h"
-#include "../../api/api.h"
+#include "../../repo/repo.hpp"
 #include "../commands.h"
 #include "../options/opts.h"
 
@@ -16,10 +16,10 @@ namespace {
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
 
-            minty::cli::api(settings, [&id](auto& api) -> ext::task<> {
-                const auto preview =
-                    co_await api.regenerate_preview(id);
-
+            minty::cli::repo(settings, [&id](
+                minty::core::repo& repo
+            ) -> ext::task<> {
+                const auto preview = co_await repo.regenerate_preview(id);
                 if (preview) fmt::print("{}\n", *preview);
             });
         }

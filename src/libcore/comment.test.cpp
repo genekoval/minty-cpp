@@ -20,7 +20,7 @@ TEST_F(CoreCommentTest, AddRootComment) {
     ).WillOnce(Return(ext::make_task(comment { .content = content })));
 
     [&]() -> ext::detached_task {
-        const auto comment = co_await api.add_comment(post_id, content);
+        const auto comment = co_await repo.add_comment(post_id, content);
         EXPECT_EQ(content, comment.content);
     }();
 }
@@ -68,7 +68,7 @@ TEST_F(CoreCommentTest, ReadCommentChain) {
     auto comments = minty::comment_tree();
 
     [&]() -> ext::detached_task {
-        comments = co_await api.get_comments(post_id);
+        comments = co_await repo.get_comments(post_id);
     }();
 
     const auto& roots = comments.roots;

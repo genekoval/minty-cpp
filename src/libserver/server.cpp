@@ -26,13 +26,13 @@ namespace minty::server {
     }
 
     auto create(
-        core::api& api,
+        core::repo& repo,
         const server_info& info,
         timber::timer& startup_timer,
         timber::timer& uptime_timer
     ) -> server_type {
         return server_type(
-            make_router(api, info),
+            make_router(repo, info),
             startup_timer,
             uptime_timer
         );

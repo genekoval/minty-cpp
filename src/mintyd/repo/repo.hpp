@@ -1,10 +1,10 @@
 #pragma once
 
 #include <internal/conf/settings.hpp>
-#include <internal/core/api.hpp>
+#include <internal/core/repo.hpp>
 
 namespace minty::cli {
-    class api_container {
+    class container {
         pg::parameters db_params;
 
         core::db::database database;
@@ -12,26 +12,26 @@ namespace minty::cli {
         core::downloader downloader;
         core::search_engine search;
     public:
-        core::api api;
+        core::repo repo;
 
-        api_container(const minty::conf::settings& settings);
+        container(const minty::conf::settings& settings);
 
         auto init(const minty::conf::settings& settings) -> ext::task<>;
     };
 
     template <typename F>
-    requires requires(const F& f, core::api& api) {
-        { f(api) } -> std::same_as<ext::task<>>;
+    requires requires(const F& f, core::repo& repo) {
+        { f(repo) } -> std::same_as<ext::task<>>;
     }
-    auto api(
+    auto repo(
         const conf::settings& settings,
         const F& action
     ) -> void {
         netcore::async([&]() -> ext::task<> {
-            auto container = api_container(settings);
+            auto container = cli::container(settings);
 
             co_await container.init(settings);
-            co_await action(container.api);
+            co_await action(container.repo);
         }());
     }
 }

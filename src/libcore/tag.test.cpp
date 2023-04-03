@@ -16,7 +16,7 @@ TEST_F(CoreTagTest, AddTag) {
         .WillOnce(Return(ext::make_task()));
 
     [&]() -> ext::detached_task {
-        const auto result = co_await api.add_tag(whitespace_text);
+        const auto result = co_await repo.add_tag(whitespace_text);
         EXPECT_EQ(tag_id, result);
     }();
 }

@@ -1,7 +1,7 @@
-#include "api.h"
+#include "repo.hpp"
 
 namespace minty::cli {
-    api_container::api_container(const minty::conf::settings& settings) :
+    container::container(const minty::conf::settings& settings) :
         db_params(pg::parameters::parse(
             settings.database.connection.parameters
         )),
@@ -16,10 +16,10 @@ namespace minty::cli {
             settings.search.node,
             settings.search.auth
         ),
-        api(database, objects, downloader, search)
+        repo(database, objects, downloader, search)
     {}
 
-    auto api_container::init(const conf::settings& settings) -> ext::task<> {
+    auto container::init(const conf::settings& settings) -> ext::task<> {
         co_await objects.init(settings.fstore.bucket);
     }
 }

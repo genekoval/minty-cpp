@@ -1,6 +1,5 @@
 #include "commands.h"
 #include "options/opts.h"
-#include "../api/api.h"
 #include "../db/db.hpp"
 
 using namespace commline;

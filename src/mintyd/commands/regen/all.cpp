@@ -1,5 +1,5 @@
 #include "commands.h"
-#include "../../api/api.h"
+#include "../../repo/repo.hpp"
 #include "../options/opts.h"
 
 #include <chrono>
@@ -72,12 +72,12 @@ namespace {
 
             auto errors = std::size_t(0);
 
-            minty::cli::api(settings, [
+            minty::cli::repo(settings, [
                 &errors,
                 jobs,
                 &progress
-            ](auto& api) -> ext::task<> {
-                errors = co_await api.regenerate_previews(jobs, progress);
+            ](minty::core::repo& repo) -> ext::task<> {
+                errors = co_await repo.regenerate_previews(jobs, progress);
             });
 
             running = false;

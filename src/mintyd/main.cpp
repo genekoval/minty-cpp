@@ -1,4 +1,4 @@
-#include "api/api.h"
+#include "repo/repo.hpp"
 #include "commands/commands.h"
 #include "commands/options/opts.h"
 
@@ -43,20 +43,20 @@ namespace {
 
             TIMBER_NOTICE("{} version {} starting up", app.name, app.version);
 
-            minty::cli::api(settings, [&](
-                minty::core::api& api
+            minty::cli::repo(settings, [&](
+                minty::core::repo& repo
             ) -> ext::task<> {
                 const auto info = minty::server_info {
                     .version = std::string(app.version),
                     .object_source = {
                         .host = settings.fstore.proxy.host,
                         .port = settings.fstore.proxy.port,
-                        .bucket_id = api.get_bucket_id()
+                        .bucket_id = repo.get_bucket_id()
                     }
                 };
 
                 auto server = minty::server::create(
-                    api,
+                    repo,
                     info,
                     startup_timer,
                     uptime_timer

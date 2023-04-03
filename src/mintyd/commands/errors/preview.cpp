@@ -1,32 +1,33 @@
 #include "commands.h"
 #include "../options/opts.h"
-#include "../../api/api.h"
+#include "../../repo/repo.hpp"
 
 using namespace commline;
 
 namespace {
     namespace internal {
+        auto print_errors(minty::core::repo& repo) -> ext::task<> {
+            const auto errors = co_await repo.get_object_preview_errors();
+
+            for (const auto& error : errors) {
+                fmt::print("{}  {}\n", error.id, error.message);
+            }
+
+            fmt::print(
+                "{} error{}\n",
+                errors.size(),
+                errors.size() == 1 ? "" : "s"
+            );
+
+            co_return;
+        }
+
         auto preview(
             const app& app,
             std::string_view confpath
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
-
-            minty::cli::api(settings, [](minty::core::api& api) -> ext::task<> {
-                const auto errors = co_await api.get_object_preview_errors();
-
-                for (const auto& error : errors) {
-                    fmt::print("{}  {}\n", error.id, error.message);
-                }
-
-                fmt::print(
-                    "{} error{}\n",
-                    errors.size(),
-                    errors.size() == 1 ? "" : "s"
-                );
-
-                co_return;
-            });
+            minty::cli::repo(settings, print_errors);
         }
     }
 }

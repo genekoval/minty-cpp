@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api.hpp"
+#include "repo.hpp"
 
 #include <ext/pool>
 #include <netcore/netcore>
@@ -28,13 +28,13 @@ namespace minty {
 
             provider(socket_type&& endpoint);
 
-            auto provide() -> ext::task<api>;
+            auto provide() -> ext::task<repo>;
         };
 
-        ext::async_pool<api, provider> pool;
+        ext::async_pool<repo, provider> pool;
     public:
         client(std::string_view endpoint);
 
-        auto connect() -> ext::task<ext::pool_item<api>>;
+        auto connect() -> ext::task<ext::pool_item<repo>>;
     };
 }

@@ -22,11 +22,11 @@ namespace minty::server {
     }
 
     inline auto make_router(
-        core::api& api,
+        core::repo& repo,
         const server_info& info
     ) {
         return detail::make_router(
-            router_context(api, info),
+            router_context(repo, info),
             &router_context::add_comment,
             &router_context::add_object_data,
             &router_context::add_objects_url,
@@ -65,7 +65,7 @@ namespace minty::server {
 
     using router_type = std::invoke_result_t<
         decltype(make_router),
-        core::api&,
+        core::repo&,
         const server_info&
     >;
 
@@ -90,7 +90,7 @@ namespace minty::server {
     using server_type = netcore::server<server_context>;
 
     auto create(
-        core::api& api,
+        core::repo& repo,
         const server_info& info,
         timber::timer& startup_timer,
         timber::timer& uptime_timer

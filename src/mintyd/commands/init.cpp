@@ -1,7 +1,7 @@
 #include "commands.h"
 #include "options/opts.h"
-#include "../api/api.h"
 #include "../db/db.hpp"
+#include "../repo/repo.hpp"
 
 using namespace commline;
 
@@ -22,9 +22,12 @@ namespace {
 
             if (skip_index) return;
 
-            minty::cli::api(settings, [](minty::core::api& api) -> ext::task<> {
-                co_await api.reindex();
-            });
+            minty::cli::repo(
+                settings,
+                [](minty::core::repo& repo) -> ext::task<> {
+                    co_await repo.reindex();
+                }
+            );
         }
     }
 }

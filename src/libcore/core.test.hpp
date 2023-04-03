@@ -1,10 +1,10 @@
 #pragma once
 
-#include <internal/core/api.hpp>
 #include <internal/core/db/mock_connection.hpp>
 #include <internal/core/db/test_database.hpp>
 #include <internal/core/downloader/mock_downloader.hpp>
 #include <internal/core/object_store/mock_object_store.hpp>
+#include <internal/core/repo.hpp>
 #include <internal/core/search/mock_search.hpp>
 
 #include <gtest/gtest.h>
@@ -21,7 +21,7 @@ protected:
     minty::test::object_store objects;
     minty::test::downloader downloader;
     minty::test::search_engine search;
-    minty::core::api api;
+    minty::core::repo repo;
 
     CoreTest();
 };

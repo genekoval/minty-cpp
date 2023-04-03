@@ -6,7 +6,7 @@ namespace minty {
         pool(provider(parse_endpoint(endpoint)))
     {}
 
-    auto client::connect() -> ext::task<ext::pool_item<api>> {
+    auto client::connect() -> ext::task<ext::pool_item<repo>> {
         co_return co_await pool.checkout();
     }
 
@@ -37,7 +37,7 @@ namespace minty {
         endpoint(std::forward<socket_type>(endpoint))
     {}
 
-    auto client::provider::provide() -> ext::task<api> {
+    auto client::provider::provide() -> ext::task<repo> {
         auto socket = netcore::socket();
 
         if (const auto* sock = std::get_if<domain>(&endpoint)) {
@@ -50,6 +50,6 @@ namespace minty {
             );
         }
 
-        co_return api(std::move(socket));
+        co_return repo(std::move(socket));
     }
 }

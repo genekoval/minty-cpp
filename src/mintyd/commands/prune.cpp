@@ -1,4 +1,4 @@
-#include "../api/api.h"
+#include "../repo/repo.hpp"
 #include "commands.h"
 #include "options/opts.h"
 
@@ -14,9 +14,12 @@ namespace {
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
 
-            minty::cli::api(settings, [](auto& api) -> ext::task<> {
-                co_await api.prune();
-            });
+            minty::cli::repo(
+                settings,
+                [](minty::core::repo& repo) -> ext::task<> {
+                    co_await repo.prune();
+                }
+            );
         }
     }
 }

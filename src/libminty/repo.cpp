@@ -1,4 +1,4 @@
-#include <minty/api.hpp>
+#include <minty/repo.hpp>
 #include <minty/except.hpp>
 
 #include <fcntl.h>
@@ -20,14 +20,14 @@ namespace zipline {
 }
 
 namespace minty {
-    api::api(netcore::socket&& socket) :
+    repo::repo(netcore::socket&& socket) :
         client(new client_type(
             error_list::thrower(),
             std::forward<netcore::socket>(socket)
         ))
     {}
 
-    auto api::add_comment(
+    auto repo::add_comment(
         const UUID::uuid& post_id,
         std::string_view content
     ) -> ext::task<comment_data> {
@@ -38,7 +38,7 @@ namespace minty {
         );
     }
 
-    auto api::add_object_data(
+    auto repo::add_object_data(
         const fs::path& path
     ) -> ext::task<object_preview> {
         const auto file = fstore::file {
@@ -52,7 +52,7 @@ namespace minty {
         );
     }
 
-    auto api::add_objects(
+    auto repo::add_objects(
         std::span<const std::string_view> arguments
     ) -> ext::task<std::vector<object_preview>> {
         auto result = std::vector<object_preview>();
@@ -89,7 +89,7 @@ namespace minty {
         co_return result;
     }
 
-    auto api::add_objects_url(
+    auto repo::add_objects_url(
         std::string_view url
     ) -> ext::task<std::vector<object_preview>> {
         co_return co_await client->send<std::vector<object_preview>>(
@@ -98,7 +98,7 @@ namespace minty {
         );
     }
 
-    auto api::add_post_objects(
+    auto repo::add_post_objects(
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         const std::optional<UUID::uuid>& destination
@@ -111,7 +111,7 @@ namespace minty {
         );
     }
 
-    auto api::add_post_tag(
+    auto repo::add_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
     ) -> ext::task<> {
@@ -122,14 +122,14 @@ namespace minty {
         );
     }
 
-    auto api::add_related_post(
+    auto repo::add_related_post(
         const UUID::uuid& post_id,
         const UUID::uuid& related
     ) -> ext::task<> {
         co_await client->send<void>(event::add_related_post, post_id, related);
     }
 
-    auto api::add_reply(
+    auto repo::add_reply(
         const UUID::uuid& parent_id,
         std::string_view content
     ) -> ext::task<comment_data> {
@@ -140,14 +140,14 @@ namespace minty {
         );
     }
 
-    auto api::add_tag(std::string_view name) -> ext::task<UUID::uuid> {
+    auto repo::add_tag(std::string_view name) -> ext::task<UUID::uuid> {
         co_return co_await client->send<UUID::uuid>(
             event::add_tag,
             name
         );
     }
 
-    auto api::add_tag_alias(
+    auto repo::add_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<tag_name> {
@@ -158,7 +158,7 @@ namespace minty {
         );
     }
 
-    auto api::add_tag_source(
+    auto repo::add_tag_source(
         const UUID::uuid& tag_id,
         std::string_view url
     ) -> ext::task<source> {
@@ -169,19 +169,19 @@ namespace minty {
         );
     }
 
-    auto api::create_post(const UUID::uuid& post_id) -> ext::task<> {
+    auto repo::create_post(const UUID::uuid& post_id) -> ext::task<> {
         co_await client->send<void>(event::create_post, post_id);
     }
 
-    auto api::create_post_draft() -> ext::task<UUID::uuid> {
+    auto repo::create_post_draft() -> ext::task<UUID::uuid> {
         co_return co_await client->send<UUID::uuid>(event::create_post_draft);
     }
 
-    auto api::delete_post(const UUID::uuid& id) -> ext::task<> {
+    auto repo::delete_post(const UUID::uuid& id) -> ext::task<> {
         co_await client->send<void>(event::delete_post, id);
     }
 
-    auto api::delete_post_objects(
+    auto repo::delete_post_objects(
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects
     ) -> ext::task<time_point> {
@@ -192,14 +192,14 @@ namespace minty {
         );
     }
 
-    auto api::delete_post_tag(
+    auto repo::delete_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
     ) -> ext::task<> {
         co_await client->send<void>(event::delete_post_tag, post_id, tag_id);
     }
 
-    auto api::delete_related_post(
+    auto repo::delete_related_post(
         const UUID::uuid& post_id,
         const UUID::uuid& related
     ) -> ext::task<> {
@@ -210,11 +210,11 @@ namespace minty {
         );
     }
 
-    auto api::delete_tag(const UUID::uuid& id) -> ext::task<> {
+    auto repo::delete_tag(const UUID::uuid& id) -> ext::task<> {
         co_await client->send<void>(event::delete_tag, id);
     }
 
-    auto api::delete_tag_alias(
+    auto repo::delete_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<tag_name> {
@@ -225,7 +225,7 @@ namespace minty {
         );
     }
 
-    auto api::delete_tag_source(
+    auto repo::delete_tag_source(
         const UUID::uuid& tag_id,
         std::int64_t source_id
     ) -> ext::task<> {
@@ -236,7 +236,7 @@ namespace minty {
         );
     }
 
-    auto api::get_comment(
+    auto repo::get_comment(
         const UUID::uuid& comment_id
     ) -> ext::task<comment> {
         co_return co_await client->send<comment>(
@@ -245,7 +245,7 @@ namespace minty {
         );
     }
 
-    auto api::get_comments(
+    auto repo::get_comments(
         const UUID::uuid& post_id
     ) -> ext::task<std::vector<comment_data>> {
         co_return co_await client->send<std::vector<comment_data>>(
@@ -254,18 +254,18 @@ namespace minty {
         );
     }
 
-    auto api::get_object(const UUID::uuid& object_id) -> ext::task<object> {
+    auto repo::get_object(const UUID::uuid& object_id) -> ext::task<object> {
         co_return co_await client->send<object>(event::get_object, object_id);
     }
 
-    auto api::get_post(const UUID::uuid& id) -> ext::task<post> {
+    auto repo::get_post(const UUID::uuid& id) -> ext::task<post> {
         co_return co_await client->send<post>(
             event::get_post,
             id
         );
     }
 
-    auto api::get_posts(
+    auto repo::get_posts(
         const post_query& query
     ) -> ext::task<search_result<post_preview>> {
         co_return co_await client->send<search_result<post_preview>>(
@@ -274,18 +274,18 @@ namespace minty {
         );
     }
 
-    auto api::get_server_info() -> ext::task<server_info> {
+    auto repo::get_server_info() -> ext::task<server_info> {
         co_return co_await client->send<server_info>(event::get_server_info);
     }
 
-    auto api::get_tag(const UUID::uuid& id) -> ext::task<tag> {
+    auto repo::get_tag(const UUID::uuid& id) -> ext::task<tag> {
         co_return co_await client->send<tag>(
             event::get_tag,
             id
         );
     }
 
-    auto api::get_tags(
+    auto repo::get_tags(
         const tag_query& query
     ) -> ext::task<search_result<tag_preview>> {
         co_return co_await client->send<search_result<tag_preview>>(
@@ -294,7 +294,7 @@ namespace minty {
         );
     }
 
-    auto api::move_post_objects(
+    auto repo::move_post_objects(
         const UUID::uuid& post_id,
         std::span<const UUID::uuid> objects,
         const std::optional<UUID::uuid>& destination
@@ -307,7 +307,7 @@ namespace minty {
         );
     }
 
-    auto api::set_comment_content(
+    auto repo::set_comment_content(
         const UUID::uuid& comment_id,
         std::string_view content
     ) -> ext::task<std::string> {
@@ -318,7 +318,7 @@ namespace minty {
         );
     }
 
-    auto api::set_post_description(
+    auto repo::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
     ) -> ext::task<modification<std::optional<std::string>>> {
@@ -329,7 +329,7 @@ namespace minty {
         );
     }
 
-    auto api::set_post_title(
+    auto repo::set_post_title(
         const UUID::uuid& post_id,
         std::string_view title
     ) -> ext::task<modification<std::optional<std::string>>> {
@@ -340,7 +340,7 @@ namespace minty {
         );
     }
 
-    auto api::set_tag_description(
+    auto repo::set_tag_description(
         const UUID::uuid& tag_id,
         std::string_view description
     ) -> ext::task<std::optional<std::string>> {
@@ -351,7 +351,7 @@ namespace minty {
         );
     }
 
-    auto api::set_tag_name(
+    auto repo::set_tag_name(
         const UUID::uuid& tag_id,
         std::string_view new_name
     ) -> ext::task<tag_name> {

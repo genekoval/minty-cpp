@@ -1,16 +1,16 @@
 #pragma once
 
-#include <internal/core/api.hpp>
-#include <minty/api.hpp>
+#include <internal/core/repo.hpp>
+#include <minty/repo.hpp>
 
 namespace minty::server {
     using stream = zipline::stream<socket>;
 
     class router_context {
-        core::api* api;
+        core::repo* repo;
         const server_info* info;
     public:
-        router_context(core::api& api, const server_info& info);
+        router_context(core::repo& repo, const server_info& info);
 
         auto add_comment(
             UUID::uuid post_id,

@@ -1,14 +1,14 @@
 #include "utility.hpp"
 
-#include <internal/core/api.hpp>
 #include <internal/core/comment_tree.hpp>
 #include <internal/core/preview.hpp>
+#include <internal/core/repo.hpp>
 
 #include <threadpool/threadpool>
 #include <uri/uri>
 
 namespace minty::core {
-    api::api(
+    repo::repo(
         db::database& database,
         object_store& objects,
         downloader& dl,
@@ -20,7 +20,7 @@ namespace minty::core {
         search(&search)
     {}
 
-    auto api::add_comment(
+    auto repo::add_comment(
         const UUID::uuid& post_id,
         std::string_view content
     ) -> ext::task<comment_data> {
@@ -41,7 +41,7 @@ namespace minty::core {
         };
     }
 
-    auto api::add_object(
+    auto repo::add_object(
         db::connection_type& db,
         bucket& bucket,
         fstore::object&& object,
@@ -68,7 +68,7 @@ namespace minty::core {
         };
     }
 
-    auto api::add_objects_url(
+    auto repo::add_objects_url(
         std::string_view url
     ) -> ext::task<std::vector<object_preview>> {
         TIMBER_FUNC();
@@ -106,7 +106,7 @@ namespace minty::core {
         co_return result;
     }
 
-    auto api::add_post_objects(
+    auto repo::add_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         const std::optional<UUID::uuid>& destination
@@ -123,7 +123,7 @@ namespace minty::core {
         co_return date_modified;
     }
 
-    auto api::add_post_tag(
+    auto repo::add_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
     ) -> ext::task<> {
@@ -135,7 +135,7 @@ namespace minty::core {
         co_await search->add_post_tag(post_id, tag_id);
     }
 
-    auto api::add_related_post(
+    auto repo::add_related_post(
         const UUID::uuid& post_id,
         const UUID::uuid& related
     ) -> ext::task<> {
@@ -146,7 +146,7 @@ namespace minty::core {
         co_await db.create_related_post(post_id, related);
     }
 
-    auto api::add_reply(
+    auto repo::add_reply(
         const UUID::uuid& parent_id,
         std::string_view content
     ) -> ext::task<comment_data> {
@@ -167,7 +167,7 @@ namespace minty::core {
         };
     }
 
-    auto api::add_source(
+    auto repo::add_source(
         db::connection_type& db,
         std::string_view url
     ) -> ext::task<source> {
@@ -197,7 +197,7 @@ namespace minty::core {
         co_return co_await db.create_source(site_id, resource);
     }
 
-    auto api::add_site(
+    auto repo::add_site(
         db::connection_type& db,
         std::string_view scheme,
         std::string_view host
@@ -228,7 +228,7 @@ namespace minty::core {
         co_return site.id;
     }
 
-    auto api::add_tag(std::string_view name) -> ext::task<UUID::uuid> {
+    auto repo::add_tag(std::string_view name) -> ext::task<UUID::uuid> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -241,7 +241,7 @@ namespace minty::core {
         co_return id;
     }
 
-    auto api::add_tag_alias(
+    auto repo::add_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<tag_name> {
@@ -257,7 +257,7 @@ namespace minty::core {
         co_return name;
     }
 
-    auto api::add_tag_source(
+    auto repo::add_tag_source(
         const UUID::uuid& tag_id,
         std::string_view url
     ) -> ext::task<source> {
@@ -270,7 +270,7 @@ namespace minty::core {
         co_return src;
     }
 
-    auto api::create_post(const UUID::uuid& post_id) -> ext::task<> {
+    auto repo::create_post(const UUID::uuid& post_id) -> ext::task<> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -282,7 +282,7 @@ namespace minty::core {
         co_await tx.commit();
     }
 
-    auto api::create_post_draft() -> ext::task<UUID::uuid> {
+    auto repo::create_post_draft() -> ext::task<UUID::uuid> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -295,7 +295,7 @@ namespace minty::core {
         co_return post.id;
     }
 
-    auto api::delete_post(const UUID::uuid& id) -> ext::task<> {
+    auto repo::delete_post(const UUID::uuid& id) -> ext::task<> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -304,7 +304,7 @@ namespace minty::core {
         co_await search->delete_post(id);
     }
 
-    auto api::delete_post_objects(
+    auto repo::delete_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects
     ) -> ext::task<decltype(post::date_modified)> {
@@ -317,7 +317,7 @@ namespace minty::core {
         co_return modified;
     }
 
-    auto api::delete_post_tag(
+    auto repo::delete_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
     ) -> ext::task<> {
@@ -329,7 +329,7 @@ namespace minty::core {
         co_await search->remove_post_tag(post_id, tag_id);
     }
 
-    auto api::delete_related_post(
+    auto repo::delete_related_post(
         const UUID::uuid& post_id,
         const UUID::uuid& related
     ) -> ext::task<> {
@@ -340,7 +340,7 @@ namespace minty::core {
         co_await db.delete_related_post(post_id, related);
     }
 
-    auto api::delete_tag(const UUID::uuid& id) -> ext::task<> {
+    auto repo::delete_tag(const UUID::uuid& id) -> ext::task<> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -349,7 +349,7 @@ namespace minty::core {
         co_await search->delete_tag(id);
     }
 
-    auto api::delete_tag_alias(
+    auto repo::delete_tag_alias(
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<tag_name> {
@@ -362,7 +362,7 @@ namespace minty::core {
         co_return name;
     }
 
-    auto api::delete_tag_source(
+    auto repo::delete_tag_source(
         const UUID::uuid& tag_id,
         std::int64_t source_id
     ) -> ext::task<> {
@@ -373,11 +373,11 @@ namespace minty::core {
         co_await db.delete_tag_source(tag_id, source_id);
     }
 
-    auto api::get_bucket_id() const noexcept -> const UUID::uuid& {
+    auto repo::get_bucket_id() const noexcept -> const UUID::uuid& {
         return objects->get_bucket_id();
     }
 
-    auto api::get_comment(const UUID::uuid& comment_id) -> ext::task<comment> {
+    auto repo::get_comment(const UUID::uuid& comment_id) -> ext::task<comment> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -385,7 +385,7 @@ namespace minty::core {
         co_return co_await db.read_comment(comment_id);
     }
 
-    auto api::get_comments(
+    auto repo::get_comments(
         const UUID::uuid& post_id
     ) -> ext::task<comment_tree> {
         TIMBER_FUNC();
@@ -396,7 +396,7 @@ namespace minty::core {
         co_return build_tree(entities);
     }
 
-    auto api::get_object(const UUID::uuid& object_id) -> ext::task<object> {
+    auto repo::get_object(const UUID::uuid& object_id) -> ext::task<object> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -421,7 +421,7 @@ namespace minty::core {
         };
     }
 
-    auto api::get_object_preview_errors() ->
+    auto repo::get_object_preview_errors() ->
         ext::task<std::vector<object_error>>
     {
         TIMBER_FUNC();
@@ -431,7 +431,7 @@ namespace minty::core {
         co_return co_await db.read_object_preview_errors();
     }
 
-    auto api::get_post(const UUID::uuid& id) -> ext::task<post> {
+    auto repo::get_post(const UUID::uuid& id) -> ext::task<post> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -469,7 +469,7 @@ namespace minty::core {
         co_return result;
     }
 
-    auto api::get_posts(
+    auto repo::get_posts(
         bucket& bucket,
         std::vector<db::post_preview>&& posts
     ) -> ext::task<std::vector<post_preview>> {
@@ -506,7 +506,7 @@ namespace minty::core {
         co_return result;
     }
 
-    auto api::get_posts(
+    auto repo::get_posts(
         const post_query& query
     ) -> ext::task<search_result<post_preview>> {
         TIMBER_FUNC();
@@ -527,7 +527,7 @@ namespace minty::core {
         };
     }
 
-    auto api::get_tag(const UUID::uuid& id) -> ext::task<tag> {
+    auto repo::get_tag(const UUID::uuid& id) -> ext::task<tag> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -553,7 +553,7 @@ namespace minty::core {
         co_return result;
     }
 
-    auto api::get_tags(
+    auto repo::get_tags(
         const tag_query& query
     ) -> ext::task<search_result<tag_preview>> {
         TIMBER_FUNC();
@@ -568,7 +568,7 @@ namespace minty::core {
         };
     }
 
-    auto api::move_post_objects(
+    auto repo::move_post_objects(
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects,
         const std::optional<UUID::uuid>& destination
@@ -587,7 +587,7 @@ namespace minty::core {
         co_return date_modified;
     }
 
-    auto api::prune() -> ext::task<> {
+    auto repo::prune() -> ext::task<> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -615,7 +615,7 @@ namespace minty::core {
         );
     }
 
-    auto api::regenerate_preview(
+    auto repo::regenerate_preview(
         const UUID::uuid& object_id
     ) -> ext::task<std::optional<UUID::uuid>> {
         TIMBER_FUNC();
@@ -648,7 +648,7 @@ namespace minty::core {
         std::rethrow_exception(exception);
     }
 
-    auto api::regenerate_preview(
+    auto repo::regenerate_preview(
         bucket& bucket,
         const db::object_preview& object
     ) -> ext::task<std::optional<UUID::uuid>> {
@@ -660,7 +660,7 @@ namespace minty::core {
         co_return co_await generate_preview(bucket, metadata);
     }
 
-    auto api::regenerate_preview_task(
+    auto repo::regenerate_preview_task(
         netcore::thread_pool& workers,
         db::object_preview object,
         std::size_t& errors,
@@ -707,7 +707,7 @@ namespace minty::core {
         if (progress.completed == progress.total) finished.emit();
     }
 
-    auto api::regenerate_previews(
+    auto repo::regenerate_previews(
         int jobs,
         progress& progress
     ) -> ext::task<std::size_t> {
@@ -743,7 +743,7 @@ namespace minty::core {
         co_return errors;
     }
 
-    auto api::reindex() -> ext::task<> {
+    auto repo::reindex() -> ext::task<> {
         TIMBER_FUNC();
 
         constexpr auto batch_size = 500;
@@ -784,7 +784,7 @@ namespace minty::core {
         }
     }
 
-    auto api::set_comment_content(
+    auto repo::set_comment_content(
         const UUID::uuid& comment_id,
         std::string_view content
     ) -> ext::task<std::string> {
@@ -798,7 +798,7 @@ namespace minty::core {
         co_return formatted;
     }
 
-    auto api::set_post_description(
+    auto repo::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
     ) -> ext::task<modification<std::optional<std::string>>> {
@@ -817,7 +817,7 @@ namespace minty::core {
         };
     }
 
-    auto api::set_post_title(
+    auto repo::set_post_title(
         const UUID::uuid& post_id,
         std::string_view title
     ) -> ext::task<modification<std::optional<std::string>>> {
@@ -837,7 +837,7 @@ namespace minty::core {
         };
     }
 
-    auto api::set_tag_description(
+    auto repo::set_tag_description(
         const UUID::uuid& tag_id,
         std::string_view description
     ) -> ext::task<std::optional<std::string>> {
@@ -851,7 +851,7 @@ namespace minty::core {
         );
     }
 
-    auto api::set_tag_name(
+    auto repo::set_tag_name(
         const UUID::uuid& tag_id,
         std::string_view new_name
     ) -> ext::task<tag_name> {
