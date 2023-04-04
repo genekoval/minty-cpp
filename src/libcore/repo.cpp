@@ -114,12 +114,14 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         const auto date_modified =
             co_await db.create_post_objects(post_id, objects, destination);
 
         co_await search->update_post_date_modified(post_id, date_modified);
 
+        co_await tx.commit();
         co_return date_modified;
     }
 
@@ -130,9 +132,12 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         co_await db.create_post_tag(post_id, tag_id);
         co_await search->add_post_tag(post_id, tag_id);
+
+        co_await tx.commit();
     }
 
     auto repo::add_related_post(
@@ -231,13 +236,15 @@ namespace minty::core {
     auto repo::add_tag(std::string_view name) -> ext::task<UUID::uuid> {
         TIMBER_FUNC();
 
-        auto db = co_await database->connect();
-
         const auto formatted = format_tag(name);
-        const auto id = co_await db.create_tag(formatted);
 
+        auto db = co_await database->connect();
+        auto tx = co_await db.begin();
+
+        const auto id = co_await db.create_tag(formatted);
         co_await search->add_tag_alias(id, formatted);
 
+        co_await tx.commit();
         co_return id;
     }
 
@@ -247,13 +254,15 @@ namespace minty::core {
     ) -> ext::task<tag_name> {
         TIMBER_FUNC();
 
-        auto db = co_await database->connect();
-
         const auto formatted = format_tag(alias);
-        const auto name = co_await db.create_tag_alias(tag_id, formatted);
 
+        auto db = co_await database->connect();
+        auto tx = co_await db.begin();
+
+        const auto name = co_await db.create_tag_alias(tag_id, formatted);
         co_await search->add_tag_alias(tag_id, formatted);
 
+        co_await tx.commit();
         co_return name;
     }
 
@@ -299,9 +308,12 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         co_await db.delete_post(id);
         co_await search->delete_post(id);
+
+        co_await tx.commit();
     }
 
     auto repo::delete_post_objects(
@@ -311,9 +323,12 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         const auto modified = co_await db.delete_post_objects(post_id, objects);
         co_await search->update_post_date_modified(post_id, modified);
+
+        co_await tx.commit();
         co_return modified;
     }
 
@@ -324,9 +339,12 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         co_await db.delete_post_tag(post_id, tag_id);
         co_await search->remove_post_tag(post_id, tag_id);
+
+        co_await tx.commit();
     }
 
     auto repo::delete_related_post(
@@ -344,9 +362,12 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         co_await db.delete_tag(id);
         co_await search->delete_tag(id);
+
+        co_await tx.commit();
     }
 
     auto repo::delete_tag_alias(
@@ -356,9 +377,12 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         const auto name = co_await db.delete_tag_alias(tag_id, alias);
         co_await search->delete_tag_alias(tag_id, alias);
+
+        co_await tx.commit();
         co_return name;
     }
 
@@ -576,14 +600,16 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         const auto date_modified = co_await db.move_post_objects(
             post_id,
             objects,
             destination
         );
-
         co_await search->update_post_date_modified(post_id, date_modified);
+
+        co_await tx.commit();
         co_return date_modified;
     }
 
@@ -591,10 +617,9 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
-        auto bucket = co_await objects->connect();
-
         co_await db.prune();
 
+        auto bucket = co_await objects->connect();
         auto tx = co_await db.begin();
 
         const auto objects = co_await db.prune_objects();
@@ -805,12 +830,15 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         const auto update = co_await db.update_post_description(
             post_id,
             format_description(description)
         );
         co_await search->update_post_description(update);
+
+        co_await tx.commit();
         co_return modification<std::optional<std::string>> {
             .date_modified = update.date_modified,
             .new_value = update.new_data
@@ -824,6 +852,7 @@ namespace minty::core {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
 
         const auto update = co_await db.update_post_title(
             post_id,
@@ -831,6 +860,7 @@ namespace minty::core {
         );
         co_await search->update_post_title(update);
 
+        co_await tx.commit();
         co_return modification<std::optional<std::string>> {
             .date_modified = update.date_modified,
             .new_value = update.new_data
@@ -860,16 +890,19 @@ namespace minty::core {
         const auto formatted = format_tag(new_name);
 
         auto db = co_await database->connect();
+        auto tx = co_await db.begin();
+
         const auto update  = co_await db.update_tag_name(tag_id, formatted);
 
         if (update.old_name) {
             co_await search->update_tag_name(
                 tag_id,
-                update.old_name.value(),
+                *update.old_name,
                 formatted
             );
         }
 
+        co_await tx.commit();
         co_return update.names;
     }
 }
