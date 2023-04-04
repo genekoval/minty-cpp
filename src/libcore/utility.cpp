@@ -30,7 +30,7 @@ namespace {
 
     auto format_text(std::string_view text) -> std::string {
         return ext::replace(
-            ext::trim(std::string(text)),
+            ext::trim(text),
             std::regex("\r"),
             [](const auto&) -> std::string { return "\n"; }
         );
