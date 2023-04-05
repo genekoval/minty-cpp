@@ -1,30 +1,28 @@
 #include "utility.hpp"
 
+#include <minty/except.hpp>
+
 #include <ext/string.h>
 #include <fmt/core.h>
+
+using minty::invalid_data;
 
 namespace {
     auto assert_text_no_newlines(
         std::string_view text,
-        std::string_view description
+        std::string_view label
     ) -> void {
         if (text.find("\n") != std::string_view::npos) {
-            throw std::runtime_error(fmt::format(
-                "{} must not contain newlines",
-                description
-            ));
+            throw invalid_data("{} must not contain newlines", label);
         }
     }
 
     auto assert_text_not_empty(
         std::string_view text,
-        std::string_view description
+        std::string_view label
     ) -> void {
         if (text.empty()) {
-            throw std::runtime_error(fmt::format(
-                "{} must not be empty",
-                description
-            ));
+            throw invalid_data("{} must not be empty", label);
         }
     }
 
