@@ -690,6 +690,7 @@ namespace minty::core {
         db::object_preview object,
         std::size_t& errors,
         progress& progress,
+        unsigned int& counter,
         netcore::event<>& finished
     ) -> ext::detached_task {
         TIMBER_FUNC();
@@ -728,12 +729,13 @@ namespace minty::core {
         }
 
         ++progress.completed;
-
-        if (progress.completed == progress.total) finished.emit();
+        --counter;
+        if (counter == 0) finished.emit();
     }
 
     auto repo::regenerate_previews(
-        int jobs,
+        unsigned int batch_size,
+        unsigned int jobs,
         progress& progress
     ) -> ext::task<std::size_t> {
         TIMBER_FUNC();
@@ -741,14 +743,20 @@ namespace minty::core {
         auto db = co_await database->connect();
 
         progress.total = co_await db.read_total_objects();
-        std::size_t errors = 0;
+        if (progress.total == 0) co_return 0;
 
-        auto workers = netcore::thread_pool(jobs, 32, "worker");
+        std::size_t errors = 0;
+        auto workers = netcore::thread_pool(
+            std::min(static_cast<std::size_t>(jobs), progress.total),
+            1024,
+            "worker"
+        );
         auto finished = netcore::event();
-        auto portal = co_await db.read_objects(100);
+        auto portal = co_await db.read_objects(batch_size);
 
         while (portal) {
             const auto objects = co_await portal.next();
+            unsigned int counter = objects.size();
 
             for (const auto& obj : objects) {
                 regenerate_preview_task(
@@ -756,14 +764,13 @@ namespace minty::core {
                     obj,
                     errors,
                     progress,
+                    counter,
                     finished
                 );
             }
 
-            co_await netcore::yield();
+            if (counter > 0) co_await finished.listen();
         }
-
-        co_await finished.listen();
 
         co_return errors;
     }

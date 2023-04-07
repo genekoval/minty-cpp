@@ -27,7 +27,6 @@ namespace YAML {
         settings::s_database,
         c::optional("client", &settings::s_database::client),
         c::required("connection", &settings::s_database::connection),
-        c::optional("connections", &settings::s_database::connections),
         c::optional("dump ", &settings::s_database::dump),
         c::optional("restore", &settings::s_database::restore),
         c::required("sqldir", &settings::s_database::sqldir)

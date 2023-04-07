@@ -7,18 +7,15 @@
 using namespace commline;
 using namespace std::chrono_literals;
 
+using ext::jtask;
 using minty::core::progress;
 
 namespace {
     namespace internal {
-        /**
-         * One connection for streaming objects and one for logging errors.
-         */
-        constexpr auto minimum_connections = 2;
         constexpr auto refresh_rate = 500ms;
 
         auto print_progress(const progress& progress) -> void {
-            std::cerr << "\33[2K\033[A\33[2K\r";
+            fmt::print(stderr, "\33[2K\033[A\33[2K\r");
 
             if (progress.total == 0) return;
 
@@ -29,7 +26,7 @@ namespace {
 
             fmt::print(
                 stderr,
-                "[{}/{}] ({}%)\n",
+                "[{:L}/{:L}] ({}%)\n",
                 progress.completed,
                 progress.total,
                 percent
@@ -39,9 +36,9 @@ namespace {
         auto run_progress_printer(
             const progress& progress,
             bool& running
-        ) -> void {
+        ) -> jtask<> {
             while (running) {
-                std::this_thread::sleep_for(refresh_rate);
+                co_await netcore::sleep_for(refresh_rate);
                 print_progress(progress);
             }
         }
@@ -49,54 +46,59 @@ namespace {
         auto all(
             const app& app,
             std::string_view confpath,
-            int jobs,
+            unsigned int batch_size,
+            unsigned int jobs,
             bool quiet
         ) -> void {
-            jobs = std::max(jobs, 1);
+            jobs = std::max(jobs, 1u);
 
             auto settings = minty::conf::initialize(confpath);
-            settings.database.connections = jobs + minimum_connections;
 
             auto progress = ::progress();
-            auto running = true;
+            size_t errors = 0;
 
-            if (!quiet) fmt::print("\n");
+            minty::cli::repo(settings, [&](
+                minty::core::repo& repo
+            ) -> ext::task<> {
+                if (!quiet) fmt::print("\n");
 
-            auto ui_thread = quiet ?
-                std::thread() :
-                std::thread(
-                    run_progress_printer,
-                    std::ref(progress),
-                    std::ref(running)
+                auto running = true;
+                auto printer = quiet ? jtask() : run_progress_printer(
+                    progress,
+                    running
                 );
 
-            auto errors = std::size_t(0);
+                errors = co_await repo.regenerate_previews(
+                    batch_size,
+                    jobs,
+                    progress
+                );
 
-            minty::cli::repo(settings, [
-                &errors,
-                jobs,
-                &progress
-            ](minty::core::repo& repo) -> ext::task<> {
-                errors = co_await repo.regenerate_previews(jobs, progress);
+                running = false;
+                if (printer.joinable()) co_await printer;
             });
 
-            running = false;
-            if (ui_thread.joinable()) ui_thread.join();
+            if (progress.total == 0) {
+                fmt::print("No objects to process\n");
+                return;
+            }
 
-            const auto successful = progress.completed - errors;
-
-            fmt::print("Generated previews for {} objects", successful);
+            fmt::print(
+                "Processed {:L} object{}",
+                progress.completed,
+                progress.completed == 1 ? "" : "s"
+            );
 
             if (errors > 0) {
                 fmt::print(
-                    " with {} failures\n"
-                    "Run '{} errors preview' for more information",
+                    " with {:L} failure{}\n"
+                    "Run '{} errors preview' for more information\n",
                     errors,
+                    errors == 1 ? "" : "s",
                     app.argv0
                 );
             }
-
-            fmt::print("\n");
+            else fmt::print("\n");
         }
     }
 }
@@ -110,11 +112,17 @@ namespace minty::cli::sub::regen {
             "Regenerate all object previews",
             options(
                 opts::config(confpath),
-                option<int>(
+                option<unsigned int>(
+                    {"b", "batch-size"},
+                    "Number of objects to process at a time",
+                    "size",
+                    100
+                ),
+                option<unsigned int>(
                     {"j", "jobs"},
                     "Number of additional jobs to run simultaneously",
                     "jobs",
-                    1
+                    std::thread::hardware_concurrency()
                 ),
                 flag({"q", "quiet"}, "Do not print progress")
             ),

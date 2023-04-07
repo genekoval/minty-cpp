@@ -61,6 +61,7 @@ namespace minty::core {
             db::object_preview obj,
             std::size_t& errors,
             progress& progress,
+            unsigned int& counter,
             netcore::event<>& finished
         ) -> ext::detached_task;
     public:
@@ -196,7 +197,8 @@ namespace minty::core {
         ) -> ext::task<std::optional<UUID::uuid>>;
 
         auto regenerate_previews(
-            int jobs,
+            unsigned int batch_size,
+            unsigned int jobs,
             progress& progress
         ) -> ext::task<std::size_t>;
 
