@@ -9,8 +9,7 @@ namespace {
     namespace internal {
         auto init(
             const app& app,
-            std::string_view confpath,
-            bool skip_index
+            std::string_view confpath
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
 
@@ -20,14 +19,11 @@ namespace {
                 co_await db.init(app.version);
             });
 
-            if (skip_index) return;
-
-            minty::cli::repo(
-                settings,
-                [](minty::core::repo& repo) -> ext::task<> {
-                    co_await repo.reindex();
-                }
-            );
+            minty::cli::repo(settings, [](
+                minty::core::repo& repo
+            ) -> ext::task<> {
+                co_await repo.create_indices();
+            });
         }
     }
 }
@@ -39,10 +35,7 @@ namespace minty::cli {
         return command(
             "init",
             "Initialize the database",
-            options(
-                opts::config(confpath),
-                flag({"skip-index"}, "Skip search engine index operation")
-            ),
+            options(opts::config(confpath)),
             arguments(),
             internal::init
         );

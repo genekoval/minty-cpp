@@ -31,6 +31,8 @@ namespace minty::core {
 
         auto exists() -> ext::task<bool>;
 
+        auto recreate() -> ext::task<>;
+
         auto refresh() -> ext::task<>;
 
         auto remove() -> ext::task<>;

@@ -279,6 +279,11 @@ namespace minty::core {
         co_return src;
     }
 
+    auto repo::create_indices() -> ext::task<> {
+        co_await search->delete_indices();
+        co_await search->create_indices();
+    }
+
     auto repo::create_post(const UUID::uuid& post_id) -> ext::task<> {
         TIMBER_FUNC();
 
@@ -773,47 +778,6 @@ namespace minty::core {
         }
 
         co_return errors;
-    }
-
-    auto repo::reindex() -> ext::task<> {
-        TIMBER_FUNC();
-
-        constexpr auto batch_size = 500;
-
-        auto db = co_await database->connect();
-
-        co_await search->delete_indices();
-        co_await search->create_indices();
-
-        {
-            TIMBER_INFO("Reindexing tags...");
-
-            auto portal = co_await db.read_tag_search(batch_size);
-
-            while (portal) {
-                const auto tags = co_await portal.next();
-                const auto errors = co_await search->add_tags(tags);
-
-                for (const auto& error : errors) {
-                    TIMBER_ERROR("tag {}", error);
-                }
-            }
-        }
-
-        {
-            TIMBER_INFO("Reindexing posts...");
-
-            auto portal = co_await db.read_post_search(batch_size);
-
-            while (portal) {
-                const auto posts = co_await portal.next();
-                const auto errors = co_await search->add_posts(posts);
-
-                for (const auto& error : errors) {
-                    TIMBER_ERROR("post {}", error);
-                }
-            }
-        }
     }
 
     auto repo::set_comment_content(

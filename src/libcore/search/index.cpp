@@ -41,6 +41,11 @@ namespace minty::core {
         co_return co_await search->client.index_exists({name}).send();
     }
 
+    auto index::recreate() -> ext::task<> {
+        co_await remove();
+        co_await create();
+    }
+
     auto index::refresh() -> ext::task<> {
         TIMBER_FUNC();
         TIMBER_DEBUG("Refreshing index: {}", name);

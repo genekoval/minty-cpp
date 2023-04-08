@@ -12,6 +12,14 @@
 #include <minty/model/tag.hpp>
 
 namespace minty::core {
+    template <typename F>
+    concept index_error_handler = requires(
+        const F& f,
+        std::span<const std::string> errors
+    ) {
+        { f(errors) };
+    };
+
     struct progress {
         std::size_t completed = 0;
         std::size_t total = 0;
@@ -64,6 +72,42 @@ namespace minty::core {
             unsigned int& counter,
             netcore::event<>& finished
         ) -> ext::detached_task;
+
+        template <typename T>
+        auto reindex(
+            unsigned int batch_size,
+            const index_error_handler auto& on_error,
+            index& index,
+            ext::task<pg::portal<T>> (db::connection_type::* read)(
+                int batch_size
+            ),
+            ext::task<std::vector<std::string>> (search_engine::* write)(
+                std::span<const T> items
+            )
+        ) -> ext::task<bool> {
+            TIMBER_FUNC();
+
+            co_await index.recreate();
+            auto no_errors = true;
+
+            {
+                auto db = co_await database->connect();
+                auto portal = co_await (db.*read)(batch_size);
+
+                while (portal) {
+                    const auto items = co_await portal.next();
+                    const auto errors = co_await (search->*write)(items);
+
+                    if (!errors.empty()) {
+                        no_errors = false;
+                        on_error(errors);
+                    }
+                }
+            }
+
+            co_await index.refresh();
+            co_return no_errors;
+        }
     public:
         repo(
             db::database& database,
@@ -127,6 +171,8 @@ namespace minty::core {
             const UUID::uuid& tag_id,
             std::string_view url
         ) -> ext::task<source>;
+
+        auto create_indices() -> ext::task<>;
 
         auto create_post(const UUID::uuid& post_id) -> ext::task<>;
 
@@ -202,7 +248,31 @@ namespace minty::core {
             progress& progress
         ) -> ext::task<std::size_t>;
 
-        auto reindex() -> ext::task<>;
+        auto reindex_posts(
+            unsigned int batch_size,
+            const index_error_handler auto& on_error
+        ) -> ext::task<bool> {
+            co_return co_await reindex(
+                batch_size,
+                on_error,
+                search->post_index,
+                &db::connection_type::read_post_search,
+                &search_engine::add_posts
+            );
+        }
+
+        auto reindex_tags(
+            unsigned int batch_size,
+            const index_error_handler auto& on_error
+        ) -> ext::task<bool> {
+            co_return co_await reindex(
+                batch_size,
+                on_error,
+                search->tag_index,
+                &db::connection_type::read_tag_search,
+                &search_engine::add_tags
+            );
+        }
 
         auto set_comment_content(
             const UUID::uuid& comment_id,
