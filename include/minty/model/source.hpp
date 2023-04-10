@@ -8,6 +8,8 @@ namespace minty {
         std::int64_t id;
         std::string url;
         std::optional<UUID::uuid> icon;
+
+        auto operator==(const source&) const noexcept -> bool = default;
     };
 }
 

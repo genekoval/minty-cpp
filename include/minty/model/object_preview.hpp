@@ -9,6 +9,8 @@ namespace minty {
         std::optional<UUID::uuid> preview_id;
         std::string type;
         std::string subtype;
+
+        auto operator==(const object_preview&) const noexcept -> bool = default;
     };
 }
 

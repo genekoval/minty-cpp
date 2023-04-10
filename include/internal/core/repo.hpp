@@ -31,10 +31,10 @@ namespace minty::core {
     };
 
     class repo {
-        db::database* database;
-        object_store* objects;
-        downloader* dl;
-        search_engine* search;
+        db::database* database = nullptr;
+        object_store* objects = nullptr;
+        downloader* dl = nullptr;
+        search_engine* search = nullptr;
 
         auto add_object(
             db::connection_type& db,
@@ -109,6 +109,8 @@ namespace minty::core {
             co_return no_errors;
         }
     public:
+        repo() = default;
+
         repo(
             db::database& database,
             object_store& objects,
@@ -116,7 +118,9 @@ namespace minty::core {
             search_engine& search
         );
 
-        auto add_comment(
+        VIRTUAL_DESTRUCTOR(repo);
+
+        VIRTUAL auto add_comment(
             const UUID::uuid& post_id,
             std::string_view content
         ) -> ext::task<comment_data>;
@@ -135,114 +139,120 @@ namespace minty::core {
             co_return co_await add_object(db, bucket, std::move(metadata), {});
         }
 
-        auto add_objects_url(
+        VIRTUAL auto add_objects_url(
             std::string_view url
         ) -> ext::task<std::vector<object_preview>>;
 
-        auto add_post_objects(
+        VIRTUAL auto add_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination
         ) -> ext::task<time_point>;
 
-        auto add_post_tag(
+        VIRTUAL auto add_post_tag(
             const UUID::uuid& post_id,
             const UUID::uuid& tag_id
         ) -> ext::task<>;
 
-        auto add_related_post(
+        VIRTUAL auto add_related_post(
             const UUID::uuid& post_id,
             const UUID::uuid& related
         ) -> ext::task<>;
 
-        auto add_reply(
+        VIRTUAL auto add_reply(
             const UUID::uuid& parent_id,
             std::string_view content
         ) -> ext::task<comment_data>;
 
-        auto add_tag(std::string_view name) -> ext::task<UUID::uuid>;
+        VIRTUAL auto add_tag(std::string_view name) -> ext::task<UUID::uuid>;
 
-        auto add_tag_alias(
+        VIRTUAL auto add_tag_alias(
             const UUID::uuid& tag_id,
             std::string_view alias
         ) -> ext::task<tag_name>;
 
-        auto add_tag_source(
+        VIRTUAL auto add_tag_source(
             const UUID::uuid& tag_id,
             std::string_view url
         ) -> ext::task<source>;
 
-        auto create_indices() -> ext::task<>;
+        VIRTUAL auto create_indices() -> ext::task<>;
 
-        auto create_post(const UUID::uuid& post_id) -> ext::task<>;
+        VIRTUAL auto create_post(const UUID::uuid& post_id) -> ext::task<>;
 
-        auto create_post_draft() -> ext::task<UUID::uuid>;
+        VIRTUAL auto create_post_draft() -> ext::task<UUID::uuid>;
 
-        auto delete_post(const UUID::uuid& id) -> ext::task<>;
+        VIRTUAL auto delete_post(const UUID::uuid& id) -> ext::task<>;
 
-        auto delete_post_objects(
+        VIRTUAL auto delete_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects
         ) -> ext::task<time_point>;
 
-        auto delete_post_tag(
+        VIRTUAL auto delete_post_tag(
             const UUID::uuid& post_id,
             const UUID::uuid& tag_id
         ) -> ext::task<>;
 
-        auto delete_related_post(
+        VIRTUAL auto delete_related_post(
             const UUID::uuid& post_id,
             const UUID::uuid& related
         ) -> ext::task<>;
 
-        auto delete_tag(const UUID::uuid& id) -> ext::task<>;
+        VIRTUAL auto delete_tag(const UUID::uuid& id) -> ext::task<>;
 
-        auto delete_tag_alias(
+        VIRTUAL auto delete_tag_alias(
             const UUID::uuid& tag_id,
             std::string_view alias
         ) -> ext::task<tag_name>;
 
-        auto delete_tag_source(
+        VIRTUAL auto delete_tag_source(
             const UUID::uuid& tag_id,
             std::int64_t source_id
         ) -> ext::task<>;
 
-        auto get_bucket_id() const noexcept -> const UUID::uuid&;
+        VIRTUAL auto get_bucket_id() const noexcept -> const UUID::uuid&;
 
-        auto get_comment(const UUID::uuid& comment_id) -> ext::task<comment>;
+        VIRTUAL auto get_comment(
+            const UUID::uuid& comment_id
+        ) -> ext::task<comment>;
 
-        auto get_comments(const UUID::uuid& post_id) -> ext::task<comment_tree>;
+        VIRTUAL auto get_comments(
+            const UUID::uuid& post_id
+        ) -> ext::task<comment_tree>;
 
-        auto get_object(const UUID::uuid& object_id) -> ext::task<object>;
+        VIRTUAL auto get_object(
+            const UUID::uuid& object_id
+        ) -> ext::task<object>;
 
-        auto get_object_preview_errors() ->
+        VIRTUAL auto get_object_preview_errors() ->
             ext::task<std::vector<object_error>>;
 
-        auto get_post(const UUID::uuid& id) -> ext::task<post>;
+        VIRTUAL auto get_post(const UUID::uuid& id) -> ext::task<post>;
 
-        auto get_posts(
+        VIRTUAL auto get_posts(
             const post_query& query
         ) -> ext::task<search_result<post_preview>>;
 
-        auto get_tag(const UUID::uuid& id) -> ext::task<tag>;
+        VIRTUAL auto get_tag(const UUID::uuid& id) -> ext::task<tag>;
 
-        auto get_tags(
+        VIRTUAL auto get_tags(
             const tag_query& query
         ) -> ext::task<search_result<tag_preview>>;
 
-        auto move_post_objects(
+        VIRTUAL auto move_post_objects(
             const UUID::uuid& post_id,
             const std::vector<UUID::uuid>& objects,
             const std::optional<UUID::uuid>& destination
         ) -> ext::task<time_point>;
 
-        auto prune() -> ext::task<>;
+        VIRTUAL auto prune() -> ext::task<>;
 
-        auto regenerate_preview(
+        VIRTUAL auto regenerate_preview(
             const UUID::uuid& object_id
         ) -> ext::task<std::optional<UUID::uuid>>;
 
-        auto regenerate_previews(
+        VIRTUAL auto regenerate_previews(
             unsigned int batch_size,
             unsigned int jobs,
             progress& progress
@@ -274,27 +284,27 @@ namespace minty::core {
             );
         }
 
-        auto set_comment_content(
+        VIRTUAL auto set_comment_content(
             const UUID::uuid& comment_id,
             std::string_view content
         ) -> ext::task<std::string>;
 
-        auto set_post_description(
+        VIRTUAL auto set_post_description(
             const UUID::uuid& post_id,
             std::string_view description
         ) -> ext::task<modification<std::optional<std::string>>>;
 
-        auto set_post_title(
+        VIRTUAL auto set_post_title(
             const UUID::uuid& post_id,
             std::string_view title
         ) -> ext::task<modification<std::optional<std::string>>>;
 
-        auto set_tag_description(
+        VIRTUAL auto set_tag_description(
             const UUID::uuid& tag_id,
             std::string_view description
         ) -> ext::task<std::optional<std::string>>;
 
-        auto set_tag_name(
+        VIRTUAL auto set_tag_name(
             const UUID::uuid& tag_id,
             std::string_view new_name
         ) -> ext::task<tag_name>;

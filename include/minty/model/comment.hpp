@@ -16,7 +16,7 @@ namespace minty {
         std::string content;
         time_point date_created;
 
-        auto operator==(const comment&) const -> bool = default;
+        auto operator==(const comment&) const noexcept -> bool = default;
     };
 
     struct comment_data {
@@ -24,6 +24,8 @@ namespace minty {
         decltype(comment::content) content;
         decltype(comment::indent) indent;
         decltype(comment::date_created) date_created;
+
+        auto operator==(const comment_data&) const noexcept -> bool = default;
     };
 
     struct comment_node {
