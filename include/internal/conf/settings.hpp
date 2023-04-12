@@ -35,11 +35,6 @@ namespace minty::conf {
             s_proxy proxy;
         };
 
-        struct s_downloader {
-            std::string host;
-            std::string port;
-        };
-
         struct s_log {
             timber::level level = timber::level::info;
         };
@@ -56,11 +51,11 @@ namespace minty::conf {
 
         s_daemon daemon;
         s_database database;
-        s_downloader downloader;
+        std::string downloader;
         s_fstore fstore;
         s_log log;
         s_search search;
-        netcore::unix_socket server;
+        netcore::endpoint server;
 
         auto encode() const -> std::string;
     };

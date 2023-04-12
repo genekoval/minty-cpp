@@ -7,10 +7,7 @@ namespace minty::cli {
         )),
         database(db_params),
         objects(settings.fstore.connection),
-        downloader(
-            settings.downloader.host,
-            settings.downloader.port
-        ),
+        downloader(settings.downloader),
         search(
             settings.search.ns,
             settings.search.node,

@@ -22,7 +22,7 @@ using UUID::uuid;
 namespace {
     constexpr auto socket_name = "minty.test.sock"sv;
 
-    const auto sock = unix_socket {
+    const netcore::endpoint endpoint = unix_socket {
         .path = fs::temp_directory_path() / socket_name,
         .mode = perms::owner_read | perms::owner_write
     };
@@ -97,15 +97,11 @@ namespace {
 
 class ClientTest : public Test {
     auto connect() -> ext::task<minty::repo> {
-        co_return minty::repo(co_await netcore::connect(sock.path.native()));
-    }
-
-    auto listen() -> ext::jtask<> {
-        co_await server.listen(sock);
+        co_return minty::repo(co_await netcore::connect(endpoint));
     }
 
     auto task(action&& f) -> ext::task<> {
-        const auto server_task = listen();
+        const auto server_task = server.listen(endpoint);
 
         {
             auto client = co_await connect();

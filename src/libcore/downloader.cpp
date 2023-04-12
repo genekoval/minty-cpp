@@ -1,12 +1,7 @@
 #include <internal/core/downloader/downloader.hpp>
 
 namespace minty::core {
-    downloader::downloader(
-        std::string_view host,
-        std::string_view port
-    ) :
-        client(host, port)
-    {}
+    downloader::downloader(std::string_view endpoint) : client(endpoint) {}
 
     auto downloader::fetch(
         std::string_view url,

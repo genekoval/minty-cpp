@@ -33,12 +33,6 @@ namespace YAML {
     );
 
     DECODE(
-        settings::s_downloader,
-        c::required("host", &settings::s_downloader::host),
-        c::required("port", &settings::s_downloader::port)
-    );
-
-    DECODE(
         settings::s_fstore,
         c::required("bucket", &settings::s_fstore::bucket),
         c::required("connection", &settings::s_fstore::connection),

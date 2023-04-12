@@ -167,4 +167,6 @@ namespace minty {
             std::string_view new_name
         ) -> ext::task<tag_name>;
     };
+
+    using client = netcore::client<repo>;
 }

@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+using netcore::unix_socket;
+
 class ConfSettingsTest : public testing::Test {};
 
 TEST_F(ConfSettingsTest, Decode) {
@@ -18,9 +20,7 @@ database:
         dbname: minty
     sqldir: /usr/share/minty/db
 
-downloader:
-    host: 127.0.0.1
-    port: 3000
+downloader: 127.0.0.1:3000
 
 fstore:
     bucket: minty
@@ -39,16 +39,17 @@ server:
 
     const auto settings = minty::conf::settings::load(yaml);
 
+    const auto& server = std::get<unix_socket>(settings.server);
+
     ASSERT_EQ(0, settings.daemon.user.uid());
     ASSERT_EQ(0, settings.daemon.group.gid());
     ASSERT_EQ("/run/minty/minty.pid", settings.daemon.pidfile);
-    ASSERT_EQ("/run/minty/minty.sock", settings.server.path);
+    ASSERT_EQ("/run/minty/minty.sock", server.path);
     ASSERT_EQ(
         "dbname=minty host=localhost user=minty",
         settings.database.connection.str()
     );
-    ASSERT_EQ("127.0.0.1", settings.downloader.host);
-    ASSERT_EQ("3000", settings.downloader.port);
+    ASSERT_EQ("127.0.0.1:3000", settings.downloader);
     ASSERT_EQ("minty", settings.fstore.bucket);
     ASSERT_EQ("/run/fstore/fstore.sock", settings.fstore.connection);
     ASSERT_EQ(5000, settings.fstore.proxy.port);
@@ -59,18 +60,13 @@ server:
 
 TEST_F(ConfSettingsTest, Encode) {
     constexpr auto yaml =
-R"(server:
-  path: /run/minty/minty.sock
-
-database:
+R"(database:
   connection:
     dbname: minty
     host: localhost
     user: minty
 
-downloader:
-  host: 127.0.0.1
-  port: 3000
+downloader: 127.0.0.1:3000
 
 fstore:
   bucket: world
@@ -87,16 +83,10 @@ fstore:
                 }
             }
         },
-        .downloader = {
-            .host = "127.0.0.1",
-            .port = "3000"
-        },
+        .downloader = "127.0.0.1:3000",
         .fstore = {
             .bucket = "world",
             .connection = "/tmp/fstore.sock"
-        },
-        .server = {
-            .path = "/run/minty/minty.sock"
         }
     };
 

@@ -12,13 +12,6 @@ namespace minty::conf {
 
         out
             << BeginMap
-                << Key << "server" << Value << BeginMap
-                    << Key << "path" << Value << server.path
-                << EndMap
-            << EndMap
-            << Newline
-
-            << BeginMap
                 << Key << "database" << Value << BeginMap
                     << Key << "connection"
                     << Value << database.connection.parameters
@@ -27,10 +20,7 @@ namespace minty::conf {
             << Newline
 
             << BeginMap
-                << Key << "downloader" << Value << BeginMap
-                    << Key << "host" << Value << downloader.host
-                    << Key << "port" << Value << downloader.port
-                << EndMap
+                << Key << "downloader" << Value << downloader
             << EndMap
             << Newline
 
@@ -50,7 +40,21 @@ namespace minty::conf {
     }
 
     auto settings::load_file(std::string_view path) -> settings {
-        return YAML::LoadFile(path.data()).as<settings>();
+        try {
+            return YAML::LoadFile(path.data()).as<settings>();
+        }
+        catch (const YAML::BadFile& ex) {
+            throw std::runtime_error(fmt::format(R"("{}": bad file)", path));
+        }
+        catch (const YAML::Exception& ex) {
+            throw std::runtime_error(fmt::format(
+                R"("{}": error at line {:L}, column {:L}: {})",
+                path,
+                ex.mark.line,
+                ex.mark.column,
+                ex.msg
+            ));
+        }
     }
 
     auto initialize(std::string_view path) -> settings {

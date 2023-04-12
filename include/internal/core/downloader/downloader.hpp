@@ -10,7 +10,7 @@ namespace minty::core {
     public:
         downloader() = default;
 
-        downloader(std::string_view host, std::string_view port);
+        downloader(std::string_view endpoint);
 
         VIRTUAL_DESTRUCTOR(downloader)
 
