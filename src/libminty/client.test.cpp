@@ -14,6 +14,7 @@ using minty::core::mock_repo;
 using minty::object_preview;
 using minty::server::router_type;
 using minty::server_info;
+using netcore::address_type;
 using netcore::unix_socket;
 using testing::Return;
 using testing::Test;
@@ -89,8 +90,11 @@ namespace {
             co_await router.route(socket);
         }
 
-        auto listen() -> void {
-            TIMBER_DEBUG("Test server listening for connections");
+        auto listen(const address_type& address) -> void {
+            TIMBER_DEBUG(
+                "Test server listening for connections on {}",
+                address
+            );
         }
     };
 }

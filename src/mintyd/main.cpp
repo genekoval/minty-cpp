@@ -27,11 +27,6 @@ namespace {
                 timber::level::info
             );
 
-            auto uptime_timer = timber::timer(
-                "Server shutting down. Up",
-                timber::level::notice
-            );
-
             const auto settings = minty::conf::initialize(confpath);
 
             if (daemon && !dmon::daemonize({
@@ -55,14 +50,18 @@ namespace {
                     }
                 };
 
-                auto server = minty::server::create(
-                    repo,
-                    info,
-                    startup_timer,
-                    uptime_timer
+                auto server = minty::server::create(repo, info);
+                auto task = server.listen(settings.server);
+
+                startup_timer.stop();
+                auto uptime_timer = timber::timer(
+                    "Server shutting down. Up",
+                    timber::level::notice
                 );
 
-                co_await server.listen(settings.server);
+                co_await task;
+
+                uptime_timer.stop();
             });
         }
 
