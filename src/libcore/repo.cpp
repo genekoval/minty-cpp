@@ -633,11 +633,11 @@ namespace minty::core {
         co_await tx.commit();
 
         if (result.objects_removed == 0) {
-            TIMBER_INFO("No objects to prune");
+            TIMBER_DEBUG("No objects to prune");
             co_return;
         }
 
-        TIMBER_INFO(
+        TIMBER_DEBUG(
             "Removed {} {} freeing {}",
             result.objects_removed,
             result.objects_removed == 1 ? "object" : "objects",
