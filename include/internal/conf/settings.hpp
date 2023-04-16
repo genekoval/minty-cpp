@@ -56,8 +56,6 @@ namespace minty::conf {
         s_log log;
         s_search search;
         std::vector<netcore::endpoint> server;
-
-        auto encode() const -> std::string;
     };
 
     auto initialize(std::string_view path) -> settings;

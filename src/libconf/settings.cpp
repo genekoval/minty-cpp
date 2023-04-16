@@ -5,36 +5,6 @@
 #include <minty/except.hpp>
 
 namespace minty::conf {
-    auto settings::encode() const -> std::string {
-        using namespace YAML;
-
-        auto out = Emitter();
-
-        out
-            << BeginMap
-                << Key << "database" << Value << BeginMap
-                    << Key << "connection"
-                    << Value << database.connection.parameters
-                << EndMap
-            << EndMap
-            << Newline
-
-            << BeginMap
-                << Key << "downloader" << Value << downloader
-            << EndMap
-            << Newline
-
-            << BeginMap
-                << Key << "fstore" << Value << BeginMap
-                    << Key << "bucket" << Value << fstore.bucket
-                    << Key << "connection" << Value << fstore.connection
-                << EndMap
-            << EndMap
-            << Newline;
-
-        return out.c_str();
-    }
-
     auto settings::load(std::string_view text) -> settings {
         return YAML::Load(text.data()).as<settings>();
     }
