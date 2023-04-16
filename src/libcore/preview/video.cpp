@@ -53,9 +53,9 @@ namespace minty::core {
         bucket& bucket,
         const fstore::object& object
     ) -> ext::task<std::optional<UUID::uuid>> {
-        const auto source = co_await bucket.get(object.id);
+        auto source = co_await bucket.get(object.id);
 
-        auto io = video::io_context(source.span());
+        auto io = video::io_context(source);
         auto format = video::format_context(io.data());
 
         AVCodec* decoder = nullptr;

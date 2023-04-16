@@ -50,8 +50,11 @@ namespace {
                     }
                 };
 
-                auto server = minty::server::create(repo, info);
-                auto task = server.listen(settings.server);
+                auto router = minty::server::make_router(repo, info);
+                auto servers = co_await minty::server::listen(
+                    router,
+                    settings.server
+                );
 
                 startup_timer.stop();
                 auto uptime_timer = timber::timer(
@@ -59,7 +62,7 @@ namespace {
                     timber::level::notice
                 );
 
-                co_await task;
+                co_await servers.join();
 
                 uptime_timer.stop();
             });

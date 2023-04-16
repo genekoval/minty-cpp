@@ -70,9 +70,9 @@ namespace minty::server {
     >;
 
     class server_context {
-        router_type router;
+        router_type* router;
     public:
-        server_context(router_type&& router);
+        server_context(router_type& router);
 
         auto close() -> void;
 
@@ -81,10 +81,11 @@ namespace minty::server {
         auto listen(const netcore::address_type& address) -> void;
     };
 
-    using server_type = netcore::server<server_context>;
+    using server = netcore::server<server_context>;
+    using server_list = netcore::server_list<server_context>;
 
-    auto create(
-        core::repo& repo,
-        const server_info& info
-    ) -> server_type;
+    auto listen(
+        router_type& router,
+        std::span<const netcore::endpoint> endpoints
+    ) -> ext::task<server_list>;
 }

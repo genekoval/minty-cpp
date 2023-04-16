@@ -55,7 +55,7 @@ namespace minty::conf {
         s_fstore fstore;
         s_log log;
         s_search search;
-        netcore::endpoint server;
+        std::vector<netcore::endpoint> server;
 
         auto encode() const -> std::string;
     };
