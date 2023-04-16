@@ -1,3 +1,4 @@
+#include <internal/conf/settings.env.test.hpp>
 #include <internal/core/mock_repo.hpp>
 #include <internal/server/server.hpp>
 
@@ -5,29 +6,18 @@
 
 #include <gtest/gtest.h>
 
-namespace fs = std::filesystem;
-
 using namespace std::literals;
 
-using fs::perms;
 using minty::core::mock_repo;
 using minty::object_preview;
 using minty::server::router_type;
 using minty::server_info;
 using netcore::address_type;
-using netcore::unix_socket;
 using testing::Return;
 using testing::Test;
 using UUID::uuid;
 
 namespace {
-    constexpr auto socket_name = "minty.test.sock"sv;
-
-    const netcore::endpoint endpoint = unix_socket {
-        .path = fs::temp_directory_path() / socket_name,
-        .mode = perms::owner_read | perms::owner_write
-    };
-
     constexpr auto tag_name = "Test Tag"sv;
 
     const minty::time_point time_point =
@@ -100,12 +90,16 @@ namespace {
 }
 
 class ClientTest : public Test {
+    static auto endpoint() -> const netcore::endpoint& {
+        return minty::test::SettingsEnvironment::settings().server.front();
+    }
+
     auto connect() -> ext::task<minty::repo> {
-        co_return minty::repo(co_await netcore::connect(endpoint));
+        co_return minty::repo(co_await netcore::connect(endpoint()));
     }
 
     auto task(action&& f) -> ext::task<> {
-        const auto server_task = server.listen(endpoint);
+        const auto server_task = server.listen(endpoint());
 
         {
             auto client = co_await connect();
