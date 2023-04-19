@@ -39,8 +39,6 @@ namespace minty::core {
             );
         }
 
-        auto deregister() -> void;
-
         VIRTUAL auto get(
             const UUID::uuid& object_id
         ) -> ext::task<fstore::blob>;
@@ -53,8 +51,6 @@ namespace minty::core {
         VIRTUAL auto meta(
             const UUID::uuid& object_id
         ) -> ext::task<fstore::object>;
-
-        auto register_scoped() -> netcore::register_guard;
 
         VIRTUAL auto remove(
             const UUID::uuid& object_id

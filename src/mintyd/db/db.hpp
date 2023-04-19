@@ -14,7 +14,7 @@ namespace minty::cli {
         { f(db) } -> std::same_as<ext::task<>>;
     }
     auto database(const conf::settings& settings, const F& action) -> void {
-        netcore::async([&]() -> ext::task<> {
+        netcore::run([&]() -> ext::task<> {
             auto db = database(settings);
             co_await action(db);
         }());

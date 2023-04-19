@@ -684,8 +684,6 @@ namespace minty::core {
     ) -> ext::task<std::optional<UUID::uuid>> {
         TIMBER_FUNC();
 
-        const auto reg = bucket.register_scoped();
-
         const auto metadata = co_await bucket.meta(object.id);
         co_return co_await generate_preview(bucket, metadata);
     }
@@ -702,7 +700,6 @@ namespace minty::core {
 
         auto db = co_await database->connect();
         auto bucket = co_await objects->connect();
-        bucket.deregister();
 
         auto preview = std::optional<UUID::uuid>();
         auto error_message = std::string();

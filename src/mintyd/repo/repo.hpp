@@ -27,7 +27,7 @@ namespace minty::cli {
         const conf::settings& settings,
         const F& action
     ) -> void {
-        netcore::async([&]() -> ext::task<> {
+        netcore::run([&]() -> ext::task<> {
             auto container = cli::container(settings);
 
             co_await container.init(settings);

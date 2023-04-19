@@ -31,10 +31,6 @@ namespace minty::core {
         id(id)
     {}
 
-    auto bucket::deregister() -> void {
-        connection->deregister();
-    }
-
     auto bucket::get(
         const UUID::uuid& object_id
     ) -> ext::task<fstore::blob> {
@@ -52,10 +48,6 @@ namespace minty::core {
         const UUID::uuid& object_id
     ) -> ext::task<fstore::object> {
         co_return co_await connection->get_object_metadata(id, object_id);
-    }
-
-    auto bucket::register_scoped() -> netcore::register_guard {
-        return connection->register_scoped();
     }
 
     auto bucket::remove(

@@ -12,10 +12,30 @@
 
 namespace fs = std::filesystem;
 
+using minty::server::server_list;
+
 namespace {
     namespace internal {
         constexpr auto crash_log_level = timber::level::critical;
+        constexpr auto signals = std::array { SIGINT, SIGTERM };
+
         const auto default_config = fs::path(CONFDIR) / "minty.yml";
+
+        auto handle_signals(server_list& servers) -> ext::jtask<> {
+            auto signalfd = netcore::signalfd::create(signals);
+
+            while (true) {
+                const auto signal = co_await signalfd.wait_for_signal();
+
+                TIMBER_INFO(
+                    "Received signal ({}): {}",
+                    signal,
+                    strsignal(signal)
+                );
+
+                servers.close();
+            }
+        }
 
         auto main(
             const commline::app& app,
@@ -62,6 +82,7 @@ namespace {
                     timber::level::notice
                 );
 
+                const auto sigtask = handle_signals(servers);
                 co_await servers.join();
 
                 uptime_timer.stop();
