@@ -1,12 +1,6 @@
 #pragma once
 
-#include <conftools/database.h>
-#include <ext/unix.h>
-#include <map>
-#include <netcore/netcore>
-#include <optional>
-#include <string>
-#include <timber/timber>
+#include <conftools/yaml.h>
 
 namespace minty::conf {
     struct settings {
@@ -55,7 +49,7 @@ namespace minty::conf {
         s_fstore fstore;
         s_log log;
         s_search search;
-        std::vector<netcore::endpoint> server;
+        std::vector<conftools::endpoint> server;
     };
 
     auto initialize(std::string_view path) -> settings;

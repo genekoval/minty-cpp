@@ -4,11 +4,12 @@
 #include <minty/repo.hpp>
 
 namespace minty::server {
+    using std::chrono::seconds;
     using stream = zipline::stream<socket>;
 
     class router_context {
-        core::repo* repo;
-        const server_info* info;
+        core::repo* const repo;
+        const server_info* const info;
     public:
         router_context(core::repo& repo, const server_info& info);
 
@@ -138,5 +139,9 @@ namespace minty::server {
             UUID::uuid tag_id,
             std::string new_name
         ) -> ext::task<tag_name>;
+
+        auto set_timer(seconds duration) -> ext::task<>;
     };
+
+    static_assert(zipline::router_context<router_context>);
 }

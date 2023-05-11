@@ -2,6 +2,7 @@
 
 #include "router.hpp"
 
+#include <conftools/endpoint.hpp>
 #include <minty/except.hpp>
 
 namespace minty::server {
@@ -21,10 +22,7 @@ namespace minty::server {
         }
     }
 
-    inline auto make_router(
-        core::repo& repo,
-        const server_info& info
-    ) {
+    inline auto make_router(core::repo& repo, const server_info& info) {
         return detail::make_router(
             router_context(repo, info),
             &router_context::add_comment,
@@ -71,8 +69,9 @@ namespace minty::server {
 
     class server_context {
         router_type* router;
+        seconds timeout;
     public:
-        server_context(router_type& router);
+        server_context(router_type& router, seconds timeout);
 
         auto close() -> void;
 
@@ -86,6 +85,6 @@ namespace minty::server {
 
     auto listen(
         router_type& router,
-        std::span<const netcore::endpoint> endpoints
+        std::span<const conftools::endpoint> endpoints
     ) -> ext::task<server_list>;
 }

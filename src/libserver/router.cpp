@@ -221,4 +221,8 @@ namespace minty::server {
     ) -> ext::task<tag_name> {
         co_return co_await repo->set_tag_name(tag_id, new_name);
     }
+
+    auto router_context::set_timer(seconds duration) -> ext::task<> {
+        return netcore::sleep_for(duration);
+    }
 }
