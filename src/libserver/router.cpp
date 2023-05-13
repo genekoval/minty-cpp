@@ -223,6 +223,6 @@ namespace minty::server {
     }
 
     auto router_context::set_timer(seconds duration) -> ext::task<> {
-        return netcore::sleep_for(duration);
+        co_await netcore::sleep_for(duration);
     }
 }
