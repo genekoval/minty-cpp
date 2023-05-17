@@ -19,7 +19,7 @@
 #include <fstore/fstore>
 
 namespace minty {
-    using socket = fstore::net::socket;
+    using socket = netcore::buffered_socket;
 
     using client_type = zipline::client<socket, event>;
 
@@ -28,7 +28,7 @@ namespace minty {
     public:
         repo() = default;
 
-        repo(netcore::socket&& socket);
+        repo(socket&& socket);
 
         auto add_comment(
             const UUID::uuid& post_id,
@@ -46,7 +46,6 @@ namespace minty {
         auto add_objects_url(
             std::string_view url
         ) -> ext::task<std::vector<object_preview>>;
-
 
         auto add_post_objects(
             const UUID::uuid& post_id,
@@ -81,6 +80,8 @@ namespace minty {
             std::string_view url
         ) -> ext::task<source>;
 
+        auto connected() -> bool;
+
         auto create_post(const UUID::uuid& post_id) -> ext::task<>;
 
         auto create_post_draft() -> ext::task<UUID::uuid>;
@@ -113,6 +114,8 @@ namespace minty {
             const UUID::uuid& tag_id,
             std::int64_t source_id
         ) -> ext::task<>;
+
+        auto failed() const noexcept -> bool;
 
         auto get_comment(const UUID::uuid& comment_id) -> ext::task<comment>;
 

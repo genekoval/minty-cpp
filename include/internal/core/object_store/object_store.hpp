@@ -6,13 +6,13 @@
 
 namespace minty::core {
     class bucket {
-        ext::pool_item<fstore::object_store> connection;
+        fstore::client::pool::item connection;
         UUID::uuid id;
     public:
         bucket() = default;
 
         bucket(
-            ext::pool_item<fstore::object_store>&& connection,
+            fstore::client::pool::item&& connection,
             const UUID::uuid& id
         );
 

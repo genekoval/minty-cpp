@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+using namespace ext::literals;
 using namespace std::literals;
 
 using minty::core::mock_repo;
@@ -76,7 +77,10 @@ namespace {
         }
 
         auto connection(netcore::socket&& client) -> ext::task<> {
-            auto socket = minty::socket(std::forward<netcore::socket>(client));
+            auto socket = minty::socket(
+                std::forward<netcore::socket>(client),
+                8_KiB
+            );
             co_await router.route(socket);
         }
 
@@ -98,7 +102,10 @@ class ClientTest : public Test {
     }
 
     auto connect() -> ext::task<minty::repo> {
-        co_return minty::repo(co_await netcore::connect(endpoint()));
+        co_return minty::repo(co_await netcore::buffered_socket::connect(
+            endpoint(),
+            8_KiB
+        ));
     }
 
     auto task(action&& f) -> ext::task<> {

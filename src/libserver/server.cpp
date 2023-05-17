@@ -1,5 +1,7 @@
 #include <internal/server/server.hpp>
 
+using namespace ext::literals;
+
 using conftools::endpoint;
 using netcore::address_type;
 
@@ -26,7 +28,10 @@ namespace minty::server {
     auto server_context::close() -> void {}
 
     auto server_context::connection(netcore::socket&& client) -> ext::task<> {
-        auto socket = minty::socket(std::forward<netcore::socket>(client));
+        auto socket = minty::socket(
+            std::forward<netcore::socket>(client),
+            8_KiB
+        );
         co_await router->route(socket, timeout);
     }
 

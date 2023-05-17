@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pool.hpp"
+
 #include <internal/test.hpp>
 
 #include <internal/core/db/model/object.hpp>
@@ -18,12 +20,9 @@
 #include <minty/model/tag_name.hpp>
 #include <minty/model/tag_preview.hpp>
 
-#include <ext/pool>
-#include <pg++/pg++>
-
 namespace minty::core::db {
     class connection {
-        ext::pool_item<pg::client> client;
+        pool::item client;
     public:
         connection() = default;
 

@@ -15,17 +15,7 @@ namespace minty::core::db {
 #endif
 
     class database {
-        class provider {
-            pg::parameters params;
-        public:
-            provider() = default;
-
-            provider(const pg::parameters& params);
-
-            auto provide() -> ext::task<pg::client>;
-        };
-
-        ext::async_pool<pg::client, provider> pool;
+        pool pool;
     public:
         database() = default;
 

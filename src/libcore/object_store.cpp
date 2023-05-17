@@ -4,8 +4,7 @@ namespace minty::core {
     object_store::object_store(std::string_view endpoint) : client(endpoint) {}
 
     auto object_store::connect() -> ext::task<bucket> {
-        auto connection = co_await client.connect();
-        co_return bucket(std::move(connection), bucket_id);
+        co_return bucket(co_await client.connect(), bucket_id);
     }
 
     auto object_store::get_bucket_id() const noexcept -> const UUID::uuid& {
@@ -22,11 +21,11 @@ namespace minty::core {
     }
 
     bucket::bucket(
-        ext::pool_item<fstore::object_store>&& connection,
+        fstore::client::pool::item&& connection,
         const UUID::uuid& id
     ) :
         connection(
-            std::forward<ext::pool_item<fstore::object_store>>(connection)
+            std::forward<fstore::client::pool::item>(connection)
         ),
         id(id)
     {}

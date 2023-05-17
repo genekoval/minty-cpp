@@ -20,10 +20,10 @@ namespace zipline {
 }
 
 namespace minty {
-    repo::repo(netcore::socket&& socket) :
+    repo::repo(socket&& socket) :
         client(new client_type(
             error_list::thrower(),
-            std::forward<netcore::socket>(socket)
+            std::forward<minty::socket>(socket)
         ))
     {}
 
@@ -169,6 +169,10 @@ namespace minty {
         );
     }
 
+    auto repo::connected() -> bool {
+        return client->inner.connected();
+    }
+
     auto repo::create_post(const UUID::uuid& post_id) -> ext::task<> {
         co_await client->send<void>(event::create_post, post_id);
     }
@@ -234,6 +238,10 @@ namespace minty {
             tag_id,
             source_id
         );
+    }
+
+    auto repo::failed() const noexcept -> bool {
+        return client->inner.failed();
     }
 
     auto repo::get_comment(
