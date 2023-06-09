@@ -28,6 +28,7 @@ common.libs := \
  avformat \
  avutil \
  conftools \
+ crypto \
  elasticsearch \
  date \
  ext++ \
@@ -37,6 +38,7 @@ common.libs := \
  harvest \
  netcore \
  pg++ \
+ ssl \
  swscale \
  threadpool \
  timber \
