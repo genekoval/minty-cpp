@@ -11,7 +11,7 @@ namespace minty::core::db {
         UUID::uuid id;
         std::optional<std::string> title;
         std::optional<std::string> description;
-        visibility visibility;
+        minty::visibility visibility;
         time_point created;
         time_point modified;
         std::vector<UUID::uuid> tags;

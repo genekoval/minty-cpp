@@ -17,10 +17,12 @@ TEST_F(SearchTagFind, FindOne) {
 
         co_await index.refresh();
 
-        result = co_await search.find_tags({
+        const auto query = minty::tag_query {
             .size = 10,
             .name = "Python"
-        });
+        };
+
+        result = co_await search.find_tags(query);
     }());
 
     const auto& tag = opt->get();
@@ -41,10 +43,12 @@ TEST_F(SearchTagFind, FindMultiple) {
 
         co_await index.refresh();
 
-        result = co_await search.find_tags({
+        const auto query = minty::tag_query {
             .size = 10,
             .name = "Java"
-        });
+        };
+
+        result = co_await search.find_tags(query);
     }());
 
     const auto& java = java_opt->get();
@@ -66,10 +70,12 @@ TEST_F(SearchTagFind, LimitResults) {
 
         co_await index.refresh();
 
-        result = co_await search.find_tags({
+        const auto query = minty::tag_query {
             .size = 1,
             .name = "Java"
-        });
+        };
+
+        result = co_await search.find_tags(query);
     }());
 
     const auto& java = opt->get();
@@ -89,11 +95,13 @@ TEST_F(SearchTagFind, ResultWindow) {
 
         co_await index.refresh();
 
-        result = co_await search.find_tags({
+        const auto query = minty::tag_query {
             .from = 1,
             .size = 1,
             .name = "Java"
-        });
+        };
+
+        result = co_await search.find_tags(query);
     }());
 
     const auto& js = opt->get();

@@ -434,7 +434,7 @@ namespace minty::core {
         const auto obj = co_await db.read_object(object_id);
         const auto metadata = co_await bucket.meta(object_id);
 
-        co_return object {
+        auto result = object {
             .id = object_id,
             .hash = metadata.hash,
             .size = data_size(metadata.size),
@@ -443,11 +443,14 @@ namespace minty::core {
             .date_added = metadata.date_added,
             .preview_id = obj.preview_id,
             .src = obj.src,
-            .posts = co_await get_posts(
-                bucket,
-                co_await db.read_object_posts(object_id)
-            )
         };
+
+        result.posts = co_await get_posts(
+            bucket,
+            co_await db.read_object_posts(object_id)
+        );
+
+        co_return result;
     }
 
     auto repo::get_object_preview_errors() ->
@@ -479,14 +482,15 @@ namespace minty::core {
             .visibility = data.visibility,
             .date_created = data.date_created,
             .date_modified = data.date_modified,
-            .posts = std::move(posts),
-            .tags = co_await db.read_post_tags(id)
+            .posts = std::move(posts)
         };
 
+        result.tags = co_await db.read_post_tags(id);
         auto objects = co_await db.read_post_objects(id);
 
         for (auto&& obj : objects) {
             auto meta = co_await bucket.meta(obj.id);
+
             result.objects.push_back(object_preview {
                 .id = std::move(obj.id),
                 .preview_id = std::move(obj.preview_id),
@@ -587,14 +591,14 @@ namespace minty::core {
     ) -> ext::task<search_result<tag_preview>> {
         TIMBER_FUNC();
 
-        const auto result = co_await search->find_tags(query);
+        const auto res = co_await search->find_tags(query);
 
         auto db = co_await database->connect();
 
-        co_return search_result<tag_preview> {
-            .total = result.total,
-            .hits = co_await db.read_tag_previews(result.hits)
-        };
+        auto result = search_result<tag_preview> { .total = res.total };
+        result.hits = co_await db.read_tag_previews(res.hits);
+
+        co_return result;
     }
 
     auto repo::move_post_objects(

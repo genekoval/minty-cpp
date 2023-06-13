@@ -15,7 +15,7 @@ namespace minty::core::db {
 #endif
 
     class database {
-        pool pool;
+        db::pool pool;
     public:
         database() = default;
 

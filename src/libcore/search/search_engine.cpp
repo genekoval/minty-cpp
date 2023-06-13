@@ -40,25 +40,22 @@ namespace minty::core {
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                post_index,
-                post_id,
-                json({
-                    {"script", {
-                        {"lang", "painless"},
-                        {"params", {
-                            {"tag", tag_id}
-                        }},
-                        {"source",
-                            "if (!ctx._source.tags.contains(params.tag)) {"
-                                "ctx._source.tags.add(params.tag);"
-                            "}"
-                        }
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"script", {
+                {"lang", "painless"},
+                {"params", {
+                    {"tag", tag_id}
+                }},
+                {"source",
+                    "if (!ctx._source.tags.contains(params.tag)) {"
+                        "ctx._source.tags.add(params.tag);"
+                    "}"
+                }
+            }}
+        }).dump();
+
+        auto req = client.update_doc(post_index, post_id, body);
+        co_await req.send();
     }
 
     auto search_engine::add_posts(
@@ -71,28 +68,25 @@ namespace minty::core {
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                tag_index,
-                tag_id,
-                json({
-                    {"script", {
-                        {"lang", "painless"},
-                        {"params", {
-                            {"alias", alias}
-                        }},
-                        {"source",
-                            "if (!ctx._source.names.contains(params.alias)) {"
-                                "ctx._source.names.add(params.alias);"
-                            "}"
-                        }
-                    }},
-                    {"upsert", {
-                        {"names", {alias}}
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"script", {
+                {"lang", "painless"},
+                {"params", {
+                    {"alias", alias}
+                }},
+                {"source",
+                    "if (!ctx._source.names.contains(params.alias)) {"
+                        "ctx._source.names.add(params.alias);"
+                    "}"
+                }
+            }},
+            {"upsert", {
+                {"names", {alias}}
+            }}
+        }).dump();
+
+        auto req = client.update_doc(tag_index, tag_id, body);
+        co_await req.send();
     }
 
     auto search_engine::add_tags(
@@ -179,27 +173,24 @@ namespace minty::core {
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                tag_index,
-                tag_id,
-                json({
-                    {"script", {
-                        {"lang", "painless"},
-                        {"params", {
-                            {"alias", alias}
-                        }},
-                        {"source",
-                            "if (ctx._source.names.contains(params.alias)) {"
-                                "ctx._source.names.remove("
-                                    "ctx._source.names.indexOf(params.alias)"
-                                ");"
-                            "}"
-                        }
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"script", {
+                {"lang", "painless"},
+                {"params", {
+                    {"alias", alias}
+                }},
+                {"source",
+                    "if (ctx._source.names.contains(params.alias)) {"
+                        "ctx._source.names.remove("
+                            "ctx._source.names.indexOf(params.alias)"
+                        ");"
+                    "}"
+                }
+            }}
+        }).dump();
+
+        auto req = client.update_doc(tag_index, tag_id, body);
+        co_await req.send();
     }
 
     auto search_engine::delete_tag(const UUID::uuid& tag_id) -> ext::task<> {
@@ -279,7 +270,7 @@ namespace minty::core {
     auto search_engine::find_tags(
         const tag_query& query
     ) -> ext::task<search_result<UUID::uuid>> {
-        co_return co_await search(tag_index, json({
+        const auto body = json({
             {"_source", false},
             {"from", query.from},
             {"size", query.size},
@@ -303,53 +294,50 @@ namespace minty::core {
                     }}
                 }}
             }}
-        }));
+        });
+
+        auto req = search(tag_index, body);
+        co_return co_await std::move(req);
     }
 
     auto search_engine::publish_post(
         const UUID::uuid& post_id,
         time_point timestamp
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                post_index,
-                post_id,
-                json({
-                    {"doc", {
-                        {"visibility", visibility::pub},
-                        {"created", timestamp},
-                        {"modified", timestamp}
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"doc", {
+                {"visibility", visibility::pub},
+                {"created", timestamp},
+                {"modified", timestamp}
+            }}
+        }).dump();
+
+        auto req = client.update_doc(post_index, post_id, body);
+        co_await req.send();
     }
 
     auto search_engine::remove_post_tag(
         const UUID::uuid& post_id,
         const UUID::uuid& tag_id
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                post_index,
-                post_id,
-                json({
-                    {"script", {
-                        {"lang", "painless"},
-                        {"params", {
-                            {"tag", tag_id}
-                        }},
-                        {"source",
-                            "if (ctx._source.tags.contains(params.tag)) {"
-                                "ctx._source.tags.remove("
-                                    "ctx._source.tags.indexOf(params.tag)"
-                                ");"
-                            "}"
-                        }
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"script", {
+                {"lang", "painless"},
+                {"params", {
+                    {"tag", tag_id}
+                }},
+                {"source",
+                    "if (ctx._source.tags.contains(params.tag)) {"
+                        "ctx._source.tags.remove("
+                            "ctx._source.tags.indexOf(params.tag)"
+                        ");"
+                    "}"
+                }
+            }}
+        }).dump();
+
+        auto req = client.update_doc(post_index, post_id, body);
+        co_await req.send();
     }
 
     auto search_engine::search(
@@ -379,51 +367,42 @@ namespace minty::core {
         const UUID::uuid& post_id,
         time_point date_modified
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                post_index,
-                post_id,
-                json({
-                    {"doc", {
-                        {"modified", date_modified}
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"doc", {
+                {"modified", date_modified}
+            }}
+        }).dump();
+
+        auto req = client.update_doc(post_index, post_id, body);
+        co_await req.send();
     }
 
     auto search_engine::update_post_description(
         const db::post_update& post
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                post_index,
-                post.id,
-                json({
-                    {"doc", {
-                        {"description", post.new_data},
-                        {"modified", post.date_modified}
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto query = json({
+            {"doc", {
+                {"description", post.new_data},
+                {"modified", post.date_modified}
+            }}
+        }).dump();
+
+        auto req = client.update_doc(post_index, post.id, query);
+        co_await req.send();
     }
 
     auto search_engine::update_post_title(
         const db::post_update& post
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                post_index,
-                post.id,
-                json({
-                    {"doc", {
-                        {"title", post.new_data},
-                        {"modified", post.date_modified}
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"doc", {
+                {"title", post.new_data},
+                {"modified", post.date_modified}
+            }}
+        }).dump();
+
+        auto req = client.update_doc(post_index, post.id, body);
+        co_await req.send();
     }
 
     auto search_engine::update_tag_name(
@@ -431,29 +410,26 @@ namespace minty::core {
         std::string_view old_name,
         std::string_view new_name
     ) -> ext::task<> {
-        co_await client
-            .update_doc(
-                tag_index,
-                tag_id,
-                json({
-                    {"script", {
-                        {"lang", "painless"},
-                        {"params", {
-                            {"old", old_name},
-                            {"new", new_name}
-                        }},
-                        {"source",
-                            "if (ctx._source.names.contains(params.old)) {"
-                                "ctx._source.names.remove("
-                                    "ctx._source.names.indexOf(params.old)"
-                                ");"
-                                "ctx._source.names.add(params.new)"
-                            "}"
-                        }
-                    }}
-                }).dump()
-            )
-            .send();
+        const auto body = json({
+            {"script", {
+                {"lang", "painless"},
+                {"params", {
+                    {"old", old_name},
+                    {"new", new_name}
+                }},
+                {"source",
+                    "if (ctx._source.names.contains(params.old)) {"
+                        "ctx._source.names.remove("
+                            "ctx._source.names.indexOf(params.old)"
+                        ");"
+                        "ctx._source.names.add(params.new)"
+                    "}"
+                }
+            }}
+        }).dump();
+
+        auto req = client.update_doc(tag_index, tag_id, body);
+        co_await req.send();
 
         TIMBER_DEBUG(
             "Update tag name ({}): '{}' -> '{}'",

@@ -9,11 +9,9 @@ TEST_F(SearchTagAddTags, Add) {
 
         co_await index.refresh();
 
-        auto res = co_await client
-            .search(index, json({
-                {"size", tags.size()}
-            }).dump())
-            .send();
+        const auto query = json({{"size", tags.size()}}).dump();
+        auto req = client.search(index, query);
+        const auto res = co_await req.send();
 
         const auto total = res["hits"]["total"]["value"].get<unsigned int>();
 

@@ -24,7 +24,7 @@ namespace minty {
         std::uint32_t size = 0;
         std::optional<std::string> text;
         std::vector<UUID::uuid> tags;
-        visibility visibility = visibility::pub;
+        minty::visibility visibility = visibility::pub;
         post_sort sort;
     };
 }

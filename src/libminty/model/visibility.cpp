@@ -2,7 +2,7 @@
 
 namespace minty {
     auto to_string(visibility visibility) -> std::string_view {
-        using enum visibility;
+        using enum minty::visibility;
 
         switch (visibility) {
             case draft: return "draft";
