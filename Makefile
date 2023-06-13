@@ -45,15 +45,6 @@ common.libs := \
  yaml-cpp \
  zipline
 
-daemon = $(project)d
-$(daemon).type = executable
-$(daemon).deps := $(internal.libs)
-$(daemon).libs := \
- $(common.libs) \
- commline \
- dbtools \
- dmon
-
 client := lib$(project)
 $(client).type := shared
 $(client).libs := \
@@ -62,6 +53,15 @@ $(client).libs := \
  netcore \
  uri \
  uuid++
+
+daemon = $(project)d
+$(daemon).type = executable
+$(daemon).deps := $(internal.libs) $(client)
+$(daemon).libs := \
+ $(common.libs) \
+ commline \
+ dbtools \
+ dmon
 
 install := $(client) $(daemon)
 targets := $(install) $(internal.libs)
