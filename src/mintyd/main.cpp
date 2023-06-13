@@ -21,6 +21,12 @@ namespace {
 
         const auto default_config = fs::path(CONFDIR) / "minty.yml";
 
+        auto default_pidfile(std::string_view name) -> fs::path {
+            auto path = fs::temp_directory_path() / name;
+            path += ".pid";
+            return path;
+        }
+
         auto handle_signals(server_list& servers) -> ext::jtask<> {
             auto signalfd = netcore::signalfd::create(signals);
 
@@ -40,7 +46,8 @@ namespace {
         auto main(
             const commline::app& app,
             std::string_view confpath,
-            bool daemon
+            bool daemon,
+            std::optional<fs::path> pidfile
         ) -> void {
             auto startup_timer = timber::timer(
                 "Server started in",
@@ -52,7 +59,7 @@ namespace {
             if (daemon && !dmon::daemonize({
                 .group = settings.daemon.group,
                 .identifier = app.name,
-                .pidfile = settings.daemon.pidfile,
+                .pidfile = pidfile.value_or(default_pidfile(app.name)),
                 .user = settings.daemon.user
             })) return;
 
@@ -121,6 +128,11 @@ auto main(int argc, char** argv) -> int {
             commline::flag(
                 {"d", "daemon"},
                 "Run the program as a daemon."
+            ),
+            commline::option<std::optional<fs::path>>(
+                {"p", "pidfile"},
+                "Path to the pidfile",
+                "path"
             )
         ),
         commline::arguments(),
