@@ -87,6 +87,13 @@ test.libs := \
 
 include mkbuild/base.mk
 
+ifeq ($(environment),$(environment.release))
+  $(core).sources := $(filter-out \
+    src/libcore/db/connection_wrapper.cpp,\
+    $($(core).sources)\
+  )
+endif
+
 defines.develop = TEST TIMBER_TIMER_ACTIVE
 defines.release = NDEBUG TIMBER_MAX_LEVEL=info
 
