@@ -30,7 +30,6 @@ common.libs := \
  conftools \
  crypto \
  elasticsearch \
- date \
  ext++ \
  http \
  fmt \
@@ -40,7 +39,6 @@ common.libs := \
  pg++ \
  ssl \
  swscale \
- threadpool \
  timber \
  uri \
  uuid++ \

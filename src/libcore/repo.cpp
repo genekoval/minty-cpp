@@ -4,7 +4,6 @@
 #include <internal/core/preview.hpp>
 #include <internal/core/repo.hpp>
 
-#include <threadpool/threadpool>
 #include <uri/uri>
 
 namespace minty::core {
