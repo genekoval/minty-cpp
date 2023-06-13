@@ -7,7 +7,7 @@ namespace minty {
         switch (visibility) {
             case draft: return "draft";
             case pub: return "public";
-            case invalid: return "<invalid visibility>";
+            default: return "<invalid visibility>";
         }
     }
 }
