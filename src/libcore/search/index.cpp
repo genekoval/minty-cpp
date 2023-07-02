@@ -24,14 +24,13 @@ namespace minty::core {
     }
 
     auto index::clear() -> ext::task<> {
-        const auto body = json({
-            {"query", {
-                {"match_all", json::object()}
-            }}
-        }).dump();
-
-        auto req = search->client.delete_by_query({name}, body);
-        co_await req.send();
+        co_await search->client
+            .delete_by_query({name}, json({
+                {"query", {
+                    {"match_all", json::object()}
+                }}
+            }).dump())
+            .send();
     }
 
     auto index::create() -> ext::task<> {
@@ -39,8 +38,7 @@ namespace minty::core {
     }
 
     auto index::exists() -> ext::task<bool> {
-        auto req = search->client.index_exists({name});
-        co_return co_await req.send();
+        co_return co_await search->client.index_exists({name}).send();
     }
 
     auto index::recreate() -> ext::task<> {
@@ -52,12 +50,10 @@ namespace minty::core {
         TIMBER_FUNC();
         TIMBER_DEBUG("Refreshing index: {}", name);
 
-        auto req = search->client.refresh({name});
-        co_await req.send();
+        co_await search->client.refresh({name}).send();
     }
 
     auto index::remove() -> ext::task<> {
-        const auto req = search->delete_indices({name});
-        co_await req;
+        co_await search->delete_indices({name});
     }
 }
