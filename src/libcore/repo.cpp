@@ -692,7 +692,7 @@ namespace minty::core {
     }
 
     auto repo::regenerate_preview_task(
-        netcore::thread_pool& workers,
+        netcore::async_thread_pool& workers,
         db::object_preview object,
         std::size_t& errors,
         progress& progress,
@@ -751,7 +751,7 @@ namespace minty::core {
         if (progress.total == 0) co_return 0;
 
         std::size_t errors = 0;
-        auto workers = netcore::thread_pool(
+        auto workers = netcore::async_thread_pool(
             std::min(static_cast<std::size_t>(jobs), progress.total),
             1024,
             "worker"

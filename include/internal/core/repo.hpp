@@ -65,7 +65,7 @@ namespace minty::core {
         ) -> ext::task<std::optional<UUID::uuid>>;
 
         auto regenerate_preview_task(
-            netcore::thread_pool& workers,
+            netcore::async_thread_pool& workers,
             db::object_preview obj,
             std::size_t& errors,
             progress& progress,

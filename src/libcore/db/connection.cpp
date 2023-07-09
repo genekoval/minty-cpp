@@ -296,6 +296,7 @@ namespace minty::core::db {
         int batch_size
     ) -> ext::task<pg::portal<object_preview>> {
         co_return co_await client->stream_prepared<object_preview>(
+            "",
             __FUNCTION__,
             batch_size
         );
@@ -330,6 +331,7 @@ namespace minty::core::db {
         int batch_size
     ) -> ext::task<pg::portal<post_search>> {
         co_return co_await client->stream_prepared<post_search>(
+            "",
             __FUNCTION__,
             batch_size
         );
@@ -390,6 +392,7 @@ namespace minty::core::db {
         int batch_size
     ) -> ext::task<pg::portal<tag_search>> {
         co_return co_await client->stream_prepared<tag_search>(
+            "",
             __FUNCTION__,
             batch_size
         );
