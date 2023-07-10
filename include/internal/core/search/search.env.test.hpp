@@ -2,14 +2,19 @@
 
 #include "search.hpp"
 
+#include <internal/conf/settings.hpp>
+
 #include <gtest/gtest.h>
 
-namespace minty::test {
-    struct SearchEnvironment : testing::Environment {
-        static auto client() -> elastic::elasticsearch&;
+class SearchEnvironment : public testing::Environment {
+    static SearchEnvironment* instance;
+public:
+    static auto get() -> SearchEnvironment&;
 
-        static auto engine() -> core::search_engine&;
+    std::unique_ptr<elastic::elasticsearch> client;
+    std::unique_ptr<minty::core::search_engine> engine;
 
-        virtual auto SetUp() -> void override;
-    };
-}
+    auto SetUp() -> void override;
+
+    auto TearDown() -> void override;
+};

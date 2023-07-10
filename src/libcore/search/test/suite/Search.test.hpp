@@ -4,9 +4,6 @@
 
 class SearchTest : public testing::Test {
 protected:
-    elastic::elasticsearch& client =
-        minty::test::SearchEnvironment::client();
-
-    minty::core::search_engine& search =
-        minty::test::SearchEnvironment::engine();
+    elastic::elasticsearch& client = *SearchEnvironment::get().client;
+    minty::core::search_engine& search = *SearchEnvironment::get().engine;
 };

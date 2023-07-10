@@ -5,6 +5,7 @@
 
 namespace minty::cli {
     class container {
+        http::client http_client;
         pg::parameters db_params;
 
         core::db::database database;

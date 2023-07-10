@@ -5,12 +5,15 @@
 #include <gtest/gtest.h>
 #include <pg++/pg++>
 
-namespace minty::test {
-    struct SettingsEnvironment : testing::Environment {
-        static auto db_params() -> const pg::parameters&;
+class SettingsEnvironment : public testing::Environment {
+    static SettingsEnvironment* instance;
+public:
+    static auto get() -> SettingsEnvironment&;
 
-        static auto settings() -> const conf::settings&;
+    minty::conf::settings settings;
+    pg::parameters db;
 
-        virtual auto SetUp() -> void override;
-    };
-}
+    auto SetUp() -> void override;
+
+    auto TearDown() -> void override;
+};

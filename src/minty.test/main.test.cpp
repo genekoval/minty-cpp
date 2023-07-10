@@ -1,6 +1,7 @@
 #include "runtime.env.test.hpp"
 
 #include <internal/conf/settings.env.test.hpp>
+#include <internal/core/http.env.test.hpp>
 #include <internal/core/search/search.env.test.hpp>
 
 #include <filesystem>
@@ -68,16 +69,15 @@ struct TestLogger : public EmptyTestEventListener {
 auto main(int argc, char** argv) -> int {
     timber::log_handler = &file_logger;
 
-    const auto client = http::init();
-
     InitGoogleTest(&argc, argv);
 
     auto& listeners = UnitTest::GetInstance()->listeners();
     listeners.Append(new TestLogger);
 
-    AddGlobalTestEnvironment(new minty::test::RuntimeEnvironment);
-    AddGlobalTestEnvironment(new minty::test::SearchEnvironment);
-    AddGlobalTestEnvironment(new minty::test::SettingsEnvironment);
+    AddGlobalTestEnvironment(new SettingsEnvironment);
+    AddGlobalTestEnvironment(new RuntimeEnvironment);
+    AddGlobalTestEnvironment(new HttpEnvironment);
+    AddGlobalTestEnvironment(new SearchEnvironment);
 
     return RUN_ALL_TESTS();
 }

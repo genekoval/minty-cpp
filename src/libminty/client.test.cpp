@@ -95,7 +95,8 @@ namespace {
 
 class ClientTest : public Test {
     static auto endpoint() -> const netcore::endpoint& {
-        return minty::test::SettingsEnvironment::settings()
+        return SettingsEnvironment::get()
+            .settings
             .server
             .front()
             .endpoint;

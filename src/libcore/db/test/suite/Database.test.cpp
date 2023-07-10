@@ -4,15 +4,13 @@
 
 #include <fmt/format.h>
 
-using minty::test::SettingsEnvironment;
-
 namespace {
     auto connect() -> ext::task<pg::client> {
-        co_return co_await pg::connect(SettingsEnvironment::db_params());
+        co_return co_await pg::connect(SettingsEnvironment::get().db);
     }
 
     auto database() -> minty::core::db::database {
-        return minty::core::db::database(SettingsEnvironment::db_params());
+        return minty::core::db::database(SettingsEnvironment::get().db);
     }
 }
 

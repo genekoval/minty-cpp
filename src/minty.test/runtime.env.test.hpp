@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <netcore/netcore>
 
-namespace minty::test {
-    class RuntimeEnvironment : public testing::Environment {
-        netcore::runtime runtime;
-    };
-}
+class RuntimeEnvironment : public testing::Environment {
+    std::unique_ptr<netcore::runtime> runtime;
+public:
+    auto SetUp() -> void override;
+};

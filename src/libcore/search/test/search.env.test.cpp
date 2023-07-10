@@ -1,34 +1,37 @@
+#include <internal/core/http.env.test.hpp>
 #include <internal/conf/settings.env.test.hpp>
 #include <internal/core/search/search.env.test.hpp>
 
-namespace {
-    auto config() -> const minty::conf::settings::s_search& {
-        return minty::test::SettingsEnvironment::settings().search;
-    }
+SearchEnvironment* SearchEnvironment::instance = nullptr;
+
+auto SearchEnvironment::get() -> SearchEnvironment& {
+    if (instance) return *instance;
+    throw std::runtime_error("Search Environment instance is missing");
 }
 
-namespace minty::test {
-    auto SearchEnvironment::client() -> elastic::elasticsearch& {
-        static auto instance = elastic::elasticsearch(
-            config().node,
-            config().auth
-        );
+auto SearchEnvironment::SetUp() -> void {
+    const auto& search = SettingsEnvironment::get().settings.search;
 
-        return instance;
-    }
+    client = std::unique_ptr<elastic::elasticsearch>(
+        new elastic::elasticsearch(
+            *HttpEnvironment::get().client,
+            search.node,
+            search.auth
+        )
+    );
 
-    auto SearchEnvironment::engine() -> core::search_engine& {
-        static auto instance = core::search_engine(
-            config().ns,
-            config().node,
-            config().auth
-        );
+    engine = std::unique_ptr<minty::core::search_engine>(
+        new minty::core::search_engine(
+            *HttpEnvironment::get().client,
+            search.ns,
+            search.node,
+            search.auth
+        )
+    );
 
-        return instance;
-    }
+    instance = this;
+}
 
-    auto SearchEnvironment::SetUp() -> void {
-        client();
-        engine();
-    }
+auto SearchEnvironment::TearDown() -> void {
+    instance = nullptr;
 }

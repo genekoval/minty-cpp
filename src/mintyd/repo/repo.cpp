@@ -9,6 +9,7 @@ namespace minty::cli {
         objects(settings.fstore.connection),
         downloader(settings.downloader),
         search(
+            http_client,
             settings.search.ns,
             settings.search.node,
             settings.search.auth

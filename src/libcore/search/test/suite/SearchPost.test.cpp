@@ -30,7 +30,7 @@ SearchPostTest::SearchPostTest() {
 
 auto SearchPostTest::SetUpTestSuite() -> void {
     netcore::run([]() -> ext::task<> {
-        auto& search = minty::test::SearchEnvironment::engine();
+        auto& search = *SearchEnvironment::get().engine;
 
         if (!co_await search.post_index.exists()) {
             co_await search.post_index.create();

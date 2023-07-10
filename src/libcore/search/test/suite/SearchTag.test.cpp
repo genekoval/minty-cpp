@@ -11,7 +11,7 @@ SearchTagTest::SearchTagTest() {
 
 auto SearchTagTest::SetUpTestSuite() -> void {
     netcore::run([]() -> ext::task<> {
-        auto& search = minty::test::SearchEnvironment::engine();
+        auto& search = *SearchEnvironment::get().engine;
         auto& index = search.*index_member;
 
         if (!co_await index.exists()) co_await index.create();
