@@ -1,6 +1,7 @@
 #pragma once
 
 #include <uuid++/uuid++>
+#include <uuid++/zipline>
 #include <zipline/zipline>
 
 namespace minty {

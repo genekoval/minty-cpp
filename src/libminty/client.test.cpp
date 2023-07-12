@@ -4,6 +4,7 @@
 
 #include <minty/repo.hpp>
 
+#include <ext/data_size.h>
 #include <gtest/gtest.h>
 
 using namespace ext::literals;

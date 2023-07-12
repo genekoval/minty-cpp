@@ -44,7 +44,6 @@ namespace minty::conf {
 
         s_daemon daemon;
         s_database database;
-        std::string downloader;
         s_fstore fstore;
         s_log log;
         s_search search;

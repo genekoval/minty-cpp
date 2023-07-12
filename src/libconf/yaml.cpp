@@ -9,7 +9,6 @@ namespace YAML {
         settings,
         c::required("daemon", &settings::daemon),
         c::required("database", &settings::database),
-        c::required("downloader", &settings::downloader),
         c::required("fstore", &settings::fstore),
         c::optional("log", &settings::log),
         c::required("search", &settings::search),

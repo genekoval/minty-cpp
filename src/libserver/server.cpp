@@ -1,5 +1,7 @@
 #include <internal/server/server.hpp>
 
+#include <ext/data_size.h>
+
 using namespace ext::literals;
 
 using conftools::endpoint;

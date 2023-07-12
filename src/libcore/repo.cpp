@@ -4,6 +4,8 @@
 #include <internal/core/preview.hpp>
 #include <internal/core/repo.hpp>
 
+#include <minty/except.hpp>
+
 #include <uri/uri>
 
 namespace minty::core {
@@ -72,37 +74,7 @@ namespace minty::core {
     ) -> ext::task<std::vector<object_preview>> {
         TIMBER_FUNC();
 
-        auto bucket = co_await objects->connect();
-        auto objects = std::vector<fstore::object>();
-
-        const auto used_scraper = co_await dl->fetch(url, [&](
-            auto& file
-        ) -> ext::task<> {
-            objects.push_back(co_await bucket.add(
-                {},
-                co_await file.size(),
-                [&file](auto&& part) -> ext::task<> {
-                    co_await file.read([&part](auto&& chunk) -> ext::task<> {
-                        co_await part.write(chunk);
-                    });
-                }
-            ));
-        });
-
-        auto db = co_await database->connect();
-
-        const auto src = used_scraper ?
-            (co_await add_source(db, url)).id : std::optional<std::int64_t>();
-
-        auto result = std::vector<object_preview>();
-
-        for (auto&& obj : objects) {
-            result.emplace_back(
-                co_await add_object(db, bucket, std::move(obj), src)
-            );
-        }
-
-        co_return result;
+        co_return std::vector<object_preview> { co_await download_file(url) };
     }
 
     auto repo::add_post_objects(
@@ -206,29 +178,11 @@ namespace minty::core {
         std::string_view scheme,
         std::string_view host
     ) -> ext::task<std::int64_t> {
-        auto icon_id = std::optional<UUID::uuid>();
         auto bucket = co_await objects->connect();
 
-        co_await dl->get_site_icon(
-            fmt::format("{}://{}", scheme, host),
-            [&](auto& stream) -> ext::task<> {
-                const auto object = co_await bucket.add(
-                    {},
-                    co_await stream.size(),
-                    [&stream](auto&& part) -> ext::task<> {
-                        co_await stream.read(
-                            [&part](auto&& chunk) -> ext::task<> {
-                                co_await part.write(chunk);
-                            }
-                        );
-                    }
-                );
+        const auto icon = co_await dl->get_site_icon(scheme, host, bucket);
+        const auto site = co_await db.create_site(scheme, host, icon);
 
-                icon_id = object.id;
-            }
-        );
-
-        const auto site = co_await db.create_site(scheme, host, icon_id);
         co_return site.id;
     }
 
@@ -399,6 +353,26 @@ namespace minty::core {
         auto db = co_await database->connect();
 
         co_await db.delete_tag_source(tag_id, source_id);
+    }
+
+    auto repo::download_file(
+        std::string_view url
+    ) -> ext::task<object_preview> {
+        TIMBER_FUNC();
+
+        auto bucket = co_await objects->connect();
+        auto [status, metadata] = co_await dl->fetch(url, bucket);
+
+        auto db = co_await database->connect();
+        auto object = co_await add_object(
+            db,
+            bucket,
+            std::move(metadata),
+            std::nullopt
+        );
+
+        if (status.ok()) co_return object;
+        throw download_error(url, status, object);
     }
 
     auto repo::get_bucket_id() const noexcept -> const UUID::uuid& {

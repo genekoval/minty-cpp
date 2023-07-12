@@ -34,7 +34,6 @@ common.libs := \
  http \
  fmt \
  fstore \
- harvest \
  netcore \
  pg++ \
  ssl \

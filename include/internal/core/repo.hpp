@@ -54,6 +54,8 @@ namespace minty::core {
             std::string_view url
         ) -> ext::task<source>;
 
+        auto download_file(std::string_view url) -> ext::task<object_preview>;
+
         auto get_posts(
             bucket& bucket,
             std::vector<db::post_preview>&& posts
