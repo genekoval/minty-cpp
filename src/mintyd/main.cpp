@@ -4,6 +4,7 @@
 
 #include <internal/core/preview.hpp>
 #include <internal/server/server.hpp>
+#include <internal/server/http/server.hpp>
 
 #include <http/http>
 #include <dmon/dmon>
@@ -27,7 +28,10 @@ namespace {
             return path;
         }
 
-        auto handle_signals(server_list& servers) -> ext::jtask<> {
+        auto handle_signals(
+            server_list& servers,
+            http::server::server_list& http_servers
+        ) -> ext::jtask<> {
             auto signalfd = netcore::signalfd::create(signals);
 
             while (true) {
@@ -40,6 +44,7 @@ namespace {
                 );
 
                 servers.close();
+                http_servers.close();
             }
         }
 
@@ -77,6 +82,14 @@ namespace {
                     }
                 };
 
+                auto routes = minty::server::http::router(info, repo);
+                auto http = co_await minty::server::http::listen(
+                    routes,
+                    settings.http.cert,
+                    settings.http.key,
+                    settings.http.listen
+                );
+
                 auto router = minty::server::make_router(repo, info);
                 auto servers = co_await minty::server::listen(
                     router,
@@ -89,8 +102,9 @@ namespace {
                     timber::level::notice
                 );
 
-                const auto sigtask = handle_signals(servers);
+                const auto sigtask = handle_signals(servers, http);
                 co_await servers.join();
+                co_await http.join();
 
                 uptime_timer.stop();
             });

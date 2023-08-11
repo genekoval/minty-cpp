@@ -3,6 +3,7 @@
 #include "object_preview.hpp"
 #include "time_point.hpp"
 
+#include <ext/json.hpp>
 #include <zipline/zipline>
 
 namespace minty {
@@ -14,6 +15,16 @@ namespace minty {
         std::uint32_t object_count;
         time_point date_created;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        post_preview,
+        id,
+        title,
+        preview,
+        comment_count,
+        object_count,
+        date_created
+    );
 }
 
 namespace zipline {

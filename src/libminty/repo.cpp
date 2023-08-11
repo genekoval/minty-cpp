@@ -42,8 +42,10 @@ namespace minty {
         const fs::path& path
     ) -> ext::task<object_preview> {
         const auto file = fstore::file {
-            .fd = open(path.c_str(), O_RDONLY),
-            .size = fs::file_size(path)
+            .metadata = {
+                .size = fs::file_size(path)
+            },
+            .fd = open(path.c_str(), O_RDONLY)
         };
 
         co_return co_await client->send<object_preview>(

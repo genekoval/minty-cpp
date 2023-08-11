@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <zipline/zipline>
 
 namespace minty {
@@ -8,6 +9,18 @@ namespace minty {
         std::uint32_t total;
         std::vector<T> hits;
     };
+
+    template <std::convertible_to<nlohmann::json> T>
+    auto from_json(const nlohmann::json& j, search_result<T>& r) -> void {
+        j["total"].get_to(r.total);
+        j["hits"].get_to(r.hits);
+    }
+
+    template <std::convertible_to<nlohmann::json> T>
+    auto to_json(nlohmann::json& j, const search_result<T>& r) -> void {
+        j["total"] = r.total;
+        j["hits"] = r.hits;
+    }
 }
 
 namespace zipline {

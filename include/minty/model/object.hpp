@@ -21,6 +21,19 @@ namespace minty {
         std::optional<source> src;
         std::vector<post_preview> posts;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        object,
+        id,
+        hash,
+        size,
+        type,
+        subtype,
+        date_added,
+        preview_id,
+        src,
+        posts
+    );
 }
 
 namespace zipline {

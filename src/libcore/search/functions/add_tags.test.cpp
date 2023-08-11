@@ -1,5 +1,7 @@
 #include "search.test.hpp"
 
+using nlohmann::json;
+
 using SearchTagAddTags = SearchTagTest;
 
 TEST_F(SearchTagAddTags, Add) {

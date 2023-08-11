@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <zipline/zipline>
 
 namespace minty {
@@ -7,6 +8,12 @@ namespace minty {
         std::string name;
         std::vector<std::string> aliases;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        tag_name,
+        name,
+        aliases
+    );
 }
 
 namespace zipline {

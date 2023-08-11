@@ -28,6 +28,12 @@ namespace minty::conf {
             s_proxy proxy;
         };
 
+        struct s_http {
+            std::vector<conftools::endpoint> listen;
+            std::string cert;
+            std::string key;
+        };
+
         struct s_log {
             timber::level level = timber::level::info;
         };
@@ -45,6 +51,7 @@ namespace minty::conf {
         s_daemon daemon;
         s_database database;
         s_fstore fstore;
+        s_http http;
         s_log log;
         s_search search;
         std::vector<conftools::endpoint> server;

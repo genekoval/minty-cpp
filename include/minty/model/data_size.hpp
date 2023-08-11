@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <zipline/zipline>
 
@@ -11,6 +12,12 @@ namespace minty {
         data_size() = default;
         data_size(uintmax_t bytes);
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        data_size,
+        bytes,
+        formatted
+    );
 }
 
 namespace zipline {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <zipline/zipline>
 
 namespace minty {
@@ -12,6 +13,12 @@ namespace minty {
     auto to_string(visibility visibility) -> std::string_view;
 
     static_assert(zipline::codable<visibility>);
+
+    NLOHMANN_JSON_SERIALIZE_ENUM(visibility, {
+        {visibility::invalid, nullptr},
+        {visibility::draft, "draft"},
+        {visibility::pub, "public"}
+    })
 }
 
 template <>

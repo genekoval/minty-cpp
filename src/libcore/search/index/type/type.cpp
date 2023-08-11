@@ -3,8 +3,7 @@
 namespace {
     namespace internal {
         const auto date = json({
-            {"type", "date"},
-            {"format", "epoch_millis"}
+            {"type", "date"}
         });
 
         const auto keyword = json({

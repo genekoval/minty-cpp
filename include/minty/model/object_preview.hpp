@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ext/json.hpp>
+#include <uuid++/json.hpp>
 #include <uuid++/uuid++>
 #include <uuid++/zipline>
 #include <zipline/zipline>
@@ -13,6 +15,14 @@ namespace minty {
 
         auto operator==(const object_preview&) const noexcept -> bool = default;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        object_preview,
+        id,
+        preview_id,
+        type,
+        subtype
+    );
 }
 
 namespace zipline {

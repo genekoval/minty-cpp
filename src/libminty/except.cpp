@@ -1,12 +1,24 @@
 #include <minty/except.hpp>
 
 namespace minty {
+    minty_error::minty_error() : runtime_error("minty error") {}
+
+    minty_error::minty_error(const std::string& what) : runtime_error(what) {}
+
+    invalid_data::invalid_data(const std::string& what) : runtime_error(what) {}
+
+    not_found::not_found(const std::string& what) : runtime_error(what) {}
+
+    auto not_found::http_code() const noexcept -> int {
+        return 404;
+    }
+
     download_error::download_error(
         std::string_view url,
         long status,
         const object_preview& object
     ) :
-        minty_error("Download failed ({}): {}", status, url),
+        runtime_error(fmt::format("Download failed ({}): {}", status, url)),
         source_url(url),
         code(status),
         object(object)
@@ -24,7 +36,7 @@ namespace minty {
         co_await zipline::encode(object, writer);
     }
 
-    auto download_error::status() const noexcept -> std::int64_t {
+    auto download_error::http_code() const noexcept -> int {
         return code;
     }
 

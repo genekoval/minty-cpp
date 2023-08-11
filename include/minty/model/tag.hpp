@@ -3,6 +3,8 @@
 #include "source.hpp"
 #include "time_point.hpp"
 
+#include <ext/json.hpp>
+#include <uuid++/json.hpp>
 #include <uuid++/uuid++>
 #include <vector>
 #include <zipline/zipline>
@@ -19,6 +21,19 @@ namespace minty {
         std::uint32_t post_count;
         time_point date_created;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        tag,
+        id,
+        name,
+        aliases,
+        description,
+        avatar,
+        banner,
+        sources,
+        post_count,
+        date_created
+    );
 }
 
 namespace zipline {

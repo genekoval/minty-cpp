@@ -4,23 +4,59 @@
 
 #include <ext/string.h>
 #include <fmt/format.h>
+#include <http/http>
 #include <stdexcept>
 #include <zipline/zipline>
 
 namespace minty {
     struct minty_error : zipline::zipline_error {
-        using zipline_error::zipline_error;
+        minty_error();
+
+        minty_error(const std::string& what);
+
+        template <typename... Args>
+        minty_error(
+            fmt::format_string<Args...> format_string,
+            Args&&... args
+        ) :
+            runtime_error(fmt::format(
+                format_string,
+                std::forward<Args>(args)...
+            ))
+        {}
     };
 
     struct invalid_data : minty_error {
-        using minty_error::minty_error;
+        invalid_data(const std::string& what);
+
+
+        template <typename... Args>
+        invalid_data(
+            fmt::format_string<Args...> format_string,
+            Args&&... args
+        ) :
+            runtime_error(fmt::format(
+                format_string,
+                std::forward<Args>(args)...
+            ))
+        {}
     };
 
-    struct not_found : minty_error {
-        using minty_error::minty_error;
+    struct not_found : minty_error, http::server::error {
+        not_found(const std::string& what);
+
+        template <typename... Args>
+        not_found(fmt::format_string<Args...> format_string, Args&&... args) :
+            runtime_error(fmt::format(
+                format_string,
+                std::forward<Args>(args)...
+            ))
+        {}
+
+        auto http_code() const noexcept -> int override;
     };
 
-    class download_error : public minty_error {
+    class download_error : public minty_error, public http::server::error {
         std::string source_url;
         std::int64_t code;
         object_preview object;
@@ -37,7 +73,7 @@ namespace minty {
             zipline::io::abstract_writer& writer
         ) const -> ext::task<> override;
 
-        auto status() const noexcept -> std::int64_t;
+        auto http_code() const noexcept -> int override;
 
         auto url() const noexcept -> std::string_view;
     };

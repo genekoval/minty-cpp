@@ -27,6 +27,8 @@ namespace minty {
         minty::visibility visibility = visibility::pub;
         post_sort sort;
     };
+
+    auto default_sort_order(post_sort_value value) -> sort_order;
 }
 
 namespace zipline {

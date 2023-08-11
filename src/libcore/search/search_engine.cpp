@@ -1,7 +1,8 @@
 #include "index/index.hpp"
-#include "json/json.hpp"
 
 #include <internal/core/search/search.hpp>
+
+using nlohmann::json;
 
 namespace minty::core {
     search_engine::search_engine(

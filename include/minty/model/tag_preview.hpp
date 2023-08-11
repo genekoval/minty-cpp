@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ext/json.hpp>
+#include <uuid++/json.hpp>
 #include <uuid++/uuid++>
 #include <zipline/zipline>
 
@@ -9,6 +11,13 @@ namespace minty {
         std::string name;
         std::optional<UUID::uuid> avatar;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        tag_preview,
+        id,
+        name,
+        avatar
+    );
 }
 
 namespace zipline {

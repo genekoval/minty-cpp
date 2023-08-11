@@ -2,7 +2,9 @@
 
 #include "time_point.hpp"
 
+#include <ext/json.hpp>
 #include <memory>
+#include <uuid++/json.hpp>
 #include <uuid++/uuid++>
 #include <vector>
 #include <zipline/zipline>
@@ -38,6 +40,28 @@ namespace minty {
         std::unique_ptr<comment_node[]> comments;
         std::vector<comment_node*> roots;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        comment,
+        id,
+        post_id,
+        parent_id,
+        indent,
+        content,
+        date_created
+    );
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        comment_data,
+        id,
+        content,
+        indent,
+        date_created
+    );
+
+    auto to_json(nlohmann::json& j, const comment_node& node) -> void;
+
+    auto to_json(nlohmann::json& j, const comment_tree& tree) -> void;
 }
 
 namespace zipline {

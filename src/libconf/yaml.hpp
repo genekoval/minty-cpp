@@ -10,6 +10,7 @@ namespace YAML {
     CONVERT(minty::conf::settings::s_database);
     CONVERT(minty::conf::settings::s_fstore);
     CONVERT(minty::conf::settings::s_fstore::s_proxy);
+    CONVERT(minty::conf::settings::s_http);
     CONVERT(minty::conf::settings::s_log);
     CONVERT(minty::conf::settings::s_search);
 }

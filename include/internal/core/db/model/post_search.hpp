@@ -4,7 +4,9 @@
 
 #include <minty/model/time_point.hpp>
 
+#include <ext/json.hpp>
 #include <pg++/pg++>
+#include <uuid++/json.hpp>
 
 namespace minty::core::db {
     struct post_search {
@@ -18,6 +20,16 @@ namespace minty::core::db {
 
         auto operator==(const post_search&) const -> bool = default;
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+        post_search,
+        title,
+        description,
+        visibility,
+        created,
+        modified,
+        tags
+    )
 }
 
 PGCPP_COMPOSITE_DECL(minty::core::db::post_search, "post_search");
