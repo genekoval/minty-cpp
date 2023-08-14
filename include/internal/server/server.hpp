@@ -52,7 +52,6 @@ namespace minty::server {
             &router_context::get_server_info,
             &router_context::get_tag,
             &router_context::get_tags,
-            &router_context::move_post_objects,
             &router_context::set_comment_content,
             &router_context::set_post_description,
             &router_context::set_post_title,

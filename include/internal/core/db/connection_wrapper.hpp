@@ -163,14 +163,6 @@ namespace minty::core::db {
             return inner->delete_tag_source(tag_id, source_id);
         }
 
-        auto move_post_objects(
-            const UUID::uuid& post_id,
-            const std::vector<UUID::uuid>& objects,
-            const std::optional<UUID::uuid>& destination
-        ) -> ext::task<time_point> {
-            return inner->move_post_objects(post_id, objects, destination);
-        }
-
         auto prune() -> ext::task<> {
             return inner->prune();
         }
@@ -223,12 +215,6 @@ namespace minty::core::db {
             const std::vector<UUID::uuid>& posts
         ) -> ext::task<std::vector<post_preview>> {
             return inner->read_posts(posts);
-        }
-
-        auto read_post_objects(
-            const UUID::uuid& post_id
-        ) -> ext::task<std::vector<object_preview>> {
-            return inner->read_post_objects(post_id);
         }
 
         auto read_post_search(

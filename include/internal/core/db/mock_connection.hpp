@@ -117,12 +117,6 @@ namespace minty::core::db {
             std::int64_t source_id
         ), (override));
 
-        MOCK_METHOD(ext::task<time_point>, move_post_objects, (
-            const UUID::uuid& post_id,
-            const std::vector<UUID::uuid>& objects,
-            const std::optional<UUID::uuid>& destination
-        ), (override));
-
         MOCK_METHOD(ext::task<>, prune, (), (override));
 
         MOCK_METHOD(ext::task<std::vector<UUID::uuid>>, prune_objects, (
@@ -159,10 +153,6 @@ namespace minty::core::db {
 
         MOCK_METHOD(ext::task<std::vector<post_preview>>, read_posts, (
             const std::vector<UUID::uuid>& posts
-        ), (override));
-
-        MOCK_METHOD(ext::task<std::vector<object_preview>>, read_post_objects, (
-            const UUID::uuid& post_id
         ), (override));
 
         MOCK_METHOD(ext::task<pg::portal<post_search>>, read_post_search, (

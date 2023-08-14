@@ -14,16 +14,17 @@ auto DatabasePostObjectTest::create_post_with_objects() ->
 
 auto DatabasePostObjectTest::insert_object(
     const std::optional<UUID::uuid>& destination
-) -> ext::task<std::vector<minty::test::sequence_object>> {
+) -> ext::task<std::vector<minty::core::db::object_preview>> {
     co_return co_await insert_objects({new_object}, destination);
 }
 
 auto DatabasePostObjectTest::insert_objects(
     const std::vector<UUID::uuid>& objects,
     const std::optional<UUID::uuid>& destination
-) -> ext::task<std::vector<minty::test::sequence_object>> {
+) -> ext::task<std::vector<minty::core::db::object_preview>> {
     co_await db->create_post_objects(post_id, objects, destination);
-    co_return co_await with_sequence();
+    const auto post = co_await db->read_post(post_id);
+    co_return post.objects;
 }
 
 auto DatabasePostObjectTest::run(ext::task<>&& task) -> void {
@@ -41,16 +42,4 @@ auto DatabasePostObjectTest::tables() -> std::vector<std::string> {
     base.push_back("object");
 
     return base;
-}
-
-auto DatabasePostObjectTest::with_sequence() ->
-    ext::task<std::vector<minty::test::sequence_object>>
-{
-    co_return co_await client->fetch_rows<minty::test::sequence_object>(
-        "SELECT object_id, sequence "
-        "FROM data.post_object "
-        "WHERE post_id = $1 "
-        "ORDER BY sequence",
-        post_id
-    );
 }

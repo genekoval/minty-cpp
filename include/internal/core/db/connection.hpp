@@ -139,12 +139,6 @@ namespace minty::core::db {
             std::int64_t source_id
         ) -> ext::task<>;
 
-        VIRTUAL auto move_post_objects(
-            const UUID::uuid& post_id,
-            const std::vector<UUID::uuid>& objects,
-            const std::optional<UUID::uuid>& destination
-        ) -> ext::task<time_point>;
-
         VIRTUAL auto prune() -> ext::task<>;
 
         VIRTUAL auto prune_objects() -> ext::task<std::vector<UUID::uuid>>;
@@ -177,10 +171,6 @@ namespace minty::core::db {
         VIRTUAL auto read_posts(
             const std::vector<UUID::uuid>& posts
         ) -> ext::task<std::vector<post_preview>>;
-
-        VIRTUAL auto read_post_objects(
-            const UUID::uuid& post_id
-        ) -> ext::task<std::vector<object_preview>>;
 
         VIRTUAL auto read_post_search(
             int batch_size

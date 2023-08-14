@@ -225,19 +225,6 @@ namespace minty::core::db {
         co_await client->query_prepared(__FUNCTION__, tag_id, source_id);
     }
 
-    auto connection::move_post_objects(
-        const UUID::uuid& post_id,
-        const std::vector<UUID::uuid>& objects,
-        const std::optional<UUID::uuid>& destination
-    ) -> ext::task<time_point> {
-        co_return co_await client->fetch_prepared<time_point>(
-            __FUNCTION__,
-            post_id,
-            objects,
-            destination
-        );
-    }
-
     auto connection::prune() -> ext::task<> {
         co_await client->query_prepared(__FUNCTION__);
     }
@@ -315,15 +302,6 @@ namespace minty::core::db {
         co_return co_await client->fetch_rows_prepared<post_preview>(
             __FUNCTION__,
             posts
-        );
-    }
-
-    auto connection::read_post_objects(
-        const UUID::uuid& post_id
-    ) -> ext::task<std::vector<object_preview>> {
-        co_return co_await client->fetch_rows_prepared<object_preview>(
-            __FUNCTION__,
-            post_id
         );
     }
 

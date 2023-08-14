@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../model.test.hpp"
 #include "DatabasePost.test.hpp"
 
 class DatabasePostObjectTest : public DatabasePostTest {
@@ -17,17 +16,14 @@ protected:
 
     auto insert_object(
         const std::optional<UUID::uuid>& destination
-    ) -> ext::task<std::vector<minty::test::sequence_object>>;
+    ) -> ext::task<std::vector<minty::core::db::object_preview>>;
 
     auto insert_objects(
         const std::vector<UUID::uuid>& objects,
         const std::optional<UUID::uuid>& destination
-    ) -> ext::task<std::vector<minty::test::sequence_object>>;
+    ) -> ext::task<std::vector<minty::core::db::object_preview>>;
 
     auto run(ext::task<>&& task) -> void;
 
     virtual auto tables() -> std::vector<std::string> override;
-
-    auto with_sequence() ->
-        ext::task<std::vector<minty::test::sequence_object>>;
 };

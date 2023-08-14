@@ -96,10 +96,6 @@ namespace minty::core::db {
             &connection::delete_tag_source
         );
         co_await client.prepare_fn(
-            "move_post_objects",
-            &connection::move_post_objects
-        );
-        co_await client.prepare_fn(
             "prune",
             &connection::prune
         );
@@ -135,10 +131,6 @@ namespace minty::core::db {
         co_await client.prepare_fn(
             "read_posts",
             &connection::read_posts
-        );
-        co_await client.prepare_fn(
-            "read_post_objects",
-            &connection::read_post_objects
         );
         co_await client.prepare(
             "read_post_search",

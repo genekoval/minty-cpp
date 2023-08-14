@@ -242,12 +242,6 @@ namespace minty::core {
             const tag_query& query
         ) -> ext::task<search_result<tag_preview>>;
 
-        VIRTUAL auto move_post_objects(
-            const UUID::uuid& post_id,
-            const std::vector<UUID::uuid>& objects,
-            const std::optional<UUID::uuid>& destination
-        ) -> ext::task<time_point>;
-
         VIRTUAL auto prune() -> ext::task<>;
 
         VIRTUAL auto regenerate_preview(

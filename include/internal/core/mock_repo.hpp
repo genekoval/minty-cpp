@@ -131,12 +131,6 @@ namespace minty::core {
             const tag_query& query
         ), (override));
 
-        MOCK_METHOD(ext::task<time_point>, move_post_objects, (
-            const UUID::uuid& post_id,
-            const std::vector<UUID::uuid>& objects,
-            const std::optional<UUID::uuid>& destination
-        ), (override));
-
         MOCK_METHOD(ext::task<>, prune, (), (override));
 
         MOCK_METHOD(ext::task<std::optional<UUID::uuid>>, regenerate_preview, (

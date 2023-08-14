@@ -459,9 +459,8 @@ namespace minty::core {
         };
 
         result.tags = co_await db.read_post_tags(id);
-        auto objects = co_await db.read_post_objects(id);
 
-        for (auto&& obj : objects) {
+        for (auto&& obj : data.objects) {
             auto meta = co_await bucket.meta(obj.id);
 
             result.objects.push_back(object_preview {
@@ -572,27 +571,6 @@ namespace minty::core {
         result.hits = co_await db.read_tag_previews(res.hits);
 
         co_return result;
-    }
-
-    auto repo::move_post_objects(
-        const UUID::uuid& post_id,
-        const std::vector<UUID::uuid>& objects,
-        const std::optional<UUID::uuid>& destination
-    ) -> ext::task<time_point> {
-        TIMBER_FUNC();
-
-        auto db = co_await database->connect();
-        auto tx = co_await db.begin();
-
-        const auto date_modified = co_await db.move_post_objects(
-            post_id,
-            objects,
-            destination
-        );
-        co_await search->update_post_date_modified(post_id, date_modified);
-
-        co_await tx.commit();
-        co_return date_modified;
     }
 
     auto repo::prune() -> ext::task<> {

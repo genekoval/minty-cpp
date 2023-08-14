@@ -109,12 +109,6 @@ namespace minty::server {
             tag_query query
         ) -> ext::task<search_result<tag_preview>>;
 
-        auto move_post_objects(
-            UUID::uuid post_id,
-            std::vector<UUID::uuid> objects,
-            std::optional<UUID::uuid> destination
-        ) -> ext::task<time_point>;
-
         auto set_comment_content(
             UUID::uuid comment_id,
             std::string content

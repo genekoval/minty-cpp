@@ -26,6 +26,25 @@ CREATE TYPE tag_name_update AS (
 
 --}}}
 
+CREATE FUNCTION read_object_previews(objects uuid[])
+RETURNS object_preview[] AS $$
+DECLARE result object_preview[];
+BEGIN
+    SELECT INTO result
+        array_agg(
+            ROW(object_id, preview_id)::object_preview
+            ORDER BY ordinality
+        ) AS objects
+    FROM (
+        SELECT unnest as object_id, ordinality
+        FROM unnest(objects) WITH ORDINALITY
+    ) obj
+    JOIN data.object USING (object_id);
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
 --{{{( Views )
 
 CREATE VIEW object_preview_error AS
@@ -71,6 +90,7 @@ SELECT
     post_id,
     title,
     description,
+    read_object_previews(objects) AS objects,
     visibility,
     date_created,
     date_modified
@@ -224,9 +244,13 @@ LEFT JOIN (
     SELECT
         post_id,
         ROW(object_id, preview_id)::object_preview AS preview
-    FROM data.object
-    JOIN data.post_object USING (object_id)
-    WHERE sequence = 1
+    FROM (
+        SELECT
+            post_id,
+            objects[1] AS object_id
+        FROM data.post
+    ) post
+    JOIN data.object USING (object_id)
 ) previews USING (post_id);
 
 --}}}
@@ -339,60 +363,41 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION create_post_objects(
-    a_post_id       uuid,
-    a_objects       uuid[],
-    a_position      smallint
-) RETURNS timestamptz AS $$
--- Largest possible smallint
-DECLARE l_greatest_sequence CONSTANT smallint := 32767;
-DECLARE l_position smallint;
-BEGIN
-    l_position := CASE
-        WHEN a_position < 0
-            THEN l_greatest_sequence
-            ELSE a_position
-        END;
-
-    l_position := (
-        SELECT least(l_position, (
-            SELECT coalesce(max(sequence), 0)
-            FROM data.post_object
-            WHERE post_id = a_post_id
-        ))
-    );
-
-    UPDATE data.post_object
-    SET sequence = sequence + cardinality(a_objects)
-    WHERE post_id = a_post_id AND sequence > l_position;
-
-    PERFORM insert_post_objects(a_post_id, a_objects, l_position);
-
-    RETURN read_post_date_modified(a_post_id);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION create_post_objects(
     post_id uuid,
     objects uuid[],
     destination uuid
 ) RETURNS timestamptz AS $$
+DECLARE position integer;
+DECLARE tmp uuid[];
 BEGIN
-    RETURN create_post_objects(post_id, objects, (
-        CASE
-            WHEN destination IS NULL THEN (
-                SELECT max(sequence)
-                FROM data.post_object obj
-                WHERE obj.post_id = create_post_objects.post_id
-            )
-        ELSE (
-            SELECT sequence - 1
-            FROM data.post_object obj
-            WHERE
-                obj.post_id = create_post_objects.post_id AND
-                object_id = destination
-        )
-        END
-    )::smallint);
+    WITH objects_unnested AS (
+        SELECT unnest AS object_id
+        FROM unnest(objects)
+    )
+    INSERT INTO data.post_object (post_id, object_id)
+    SELECT create_post_objects.post_id, object_id
+    FROM objects_unnested
+    ON CONFLICT DO NOTHING;
+
+    tmp := (SELECT remove_ids(
+        (
+            SELECT p.objects
+            FROM data.post p
+            WHERE p.post_id = create_post_objects.post_id
+        ),
+        objects
+    ));
+
+    position := (SELECT array_position(tmp, destination));
+
+    UPDATE data.post p
+    SET objects =
+        tmp[0:(SELECT coalesce(position - 1, cardinality(tmp)))] ||
+        create_post_objects.objects ||
+        tmp[(SELECT coalesce(position, cardinality(tmp) + 1)):]
+    WHERE p.post_id = create_post_objects.post_id;
+
+    RETURN read_post_date_modified(post_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -567,44 +572,41 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION delete_post_object(
-    a_post_id       uuid,
-    a_object_id     uuid
-) RETURNS void AS $$
+CREATE FUNCTION delete_post_objects(post_id uuid, objects uuid[])
+RETURNS timestamptz AS $$
 BEGIN
-    UPDATE data.post_object
-    SET sequence = sequence - 1
-    WHERE post_id = a_post_id AND sequence > (
-        SELECT sequence
-        FROM data.post_object
-        WHERE post_id = a_post_id AND object_id = a_object_id
-    );
+    WITH deleted AS (
+        DELETE FROM data.post_object po
+        WHERE
+            po.post_id = delete_post_objects.post_id AND
+            object_id = ANY (objects)
+        RETURNING object_id
+    )
+    UPDATE data.post p
+    SET objects = remove_ids(
+        p.objects,
+        (SELECT array_agg(object_id) FROM deleted)
+    )
+    WHERE p.post_id = delete_post_objects.post_id;
 
-    DELETE FROM data.post_object
-    WHERE post_id = a_post_id AND object_id = a_object_id;
+    RETURN read_post_date_modified(post_id);
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION delete_post_objects(
-    a_post_id       uuid,
-    a_objects       uuid[]
-) RETURNS timestamptz AS $$
-DECLARE
-    l_object_id       uuid;
+CREATE FUNCTION remove_ids(ids uuid[], to_remove uuid[]) RETURNS uuid[] AS $$
+DECLARE current uuid;
 BEGIN
-    FOR l_object_id IN
-        SELECT object_id
+    FOR current IN
+        SELECT id
         FROM (
-            SELECT unnest AS object_id
-            FROM unnest(a_objects)
-        ) objects
-        JOIN data.post_object USING (object_id)
-        ORDER BY sequence DESC
+            SELECT unnest AS id
+            FROM unnest(to_remove)
+        ) unnested
     LOOP
-        PERFORM delete_post_object(a_post_id, l_object_id);
+        ids := array_remove(ids, current);
     END LOOP;
 
-    RETURN read_post_date_modified(a_post_id);
+    RETURN ids;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -661,38 +663,6 @@ CREATE FUNCTION delete_tag_source(
 BEGIN
     DELETE FROM data.tag_source
     WHERE tag_id = a_tag_id AND source_id = a_source_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION insert_post_objects(
-    a_post_id       uuid,
-    a_objects       uuid[],
-    a_position      smallint DEFAULT 0
-) RETURNS void AS $$
-BEGIN
-    WITH objects AS (
-        SELECT
-            ordinality,
-            unnest AS object_id
-        FROM unnest(a_objects) WITH ordinality
-    )
-    INSERT INTO data.post_object (post_id, object_id, sequence)
-    SELECT
-        a_post_id,
-        objects.object_id,
-        objects.ordinality + a_position
-    FROM objects;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION move_post_objects(
-    a_post_id       uuid,
-    a_objects       uuid[],
-    a_destination   uuid
-) RETURNS timestamptz AS $$
-BEGIN
-    PERFORM delete_post_objects(a_post_id, a_objects);
-    RETURN create_post_objects(a_post_id, a_objects, a_destination);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -830,21 +800,6 @@ BEGIN
     SELECT *
     FROM post_search
     ORDER BY post_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION read_post_objects(
-    a_post_id       uuid
-) RETURNS SETOF object_preview AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        o.object_id,
-        o.preview_id
-    FROM data.object o
-    JOIN data.post_object USING (object_id)
-    WHERE post_id = a_post_id
-    ORDER BY sequence;
 END;
 $$ LANGUAGE plpgsql;
 

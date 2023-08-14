@@ -304,19 +304,6 @@ namespace minty {
         );
     }
 
-    auto repo::move_post_objects(
-        const UUID::uuid& post_id,
-        std::span<const UUID::uuid> objects,
-        const std::optional<UUID::uuid>& destination
-    ) -> ext::task<time_point> {
-        co_return co_await client->send<time_point>(
-            event::move_post_objects,
-            post_id,
-            objects,
-            destination
-        );
-    }
-
     auto repo::set_comment_content(
         const UUID::uuid& comment_id,
         std::string_view content

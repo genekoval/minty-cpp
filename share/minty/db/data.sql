@@ -42,6 +42,7 @@ CREATE TABLE post (
     post_id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     title           text,
     description     text,
+    objects         uuid[] NOT NULL DEFAULT '{}',
     visibility      visibility NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW(),
     date_modified   timestamptz NOT NULL DEFAULT NOW()
@@ -50,7 +51,6 @@ CREATE TABLE post (
 CREATE TABLE post_object (
     post_id         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
     object_id       uuid NOT NULL REFERENCES object ON DELETE CASCADE,
-    sequence        smallint NOT NULL,
     date_added      timestamptz NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (post_id, object_id)

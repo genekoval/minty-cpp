@@ -175,18 +175,6 @@ namespace minty::server {
         co_return co_await repo->get_tags(query);
     }
 
-    auto router_context::move_post_objects(
-        UUID::uuid post_id,
-        std::vector<UUID::uuid> objects,
-        std::optional<UUID::uuid> destination
-    ) -> ext::task<time_point> {
-        co_return co_await repo->move_post_objects(
-            post_id,
-            objects,
-            destination
-        );
-    }
-
     auto router_context::set_comment_content(
         UUID::uuid comment_id,
         std::string content
