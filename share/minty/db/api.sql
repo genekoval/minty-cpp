@@ -254,6 +254,16 @@ LEFT JOIN (
 
 --{{{( Functions )
 
+CREATE FUNCTION array_remove(array1 anyarray, array2 anyarray)
+RETURNS anyarray AS $$
+    SELECT coalesce(array_agg(element.value ORDER BY element.ordinality), '{}')
+    FROM (
+        SELECT ordinality, unnest AS value
+        FROM unnest(array1) WITH ORDINALITY
+    ) element
+    WHERE element.value <> ALL(array2);
+$$ LANGUAGE sql;
+
 CREATE FUNCTION create_comment(
     a_post_id       uuid,
     a_content       text
@@ -367,16 +377,15 @@ CREATE FUNCTION create_post_objects(
 DECLARE position integer;
 DECLARE tmp uuid[];
 BEGIN
-    WITH objects_unnested AS (
-        SELECT unnest AS object_id
-        FROM unnest(objects)
-    )
     INSERT INTO data.post_object (post_id, object_id)
     SELECT create_post_objects.post_id, object_id
-    FROM objects_unnested
+    FROM (
+        SELECT unnest AS object_id
+        FROM unnest(objects)
+    ) obj
     ON CONFLICT DO NOTHING;
 
-    tmp := (SELECT remove_ids(
+    tmp := (SELECT array_remove(
         (
             SELECT p.objects
             FROM data.post p
@@ -572,38 +581,15 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION delete_post_objects(post_id uuid, objects uuid[])
 RETURNS timestamptz AS $$
 BEGIN
-    WITH deleted AS (
-        DELETE FROM data.post_object po
-        WHERE
-            po.post_id = delete_post_objects.post_id AND
-            object_id = ANY (objects)
-        RETURNING object_id
-    )
     UPDATE data.post p
-    SET objects = remove_ids(
-        p.objects,
-        (SELECT array_agg(object_id) FROM deleted)
-    )
-    WHERE p.post_id = delete_post_objects.post_id;
+    SET objects = array_remove(p.objects, delete_post_objects.objects);
+
+    DELETE FROM data.post_object po
+    WHERE
+        po.post_id = delete_post_objects.post_id AND
+        object_id = ANY(objects);
 
     RETURN read_post_date_modified(post_id);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION remove_ids(ids uuid[], to_remove uuid[]) RETURNS uuid[] AS $$
-DECLARE current uuid;
-BEGIN
-    FOR current IN
-        SELECT id
-        FROM (
-            SELECT unnest AS id
-            FROM unnest(to_remove)
-        ) unnested
-    LOOP
-        ids := array_remove(ids, current);
-    END LOOP;
-
-    RETURN ids;
 END;
 $$ LANGUAGE plpgsql;
 
