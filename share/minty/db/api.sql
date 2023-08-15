@@ -1,6 +1,3 @@
-DROP SCHEMA IF EXISTS minty CASCADE;
-CREATE SCHEMA minty;
-
 --{{{( Types )
 
 CREATE TYPE object_preview AS (

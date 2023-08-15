@@ -9,14 +9,16 @@ namespace {
     namespace internal {
         auto init(
             const app& app,
-            std::string_view confpath
+            std::string_view confpath,
+            bool overwrite
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
 
-            minty::cli::database(settings, [&app](
+            minty::cli::database(settings, [&app, overwrite](
                 dbtools::postgresql& db
             ) -> ext::task<> {
-                co_await db.init(app.version);
+                if (overwrite) co_await db.reset(app.version);
+                else co_await db.init(app.version);
             });
 
             minty::cli::repo(settings, [](
@@ -35,7 +37,10 @@ namespace minty::cli {
         return command(
             "init",
             "Initialize the database",
-            options(opts::config(confpath)),
+            options(
+                opts::config(confpath),
+                flag({"o", "overwrite"}, "Delete existing data if necessary")
+            ),
             arguments(),
             internal::init
         );

@@ -1,8 +1,3 @@
-DROP SCHEMA IF EXISTS data CASCADE;
-CREATE SCHEMA data;
-
-SET search_path TO data;
-
 CREATE TYPE visibility AS ENUM (
     'draft',
     'public'
