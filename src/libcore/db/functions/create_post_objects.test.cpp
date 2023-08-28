@@ -73,6 +73,29 @@ TEST_F(DatabasePostObjectTest, MoveObjects) {
     EXPECT_EQ(objects.at(0), results.at(2).id);
 }
 
+TEST_F(DatabasePostObjectTest, InsertDuplicates) {
+    auto results = std::vector<object_preview>();
+
+    run([&]() -> ext::task<> {
+        results = co_await insert_objects(
+            {
+                objects.at(0),
+                objects.at(2),
+                objects.at(0),
+                objects.at(0),
+                objects.at(2)
+            },
+            std::nullopt
+        );
+    }());
+
+    ASSERT_EQ(objects.size(), results.size());
+
+    EXPECT_EQ(objects.at(1), results.at(0).id);
+    EXPECT_EQ(objects.at(0), results.at(1).id);
+    EXPECT_EQ(objects.at(2), results.at(2).id);
+}
+
 TEST_F(DatabasePostObjectTest, AddPostObjectsDateModified) {
     run([&]() -> ext::task<> {
         const auto id = co_await create_draft();

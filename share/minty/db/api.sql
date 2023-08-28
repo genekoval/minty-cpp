@@ -254,6 +254,15 @@ LEFT JOIN (
 
 --{{{( Functions )
 
+CREATE FUNCTION array_distinct(anyarray) RETURNS anyarray AS $$
+    SELECT coalesce(array_agg(element.value ORDER BY element.ordinality), '{}')
+    FROM (
+        SELECT DISTINCT ON(value) unnest AS value, ordinality
+        FROM unnest($1) WITH ORDINALITY
+        ORDER BY value, ordinality
+    ) element;
+$$ LANGUAGE sql;
+
 CREATE FUNCTION array_remove(array1 anyarray, array2 anyarray)
 RETURNS anyarray AS $$
     SELECT coalesce(array_agg(element.value ORDER BY element.ordinality), '{}')
@@ -399,7 +408,7 @@ BEGIN
     UPDATE data.post p
     SET objects =
         tmp[0:(SELECT coalesce(position - 1, cardinality(tmp)))] ||
-        create_post_objects.objects ||
+        array_distinct(create_post_objects.objects) ||
         tmp[(SELECT coalesce(position, cardinality(tmp) + 1)):]
     WHERE p.post_id = create_post_objects.post_id;
 
