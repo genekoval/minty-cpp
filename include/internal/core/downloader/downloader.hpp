@@ -7,7 +7,7 @@
 
 namespace minty::core {
     class downloader {
-        http::client* client = nullptr;
+        http::session* session = nullptr;
 
         auto fetch(
             http::request& request,
@@ -21,7 +21,7 @@ namespace minty::core {
     public:
         downloader() = default;
 
-        explicit downloader(http::client& client);
+        explicit downloader(http::session& session);
 
         VIRTUAL_DESTRUCTOR(downloader)
 

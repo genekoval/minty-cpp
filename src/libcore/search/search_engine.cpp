@@ -6,12 +6,12 @@ using nlohmann::json;
 
 namespace minty::core {
     search_engine::search_engine(
-        http::client& client,
+        http::session& session,
         std::string_view ns,
         std::string_view host,
         std::string_view api_key
     ) :
-        client(client, host, api_key),
+        client(session, host, api_key),
         post_index(
             this,
             ns,

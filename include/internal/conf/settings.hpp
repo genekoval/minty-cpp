@@ -18,14 +18,9 @@ namespace minty::conf {
         };
 
         struct s_fstore {
-            struct s_proxy {
-                std::optional<std::string> host;
-                unsigned short port;
-            };
-
             std::string bucket;
             std::string connection;
-            s_proxy proxy;
+            std::string proxy;
         };
 
         struct s_http {

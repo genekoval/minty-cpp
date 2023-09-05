@@ -64,10 +64,7 @@ protected:
 TEST_F(SearchPostFind, LimitResults) {
     find({
         .size = 3,
-        .sort = {
-            .value = title,
-            .order = asc
-        }
+        .sort = {title, asc}
     }, {
         c,
         cpp,
@@ -79,10 +76,7 @@ TEST_F(SearchPostFind, LimitResults) {
 
 TEST_F(SearchPostFind, SortCreatedAscending) {
     find({
-        .sort = {
-            .value = created,
-            .order = asc
-        }
+        .sort = {created, asc}
     }, {
         c,
         cpp,
@@ -94,10 +88,7 @@ TEST_F(SearchPostFind, SortCreatedAscending) {
 
 TEST_F(SearchPostFind, SortCreatedDescending) {
     find({
-        .sort = {
-            .value = created,
-            .order = desc
-        }
+        .sort = {created, desc}
     }, {
         rust,
         js,
@@ -109,10 +100,7 @@ TEST_F(SearchPostFind, SortCreatedDescending) {
 
 TEST_F(SearchPostFind, SortModifiedAscending) {
     find({
-        .sort = {
-            .value = modified,
-            .order = asc
-        }
+        .sort = {modified, asc}
     }, {
         c,
         cpp,
@@ -124,10 +112,7 @@ TEST_F(SearchPostFind, SortModifiedAscending) {
 
 TEST_F(SearchPostFind, SortModifiedDescending) {
     find({
-        .sort = {
-            .value = modified,
-            .order = desc
-        }
+        .sort = {modified, desc}
     }, {
         rust,
         java,
@@ -140,10 +125,7 @@ TEST_F(SearchPostFind, SortModifiedDescending) {
 
 TEST_F(SearchPostFind, SortTitleAscending) {
     find({
-        .sort = {
-            .value = title,
-            .order = asc
-        },
+        .sort = {title, asc},
     }, {
         c,
         cpp,
@@ -155,10 +137,7 @@ TEST_F(SearchPostFind, SortTitleAscending) {
 
 TEST_F(SearchPostFind, SortTitleDescending) {
     find({
-        .sort = {
-            .value = title,
-            .order = desc
-        },
+        .sort = {title, desc},
     }, {
         rust,
         js,
@@ -173,10 +152,7 @@ TEST_F(SearchPostFind, Tag) {
         .tags = {
             language
         },
-        .sort = {
-            .value = title,
-            .order = asc
-        }
+        .sort = {title, asc}
     }, {
         c,
         cpp,
@@ -189,10 +165,7 @@ TEST_F(SearchPostFind, Tag) {
         .tags = {
             native
         },
-        .sort = {
-            .value = title,
-            .order = asc
-        }
+        .sort = {title, asc}
     }, {
         c,
         cpp,
@@ -203,10 +176,7 @@ TEST_F(SearchPostFind, Tag) {
 TEST_F(SearchPostFind, TextDescription) {
     find({
         .text = "programming language",
-        .sort = {
-            .value = title,
-            .order = asc
-        }
+        .sort = {title, asc}
     }, {
         c,
         cpp,
@@ -230,10 +200,7 @@ TEST_F(SearchPostFind, TextTitle) {
 
     find({
         .text = "c",
-        .sort = {
-            .value = title,
-            .order = asc
-        }
+        .sort = {title, asc}
     }, {
         c,
         cpp

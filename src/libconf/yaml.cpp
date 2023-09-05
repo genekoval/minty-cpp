@@ -39,12 +39,6 @@ namespace YAML {
     );
 
     DECODE(
-        settings::s_fstore::s_proxy,
-        c::optional("host", &settings::s_fstore::s_proxy::host),
-        c::required("port", &settings::s_fstore::s_proxy::port)
-    );
-
-    DECODE(
         settings::s_http,
         c::required("listen", &settings::s_http::listen),
         c::required("cert", &settings::s_http::cert),

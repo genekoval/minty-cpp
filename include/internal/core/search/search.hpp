@@ -41,7 +41,7 @@ namespace minty::core {
         search_engine() = default;
 
         search_engine(
-            http::client& client,
+            http::session& session,
             std::string_view ns,
             std::string_view host,
             std::string_view api_key

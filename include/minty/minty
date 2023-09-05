@@ -1,4 +1,6 @@
+#include "async/http/repo.hpp"
 #include "except.hpp"
 #include "repo.hpp"
+#include "sync/http/repo.hpp"
 
 // vim: ft=cpp

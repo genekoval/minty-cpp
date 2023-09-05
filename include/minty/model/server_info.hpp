@@ -8,9 +8,8 @@
 
 namespace minty {
     struct object_source_type {
-        std::optional<std::string> host;
-        std::uint16_t port;
-        UUID::uuid bucket_id;
+        std::string location;
+        UUID::uuid bucket;
     };
 
     struct server_info {
@@ -20,9 +19,8 @@ namespace minty {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         object_source_type,
-        host,
-        port,
-        bucket_id
+        location,
+        bucket
     );
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
@@ -35,9 +33,8 @@ namespace minty {
 namespace zipline {
     ZIPLINE_OBJECT(
         minty::object_source_type,
-        &minty::object_source_type::host,
-        &minty::object_source_type::port,
-        &minty::object_source_type::bucket_id
+        &minty::object_source_type::location,
+        &minty::object_source_type::bucket
     );
 
     ZIPLINE_OBJECT(

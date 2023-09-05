@@ -198,10 +198,10 @@ namespace minty::server::http {
                     std::optional<std::string>(),
                 .tags = tags.value ? *tags.value : std::vector<UUID::uuid>(),
                 .visibility = visibility.value.value_or(visibility::pub),
-                .sort = post_sort {
-                    .value = sort_value,
-                    .order = order->value_or(default_sort_order(sort_value))
-                }
+                .sort = post_sort(
+                    sort_value,
+                    order->value_or(default_sort_order(sort_value))
+                )
             });
         }));
 

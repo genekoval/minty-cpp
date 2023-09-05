@@ -76,9 +76,8 @@ namespace {
                 const auto info = minty::server_info {
                     .version = std::string(app.version),
                     .object_source = {
-                        .host = settings.fstore.proxy.host,
-                        .port = settings.fstore.proxy.port,
-                        .bucket_id = repo.get_bucket_id()
+                        .location = settings.fstore.proxy,
+                        .bucket = repo.get_bucket_id()
                     }
                 };
 

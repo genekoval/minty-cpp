@@ -3,7 +3,7 @@
 #include <minty/except.hpp>
 
 namespace minty::core {
-    downloader::downloader(http::client& client) : client(&client) {}
+    downloader::downloader(http::session& session) : session(&session) {}
 
     auto downloader::fetch(
         http::request& request,
@@ -11,7 +11,7 @@ namespace minty::core {
     ) -> ext::task<std::pair<http::status, fstore::object>> {
         auto task = read(request, bucket);
 
-        const auto response = co_await request.perform(*client);
+        const auto response = co_await request.perform(*session);
         auto object = co_await task;
 
         co_return std::make_pair(response.status(), std::move(object));
@@ -23,7 +23,7 @@ namespace minty::core {
     ) -> ext::task<std::pair<http::status, fstore::object>> {
         auto request = http::request();
         request.follow_redirects(true);
-        request.url(url);
+        request.url = url;
         co_return co_await fetch(request, bucket);
     }
 
@@ -35,14 +35,11 @@ namespace minty::core {
         auto request = http::request();
         request.follow_redirects(true);
 
-        auto& url = request.url();
+        auto& url = request.url;
 
-        const auto scheme_string = std::string(scheme);
-        const auto host_string = std::string(host);
-
-        url.set(CURLUPART_SCHEME, scheme_string.c_str());
-        url.set(CURLUPART_HOST, host_string.c_str());
-        url.set(CURLUPART_PATH, "/favicon.ico");
+        url.scheme(std::string(scheme));
+        url.host(std::string(host));
+        url.path("/favicon.ico");
 
         const auto [status, icon] = co_await fetch(request, bucket);
 
@@ -53,9 +50,11 @@ namespace minty::core {
         if (status != 404) {
             TIMBER_ERROR(
                 "Failed to download site icon for {}://{}: "
-                "GET /favicon.ico: {}",
+                "{} {}: {}",
                 scheme,
                 host,
+                request.method,
+                request.url,
                 status.ok() ?
                     fmt::format(
                         "Expected image; received {}",
@@ -71,10 +70,10 @@ namespace minty::core {
         http::request& request,
         bucket& bucket
     ) -> ext::jtask<fstore::object> {
-        auto stream = request.stream();
+        auto stream = request.pipe();
         auto chunk = co_await stream.read();
 
-        const auto size = request.response().content_length();
+        const auto size = stream.expected_size();
         if (size < 0) throw minty_error("Content length is unknown");
 
         co_return co_await bucket.add(

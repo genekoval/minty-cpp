@@ -10,7 +10,7 @@ class HttpEnvironment : public testing::Environment {
 public:
     static auto get() -> HttpEnvironment&;
 
-    std::unique_ptr<http::client> client;
+    std::unique_ptr<http::session> session;
 
     auto SetUp() -> void override;
 

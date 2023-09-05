@@ -9,7 +9,7 @@ auto HttpEnvironment::get() -> HttpEnvironment& {
 
 auto HttpEnvironment::SetUp() -> void {
     init = std::make_unique<http::init>();
-    client = std::make_unique<http::client>();
+    session = std::make_unique<http::session>();
 
     instance = this;
 }

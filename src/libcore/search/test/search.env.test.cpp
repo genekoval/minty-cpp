@@ -14,7 +14,7 @@ auto SearchEnvironment::SetUp() -> void {
 
     client = std::unique_ptr<elastic::elasticsearch>(
         new elastic::elasticsearch(
-            *HttpEnvironment::get().client,
+            *HttpEnvironment::get().session,
             search.node,
             search.auth
         )
@@ -22,7 +22,7 @@ auto SearchEnvironment::SetUp() -> void {
 
     engine = std::unique_ptr<minty::core::search_engine>(
         new minty::core::search_engine(
-            *HttpEnvironment::get().client,
+            *HttpEnvironment::get().session,
             search.ns,
             search.node,
             search.auth
