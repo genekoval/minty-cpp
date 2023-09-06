@@ -24,7 +24,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request = client.post("comments", post_id);
 
-        request.text(content);
+        request.text_view(content);
 
         return request;
     }
@@ -44,7 +44,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request = client.post("object", "url");
 
-        request.text(url);
+        request.text_view(url);
 
         return request;
     }
@@ -91,7 +91,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request = client.post("tag", tag_id, "source");
 
-        request.text(url);
+        request.text_view(url);
 
         return request;
     }
@@ -236,7 +236,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request = client.post("comment", parent_id);
 
-        request.text(content);
+        request.text_view(content);
 
         return request;
     }
@@ -247,7 +247,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request =  client.put("comment", comment_id);
 
-        request.text(content);
+        request.text_view(content);
 
         return request;
     }
@@ -258,7 +258,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request = client.put("post", post_id, "description");
 
-        request.text(description);
+        request.text_view(description);
 
         return request;
     }
@@ -269,7 +269,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request = client.put("post", post_id, "title");
 
-        request.text(title);
+        request.text_view(title);
 
         return request;
     }
@@ -280,7 +280,7 @@ namespace minty::detail::http {
     ) const -> request {
         auto request = client.put("tag", tag_id, "description");
 
-        request.text(description);
+        request.text_view(description);
 
         return request;
     }
