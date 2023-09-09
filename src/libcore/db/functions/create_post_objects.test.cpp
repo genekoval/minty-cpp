@@ -1,6 +1,7 @@
 #include "database.test.hpp"
 
 using minty::core::db::object_preview;
+using minty::time_point;
 
 TEST_F(DatabasePostObjectTest, AppendPostObject) {
     run([&]() -> ext::task<> {
@@ -98,13 +99,21 @@ TEST_F(DatabasePostObjectTest, InsertDuplicates) {
 
 TEST_F(DatabasePostObjectTest, AddPostObjectsDateModified) {
     run([&]() -> ext::task<> {
-        const auto id = co_await create_draft();
+        const auto append_object = [this]() -> ext::task<time_point> {
+            co_return co_await db->create_post_objects(
+                post_id,
+                {new_object},
+                std::nullopt
+            );
+        };
 
-        co_await db->create_object(new_object, {}, {});
-        co_await db->create_post_objects(id, {new_object}, std::nullopt);
+        const auto post = co_await db->read_post(post_id);
+        const auto modified1 = co_await append_object();
 
-        const auto post = co_await db->read_post(id);
+        EXPECT_NE(post.date_modified, modified1);
 
-        EXPECT_NE(post.date_created, post.date_modified);
+        const auto modified2 = co_await append_object();
+
+        EXPECT_EQ(modified1, modified2);
     }());
 }

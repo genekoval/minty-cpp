@@ -1045,24 +1045,11 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION update_date_modified() RETURNS trigger AS $$
 BEGIN
-    NEW.date_modified = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION update_post_date_modified() RETURNS trigger AS $$
-BEGIN
-    IF (TG_OP = 'DELETE') THEN
-        UPDATE data.post
-        SET date_modified = NOW()
-        WHERE post_id IN (SELECT DISTINCT post_id FROM old_table);
-    ELSEIF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
-        UPDATE data.post
-        SET date_modified = NOW()
-        WHERE post_id IN (SELECT DISTINCT post_id FROM new_table);
+    IF OLD <> NEW THEN
+        NEW.date_modified = NOW();
     END IF;
 
-    RETURN NULL;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -1072,20 +1059,5 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_post_date_modified BEFORE UPDATE ON data.post
 FOR EACH ROW EXECUTE FUNCTION update_date_modified();
-
-CREATE TRIGGER update_post_date_modified_object_delete
-AFTER DELETE ON data.post_object
-REFERENCING OLD TABLE AS old_table
-FOR EACH STATEMENT EXECUTE FUNCTION update_post_date_modified();
-
-CREATE TRIGGER update_post_date_modified_object_insert
-AFTER INSERT ON data.post_object
-REFERENCING NEW TABLE AS new_table
-FOR EACH STATEMENT EXECUTE FUNCTION update_post_date_modified();
-
-CREATE TRIGGER update_post_date_modified_object_update
-AFTER UPDATE ON data.post_object
-REFERENCING NEW TABLE AS new_table
-FOR EACH STATEMENT EXECUTE FUNCTION update_post_date_modified();
 
 --}}}
