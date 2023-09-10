@@ -86,8 +86,10 @@ test.libs := \
 
 include mkbuild/base.mk
 
+TIMBER_MAX_LEVEL ?= info
+
 defines.develop = TEST TIMBER_TIMER_ACTIVE
-defines.release = NDEBUG TIMBER_MAX_LEVEL=info
+defines.release = NDEBUG TIMBER_MAX_LEVEL=$(TIMBER_MAX_LEVEL)
 
 confdir = $(prefix)/etc/$(project)
 test.config = .test.conf.yaml
