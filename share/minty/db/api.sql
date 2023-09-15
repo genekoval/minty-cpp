@@ -591,7 +591,8 @@ CREATE FUNCTION delete_post_objects(post_id uuid, objects uuid[])
 RETURNS timestamptz AS $$
 BEGIN
     UPDATE data.post p
-    SET objects = array_remove(p.objects, delete_post_objects.objects);
+    SET objects = array_remove(p.objects, delete_post_objects.objects)
+    WHERE p.post_id = delete_post_objects.post_id;
 
     DELETE FROM data.post_object po
     WHERE
