@@ -4,7 +4,7 @@ namespace http::server::extractor {
     auto data<std::vector<UUID::uuid>>::read(
         request& request
     ) -> ext::task<std::vector<UUID::uuid>> {
-        request.expect_content_type(media::utf8_text);
+        request.expect_content_type(media::utf8_text());
 
         const auto body = co_await data<std::string>::read(request);
 
