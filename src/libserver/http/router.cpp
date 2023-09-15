@@ -68,10 +68,19 @@ namespace minty::server::http {
 
                     while (written < content_length) {
                         const auto chunk = co_await stream.read();
-                        if (chunk.empty()) continue;
+                        if (chunk.empty()) throw netcore::eof();
 
                         co_await part.write(chunk);
                         written += chunk.size();
+                    }
+
+                    const auto chunk = co_await stream.read();
+
+                    if (!chunk.empty()) {
+                        throw ::http::error_code(
+                            400,
+                            "Request body larger than expected"
+                        );
                     }
                 }
             );
