@@ -31,7 +31,9 @@ namespace minty::core::video {
         return ctx;
     }
 
-    auto format_context::find_video_stream(AVCodec** decoder) -> AVStream* {
+    auto format_context::find_video_stream(
+        const AVCodec** decoder
+    ) -> AVStream* {
         auto index = av_find_best_stream(
             ctx,
             AVMEDIA_TYPE_VIDEO,

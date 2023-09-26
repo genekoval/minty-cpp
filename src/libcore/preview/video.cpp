@@ -58,7 +58,7 @@ namespace minty::core {
         auto io = video::io_context(source);
         auto format = video::format_context(io.data());
 
-        AVCodec* decoder = nullptr;
+        const AVCodec* decoder = nullptr;
         auto* stream = format.find_video_stream(&decoder);
 
         auto codec = video::codec_context(decoder);

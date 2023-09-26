@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 namespace minty::core::video {
-    codec_context::codec_context(AVCodec* codec) :
+    codec_context::codec_context(const AVCodec* codec) :
         codec(codec),
         ctx(avcodec_alloc_context3(codec))
     {
