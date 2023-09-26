@@ -12,9 +12,8 @@ namespace minty::core {
         auto task = read(request, bucket);
 
         const auto response = co_await request.perform(*session);
-        auto object = co_await task;
 
-        co_return std::make_pair(response.status(), std::move(object));
+        co_return std::make_pair(response.status(), co_await std::move(task));
     }
 
     auto downloader::fetch(
@@ -80,10 +79,41 @@ namespace minty::core {
             std::nullopt,
             size,
             [&](fstore::part& part) -> ext::task<> {
-                while (!chunk.empty()) {
-                    co_await part.write(chunk);
+                auto offset = 0;
+                auto written = 0;
+
+                while (written < size) {
+                    if (chunk.empty()) throw netcore::eof();
+
+                    offset += part.try_write(chunk.subspan(offset));
+
+                    TIMBER_TRACE(
+                        "{} wrote chunk {:L} of {:L}",
+                        request,
+                        offset,
+                        chunk.size()
+                    );
+
+                    if (offset < chunk.size()) co_await part.await_write();
+                    else {
+                        written += offset;
+                        offset = 0;
+
+                        TIMBER_TRACE(
+                            "{} downloaded {:L} of {:L} ({:L} remaining)",
+                            request,
+                            written,
+                            size,
+                            size - written
+                        );
+                    }
+
                     chunk = co_await stream.read();
                 }
+
+                if (!chunk.empty()) throw std::runtime_error(
+                    "Response body larger than expected"
+                );
             }
         );
     }
