@@ -11,7 +11,7 @@ TEST_F(DatabasePostTest, DeletePost) {
 
         EXPECT_EQ(1, co_await count("post"));
 
-        const auto remaining = co_await db->read_post(post2);
+        const auto remaining = (co_await db->read_post(post2)).value();
         EXPECT_EQ(post2, remaining.id);
     }());
 }

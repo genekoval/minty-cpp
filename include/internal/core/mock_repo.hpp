@@ -96,7 +96,7 @@ namespace minty::core {
             (const, noexcept, override)
         );
 
-        MOCK_METHOD(ext::task<comment>, get_comment, (
+        MOCK_METHOD(ext::task<std::optional<comment>>, get_comment, (
             const UUID::uuid& comment_id
         ), (override));
 
@@ -104,7 +104,7 @@ namespace minty::core {
             const UUID::uuid& post_id
         ), (override));
 
-        MOCK_METHOD(ext::task<object>, get_object, (
+        MOCK_METHOD(ext::task<std::optional<object>>, get_object, (
             const UUID::uuid& object_id
         ), (override));
 
@@ -115,7 +115,7 @@ namespace minty::core {
             (override)
         );
 
-        MOCK_METHOD(ext::task<post>, get_post, (
+        MOCK_METHOD(ext::task<std::optional<post>>, get_post, (
             const UUID::uuid& id
         ), (override));
 
@@ -123,7 +123,7 @@ namespace minty::core {
             const post_query& query
         ), (override));
 
-        MOCK_METHOD(ext::task<tag>, get_tag, (
+        MOCK_METHOD(ext::task<std::optional<tag>>, get_tag, (
             const UUID::uuid& id
         ), (override));
 

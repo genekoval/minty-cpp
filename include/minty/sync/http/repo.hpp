@@ -112,19 +112,21 @@ namespace minty::sync::http {
             const std::filesystem::path& location
         ) -> void;
 
-        auto get_comment(const UUID::uuid& comment_id) -> comment;
+        auto get_comment(
+            const UUID::uuid& comment_id
+        ) -> std::optional<comment>;
 
         auto get_comments(
             const UUID::uuid& post_id
         ) -> std::vector<comment_data>;
 
-        auto get_object(const UUID::uuid& object_id) -> object;
+        auto get_object(const UUID::uuid& object_id) -> std::optional<object>;
 
         auto get_object_data(const UUID::uuid& object_id) -> std::string;
 
         auto get_object_data(const UUID::uuid& object_id, FILE* file) -> void;
 
-        auto get_post(const UUID::uuid& id) -> post;
+        auto get_post(const UUID::uuid& id) -> std::optional<post>;
 
         auto get_posts(
             const post_query& query
@@ -132,7 +134,7 @@ namespace minty::sync::http {
 
         auto get_server_info() -> server_info;
 
-        auto get_tag(const UUID::uuid& id) -> tag;
+        auto get_tag(const UUID::uuid& id) -> std::optional<tag>;
 
         auto get_tags(
             const tag_query& query

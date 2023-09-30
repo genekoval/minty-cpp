@@ -135,7 +135,7 @@ namespace minty::server {
 
     auto router_context::get_comment(
         UUID::uuid comment_id
-    ) -> ext::task<comment> {
+    ) -> ext::task<std::optional<comment>> {
         co_return co_await repo->get_comment(comment_id);
     }
 
@@ -147,11 +147,13 @@ namespace minty::server {
 
     auto router_context::get_object(
         UUID::uuid object_id
-    ) -> ext::task<object> {
+    ) -> ext::task<std::optional<object>> {
         co_return co_await repo->get_object(object_id);
     }
 
-    auto router_context::get_post(UUID::uuid post_id) -> ext::task<post> {
+    auto router_context::get_post(
+        UUID::uuid post_id
+    ) -> ext::task<std::optional<post>> {
         co_return co_await repo->get_post(post_id);
     }
 
@@ -165,7 +167,9 @@ namespace minty::server {
         co_return *info;
     }
 
-    auto router_context::get_tag(UUID::uuid tag_id) -> ext::task<tag> {
+    auto router_context::get_tag(
+        UUID::uuid tag_id
+    ) -> ext::task<std::optional<tag>> {
         co_return co_await repo->get_tag(tag_id);
     }
 

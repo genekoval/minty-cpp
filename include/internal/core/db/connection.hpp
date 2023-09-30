@@ -145,7 +145,7 @@ namespace minty::core::db {
 
         VIRTUAL auto read_comment(
             const UUID::uuid& comment_id
-        ) -> ext::task<comment>;
+        ) -> ext::task<std::optional<comment>>;
 
         VIRTUAL auto read_comments(
             const UUID::uuid& post_id
@@ -153,7 +153,7 @@ namespace minty::core::db {
 
         VIRTUAL auto read_object(
             const UUID::uuid& object_id
-        ) -> ext::task<object>;
+        ) -> ext::task<std::optional<object>>;
 
         VIRTUAL auto read_object_posts(
             const UUID::uuid& object_id
@@ -166,7 +166,9 @@ namespace minty::core::db {
             int batch_size
         ) -> ext::task<pg::portal<object_preview>>;
 
-        VIRTUAL auto read_post(const UUID::uuid& post_id) -> ext::task<post>;
+        VIRTUAL auto read_post(
+            const UUID::uuid& post_id
+        ) -> ext::task<std::optional<post>>;
 
         VIRTUAL auto read_posts(
             const std::vector<UUID::uuid>& posts
@@ -189,7 +191,9 @@ namespace minty::core::db {
             std::string_view host
         ) -> ext::task<std::optional<std::int64_t>>;
 
-        VIRTUAL auto read_tag(const UUID::uuid& tag_id) -> ext::task<tag>;
+        VIRTUAL auto read_tag(
+            const UUID::uuid& tag_id
+        ) -> ext::task<std::optional<tag>>;
 
         VIRTUAL auto read_tag_previews(
             const std::vector<UUID::uuid>& tags

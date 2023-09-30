@@ -5,13 +5,13 @@ TEST_F(DatabaseTagTest, UpdateTagDescription) {
 
     run([&]() -> ext::task<> {
         const auto id = co_await create_tag();
-        auto tag = co_await db->read_tag(id);
+        auto tag = (co_await db->read_tag(id)).value();
 
         const auto desc = co_await db->update_tag_description(id, description);
         EXPECT_TRUE(desc.has_value());
         EXPECT_EQ(description, desc.value());
 
-        tag = co_await db->read_tag(id);
+        tag = (co_await db->read_tag(id)).value();
         EXPECT_TRUE(tag.description.has_value());
         EXPECT_EQ(description, tag.description.value());
     }());
@@ -26,7 +26,7 @@ TEST_F(DatabaseTagTest, UpdateTagDescriptionEmpty) {
         const auto desc = co_await db->update_tag_description(id, description);
         EXPECT_FALSE(desc.has_value());
 
-        const auto tag = co_await db->read_tag(id);
+        const auto tag = (co_await db->read_tag(id)).value();
         EXPECT_FALSE(tag.description.has_value());
     }());
 }

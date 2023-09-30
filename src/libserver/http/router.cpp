@@ -23,7 +23,7 @@ namespace minty::server::http {
         paths.insert("/comment/:id",
             get([&repo](
                 path<"id", UUID::uuid> comment_id
-            ) -> ext::task<comment> {
+            ) -> ext::task<std::optional<comment>> {
                 co_return co_await repo.get_comment(comment_id);
             }).
             post([&repo](
@@ -94,7 +94,7 @@ namespace minty::server::http {
 
         paths.insert("/object/:object", get([&repo](
             path<"object", UUID::uuid> object_id
-        ) -> ext::task<object> {
+        ) -> ext::task<std::optional<object>> {
             co_return co_await repo.get_object(object_id);
         }));
 
@@ -105,7 +105,7 @@ namespace minty::server::http {
         paths.insert("/post/:post",
             get([&repo](
                 path<"post", UUID::uuid> post_id
-            ) -> ext::task<minty::post> {
+            ) -> ext::task<std::optional<minty::post>> {
                 co_return co_await repo.get_post(post_id);
             }).
             put([&repo](path<"post", UUID::uuid> draft_id) -> ext::task<> {
@@ -215,7 +215,9 @@ namespace minty::server::http {
         }));
 
         paths.insert("/tag/:tag",
-            get([&repo](path<"tag", UUID::uuid> tag_id) -> ext::task<tag> {
+            get([&repo](
+                path<"tag", UUID::uuid> tag_id
+            ) -> ext::task<std::optional<tag>> {
                 co_return co_await repo.get_tag(tag_id);
             }).
             post([&repo](path<"tag"> name) -> ext::task<UUID::uuid> {

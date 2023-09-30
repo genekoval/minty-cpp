@@ -11,7 +11,7 @@ TEST_F(DatabaseTagTest, DeleteTag) {
 
         EXPECT_EQ(1, co_await count("tag"));
 
-        const auto remaining = co_await db->read_tag(tag2);
+        const auto remaining = (co_await db->read_tag(tag2)).value();
         EXPECT_EQ(tag2, remaining.id);
     }());
 }

@@ -12,7 +12,7 @@ TEST_F(DatabasePostTest, CreatePost) {
         const auto update = co_await db->update_post_title(id, title);
         const auto published = co_await db->create_post(id);
 
-        const auto post = co_await db->read_post(id);
+        const auto post = (co_await db->read_post(id)).value();
 
         EXPECT_EQ(id, post.id);
 

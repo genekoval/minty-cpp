@@ -188,10 +188,12 @@ namespace minty::sync::http {
         bucket().download_object(object_id, location);
     }
 
-    auto repo::get_comment(const UUID::uuid& comment_id) -> comment {
+    auto repo::get_comment(
+        const UUID::uuid& comment_id
+    ) -> std::optional<comment> {
         return client
             .get_comment(comment_id)
-            .json<comment>();
+            .try_json<comment>();
     }
 
     auto repo::get_comments(
@@ -202,10 +204,12 @@ namespace minty::sync::http {
             .json<std::vector<comment_data>>();
     }
 
-    auto repo::get_object(const UUID::uuid& object_id) -> object {
+    auto repo::get_object(
+        const UUID::uuid& object_id
+    ) -> std::optional<object> {
         return client
             .get_object(object_id)
-            .json<object>();
+            .try_json<object>();
     }
 
     auto repo::get_object_data(const UUID::uuid& object_id) -> std::string {
@@ -219,10 +223,10 @@ namespace minty::sync::http {
         bucket().get_object(object_id, file);
     }
 
-    auto repo::get_post(const UUID::uuid& id) -> post {
+    auto repo::get_post(const UUID::uuid& id) -> std::optional<post> {
         return client
             .get_post(id)
-            .json<post>();
+            .try_json<post>();
     }
 
     auto repo::get_posts(
@@ -239,10 +243,10 @@ namespace minty::sync::http {
             .json<server_info>();
     }
 
-    auto repo::get_tag(const UUID::uuid& id) -> tag {
+    auto repo::get_tag(const UUID::uuid& id) -> std::optional<tag> {
         return client
             .get_tag(id)
-            .json<tag>();
+            .try_json<tag>();
     }
 
     auto repo::get_tags(

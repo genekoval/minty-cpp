@@ -217,7 +217,7 @@ namespace minty::core {
 
         VIRTUAL auto get_comment(
             const UUID::uuid& comment_id
-        ) -> ext::task<comment>;
+        ) -> ext::task<std::optional<comment>>;
 
         VIRTUAL auto get_comments(
             const UUID::uuid& post_id
@@ -225,18 +225,22 @@ namespace minty::core {
 
         VIRTUAL auto get_object(
             const UUID::uuid& object_id
-        ) -> ext::task<object>;
+        ) -> ext::task<std::optional<object>>;
 
         VIRTUAL auto get_object_preview_errors() ->
             ext::task<std::vector<object_error>>;
 
-        VIRTUAL auto get_post(const UUID::uuid& id) -> ext::task<post>;
+        VIRTUAL auto get_post(
+            const UUID::uuid& id
+        ) -> ext::task<std::optional<post>>;
 
         VIRTUAL auto get_posts(
             const post_query& query
         ) -> ext::task<search_result<post_preview>>;
 
-        VIRTUAL auto get_tag(const UUID::uuid& id) -> ext::task<tag>;
+        VIRTUAL auto get_tag(
+            const UUID::uuid& id
+        ) -> ext::task<std::optional<tag>>;
 
         VIRTUAL auto get_tags(
             const tag_query& query

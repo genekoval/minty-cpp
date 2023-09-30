@@ -379,7 +379,9 @@ namespace minty::core {
         return objects->get_bucket_id();
     }
 
-    auto repo::get_comment(const UUID::uuid& comment_id) -> ext::task<comment> {
+    auto repo::get_comment(
+        const UUID::uuid& comment_id
+    ) -> ext::task<std::optional<comment>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -398,13 +400,18 @@ namespace minty::core {
         co_return build_tree(entities);
     }
 
-    auto repo::get_object(const UUID::uuid& object_id) -> ext::task<object> {
+    auto repo::get_object(
+        const UUID::uuid& object_id
+    ) -> ext::task<std::optional<object>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
-        auto bucket = co_await objects->connect();
 
         const auto obj = co_await db.read_object(object_id);
+        if (!obj) co_return std::nullopt;
+
+        auto bucket = co_await objects->connect();
+
         const auto metadata = co_await bucket.meta(object_id);
 
         auto result = object {
@@ -414,8 +421,8 @@ namespace minty::core {
             .type = metadata.type,
             .subtype = metadata.subtype,
             .date_added = metadata.date_added,
-            .preview_id = obj.preview_id,
-            .src = obj.src,
+            .preview_id = obj->preview_id,
+            .src = obj->src
         };
 
         result.posts = co_await get_posts(
@@ -436,31 +443,36 @@ namespace minty::core {
         co_return co_await db.read_object_preview_errors();
     }
 
-    auto repo::get_post(const UUID::uuid& id) -> ext::task<post> {
+    auto repo::get_post(
+        const UUID::uuid& id
+    ) -> ext::task<std::optional<post>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
+
+        auto post = co_await db.read_post(id);
+        if (!post) co_return std::nullopt;
+
         auto bucket = co_await objects->connect();
 
-        auto data = co_await db.read_post(id);
         auto posts = co_await get_posts(
             bucket,
             co_await db.read_related_posts(id)
         );
 
-        auto result = post {
-            .id = data.id,
-            .title = data.title,
-            .description = data.description,
-            .visibility = data.visibility,
-            .date_created = data.date_created,
-            .date_modified = data.date_modified,
+        auto result = minty::post {
+            .id = post->id,
+            .title = post->title,
+            .description = post->description,
+            .visibility = post->visibility,
+            .date_created = post->date_created,
+            .date_modified = post->date_modified,
             .posts = std::move(posts)
         };
 
         result.tags = co_await db.read_post_tags(id);
 
-        for (auto&& obj : data.objects) {
+        for (auto&& obj : post->objects) {
             auto meta = co_await bucket.meta(obj.id);
 
             result.objects.push_back(object_preview {
@@ -532,23 +544,25 @@ namespace minty::core {
         };
     }
 
-    auto repo::get_tag(const UUID::uuid& id) -> ext::task<tag> {
+    auto repo::get_tag(const UUID::uuid& id) -> ext::task<std::optional<tag>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
 
         auto tag = co_await db.read_tag(id);
+        if (!tag) co_return std::nullopt;
+
         auto sources = co_await db.read_tag_sources(id);
 
         auto result = minty::tag {
-            .id = std::move(tag.id),
-            .name = std::move(tag.name),
-            .aliases = std::move(tag.aliases),
-            .description = std::move(tag.description),
-            .avatar = std::move(tag.avatar),
-            .banner = std::move(tag.banner),
-            .post_count = static_cast<std::uint32_t>(tag.post_count),
-            .date_created = tag.date_created
+            .id = std::move(tag->id),
+            .name = std::move(tag->name),
+            .aliases = std::move(tag->aliases),
+            .description = std::move(tag->description),
+            .avatar = std::move(tag->avatar),
+            .banner = std::move(tag->banner),
+            .post_count = static_cast<std::uint32_t>(tag->post_count),
+            .date_created = tag->date_created
         };
 
         for (const auto& src : sources) {

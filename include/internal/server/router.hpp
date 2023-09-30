@@ -89,13 +89,15 @@ namespace minty::server {
 
         auto get_comment(
             UUID::uuid comment_id
-        ) -> ext::task<comment>;
+        ) -> ext::task<std::optional<comment>>;
 
         auto get_comments(UUID::uuid post_id) -> ext::task<comment_tree>;
 
-        auto get_object(UUID::uuid object_id) -> ext::task<object>;
+        auto get_object(
+            UUID::uuid object_id
+        ) -> ext::task<std::optional<object>>;
 
-        auto get_post(UUID::uuid post_id) -> ext::task<post>;
+        auto get_post(UUID::uuid post_id) -> ext::task<std::optional<post>>;
 
         auto get_posts(
             post_query query
@@ -103,7 +105,7 @@ namespace minty::server {
 
         auto get_server_info() -> ext::task<server_info>;
 
-        auto get_tag(UUID::uuid tag_id) -> ext::task<tag>;
+        auto get_tag(UUID::uuid tag_id) -> ext::task<std::optional<tag>>;
 
         auto get_tags(
             tag_query query

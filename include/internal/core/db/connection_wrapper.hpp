@@ -173,7 +173,7 @@ namespace minty::core::db {
 
         auto read_comment(
             const UUID::uuid& comment_id
-        ) -> ext::task<comment> {
+        ) -> ext::task<std::optional<comment>> {
             return inner->read_comment(comment_id);
         }
 
@@ -185,7 +185,7 @@ namespace minty::core::db {
 
         auto read_object(
             const UUID::uuid& object_id
-        ) -> ext::task<object> {
+        ) -> ext::task<std::optional<object>> {
             return inner->read_object(object_id);
         }
 
@@ -207,7 +207,9 @@ namespace minty::core::db {
             return inner->read_objects(batch_size);
         }
 
-        auto read_post(const UUID::uuid& post_id) -> ext::task<post> {
+        auto read_post(
+            const UUID::uuid& post_id
+        ) -> ext::task<std::optional<post>> {
             return inner->read_post(post_id);
         }
 
@@ -242,7 +244,9 @@ namespace minty::core::db {
             return inner->read_site(scheme, host);
         }
 
-        auto read_tag(const UUID::uuid& tag_id) -> ext::task<tag> {
+        auto read_tag(
+            const UUID::uuid& tag_id
+        ) -> ext::task<std::optional<tag>> {
             return inner->read_tag(tag_id);
         }
 

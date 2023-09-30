@@ -107,7 +107,7 @@ TEST_F(DatabasePostObjectTest, AddPostObjectsDateModified) {
             );
         };
 
-        const auto post = co_await db->read_post(post_id);
+        const auto post = (co_await db->read_post(post_id)).value();
         const auto modified1 = co_await append_object();
 
         EXPECT_NE(post.date_modified, modified1);

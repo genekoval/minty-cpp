@@ -60,15 +60,16 @@ namespace minty {
         auto result = std::vector<object_preview>();
 
         for (const auto& arg : arguments) {
-            const auto uuid = UUID::parse(arg);
-            if (uuid) {
+            if (const auto uuid = UUID::parse(arg)) {
                 const auto object = co_await get_object(*uuid);
 
+                if (!object) throw not_found("Object '{}' not found", *uuid);
+
                 auto preview = object_preview();
-                preview.id = object.id;
-                preview.preview_id = object.preview_id;
-                preview.type = object.type;
-                preview.subtype = object.subtype;
+                preview.id = object->id;
+                preview.preview_id = object->preview_id;
+                preview.type = object->type;
+                preview.subtype = object->subtype;
 
                 result.push_back(std::move(preview));
                 continue;
@@ -248,7 +249,7 @@ namespace minty {
 
     auto repo::get_comment(
         const UUID::uuid& comment_id
-    ) -> ext::task<comment> {
+    ) -> ext::task<std::optional<comment>> {
         co_return co_await client->send<comment>(
             event::get_comment,
             comment_id
@@ -264,11 +265,13 @@ namespace minty {
         );
     }
 
-    auto repo::get_object(const UUID::uuid& object_id) -> ext::task<object> {
+    auto repo::get_object(
+        const UUID::uuid& object_id
+    ) -> ext::task<std::optional<object>> {
         co_return co_await client->send<object>(event::get_object, object_id);
     }
 
-    auto repo::get_post(const UUID::uuid& id) -> ext::task<post> {
+    auto repo::get_post(const UUID::uuid& id) -> ext::task<std::optional<post>> {
         co_return co_await client->send<post>(
             event::get_post,
             id
@@ -288,7 +291,7 @@ namespace minty {
         co_return co_await client->send<server_info>(event::get_server_info);
     }
 
-    auto repo::get_tag(const UUID::uuid& id) -> ext::task<tag> {
+    auto repo::get_tag(const UUID::uuid& id) -> ext::task<std::optional<tag>> {
         co_return co_await client->send<tag>(
             event::get_tag,
             id

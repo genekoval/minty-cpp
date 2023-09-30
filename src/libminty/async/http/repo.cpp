@@ -157,10 +157,12 @@ namespace minty::async::http {
             .send_task();
     }
 
-    auto repo::get_comment(const UUID::uuid& comment_id) -> ext::task<comment> {
+    auto repo::get_comment(
+        const UUID::uuid& comment_id
+    ) -> ext::task<std::optional<comment>> {
         co_return co_await client
             .get_comment(comment_id)
-            .json_task<comment>();
+            .try_json_task<comment>();
     }
 
     auto repo::get_comments(
@@ -171,16 +173,20 @@ namespace minty::async::http {
             .json_task<std::vector<comment_data>>();
     }
 
-    auto repo::get_object(const UUID::uuid& object_id) -> ext::task<object> {
+    auto repo::get_object(
+        const UUID::uuid& object_id
+    ) -> ext::task<std::optional<object>> {
         co_return co_await client
             .get_object(object_id)
-            .json_task<object>();
+            .try_json_task<object>();
     }
 
-    auto repo::get_post(const UUID::uuid& id) -> ext::task<post> {
+    auto repo::get_post(
+        const UUID::uuid& id
+    ) -> ext::task<std::optional<post>> {
         co_return co_await client
             .get_post(id)
-            .json_task<post>();
+            .try_json_task<post>();
     }
 
     auto repo::get_posts(
@@ -197,10 +203,10 @@ namespace minty::async::http {
             .json_task<server_info>();
     }
 
-    auto repo::get_tag(const UUID::uuid& id) -> ext::task<tag> {
+    auto repo::get_tag(const UUID::uuid& id) -> ext::task<std::optional<tag>> {
         co_return co_await client
             .get_tag(id)
-            .json_task<tag>();
+            .try_json_task<tag>();
     }
 
     auto repo::get_tags(

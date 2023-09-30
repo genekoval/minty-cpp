@@ -3,7 +3,7 @@
 TEST_F(DatabaseTagTest, CreateTag) {
     run([&]() -> ext::task<> {
         const auto id = co_await create_tag();
-        const auto tag = co_await db->read_tag(id);
+        const auto tag = (co_await db->read_tag(id)).value();
 
         EXPECT_EQ(id, tag.id);
         EXPECT_EQ(tag_name, tag.name);

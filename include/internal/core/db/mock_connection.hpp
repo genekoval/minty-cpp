@@ -122,7 +122,7 @@ namespace minty::core::db {
         MOCK_METHOD(ext::task<std::vector<UUID::uuid>>, prune_objects, (
         ), (override));
 
-        MOCK_METHOD(ext::task<comment>, read_comment, (
+        MOCK_METHOD(ext::task<std::optional<comment>>, read_comment, (
             const UUID::uuid& comment_id
         ), (override));
 
@@ -130,7 +130,7 @@ namespace minty::core::db {
             const UUID::uuid& post_id
         ), (override));
 
-        MOCK_METHOD(ext::task<object>, read_object, (
+        MOCK_METHOD(ext::task<std::optional<object>>, read_object, (
             const UUID::uuid& object_id
         ), (override));
 
@@ -147,7 +147,7 @@ namespace minty::core::db {
             int batch_size
         ), (override));
 
-        MOCK_METHOD(ext::task<post>, read_post, (
+        MOCK_METHOD(ext::task<std::optional<post>>, read_post, (
             const UUID::uuid& post_id
         ), (override));
 
@@ -172,7 +172,7 @@ namespace minty::core::db {
             std::string_view host
         ), (override));
 
-        MOCK_METHOD(ext::task<tag>, read_tag, (
+        MOCK_METHOD(ext::task<std::optional<tag>>, read_tag, (
             const UUID::uuid& tag_id
         ), (override));
 

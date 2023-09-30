@@ -14,7 +14,7 @@ TEST_F(DatabaseTagTest, CreateTagAliases) {
             co_await db->create_tag_alias(id, alias);
         }
 
-        const auto tag = co_await db->read_tag(id);
+        const auto tag = (co_await db->read_tag(id)).value();
 
         EXPECT_EQ(tag_name, tag.name);
         EXPECT_EQ(aliases.size(), tag.aliases.size());

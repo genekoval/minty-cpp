@@ -8,7 +8,7 @@ TEST_F(DatabaseObjectTest, CreateObject) {
         co_await db->create_object(object_id, {}, {});
         EXPECT_EQ(1, co_await count("object"));
 
-        const auto object = co_await db->read_object(object_id);
+        const auto object = (co_await db->read_object(object_id)).value();
 
         EXPECT_EQ(object_id, object.id);
         EXPECT_FALSE(object.preview_id.has_value());

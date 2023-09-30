@@ -23,7 +23,7 @@ auto DatabasePostObjectTest::insert_objects(
     const std::optional<UUID::uuid>& destination
 ) -> ext::task<std::vector<minty::core::db::object_preview>> {
     co_await db->create_post_objects(post_id, objects, destination);
-    const auto post = co_await db->read_post(post_id);
+    const auto post = (co_await db->read_post(post_id)).value();
     co_return post.objects;
 }
 

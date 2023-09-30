@@ -4,7 +4,7 @@ TEST_F(DatabasePostObjectTest, DeletePostObjects) {
     run([&]() -> ext::task<> {
         co_await db->delete_post_objects(post_id, {objects[1], objects[2]});
 
-        const auto post = co_await db->read_post(post_id);
+        const auto post = (co_await db->read_post(post_id)).value();
         const auto& objects = post.objects;
 
         EXPECT_EQ(1, objects.size());
@@ -19,7 +19,7 @@ TEST_F(DatabasePostObjectTest, DeletePostObjectsDateModified) {
             {objects.front()}
         );
 
-        const auto post = co_await db->read_post(post_id);
+        const auto post = (co_await db->read_post(post_id)).value();
 
         EXPECT_EQ(date_modified, post.date_modified);
         EXPECT_NE(post.date_created, post.date_modified);
@@ -30,7 +30,7 @@ TEST_F(DatabasePostObjectTest, DeletePostObjectsSequence) {
     run([&]() -> ext::task<> {
         co_await db->delete_post_objects(post_id, {objects.front()});
 
-        const auto post = co_await db->read_post(post_id);
+        const auto post = (co_await db->read_post(post_id)).value();
         const auto& result = post.objects;
 
         EXPECT_EQ(objects.at(1), result.at(0).id);

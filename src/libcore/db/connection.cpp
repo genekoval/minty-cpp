@@ -237,8 +237,8 @@ namespace minty::core::db {
 
     auto connection::read_comment(
         const UUID::uuid& comment_id
-    ) -> ext::task<comment> {
-        co_return co_await client->fetch_prepared<comment>(
+    ) -> ext::task<std::optional<comment>> {
+        co_return co_await client->try_fetch_prepared<comment>(
             __FUNCTION__,
             comment_id
         );
@@ -255,8 +255,8 @@ namespace minty::core::db {
 
     auto connection::read_object(
         const UUID::uuid& object_id
-    ) -> ext::task<object> {
-        co_return co_await client->fetch_prepared<object>(
+    ) -> ext::task<std::optional<object>> {
+        co_return co_await client->try_fetch_prepared<object>(
             __FUNCTION__,
             object_id
         );
@@ -289,8 +289,10 @@ namespace minty::core::db {
         );
     }
 
-    auto connection::read_post(const UUID::uuid& post_id) -> ext::task<post> {
-        co_return co_await client->fetch_prepared<post>(
+    auto connection::read_post(
+        const UUID::uuid& post_id
+    ) -> ext::task<std::optional<post>> {
+        co_return co_await client->try_fetch_prepared<post>(
             __FUNCTION__,
             post_id
         );
@@ -344,8 +346,13 @@ namespace minty::core::db {
         );
     }
 
-    auto connection::read_tag(const UUID::uuid& tag_id) -> ext::task<tag> {
-        co_return co_await client->fetch_prepared<tag>(__FUNCTION__, tag_id);
+    auto connection::read_tag(
+        const UUID::uuid& tag_id
+    ) -> ext::task<std::optional<tag>> {
+        co_return co_await client->try_fetch_prepared<tag>(
+            __FUNCTION__, 
+            tag_id
+        );
     }
 
     auto connection::read_tag_previews(
