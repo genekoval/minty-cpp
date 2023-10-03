@@ -14,12 +14,7 @@ namespace minty {
         auto operator==(const source&) const noexcept -> bool = default;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        source,
-        id,
-        url,
-        icon
-    );
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(source, id, url, icon);
 }
 
 namespace zipline {

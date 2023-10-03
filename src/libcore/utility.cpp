@@ -8,22 +8,16 @@
 using minty::invalid_data;
 
 namespace {
-    auto assert_text_no_newlines(
-        std::string_view text,
-        std::string_view label
-    ) -> void {
+    auto assert_text_no_newlines(std::string_view text, std::string_view label)
+        -> void {
         if (text.find("\n") != std::string_view::npos) {
             throw invalid_data("{} must not contain newlines", label);
         }
     }
 
-    auto assert_text_not_empty(
-        std::string_view text,
-        std::string_view label
-    ) -> void {
-        if (text.empty()) {
-            throw invalid_data("{} must not be empty", label);
-        }
+    auto assert_text_not_empty(std::string_view text, std::string_view label)
+        -> void {
+        if (text.empty()) { throw invalid_data("{} must not be empty", label); }
     }
 
     auto format_text(std::string_view text) -> std::string {

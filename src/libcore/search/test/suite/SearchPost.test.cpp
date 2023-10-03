@@ -38,41 +38,32 @@ auto SearchPostTest::SetUpTestSuite() -> void {
     }());
 }
 
-auto SearchPostTest::add_post() ->
-    ext::task<std::reference_wrapper<const post>>
-{
+auto SearchPostTest::add_post()
+    -> ext::task<std::reference_wrapper<const post>> {
     return add_post(cpp);
 }
 
-auto SearchPostTest::add_post(
-    const UUID::uuid& id
-) -> ext::task<std::reference_wrapper<const post>> {
+auto SearchPostTest::add_post(const UUID::uuid& id)
+    -> ext::task<std::reference_wrapper<const post>> {
     const auto& post = find_post(id);
     co_await search.add_post(post);
     co_return post;
 }
 
 auto SearchPostTest::find_post(const UUID::uuid& id) const -> const post& {
-    const auto result = std::find_if(
-        posts.begin(),
-        posts.end(),
-        [id](const auto& post) { return post.id == id; }
-    );
+    const auto result =
+        std::find_if(posts.begin(), posts.end(), [id](const auto& post) {
+            return post.id == id;
+        });
 
     if (result == posts.end()) {
-        throw minty::minty_error(
-            "post not found: {}",
-            id
-        );
+        throw minty::minty_error("post not found: {}", id);
     }
 
     return *result;
 }
 
-auto SearchPostTest::get_post(
-    const UUID::uuid& id
-) -> ext::task<elastic::json> {
-    co_return co_await client
-        .get_doc_source(index, id)
-        .send();
+auto SearchPostTest::get_post(const UUID::uuid& id)
+    -> ext::task<elastic::json> {
+    co_return co_await client.get_doc_source(index, id).send();
 }

@@ -2,10 +2,8 @@
 #include "video/video.hpp"
 
 namespace minty::core {
-    auto generate_audio_preview(
-        bucket& bucket,
-        const fstore::object& object
-    ) -> ext::task<std::optional<UUID::uuid>> {
+    auto generate_audio_preview(bucket& bucket, const fstore::object& object)
+        -> ext::task<std::optional<UUID::uuid>> {
         auto source = co_await bucket.get(object.id);
 
         auto io = video::io_context(source);
@@ -44,7 +42,8 @@ namespace minty::core {
                         pkt->size
                     ));
                 }
-            );;
+            );
+            ;
 
             co_return obj.id;
         }

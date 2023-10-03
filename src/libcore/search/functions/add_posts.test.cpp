@@ -20,7 +20,8 @@ TEST_F(SearchPostTest, AddPosts) {
             const auto end = hits.end();
             const auto contains = std::find(hits.begin(), end, id) != end;
 
-            EXPECT_TRUE(contains) << "result does not contain post [" << id << "]";
+            EXPECT_TRUE(contains)
+                << "result does not contain post [" << id << "]";
         }
     }());
 }
@@ -34,10 +35,9 @@ TEST_F(SearchPostTest, AddPostsErrors) {
 
         constexpr auto duplicates = 3;
 
-        errors = co_await search.add_posts(std::span<const post>(
-            posts.begin(),
-            posts.begin() + duplicates
-        ));
+        errors = co_await search.add_posts(
+            std::span<const post>(posts.begin(), posts.begin() + duplicates)
+        );
 
         EXPECT_EQ(duplicates, errors.size());
     }());

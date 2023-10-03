@@ -14,8 +14,6 @@ namespace minty::server::http {
         std::span<const conftools::endpoint> endpoints
     ) -> ext::task<::http::server::server_list>;
 
-    auto router(
-        const server_info& info,
-        core::repo& repo
-    ) -> ::http::server::router;
+    auto router(const server_info& info, core::repo& repo)
+        -> ::http::server::router;
 }

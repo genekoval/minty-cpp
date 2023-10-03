@@ -9,9 +9,7 @@ TEST_F(DatabasePostObjectTest, ReadObjects) {
         while (portal) {
             const auto objects = co_await portal.next();
 
-            for (const auto& object : objects) {
-                found.push_back(object.id);
-            }
+            for (const auto& object : objects) { found.push_back(object.id); }
         }
 
         EXPECT_EQ(4, found.size());

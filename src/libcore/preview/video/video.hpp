@@ -78,17 +78,10 @@ namespace minty::core::video {
             uint8_t* const start;
         };
 
-        static auto read_packet(
-            void* opaque,
-            uint8_t* buffer,
-            int buffer_size
-        ) -> int;
+        static auto read_packet(void* opaque, uint8_t* buffer, int buffer_size)
+            -> int;
 
-        static auto seek(
-            void* opaque,
-            int64_t offset,
-            int whence
-        ) -> int64_t;
+        static auto seek(void* opaque, int64_t offset, int whence) -> int64_t;
 
         buffer_data bd;
         uint8_t* buffer;
@@ -119,10 +112,7 @@ namespace minty::core::video {
         SwsContext* ctx;
         int height;
     public:
-        sws_context(
-            AVCodecContext* codec,
-            AVPixelFormat pixel_format
-        );
+        sws_context(AVCodecContext* codec, AVPixelFormat pixel_format);
 
         ~sws_context();
 

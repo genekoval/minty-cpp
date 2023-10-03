@@ -1,8 +1,7 @@
 #include "DatabasePostObject.test.hpp"
 
-auto DatabasePostObjectTest::create_post_with_objects() ->
-    ext::task<UUID::uuid>
-{
+auto DatabasePostObjectTest::create_post_with_objects()
+    -> ext::task<UUID::uuid> {
     for (const auto& object : objects) {
         co_await db->create_object(object, {}, {});
     }

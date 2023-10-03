@@ -1,5 +1,5 @@
-#include "commands.h"
 #include "../commands.h"
+#include "commands.h"
 
 using namespace commline;
 

@@ -19,16 +19,12 @@ namespace minty::core::video {
             nullptr,
             nullptr
         )),
-        height(codec->height)
-    {
-        if (!ctx) throw std::runtime_error(
-            "Failed to allocate scaling context"
-        );
+        height(codec->height) {
+        if (!ctx)
+            throw std::runtime_error("Failed to allocate scaling context");
     }
 
-    sws_context::~sws_context() {
-        sws_freeContext(ctx);
-    }
+    sws_context::~sws_context() { sws_freeContext(ctx); }
 
     auto sws_context::scale(AVFrame* src, AVFrame* dest) -> void {
         sws_scale(

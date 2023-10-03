@@ -6,8 +6,7 @@
 namespace http::server::extractor {
     template <>
     struct data<std::vector<UUID::uuid>> {
-        static auto read(
-            request& request
-        ) -> ext::task<std::vector<UUID::uuid>>;
+        static auto read(request& request)
+            -> ext::task<std::vector<UUID::uuid>>;
     };
 }

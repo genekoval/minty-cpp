@@ -9,10 +9,5 @@ auto DatabaseObjectTest::create_site() -> ext::task<minty::core::db::site> {
 }
 
 auto DatabaseObjectTest::tables() -> std::vector<std::string> {
-    return {
-        "object",
-        "source",
-        "site",
-        "object"
-    };
+    return {"object", "source", "site", "object"};
 }

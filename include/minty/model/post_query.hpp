@@ -14,9 +14,8 @@ namespace minty {
         title
     };
 
-    constexpr auto to_string(
-        post_sort_value value
-    ) noexcept -> std::string_view {
+    constexpr auto to_string(post_sort_value value) noexcept
+        -> std::string_view {
         using enum post_sort_value;
 
         switch (value) {
@@ -55,17 +54,14 @@ namespace minty {
         constexpr post_sort() : post_sort(post_sort_value::date_created) {}
 
         constexpr post_sort(post_sort_value value) :
-            post_sort(value, default_sort_order(value))
-        {}
+            post_sort(value, default_sort_order(value)) {}
 
         constexpr post_sort(post_sort_value value, sort_order order) :
             value(value),
-            order(order)
-        {}
+            order(order) {}
 
-        auto operator==(
-            const post_sort& other
-        ) const noexcept -> bool = default;
+        auto operator==(const post_sort& other) const noexcept
+            -> bool = default;
     };
 
     struct post_query {

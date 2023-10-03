@@ -3,10 +3,7 @@
 #include <fmt/format.h>
 
 namespace minty {
-    enum class sort_order : std::uint8_t {
-        ascending,
-        descending
-    };
+    enum class sort_order : std::uint8_t { ascending, descending };
 
     constexpr auto to_string(sort_order order) noexcept -> std::string_view {
         using enum sort_order;

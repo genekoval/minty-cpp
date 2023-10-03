@@ -10,8 +10,7 @@ TEST_F(SearchPostTest, UpdatePostTitle) {
         const auto update = minty::core::db::post_update {
             .id = post.id,
             .new_data = title,
-            .date_modified = modified
-        };
+            .date_modified = modified};
 
         co_await search.update_post_title(update);
 

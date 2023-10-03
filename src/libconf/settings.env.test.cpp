@@ -22,6 +22,4 @@ auto SettingsEnvironment::SetUp() -> void {
     instance = this;
 }
 
-auto SettingsEnvironment::TearDown() -> void {
-    instance = nullptr;
-}
+auto SettingsEnvironment::TearDown() -> void { instance = nullptr; }

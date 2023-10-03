@@ -23,82 +23,55 @@ protected:
     const UUID::uuid jit = "c7b4c405-f4e4-421f-acb3-7de47e473584";
 
     const std::vector<post> posts = {
-        {
-            .id = cpp,
-            .title = "C++",
-            .description =
-                "A general-purpose programming language created by Danish "
-                "computer scientist Bjarne Stroustrup as an extension of the "
-                "C programming language, or \"C with Classes\".",
-            .visibility = minty::visibility::pub,
-            .created = minty::test::parse_date("1985-01-01 12:00:00.0-04"),
-            .modified = minty::test::parse_date("2020-12-15 12:00:00.0-04"),
-            .tags = {
-                language,
-                native
-            }
-        },
-        {
-            .id = c,
-            .title = "C",
-            .description =
-                "A successor to the programming language B, C was originally "
-                "developed at Bell Labs by Dennis Ritchie between 1972 and "
-                "1973 to construct utilities running on Unix.",
-            .visibility = minty::visibility::pub,
-            .created = minty::test::parse_date("1972-01-01 12:00:00.0-04"),
-            .modified = minty::test::parse_date("2018-06-01 12:00:00.0-04"),
-            .tags = {
-                language,
-                native
-            }
-        },
-        {
-            .id = java,
-            .title = "Java",
-            .description =
-                "Java is a high-level, class-based, object-oriented "
-                "programming language that is designed to have as few "
-                "implementation dependencies as possible.",
-            .visibility = minty::visibility::pub,
-            .created = minty::test::parse_date("1995-05-23 12:00:00.0-04"),
-            .modified = minty::test::parse_date("2022-03-22 12:00:00.0-04"),
-            .tags = {
-                language,
-                jit
-            }
-        },
-        {
-            .id = js,
-            .title = "JavaScript",
-            .description =
-                "A programming language that is one of the core technologies "
-                "of the World Wide Web, alongside HTML and CSS.",
-            .visibility = minty::visibility::pub,
-            .created = minty::test::parse_date("1995-12-04 12:00:00.0-04"),
-            .modified = minty::test::parse_date("2021-07-22 12:00:00.0-04"),
-            .tags = {
-                language,
-                jit
-            }
-        },
-        {
-            .id = rust,
-            .title = "Rust",
-            .description =
-                "Rust enforces memory safety — that is, that all references "
-                "point to valid memory — without requiring the use of a "
-                "garbage collector or reference counting present in other "
-                "memory-safe languages.",
-            .visibility = minty::visibility::pub,
-            .created = minty::test::parse_date("2010-07-07 12:00:00.0-04"),
-            .modified = minty::test::parse_date("2022-06-30 12:00:00.0-04"),
-            .tags = {
-                language,
-                native
-            }
-        }
-    };
+        {.id = cpp,
+         .title = "C++",
+         .description =
+             "A general-purpose programming language created by Danish "
+             "computer scientist Bjarne Stroustrup as an extension of the "
+             "C programming language, or \"C with Classes\".",
+         .visibility = minty::visibility::pub,
+         .created = minty::test::parse_date("1985-01-01 12:00:00.0-04"),
+         .modified = minty::test::parse_date("2020-12-15 12:00:00.0-04"),
+         .tags = {language, native}},
+        {.id = c,
+         .title = "C",
+         .description =
+             "A successor to the programming language B, C was originally "
+             "developed at Bell Labs by Dennis Ritchie between 1972 and "
+             "1973 to construct utilities running on Unix.",
+         .visibility = minty::visibility::pub,
+         .created = minty::test::parse_date("1972-01-01 12:00:00.0-04"),
+         .modified = minty::test::parse_date("2018-06-01 12:00:00.0-04"),
+         .tags = {language, native}},
+        {.id = java,
+         .title = "Java",
+         .description = "Java is a high-level, class-based, object-oriented "
+                        "programming language that is designed to have as few "
+                        "implementation dependencies as possible.",
+         .visibility = minty::visibility::pub,
+         .created = minty::test::parse_date("1995-05-23 12:00:00.0-04"),
+         .modified = minty::test::parse_date("2022-03-22 12:00:00.0-04"),
+         .tags = {language, jit}},
+        {.id = js,
+         .title = "JavaScript",
+         .description =
+             "A programming language that is one of the core technologies "
+             "of the World Wide Web, alongside HTML and CSS.",
+         .visibility = minty::visibility::pub,
+         .created = minty::test::parse_date("1995-12-04 12:00:00.0-04"),
+         .modified = minty::test::parse_date("2021-07-22 12:00:00.0-04"),
+         .tags = {language, jit}},
+        {.id = rust,
+         .title = "Rust",
+         .description =
+             "Rust enforces memory safety — that is, that all references "
+             "point to valid memory — without requiring the use of a "
+             "garbage collector or reference counting present in other "
+             "memory-safe languages.",
+         .visibility = minty::visibility::pub,
+         .created = minty::test::parse_date("2010-07-07 12:00:00.0-04"),
+         .modified = minty::test::parse_date("2022-06-30 12:00:00.0-04"),
+         .tags = {language, native}}};
 
     const UUID::uuid tag = "f14cdce9-33ae-4a52-8613-2761b44a9388";
 
@@ -110,9 +83,8 @@ protected:
 
     auto add_post() -> ext::task<std::reference_wrapper<const post>>;
 
-    auto add_post(
-        const UUID::uuid& id
-    ) -> ext::task<std::reference_wrapper<const post>>;
+    auto add_post(const UUID::uuid& id)
+        -> ext::task<std::reference_wrapper<const post>>;
 
     auto find_post(const UUID::uuid& id) const -> const post&;
 

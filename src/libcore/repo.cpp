@@ -18,28 +18,22 @@ namespace minty::core {
         database(&database),
         objects(&objects),
         dl(&dl),
-        search(&search)
-    {}
+        search(&search) {}
 
-    auto repo::add_comment(
-        const UUID::uuid& post_id,
-        std::string_view content
-    ) -> ext::task<comment_data> {
+    auto repo::add_comment(const UUID::uuid& post_id, std::string_view content)
+        -> ext::task<comment_data> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
 
-        const auto comment = co_await db.create_comment(
-            post_id,
-            format_comment(content)
-        );
+        const auto comment =
+            co_await db.create_comment(post_id, format_comment(content));
 
         co_return comment_data {
             comment.id,
             comment.content,
             comment.indent,
-            comment.date_created
-        };
+            comment.date_created};
     }
 
     auto repo::add_object(
@@ -65,16 +59,14 @@ namespace minty::core {
             std::move(object.id),
             std::move(preview_id),
             std::move(object.type),
-            std::move(object.subtype)
-        };
+            std::move(object.subtype)};
     }
 
-    auto repo::add_objects_url(
-        std::string_view url
-    ) -> ext::task<std::vector<object_preview>> {
+    auto repo::add_objects_url(std::string_view url)
+        -> ext::task<std::vector<object_preview>> {
         TIMBER_FUNC();
 
-        co_return std::vector<object_preview> { co_await download_file(url) };
+        co_return std::vector<object_preview> {co_await download_file(url)};
     }
 
     auto repo::add_post_objects(
@@ -96,10 +88,8 @@ namespace minty::core {
         co_return date_modified;
     }
 
-    auto repo::add_post_tag(
-        const UUID::uuid& post_id,
-        const UUID::uuid& tag_id
-    ) -> ext::task<> {
+    auto repo::add_post_tag(const UUID::uuid& post_id, const UUID::uuid& tag_id)
+        -> ext::task<> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -122,31 +112,24 @@ namespace minty::core {
         co_await db.create_related_post(post_id, related);
     }
 
-    auto repo::add_reply(
-        const UUID::uuid& parent_id,
-        std::string_view content
-    ) -> ext::task<comment_data> {
+    auto repo::add_reply(const UUID::uuid& parent_id, std::string_view content)
+        -> ext::task<comment_data> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
 
-        const auto comment = co_await db.create_reply(
-            parent_id,
-            format_comment(content)
-        );
+        const auto comment =
+            co_await db.create_reply(parent_id, format_comment(content));
 
         co_return comment_data {
             comment.id,
             comment.content,
             comment.indent,
-            comment.date_created
-        };
+            comment.date_created};
     }
 
-    auto repo::add_source(
-        db::connection_type& db,
-        std::string_view url
-    ) -> ext::task<source> {
+    auto repo::add_source(db::connection_type& db, std::string_view url)
+        -> ext::task<source> {
         constexpr auto host_prefix = std::string_view("www.");
 
         const auto uri = uri::uri(std::string(url));
@@ -158,17 +141,15 @@ namespace minty::core {
         }
 
         const auto site_opt = co_await db.read_site(scheme, host);
-        const auto site_id = site_opt ?
-            *site_opt : co_await add_site(db, scheme, host);
+        const auto site_id =
+            site_opt ? *site_opt : co_await add_site(db, scheme, host);
 
         auto resource = uri.pathname();
 
-        if (!uri.query().empty()) resource.append(
-            fmt::format("?{}", uri.query())
-        );
-        if (!uri.fragment().empty()) resource.append(
-            fmt::format("#{}", uri.fragment())
-        );
+        if (!uri.query().empty())
+            resource.append(fmt::format("?{}", uri.query()));
+        if (!uri.fragment().empty())
+            resource.append(fmt::format("#{}", uri.fragment()));
 
         co_return co_await db.create_source(site_id, resource);
     }
@@ -201,10 +182,8 @@ namespace minty::core {
         co_return id;
     }
 
-    auto repo::add_tag_alias(
-        const UUID::uuid& tag_id,
-        std::string_view alias
-    ) -> ext::task<tag_name> {
+    auto repo::add_tag_alias(const UUID::uuid& tag_id, std::string_view alias)
+        -> ext::task<tag_name> {
         TIMBER_FUNC();
 
         const auto formatted = format_tag(alias);
@@ -219,10 +198,8 @@ namespace minty::core {
         co_return name;
     }
 
-    auto repo::add_tag_source(
-        const UUID::uuid& tag_id,
-        std::string_view url
-    ) -> ext::task<source> {
+    auto repo::add_tag_source(const UUID::uuid& tag_id, std::string_view url)
+        -> ext::task<source> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -355,21 +332,16 @@ namespace minty::core {
         co_await db.delete_tag_source(tag_id, source_id);
     }
 
-    auto repo::download_file(
-        std::string_view url
-    ) -> ext::task<object_preview> {
+    auto repo::download_file(std::string_view url)
+        -> ext::task<object_preview> {
         TIMBER_FUNC();
 
         auto bucket = co_await objects->connect();
         auto [status, metadata] = co_await dl->fetch(url, bucket);
 
         auto db = co_await database->connect();
-        auto object = co_await add_object(
-            db,
-            bucket,
-            std::move(metadata),
-            std::nullopt
-        );
+        auto object =
+            co_await add_object(db, bucket, std::move(metadata), std::nullopt);
 
         if (status.ok()) co_return object;
         throw download_error(url, status, object);
@@ -379,9 +351,8 @@ namespace minty::core {
         return objects->get_bucket_id();
     }
 
-    auto repo::get_comment(
-        const UUID::uuid& comment_id
-    ) -> ext::task<std::optional<comment>> {
+    auto repo::get_comment(const UUID::uuid& comment_id)
+        -> ext::task<std::optional<comment>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -389,9 +360,8 @@ namespace minty::core {
         co_return co_await db.read_comment(comment_id);
     }
 
-    auto repo::get_comments(
-        const UUID::uuid& post_id
-    ) -> ext::task<comment_tree> {
+    auto repo::get_comments(const UUID::uuid& post_id)
+        -> ext::task<comment_tree> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -400,9 +370,8 @@ namespace minty::core {
         co_return build_tree(entities);
     }
 
-    auto repo::get_object(
-        const UUID::uuid& object_id
-    ) -> ext::task<std::optional<object>> {
+    auto repo::get_object(const UUID::uuid& object_id)
+        -> ext::task<std::optional<object>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -422,8 +391,7 @@ namespace minty::core {
             .subtype = metadata.subtype,
             .date_added = metadata.date_added,
             .preview_id = obj->preview_id,
-            .src = obj->src
-        };
+            .src = obj->src};
 
         result.posts = co_await get_posts(
             bucket,
@@ -433,9 +401,8 @@ namespace minty::core {
         co_return result;
     }
 
-    auto repo::get_object_preview_errors() ->
-        ext::task<std::vector<object_error>>
-    {
+    auto repo::get_object_preview_errors()
+        -> ext::task<std::vector<object_error>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -443,9 +410,8 @@ namespace minty::core {
         co_return co_await db.read_object_preview_errors();
     }
 
-    auto repo::get_post(
-        const UUID::uuid& id
-    ) -> ext::task<std::optional<post>> {
+    auto repo::get_post(const UUID::uuid& id)
+        -> ext::task<std::optional<post>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -455,10 +421,8 @@ namespace minty::core {
 
         auto bucket = co_await objects->connect();
 
-        auto posts = co_await get_posts(
-            bucket,
-            co_await db.read_related_posts(id)
-        );
+        auto posts =
+            co_await get_posts(bucket, co_await db.read_related_posts(id));
 
         auto result = minty::post {
             .id = post->id,
@@ -467,8 +431,7 @@ namespace minty::core {
             .visibility = post->visibility,
             .date_created = post->date_created,
             .date_modified = post->date_modified,
-            .posts = std::move(posts)
-        };
+            .posts = std::move(posts)};
 
         result.tags = co_await db.read_post_tags(id);
 
@@ -479,23 +442,19 @@ namespace minty::core {
                 .id = std::move(obj.id),
                 .preview_id = std::move(obj.preview_id),
                 .type = std::move(meta.type),
-                .subtype = std::move(meta.subtype)
-            });
+                .subtype = std::move(meta.subtype)});
         }
 
         co_return result;
     }
 
-    auto repo::get_posts(
-        bucket& bucket,
-        std::vector<db::post_preview>&& posts
-    ) -> ext::task<std::vector<post_preview>> {
+    auto repo::get_posts(bucket& bucket, std::vector<db::post_preview>&& posts)
+        -> ext::task<std::vector<post_preview>> {
         auto result = std::vector<post_preview>();
 
         for (auto&& post : posts) {
-            const auto obj = post.preview ?
-                post.preview->id :
-                std::optional<UUID::uuid>();
+            const auto obj =
+                post.preview ? post.preview->id : std::optional<UUID::uuid>();
 
             auto preview = std::optional<object_preview>();
 
@@ -506,8 +465,7 @@ namespace minty::core {
                     .id = std::move(metadata.id),
                     .preview_id = post.preview->preview_id,
                     .type = std::move(metadata.type),
-                    .subtype = std::move(metadata.subtype)
-                };
+                    .subtype = std::move(metadata.subtype)};
             }
 
             result.push_back(post_preview {
@@ -516,16 +474,14 @@ namespace minty::core {
                 .preview = std::move(preview),
                 .comment_count = static_cast<std::uint32_t>(post.comment_count),
                 .object_count = static_cast<std::uint32_t>(post.object_count),
-                .date_created = post.date_created
-            });
+                .date_created = post.date_created});
         }
 
         co_return result;
     }
 
-    auto repo::get_posts(
-        const post_query& query
-    ) -> ext::task<search_result<post_preview>> {
+    auto repo::get_posts(const post_query& query)
+        -> ext::task<search_result<post_preview>> {
         TIMBER_FUNC();
 
         const auto result = co_await search->find_posts(query);
@@ -533,15 +489,12 @@ namespace minty::core {
         auto db = co_await database->connect();
         auto bucket = co_await objects->connect();
 
-        auto posts = co_await get_posts(
-            bucket,
-            co_await db.read_posts(result.hits)
-        );
+        auto posts =
+            co_await get_posts(bucket, co_await db.read_posts(result.hits));
 
         co_return search_result<post_preview> {
             .total = result.total,
-            .hits = std::move(posts)
-        };
+            .hits = std::move(posts)};
     }
 
     auto repo::get_tag(const UUID::uuid& id) -> ext::task<std::optional<tag>> {
@@ -562,26 +515,22 @@ namespace minty::core {
             .avatar = std::move(tag->avatar),
             .banner = std::move(tag->banner),
             .post_count = static_cast<std::uint32_t>(tag->post_count),
-            .date_created = tag->date_created
-        };
+            .date_created = tag->date_created};
 
-        for (const auto& src : sources) {
-            result.sources.emplace_back(src);
-        }
+        for (const auto& src : sources) { result.sources.emplace_back(src); }
 
         co_return result;
     }
 
-    auto repo::get_tags(
-        const tag_query& query
-    ) -> ext::task<search_result<tag_preview>> {
+    auto repo::get_tags(const tag_query& query)
+        -> ext::task<search_result<tag_preview>> {
         TIMBER_FUNC();
 
         const auto res = co_await search->find_tags(query);
 
         auto db = co_await database->connect();
 
-        auto result = search_result<tag_preview> { .total = res.total };
+        auto result = search_result<tag_preview> {.total = res.total};
         result.hits = co_await db.read_tag_previews(res.hits);
 
         co_return result;
@@ -614,9 +563,8 @@ namespace minty::core {
         );
     }
 
-    auto repo::regenerate_preview(
-        const UUID::uuid& object_id
-    ) -> ext::task<std::optional<UUID::uuid>> {
+    auto repo::regenerate_preview(const UUID::uuid& object_id)
+        -> ext::task<std::optional<UUID::uuid>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
@@ -637,10 +585,8 @@ namespace minty::core {
         }
         catch (const std::exception& ex) {
             exception = std::current_exception();
-            exception_task = db.create_object_preview_error(
-                object_id,
-                ex.what()
-            );
+            exception_task =
+                db.create_object_preview_error(object_id, ex.what());
         }
 
         co_await exception_task.value();
@@ -675,16 +621,12 @@ namespace minty::core {
         auto exception_task = std::optional<ext::task<>>();
 
         try {
-            preview = co_await workers.wait(
-                regenerate_preview(bucket, object)
-            );
+            preview = co_await workers.wait(regenerate_preview(bucket, object));
         }
         catch (const std::exception& ex) {
             error_message = ex.what();
-            exception_task = db.create_object_preview_error(
-                object.id,
-                error_message
-            );
+            exception_task =
+                db.create_object_preview_error(object.id, error_message);
         }
 
         if (exception_task) {
@@ -778,30 +720,24 @@ namespace minty::core {
         co_await tx.commit();
         co_return modification<std::optional<std::string>> {
             .date_modified = update.date_modified,
-            .new_value = update.new_data
-        };
+            .new_value = update.new_data};
     }
 
-    auto repo::set_post_title(
-        const UUID::uuid& post_id,
-        std::string_view title
-    ) -> ext::task<modification<std::optional<std::string>>> {
+    auto repo::set_post_title(const UUID::uuid& post_id, std::string_view title)
+        -> ext::task<modification<std::optional<std::string>>> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
         auto tx = co_await db.begin();
 
-        const auto update = co_await db.update_post_title(
-            post_id,
-            format_title(title)
-        );
+        const auto update =
+            co_await db.update_post_title(post_id, format_title(title));
         co_await search->update_post_title(update);
 
         co_await tx.commit();
         co_return modification<std::optional<std::string>> {
             .date_modified = update.date_modified,
-            .new_value = update.new_data
-        };
+            .new_value = update.new_data};
     }
 
     auto repo::set_tag_description(
@@ -818,10 +754,8 @@ namespace minty::core {
         );
     }
 
-    auto repo::set_tag_name(
-        const UUID::uuid& tag_id,
-        std::string_view new_name
-    ) -> ext::task<tag_name> {
+    auto repo::set_tag_name(const UUID::uuid& tag_id, std::string_view new_name)
+        -> ext::task<tag_name> {
         TIMBER_FUNC();
 
         const auto formatted = format_tag(new_name);
@@ -829,14 +763,11 @@ namespace minty::core {
         auto db = co_await database->connect();
         auto tx = co_await db.begin();
 
-        const auto update  = co_await db.update_tag_name(tag_id, formatted);
+        const auto update = co_await db.update_tag_name(tag_id, formatted);
 
         if (update.old_name) {
-            co_await search->update_tag_name(
-                tag_id,
-                *update.old_name,
-                formatted
-            );
+            co_await search
+                ->update_tag_name(tag_id, *update.old_name, formatted);
         }
 
         co_await tx.commit();

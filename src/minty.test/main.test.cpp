@@ -47,22 +47,15 @@ struct TestLogger : public EmptyTestEventListener {
         TIMBER_INFO(
             "{} in {} {}",
             result.failed() ? "Failure"sv : "Success"sv,
-            result.file_name() ?
-                fmt::format(
-                    "{}:{}",
-                    result.file_name(),
-                    result.line_number()
-                ) : "unknown file"s,
+            result.file_name()
+                ? fmt::format("{}:{}", result.file_name(), result.line_number())
+                : "unknown file"s,
             result.summary()
         );
     }
 
     auto OnTestEnd(const TestInfo& info) -> void override {
-        TIMBER_NOTICE(
-            "Test {}.{} ending",
-            info.test_suite_name(),
-            info.name()
-        );
+        TIMBER_NOTICE("Test {}.{} ending", info.test_suite_name(), info.name());
     }
 };
 

@@ -3,15 +3,11 @@
 #include <internal/core/preview.hpp>
 
 namespace minty::core {
-    auto generate_audio_preview(
-        bucket& bucket,
-        const fstore::object& object
-    ) -> ext::task<std::optional<UUID::uuid>>;
+    auto generate_audio_preview(bucket& bucket, const fstore::object& object)
+        -> ext::task<std::optional<UUID::uuid>>;
 
-    auto generate_image_preview(
-        bucket& bucket,
-        const fstore::object& object
-    ) -> ext::task<std::optional<UUID::uuid>>;
+    auto generate_image_preview(bucket& bucket, const fstore::object& object)
+        -> ext::task<std::optional<UUID::uuid>>;
 
     auto generate_image_preview(
         bucket& bucket,
@@ -20,8 +16,6 @@ namespace minty::core {
         const void* pixels
     ) -> ext::task<UUID::uuid>;
 
-    auto generate_video_preview(
-        bucket& bucket,
-        const fstore::object& object
-    ) -> ext::task<std::optional<UUID::uuid>>;
+    auto generate_video_preview(bucket& bucket, const fstore::object& object)
+        -> ext::task<std::optional<UUID::uuid>>;
 }

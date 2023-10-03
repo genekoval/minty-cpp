@@ -85,10 +85,8 @@ namespace zipline {
 
     template <io::writer Writer>
     struct encoder<minty::comment_node, Writer> {
-        static auto encode(
-            const minty::comment_node& comment,
-            Writer& writer
-        ) -> ext::task<> {
+        static auto encode(const minty::comment_node& comment, Writer& writer)
+            -> ext::task<> {
             co_await zipline::encode(comment.data, writer);
 
             for (const auto* child : comment.children) {
@@ -99,10 +97,8 @@ namespace zipline {
 
     template <io::writer Writer>
     struct encoder<minty::comment_tree, Writer> {
-        static auto encode(
-            const minty::comment_tree& tree,
-            Writer& writer
-        ) -> ext::task<> {
+        static auto encode(const minty::comment_tree& tree, Writer& writer)
+            -> ext::task<> {
             co_await zipline::encode(tree.total, writer);
 
             for (const auto* root : tree.roots) {

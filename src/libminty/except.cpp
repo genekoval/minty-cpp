@@ -9,9 +9,7 @@ namespace minty {
 
     not_found::not_found(const std::string& what) : runtime_error(what) {}
 
-    auto not_found::http_code() const noexcept -> int {
-        return 404;
-    }
+    auto not_found::http_code() const noexcept -> int { return 404; }
 
     download_error::download_error(
         std::string_view url,
@@ -21,24 +19,20 @@ namespace minty {
         runtime_error(fmt::format("Download failed ({}): {}", status, url)),
         source_url(url),
         code(status),
-        object(object)
-    {}
+        object(object) {}
 
     auto download_error::data() const noexcept -> const object_preview& {
         return object;
     }
 
-    auto download_error::encode(
-        zipline::io::abstract_writer& writer
-    ) const -> ext::task<> {
+    auto download_error::encode(zipline::io::abstract_writer& writer) const
+        -> ext::task<> {
         co_await zipline::encode(source_url, writer);
         co_await zipline::encode(code, writer);
         co_await zipline::encode(object, writer);
     }
 
-    auto download_error::http_code() const noexcept -> int {
-        return code;
-    }
+    auto download_error::http_code() const noexcept -> int { return code; }
 
     auto download_error::url() const noexcept -> std::string_view {
         return source_url;
@@ -53,10 +47,6 @@ namespace zipline {
         const auto status = co_await zipline::decode<std::int64_t>(reader);
         auto object = co_await zipline::decode<minty::object_preview>(reader);
 
-        co_return minty::download_error(
-            url,
-            status,
-            std::move(object)
-        );
+        co_return minty::download_error(url, status, std::move(object));
     }
 }

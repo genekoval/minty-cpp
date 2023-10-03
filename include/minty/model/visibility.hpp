@@ -4,21 +4,18 @@
 #include <zipline/zipline>
 
 namespace minty {
-    enum class visibility : std::int32_t {
-        invalid = -1,
-        draft,
-        pub
-    };
+    enum class visibility : std::int32_t { invalid = -1, draft, pub };
 
     auto to_string(visibility visibility) -> std::string_view;
 
     static_assert(zipline::codable<visibility>);
 
-    NLOHMANN_JSON_SERIALIZE_ENUM(visibility, {
-        {visibility::invalid, nullptr},
-        {visibility::draft, "draft"},
-        {visibility::pub, "public"}
-    })
+    NLOHMANN_JSON_SERIALIZE_ENUM(
+        visibility,
+        {{visibility::invalid, nullptr},
+         {visibility::draft, "draft"},
+         {visibility::pub, "public"}}
+    )
 }
 
 template <>

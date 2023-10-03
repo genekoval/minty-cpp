@@ -14,10 +14,8 @@ TEST_F(DatabasePostObjectTest, DeletePostObjects) {
 
 TEST_F(DatabasePostObjectTest, DeletePostObjectsDateModified) {
     run([&]() -> ext::task<> {
-        const auto date_modified = co_await db->delete_post_objects(
-            post_id,
-            {objects.front()}
-        );
+        const auto date_modified =
+            co_await db->delete_post_objects(post_id, {objects.front()});
 
         const auto post = (co_await db->read_post(post_id)).value();
 

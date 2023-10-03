@@ -1,6 +1,6 @@
-#include "commands.h"
-#include "../options/opts.h"
 #include "../../repo/repo.hpp"
+#include "../options/opts.h"
+#include "commands.h"
 
 using namespace commline;
 
@@ -22,10 +22,7 @@ namespace {
             co_return;
         }
 
-        auto preview(
-            const app& app,
-            std::string_view confpath
-        ) -> void {
+        auto preview(const app& app, std::string_view confpath) -> void {
             const auto settings = minty::conf::initialize(confpath);
             minty::cli::repo(settings, print_errors);
         }
@@ -37,9 +34,7 @@ namespace minty::cli::sub::errors {
         return command(
             __FUNCTION__,
             "Read object preview error messages",
-            options(
-                opts::config(confpath)
-            ),
+            options(opts::config(confpath)),
             arguments(),
             internal::preview
         );

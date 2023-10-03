@@ -14,6 +14,4 @@ auto HttpEnvironment::SetUp() -> void {
     instance = this;
 }
 
-auto HttpEnvironment::TearDown() -> void {
-    instance = nullptr;
-}
+auto HttpEnvironment::TearDown() -> void { instance = nullptr; }

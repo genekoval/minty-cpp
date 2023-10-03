@@ -15,13 +15,10 @@ namespace minty::detail::http {
     repo::repo(std::string_view base_url) : client(base_url) {}
 
     repo::repo(std::string_view base_url, ::http::session& session) :
-        client(base_url, session)
-    {}
+        client(base_url, session) {}
 
-    auto repo::add_comment(
-        const UUID::uuid& post_id,
-        std::string_view content
-    ) const -> request {
+    auto repo::add_comment(const UUID::uuid& post_id, std::string_view content)
+        const -> request {
         auto request = client.post("comments", post_id);
 
         request.text_view(content);
@@ -29,9 +26,8 @@ namespace minty::detail::http {
         return request;
     }
 
-    auto repo::add_object_data(
-        const std::filesystem::path& path
-    ) const -> request {
+    auto repo::add_object_data(const std::filesystem::path& path) const
+        -> request {
         auto request = client.post("object");
 
         request.upload(path);
@@ -39,9 +35,7 @@ namespace minty::detail::http {
         return request;
     }
 
-    auto repo::add_objects_url(
-        std::string_view url
-    ) const -> request {
+    auto repo::add_objects_url(std::string_view url) const -> request {
         auto request = client.post("object", "url");
 
         request.text_view(url);
@@ -60,10 +54,8 @@ namespace minty::detail::http {
         return request;
     }
 
-    auto repo::add_post_tag(
-        const UUID::uuid& post_id,
-        const UUID::uuid& tag_id
-    ) const -> request {
+    auto repo::add_post_tag(const UUID::uuid& post_id, const UUID::uuid& tag_id)
+        const -> request {
         return client.put("post", post_id, "tag", tag_id);
     }
 
@@ -78,17 +70,13 @@ namespace minty::detail::http {
         return client.post("tag", name);
     }
 
-    auto repo::add_tag_alias(
-        const UUID::uuid& tag_id,
-        std::string_view alias
-    ) const -> request {
+    auto repo::add_tag_alias(const UUID::uuid& tag_id, std::string_view alias)
+        const -> request {
         return client.put("tag", tag_id, "name", alias);
     }
 
-    auto repo::add_tag_source(
-        const UUID::uuid& tag_id,
-        std::string_view url
-    ) const -> request {
+    auto repo::add_tag_source(const UUID::uuid& tag_id, std::string_view url)
+        const -> request {
         auto request = client.post("tag", tag_id, "source");
 
         request.text_view(url);
@@ -155,9 +143,7 @@ namespace minty::detail::http {
         return client.get("comment", comment_id);
     }
 
-    auto repo::get_comments(
-        const UUID::uuid& post_id
-    ) const -> request {
+    auto repo::get_comments(const UUID::uuid& post_id) const -> request {
         return client.get("comments", post_id);
     }
 
@@ -169,9 +155,7 @@ namespace minty::detail::http {
         return client.get("post", id);
     }
 
-    auto repo::get_posts(
-        const post_query& query
-    ) const -> request {
+    auto repo::get_posts(const post_query& query) const -> request {
         auto request = client.get("posts");
 
         request.query("size", query.size);
@@ -193,22 +177,16 @@ namespace minty::detail::http {
         return request;
     }
 
-    auto repo::get_server_info() const -> request {
-        return client.get();
-    }
+    auto repo::get_server_info() const -> request { return client.get(); }
 
     auto repo::get_tag(const UUID::uuid& id) const -> request {
         return client.get("tag", id);
     }
 
-    auto repo::get_tags(
-        const tag_query& query
-    ) const -> request {
+    auto repo::get_tags(const tag_query& query) const -> request {
         auto request = client.get("tags");
 
-        request
-            .query("name", query.name)
-            .query("size", query.size);
+        request.query("name", query.name).query("size", query.size);
 
         if (query.from > 0) request.query("from", query.from);
         if (!query.exclude.empty()) {
@@ -230,10 +208,8 @@ namespace minty::detail::http {
         return request;
     }
 
-    auto repo::reply(
-        const UUID::uuid& parent_id,
-        std::string_view content
-    ) const -> request {
+    auto repo::reply(const UUID::uuid& parent_id, std::string_view content)
+        const -> request {
         auto request = client.post("comment", parent_id);
 
         request.text_view(content);
@@ -245,7 +221,7 @@ namespace minty::detail::http {
         const UUID::uuid& comment_id,
         std::string_view content
     ) const -> request {
-        auto request =  client.put("comment", comment_id);
+        auto request = client.put("comment", comment_id);
 
         request.text_view(content);
 
@@ -263,10 +239,8 @@ namespace minty::detail::http {
         return request;
     }
 
-    auto repo::set_post_title(
-        const UUID::uuid& post_id,
-        std::string_view title
-    ) const -> request {
+    auto repo::set_post_title(const UUID::uuid& post_id, std::string_view title)
+        const -> request {
         auto request = client.put("post", post_id, "title");
 
         request.text_view(title);
@@ -285,10 +259,8 @@ namespace minty::detail::http {
         return request;
     }
 
-    auto repo::set_tag_name(
-        const UUID::uuid& tag_id,
-        std::string_view new_name
-    ) const -> request {
+    auto repo::set_tag_name(const UUID::uuid& tag_id, std::string_view new_name)
+        const -> request {
         auto request = client.put("tag", tag_id, "name", new_name);
 
         request.query("main", true);

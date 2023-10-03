@@ -3,13 +3,10 @@
 #include <unordered_map>
 
 namespace minty::core {
-    auto build_tree(
-        std::span<const comment> entities
-    ) -> comment_tree {
+    auto build_tree(std::span<const comment> entities) -> comment_tree {
         auto tree = comment_tree {
             .total = entities.size(),
-            .comments = std::make_unique<comment_node[]>(entities.size())
-        };
+            .comments = std::make_unique<comment_node[]>(entities.size())};
 
         auto map = std::unordered_map<decltype(comment::id), comment_node*>();
 
@@ -18,12 +15,11 @@ namespace minty::core {
         for (auto i = 0UL; i < tree.total; ++i) {
             const auto& entity = entities[i];
 
-            tree.comments[i] = {{
-                entity.id,
-                entity.content,
-                entity.indent,
-                entity.date_created
-            }};
+            tree.comments[i] = {
+                {entity.id,
+                 entity.content,
+                 entity.indent,
+                 entity.date_created}};
 
             auto& comment = tree.comments[i];
             map[comment.data.id] = &comment;

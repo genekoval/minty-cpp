@@ -14,10 +14,7 @@ namespace {
         for (const auto& error : errors) fmt::print("\n{}", error);
     }
 
-    auto reindex(
-        std::string_view label,
-        ext::task<bool> task
-    ) -> ext::task<> {
+    auto reindex(std::string_view label, ext::task<bool> task) -> ext::task<> {
         fmt::print("Reindexing {}...", label);
         fflush(stdout);
 
@@ -27,17 +24,13 @@ namespace {
         fmt::print(fg(color::lime_green), "done\n");
     }
 
-    auto reindex_posts(
-        minty::core::repo& repo,
-        unsigned int batch_size
-    ) -> ext::task<> {
+    auto reindex_posts(minty::core::repo& repo, unsigned int batch_size)
+        -> ext::task<> {
         co_await reindex("posts", repo.reindex_posts(batch_size, on_error));
     }
 
-    auto reindex_tags(
-        minty::core::repo& repo,
-        unsigned int batch_size
-    ) -> ext::task<> {
+    auto reindex_tags(minty::core::repo& repo, unsigned int batch_size)
+        -> ext::task<> {
         co_await reindex("tags", repo.reindex_tags(batch_size, on_error));
     }
 
@@ -94,16 +87,11 @@ namespace minty::cli {
         );
     }
 
-    auto reindex(
-        std::string_view confpath
-    ) -> std::unique_ptr<command_node> {
+    auto reindex(std::string_view confpath) -> std::unique_ptr<command_node> {
         auto cmd = command(
             "reindex",
             "Reindex the search engine",
-            options(
-                batch_size(),
-                opts::config(confpath)
-            ),
+            options(batch_size(), opts::config(confpath)),
             arguments(),
             internal::reindex
         );
@@ -111,10 +99,7 @@ namespace minty::cli {
         cmd->subcommand(command(
             "posts",
             "Reindex posts",
-            options(
-                batch_size(),
-                opts::config(confpath)
-            ),
+            options(batch_size(), opts::config(confpath)),
             arguments(),
             internal::reindex_posts
         ));
@@ -122,10 +107,7 @@ namespace minty::cli {
         cmd->subcommand(command(
             "tags",
             "Reindex tags",
-            options(
-                batch_size(),
-                opts::config(confpath)
-            ),
+            options(batch_size(), opts::config(confpath)),
             arguments(),
             internal::reindex_tags
         ));

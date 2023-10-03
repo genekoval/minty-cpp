@@ -10,8 +10,7 @@ using pg::sqlstate;
 
 namespace minty::core::db {
     connection::connection(ext::pool_item<pg::client>&& client) :
-        client(std::forward<ext::pool_item<pg::client>>(client))
-    {}
+        client(std::forward<ext::pool_item<pg::client>>(client)) {}
 
     auto connection::begin() -> ext::task<pg::transaction> {
         co_return co_await client->begin();
@@ -21,11 +20,8 @@ namespace minty::core::db {
         const UUID::uuid& post_id,
         std::string_view content
     ) -> ext::task<comment> {
-        co_return co_await client->fetch_prepared<comment>(
-            __FUNCTION__,
-            post_id,
-            content
-        );
+        co_return co_await client
+            ->fetch_prepared<comment>(__FUNCTION__, post_id, content);
     }
 
     auto connection::create_object(
@@ -33,12 +29,8 @@ namespace minty::core::db {
         const std::optional<UUID::uuid>& preview_id,
         const std::optional<std::int64_t>& source_id
     ) -> ext::task<> {
-        co_await client->query_prepared(
-            __FUNCTION__,
-            object_id,
-            preview_id,
-            source_id
-        );
+        co_await client
+            ->query_prepared(__FUNCTION__, object_id, preview_id, source_id);
     }
 
     auto connection::create_object_preview_error(
@@ -48,9 +40,8 @@ namespace minty::core::db {
         co_await client->query_prepared(__FUNCTION__, object_id, message);
     }
 
-    auto connection::create_post(
-        const UUID::uuid& post_id
-    ) -> ext::task<time_point> {
+    auto connection::create_post(const UUID::uuid& post_id)
+        -> ext::task<time_point> {
         try {
             co_return co_await client->fetch_prepared<time_point>(
                 __FUNCTION__,
@@ -67,16 +58,16 @@ namespace minty::core::db {
     }
 
     auto connection::create_post_draft() -> ext::task<post_search> {
-        const auto [id, created] = co_await client->fetch_prepared<
-            std::tuple<UUID::uuid, time_point>
-        >(__FUNCTION__);
+        const auto [id, created] =
+            co_await client->fetch_prepared<std::tuple<UUID::uuid, time_point>>(
+                __FUNCTION__
+            );
 
         co_return post_search {
             .id = id,
             .visibility = visibility::draft,
             .created = created,
-            .modified = created
-        };
+            .modified = created};
     }
 
     auto connection::create_post_objects(
@@ -110,11 +101,8 @@ namespace minty::core::db {
         const UUID::uuid& parent_id,
         std::string_view content
     ) -> ext::task<comment> {
-        co_return co_await client->fetch_prepared<comment>(
-            __FUNCTION__,
-            parent_id,
-            content
-        );
+        co_return co_await client
+            ->fetch_prepared<comment>(__FUNCTION__, parent_id, content);
     }
 
     auto connection::create_site(
@@ -122,28 +110,20 @@ namespace minty::core::db {
         std::string_view name,
         std::optional<UUID::uuid> icon
     ) -> ext::task<site> {
-        co_return co_await client->fetch_prepared<site>(
-            __FUNCTION__,
-            scheme,
-            name,
-            icon
-        );
+        co_return co_await client
+            ->fetch_prepared<site>(__FUNCTION__, scheme, name, icon);
     }
 
     auto connection::create_source(
         std::int64_t site_id,
         std::string_view resource
     ) -> ext::task<source> {
-        co_return co_await client->fetch_prepared<source>(
-            __FUNCTION__,
-            site_id,
-            resource
-        );
+        co_return co_await client
+            ->fetch_prepared<source>(__FUNCTION__, site_id, resource);
     }
 
-    auto connection::create_tag(
-        std::string_view name
-    ) -> ext::task<UUID::uuid> {
+    auto connection::create_tag(std::string_view name)
+        -> ext::task<UUID::uuid> {
         co_return co_await client->fetch_prepared<UUID::uuid>(
             __FUNCTION__,
             name
@@ -154,11 +134,8 @@ namespace minty::core::db {
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<tag_name> {
-        co_return co_await client->fetch_prepared<tag_name>(
-            __FUNCTION__,
-            tag_id,
-            alias
-        );
+        co_return co_await client
+            ->fetch_prepared<tag_name>(__FUNCTION__, tag_id, alias);
     }
 
     auto connection::create_tag_source(
@@ -168,9 +145,8 @@ namespace minty::core::db {
         co_await client->query_prepared(__FUNCTION__, tag_id, source_id);
     }
 
-    auto connection::delete_object_preview_error(
-        const UUID::uuid& object_id
-    ) -> ext::task<> {
+    auto connection::delete_object_preview_error(const UUID::uuid& object_id)
+        -> ext::task<> {
         co_await client->query_prepared(__FUNCTION__, object_id);
     }
 
@@ -182,11 +158,8 @@ namespace minty::core::db {
         const UUID::uuid& post_id,
         const std::vector<UUID::uuid>& objects
     ) -> ext::task<time_point> {
-        co_return co_await client->fetch_prepared<time_point>(
-            __FUNCTION__,
-            post_id,
-            objects
-        );
+        co_return co_await client
+            ->fetch_prepared<time_point>(__FUNCTION__, post_id, objects);
     }
 
     auto connection::delete_post_tag(
@@ -211,11 +184,8 @@ namespace minty::core::db {
         const UUID::uuid& tag_id,
         std::string_view alias
     ) -> ext::task<tag_name> {
-        co_return co_await client->fetch_prepared<tag_name>(
-            __FUNCTION__,
-            tag_id,
-            alias
-        );
+        co_return co_await client
+            ->fetch_prepared<tag_name>(__FUNCTION__, tag_id, alias);
     }
 
     auto connection::delete_tag_source(
@@ -230,115 +200,95 @@ namespace minty::core::db {
     }
 
     auto connection::prune_objects() -> ext::task<std::vector<UUID::uuid>> {
-        co_return co_await client->fetch_rows_prepared<UUID::uuid>(
-            __FUNCTION__
+        co_return co_await client->fetch_rows_prepared<UUID::uuid>(__FUNCTION__
         );
     }
 
-    auto connection::read_comment(
-        const UUID::uuid& comment_id
-    ) -> ext::task<std::optional<comment>> {
+    auto connection::read_comment(const UUID::uuid& comment_id)
+        -> ext::task<std::optional<comment>> {
         co_return co_await client->try_fetch_prepared<comment>(
             __FUNCTION__,
             comment_id
         );
     }
 
-    auto connection::read_comments(
-        const UUID::uuid& post_id
-    ) -> ext::task<std::vector<comment>> {
+    auto connection::read_comments(const UUID::uuid& post_id)
+        -> ext::task<std::vector<comment>> {
         co_return co_await client->fetch_rows_prepared<comment>(
             __FUNCTION__,
             post_id
         );
     }
 
-    auto connection::read_object(
-        const UUID::uuid& object_id
-    ) -> ext::task<std::optional<object>> {
+    auto connection::read_object(const UUID::uuid& object_id)
+        -> ext::task<std::optional<object>> {
         co_return co_await client->try_fetch_prepared<object>(
             __FUNCTION__,
             object_id
         );
     }
 
-    auto connection::read_object_posts(
-        const UUID::uuid& object_id
-    ) -> ext::task<std::vector<post_preview>> {
+    auto connection::read_object_posts(const UUID::uuid& object_id)
+        -> ext::task<std::vector<post_preview>> {
         co_return co_await client->fetch_rows_prepared<post_preview>(
             __FUNCTION__,
             object_id
         );
     }
 
-    auto connection::read_object_preview_errors() ->
-        ext::task<std::vector<object_error>>
-    {
+    auto connection::read_object_preview_errors()
+        -> ext::task<std::vector<object_error>> {
         co_return co_await client->fetch_rows_prepared<object_error>(
             __FUNCTION__
         );
     }
 
-    auto connection::read_objects(
-        int batch_size
-    ) -> ext::task<pg::portal<object_preview>> {
-        co_return co_await client->stream_prepared<object_preview>(
-            "",
-            __FUNCTION__,
-            batch_size
-        );
+    auto connection::read_objects(int batch_size)
+        -> ext::task<pg::portal<object_preview>> {
+        co_return co_await client
+            ->stream_prepared<object_preview>("", __FUNCTION__, batch_size);
     }
 
-    auto connection::read_post(
-        const UUID::uuid& post_id
-    ) -> ext::task<std::optional<post>> {
+    auto connection::read_post(const UUID::uuid& post_id)
+        -> ext::task<std::optional<post>> {
         co_return co_await client->try_fetch_prepared<post>(
             __FUNCTION__,
             post_id
         );
     }
 
-    auto connection::read_posts(
-        const std::vector<UUID::uuid>& posts
-    ) -> ext::task<std::vector<post_preview>> {
+    auto connection::read_posts(const std::vector<UUID::uuid>& posts)
+        -> ext::task<std::vector<post_preview>> {
         co_return co_await client->fetch_rows_prepared<post_preview>(
             __FUNCTION__,
             posts
         );
     }
 
-    auto connection::read_post_search(
-        int batch_size
-    ) -> ext::task<pg::portal<post_search>> {
-        co_return co_await client->stream_prepared<post_search>(
-            "",
-            __FUNCTION__,
-            batch_size
-        );
+    auto connection::read_post_search(int batch_size)
+        -> ext::task<pg::portal<post_search>> {
+        co_return co_await client
+            ->stream_prepared<post_search>("", __FUNCTION__, batch_size);
     }
 
-    auto connection::read_post_tags(
-        const UUID::uuid& post_id
-    ) -> ext::task<std::vector<tag_preview>> {
+    auto connection::read_post_tags(const UUID::uuid& post_id)
+        -> ext::task<std::vector<tag_preview>> {
         co_return co_await client->fetch_rows_prepared<tag_preview>(
             __FUNCTION__,
             post_id
         );
     }
 
-    auto connection::read_related_posts(
-        const UUID::uuid& post_id
-    ) -> ext::task<std::vector<post_preview>> {
+    auto connection::read_related_posts(const UUID::uuid& post_id)
+        -> ext::task<std::vector<post_preview>> {
         co_return co_await client->fetch_rows_prepared<post_preview>(
             __FUNCTION__,
             post_id
         );
     }
 
-    auto connection::read_site(
-        std::string_view scheme,
-        std::string_view host
-    ) -> ext::task<std::optional<std::int64_t>> {
+    auto connection::read_site(std::string_view scheme, std::string_view host)
+        -> ext::task<std::optional<std::int64_t>> {
         co_return co_await client->fetch_prepared<std::optional<std::int64_t>>(
             __FUNCTION__,
             scheme,
@@ -346,41 +296,34 @@ namespace minty::core::db {
         );
     }
 
-    auto connection::read_tag(
-        const UUID::uuid& tag_id
-    ) -> ext::task<std::optional<tag>> {
+    auto connection::read_tag(const UUID::uuid& tag_id)
+        -> ext::task<std::optional<tag>> {
         co_return co_await client->try_fetch_prepared<tag>(
-            __FUNCTION__, 
+            __FUNCTION__,
             tag_id
         );
     }
 
-    auto connection::read_tag_previews(
-        const std::vector<UUID::uuid>& tags
-    ) -> ext::task<std::vector<tag_preview>> {
+    auto connection::read_tag_previews(const std::vector<UUID::uuid>& tags)
+        -> ext::task<std::vector<tag_preview>> {
         co_return co_await client->fetch_rows_prepared<tag_preview>(
             __FUNCTION__,
             tags
         );
     }
 
-    auto connection::read_tag_sources(
-        const UUID::uuid& tag_id
-    ) -> ext::task<std::vector<source>> {
+    auto connection::read_tag_sources(const UUID::uuid& tag_id)
+        -> ext::task<std::vector<source>> {
         co_return co_await client->fetch_rows_prepared<source>(
             __FUNCTION__,
             tag_id
         );
     }
 
-    auto connection::read_tag_search(
-        int batch_size
-    ) -> ext::task<pg::portal<tag_search>> {
-        co_return co_await client->stream_prepared<tag_search>(
-            "",
-            __FUNCTION__,
-            batch_size
-        );
+    auto connection::read_tag_search(int batch_size)
+        -> ext::task<pg::portal<tag_search>> {
+        co_return co_await client
+            ->stream_prepared<tag_search>("", __FUNCTION__, batch_size);
     }
 
     auto connection::read_total_objects() -> ext::task<std::size_t> {
@@ -405,22 +348,16 @@ namespace minty::core::db {
         const UUID::uuid& post_id,
         std::string_view description
     ) -> ext::task<post_update> {
-        co_return co_await client->fetch_prepared<post_update>(
-            __FUNCTION__,
-            post_id,
-            description
-        );
+        co_return co_await client
+            ->fetch_prepared<post_update>(__FUNCTION__, post_id, description);
     }
 
     auto connection::update_post_title(
         const UUID::uuid& post_id,
         std::string_view title
     ) -> ext::task<post_update> {
-        co_return co_await client->fetch_prepared<post_update>(
-            __FUNCTION__,
-            post_id,
-            title
-        );
+        co_return co_await client
+            ->fetch_prepared<post_update>(__FUNCTION__, post_id, title);
     }
 
     auto connection::update_tag_description(
@@ -438,10 +375,7 @@ namespace minty::core::db {
         const UUID::uuid& tag_id,
         std::string_view name
     ) -> ext::task<tag_name_update> {
-        co_return co_await client->fetch_prepared<tag_name_update>(
-            __FUNCTION__,
-            tag_id,
-            name
-        );
+        co_return co_await client
+            ->fetch_prepared<tag_name_update>(__FUNCTION__, tag_id, name);
     }
 }

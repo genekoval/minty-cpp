@@ -1,7 +1,6 @@
 #include "database.test.hpp"
 
 TEST_F(DatabasePostTest, CreateRelatedPost) {
-
     run([&]() -> ext::task<> {
         const auto post = co_await create_draft();
         const auto related = co_await create_draft();

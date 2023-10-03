@@ -11,18 +11,12 @@ namespace minty::core::db {
             "create_comment",
             &connection::create_comment
         );
-        co_await client.prepare_fn(
-            "create_object",
-            &connection::create_object
-        );
+        co_await client.prepare_fn("create_object", &connection::create_object);
         co_await client.prepare_fn(
             "create_object_preview_error",
             &connection::create_object_preview_error
         );
-        co_await client.prepare_fn(
-            "create_post",
-            &connection::create_post
-        );
+        co_await client.prepare_fn("create_post", &connection::create_post);
         co_await client.prepare_fn(
             "create_post_draft",
             &connection::create_post_draft
@@ -35,26 +29,14 @@ namespace minty::core::db {
             "create_post_tag",
             &connection::create_post_tag
         );
-        co_await client.prepare_fn(
-            "create_reply",
-            &connection::create_reply
-        );
+        co_await client.prepare_fn("create_reply", &connection::create_reply);
         co_await client.prepare_fn(
             "create_related_post",
             &connection::create_related_post
         );
-        co_await client.prepare_fn(
-            "create_site",
-            &connection::create_site
-        );
-        co_await client.prepare_fn(
-            "create_source",
-            &connection::create_source
-        );
-        co_await client.prepare_fn(
-            "create_tag",
-            &connection::create_tag
-        );
+        co_await client.prepare_fn("create_site", &connection::create_site);
+        co_await client.prepare_fn("create_source", &connection::create_source);
+        co_await client.prepare_fn("create_tag", &connection::create_tag);
         co_await client.prepare_fn(
             "create_tag_alias",
             &connection::create_tag_alias
@@ -67,10 +49,7 @@ namespace minty::core::db {
             "delete_object_preview_error",
             &connection::delete_object_preview_error
         );
-        co_await client.prepare_fn(
-            "delete_post",
-            &connection::delete_post
-        );
+        co_await client.prepare_fn("delete_post", &connection::delete_post);
         co_await client.prepare_fn(
             "delete_post_objects",
             &connection::delete_post_objects
@@ -83,10 +62,7 @@ namespace minty::core::db {
             "delete_related_post",
             &connection::delete_related_post
         );
-        co_await client.prepare_fn(
-            "delete_tag",
-            &connection::delete_tag
-        );
+        co_await client.prepare_fn("delete_tag", &connection::delete_tag);
         co_await client.prepare_fn(
             "delete_tag_alias",
             &connection::delete_tag_alias
@@ -95,26 +71,11 @@ namespace minty::core::db {
             "delete_tag_source",
             &connection::delete_tag_source
         );
-        co_await client.prepare_fn(
-            "prune",
-            &connection::prune
-        );
-        co_await client.prepare_fn(
-            "prune_objects",
-            &connection::prune_objects
-        );
-        co_await client.prepare_fn(
-            "read_comment",
-            &connection::read_comment
-        );
-        co_await client.prepare_fn(
-            "read_comments",
-            &connection::read_comments
-        );
-        co_await client.prepare_fn(
-            "read_object",
-            &connection::read_object
-        );
+        co_await client.prepare_fn("prune", &connection::prune);
+        co_await client.prepare_fn("prune_objects", &connection::prune_objects);
+        co_await client.prepare_fn("read_comment", &connection::read_comment);
+        co_await client.prepare_fn("read_comments", &connection::read_comments);
+        co_await client.prepare_fn("read_object", &connection::read_object);
         co_await client.prepare_fn(
             "read_object_posts",
             &connection::read_object_posts
@@ -124,14 +85,8 @@ namespace minty::core::db {
             &connection::read_object_preview_errors
         );
         co_await client.prepare("read_objects", "SELECT * FROM read_objects()");
-        co_await client.prepare_fn(
-            "read_post",
-            &connection::read_post
-        );
-        co_await client.prepare_fn(
-            "read_posts",
-            &connection::read_posts
-        );
+        co_await client.prepare_fn("read_post", &connection::read_post);
+        co_await client.prepare_fn("read_posts", &connection::read_posts);
         co_await client.prepare(
             "read_post_search",
             "SELECT * FROM read_post_search()"
@@ -144,14 +99,8 @@ namespace minty::core::db {
             "read_related_posts",
             &connection::read_related_posts
         );
-        co_await client.prepare_fn(
-            "read_site",
-            &connection::read_site
-        );
-        co_await client.prepare_fn(
-            "read_tag",
-            &connection::read_tag
-        );
+        co_await client.prepare_fn("read_site", &connection::read_site);
+        co_await client.prepare_fn("read_tag", &connection::read_tag);
         co_await client.prepare_fn(
             "read_tag_previews",
             &connection::read_tag_previews

@@ -10,8 +10,7 @@ namespace minty::core::db {
                 website.host,
                 resource
             ),
-            .icon = website.icon
-        };
+            .icon = website.icon};
     }
 }
 

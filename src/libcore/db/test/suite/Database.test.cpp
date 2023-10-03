@@ -15,10 +15,9 @@ namespace {
 }
 
 auto DatabaseTest::count(std::string_view table) -> ext::task<std::int64_t> {
-    co_return co_await client->fetch<std::int64_t>(fmt::format(
-        "SELECT count(*) FROM data.{}",
-        table
-    ));
+    co_return co_await client->fetch<std::int64_t>(
+        fmt::format("SELECT count(*) FROM data.{}", table)
+    );
 }
 
 auto DatabaseTest::run(ext::task<>&& task) -> void {

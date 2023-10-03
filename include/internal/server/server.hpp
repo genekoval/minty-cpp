@@ -13,8 +13,7 @@ namespace minty::server {
                 socket,
                 std::underlying_type_t<event>,
                 router_context,
-                Routes...
-            >(
+                Routes...>(
                 std::forward<router_context>(context),
                 error_list::codes(),
                 std::forward<Routes>(routes)...
@@ -60,11 +59,8 @@ namespace minty::server {
         );
     }
 
-    using router_type = std::invoke_result_t<
-        decltype(make_router),
-        core::repo&,
-        const server_info&
-    >;
+    using router_type = std::
+        invoke_result_t<decltype(make_router), core::repo&, const server_info&>;
 
     class server_context {
         router_type* router;

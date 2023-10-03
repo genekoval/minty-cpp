@@ -7,10 +7,8 @@
 
 namespace minty::async::detail {
     template <typename Repo>
-    auto add_objects(
-        std::span<const std::string_view> arguments,
-        Repo& repo
-    ) -> ext::task<std::vector<object_preview>> {
+    auto add_objects(std::span<const std::string_view> arguments, Repo& repo)
+        -> ext::task<std::vector<object_preview>> {
         auto result = std::vector<object_preview>();
 
         for (const auto& arg : arguments) {

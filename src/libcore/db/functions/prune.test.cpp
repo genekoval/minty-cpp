@@ -44,7 +44,7 @@ TEST_F(DatabasePruneTest, PrunePostObject) {
 
         co_await db->create_object(object_id, {}, source);
 
-        const auto objects = std::vector<UUID::uuid> { object_id };
+        const auto objects = std::vector<UUID::uuid> {object_id};
         const auto draft = co_await db->create_post_draft();
         co_await db->create_post_objects(draft.id, objects, std::nullopt);
 

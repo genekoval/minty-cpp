@@ -12,12 +12,7 @@ namespace minty {
         std::optional<UUID::uuid> avatar;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tag_preview,
-        id,
-        name,
-        avatar
-    );
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(tag_preview, id, name, avatar);
 }
 
 namespace zipline {

@@ -1,6 +1,6 @@
-#include "commands.h"
 #include "../../repo/repo.hpp"
 #include "../options/opts.h"
+#include "commands.h"
 
 #include <chrono>
 
@@ -33,10 +33,8 @@ namespace {
             );
         }
 
-        auto run_progress_printer(
-            const progress& progress,
-            bool& running
-        ) -> jtask<> {
+        auto run_progress_printer(const progress& progress, bool& running)
+            -> jtask<> {
             while (running) {
                 co_await netcore::sleep_for(refresh_rate);
                 print_progress(progress);
@@ -57,26 +55,26 @@ namespace {
             auto progress = ::progress();
             size_t errors = 0;
 
-            minty::cli::repo(settings, [&](
-                minty::core::repo& repo
-            ) -> ext::task<> {
-                if (!quiet) fmt::print("\n");
+            minty::cli::repo(
+                settings,
+                [&](minty::core::repo& repo) -> ext::task<> {
+                    if (!quiet) fmt::print("\n");
 
-                auto running = true;
-                auto printer = quiet ? jtask() : run_progress_printer(
-                    progress,
-                    running
-                );
+                    auto running = true;
+                    auto printer =
+                        quiet ? jtask()
+                              : run_progress_printer(progress, running);
 
-                errors = co_await repo.regenerate_previews(
-                    batch_size,
-                    jobs,
-                    progress
-                );
+                    errors = co_await repo.regenerate_previews(
+                        batch_size,
+                        jobs,
+                        progress
+                    );
 
-                running = false;
-                if (printer.joinable()) co_await printer;
-            });
+                    running = false;
+                    if (printer.joinable()) co_await printer;
+                }
+            );
 
             if (progress.total == 0) {
                 fmt::print("No objects to process\n");
@@ -104,9 +102,7 @@ namespace {
 }
 
 namespace minty::cli::sub::regen {
-    auto all(
-        std::string_view confpath
-    ) -> std::unique_ptr<command_node> {
+    auto all(std::string_view confpath) -> std::unique_ptr<command_node> {
         return command(
             __FUNCTION__,
             "Regenerate all object previews",

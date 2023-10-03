@@ -11,10 +11,7 @@ namespace minty::core {
     public:
         bucket() = default;
 
-        bucket(
-            fstore::client::pool::item&& connection,
-            const UUID::uuid& id
-        );
+        bucket(fstore::client::pool::item&& connection, const UUID::uuid& id);
 
         bucket(bucket&) = delete;
 
@@ -31,34 +28,24 @@ namespace minty::core {
             std::size_t stream_size,
             const fstore::add_object_fn auto& pipe
         ) -> ext::task<fstore::object> {
-            co_return co_await connection->add_object(
-                id,
-                part_id,
-                stream_size,
-                pipe
-            );
+            co_return co_await connection
+                ->add_object(id, part_id, stream_size, pipe);
         }
 
-        VIRTUAL auto get(
-            const UUID::uuid& object_id
-        ) -> ext::task<fstore::blob>;
+        VIRTUAL auto get(const UUID::uuid& object_id)
+            -> ext::task<fstore::blob>;
 
-        VIRTUAL auto get(
-            const UUID::uuid& object_id,
-            std::byte* buffer
-        ) -> ext::task<>;
+        VIRTUAL auto get(const UUID::uuid& object_id, std::byte* buffer)
+            -> ext::task<>;
 
-        VIRTUAL auto meta(
-            const UUID::uuid& object_id
-        ) -> ext::task<fstore::object>;
+        VIRTUAL auto meta(const UUID::uuid& object_id)
+            -> ext::task<fstore::object>;
 
-        VIRTUAL auto remove(
-            const UUID::uuid& object_id
-        ) -> ext::task<fstore::object>;
+        VIRTUAL auto remove(const UUID::uuid& object_id)
+            -> ext::task<fstore::object>;
 
-        VIRTUAL auto remove(
-            std::span<const UUID::uuid> objects
-        ) -> ext::task<fstore::remove_result>;
+        VIRTUAL auto remove(std::span<const UUID::uuid> objects)
+            -> ext::task<fstore::remove_result>;
     };
 
     class object_store {

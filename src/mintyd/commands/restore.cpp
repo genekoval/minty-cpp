@@ -1,6 +1,6 @@
+#include "../db/db.hpp"
 #include "commands.h"
 #include "options/opts.h"
-#include "../db/db.hpp"
 
 using namespace commline;
 
@@ -15,19 +15,18 @@ namespace {
             auto settings = minty::conf::initialize(confpath);
             if (user) settings.database.connection.parameters["user"] = *user;
 
-            minty::cli::database(settings, [filename](
-                dbtools::postgresql& db
-            ) -> ext::task<> {
-                co_await db.restore(filename);
-            });
+            minty::cli::database(
+                settings,
+                [filename](dbtools::postgresql& db) -> ext::task<> {
+                    co_await db.restore(filename);
+                }
+            );
         }
     }
 }
 
 namespace minty::cli {
-    auto restore(
-        std::string_view confpath
-    ) -> std::unique_ptr<command_node> {
+    auto restore(std::string_view confpath) -> std::unique_ptr<command_node> {
         return command(
             __FUNCTION__,
             "Restore a minty database from an archive",
@@ -39,9 +38,7 @@ namespace minty::cli {
                     "username"
                 )
             ),
-            arguments(
-                required<std::string_view>("filename")
-            ),
+            arguments(required<std::string_view>("filename")),
             internal::restore
         );
     }

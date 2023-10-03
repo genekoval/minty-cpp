@@ -56,9 +56,8 @@ namespace minty::core::db {
             std::string_view message
         ) -> ext::task<>;
 
-        VIRTUAL auto create_post(
-            const UUID::uuid& post_id
-        ) -> ext::task<time_point>;
+        VIRTUAL auto create_post(const UUID::uuid& post_id)
+            -> ext::task<time_point>;
 
         VIRTUAL auto create_post_draft() -> ext::task<post_search>;
 
@@ -106,9 +105,8 @@ namespace minty::core::db {
             std::int64_t source_id
         ) -> ext::task<>;
 
-        VIRTUAL auto delete_object_preview_error(
-            const UUID::uuid& object_id
-        ) -> ext::task<>;
+        VIRTUAL auto delete_object_preview_error(const UUID::uuid& object_id)
+            -> ext::task<>;
 
         VIRTUAL auto delete_post(const UUID::uuid& post_id) -> ext::task<>;
 
@@ -143,69 +141,53 @@ namespace minty::core::db {
 
         VIRTUAL auto prune_objects() -> ext::task<std::vector<UUID::uuid>>;
 
-        VIRTUAL auto read_comment(
-            const UUID::uuid& comment_id
-        ) -> ext::task<std::optional<comment>>;
+        VIRTUAL auto read_comment(const UUID::uuid& comment_id)
+            -> ext::task<std::optional<comment>>;
 
-        VIRTUAL auto read_comments(
-            const UUID::uuid& post_id
-        ) -> ext::task<std::vector<comment>>;
+        VIRTUAL auto read_comments(const UUID::uuid& post_id)
+            -> ext::task<std::vector<comment>>;
 
-        VIRTUAL auto read_object(
-            const UUID::uuid& object_id
-        ) -> ext::task<std::optional<object>>;
+        VIRTUAL auto read_object(const UUID::uuid& object_id)
+            -> ext::task<std::optional<object>>;
 
-        VIRTUAL auto read_object_posts(
-            const UUID::uuid& object_id
-        ) -> ext::task<std::vector<post_preview>>;
+        VIRTUAL auto read_object_posts(const UUID::uuid& object_id)
+            -> ext::task<std::vector<post_preview>>;
 
-        VIRTUAL auto read_object_preview_errors() ->
-            ext::task<std::vector<object_error>>;
+        VIRTUAL auto read_object_preview_errors()
+            -> ext::task<std::vector<object_error>>;
 
-        VIRTUAL auto read_objects(
-            int batch_size
-        ) -> ext::task<pg::portal<object_preview>>;
+        VIRTUAL auto read_objects(int batch_size)
+            -> ext::task<pg::portal<object_preview>>;
 
-        VIRTUAL auto read_post(
-            const UUID::uuid& post_id
-        ) -> ext::task<std::optional<post>>;
+        VIRTUAL auto read_post(const UUID::uuid& post_id)
+            -> ext::task<std::optional<post>>;
 
-        VIRTUAL auto read_posts(
-            const std::vector<UUID::uuid>& posts
-        ) -> ext::task<std::vector<post_preview>>;
+        VIRTUAL auto read_posts(const std::vector<UUID::uuid>& posts)
+            -> ext::task<std::vector<post_preview>>;
 
-        VIRTUAL auto read_post_search(
-            int batch_size
-        ) -> ext::task<pg::portal<post_search>>;
+        VIRTUAL auto read_post_search(int batch_size)
+            -> ext::task<pg::portal<post_search>>;
 
-        VIRTUAL auto read_post_tags(
-            const UUID::uuid& post_id
-        ) -> ext::task<std::vector<tag_preview>>;
+        VIRTUAL auto read_post_tags(const UUID::uuid& post_id)
+            -> ext::task<std::vector<tag_preview>>;
 
-        VIRTUAL auto read_related_posts(
-            const UUID::uuid& post_id
-        ) -> ext::task<std::vector<post_preview>>;
+        VIRTUAL auto read_related_posts(const UUID::uuid& post_id)
+            -> ext::task<std::vector<post_preview>>;
 
-        VIRTUAL auto read_site(
-            std::string_view scheme,
-            std::string_view host
-        ) -> ext::task<std::optional<std::int64_t>>;
+        VIRTUAL auto read_site(std::string_view scheme, std::string_view host)
+            -> ext::task<std::optional<std::int64_t>>;
 
-        VIRTUAL auto read_tag(
-            const UUID::uuid& tag_id
-        ) -> ext::task<std::optional<tag>>;
+        VIRTUAL auto read_tag(const UUID::uuid& tag_id)
+            -> ext::task<std::optional<tag>>;
 
-        VIRTUAL auto read_tag_previews(
-            const std::vector<UUID::uuid>& tags
-        ) -> ext::task<std::vector<tag_preview>>;
+        VIRTUAL auto read_tag_previews(const std::vector<UUID::uuid>& tags)
+            -> ext::task<std::vector<tag_preview>>;
 
-        VIRTUAL auto read_tag_sources(
-            const UUID::uuid& tag_id
-        ) -> ext::task<std::vector<source>>;
+        VIRTUAL auto read_tag_sources(const UUID::uuid& tag_id)
+            -> ext::task<std::vector<source>>;
 
-        VIRTUAL auto read_tag_search(
-            int batch_size
-        ) -> ext::task<pg::portal<tag_search>>;
+        VIRTUAL auto read_tag_search(int batch_size)
+            -> ext::task<pg::portal<tag_search>>;
 
         VIRTUAL auto read_total_objects() -> ext::task<std::size_t>;
 

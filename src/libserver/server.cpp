@@ -8,10 +8,8 @@ using conftools::endpoint;
 using netcore::address_type;
 
 namespace {
-    auto on_error(
-        const endpoint& endpoint,
-        std::exception_ptr exception
-    ) -> void {
+    auto on_error(const endpoint& endpoint, std::exception_ptr exception)
+        -> void {
         try {
             if (exception) std::rethrow_exception(exception);
         }
@@ -24,16 +22,13 @@ namespace {
 namespace minty::server {
     server_context::server_context(router_type& router, seconds timeout) :
         router(&router),
-        timeout(timeout)
-    {}
+        timeout(timeout) {}
 
     auto server_context::close() -> void {}
 
     auto server_context::connection(netcore::socket&& client) -> ext::task<> {
-        auto socket = minty::socket(
-            std::forward<netcore::socket>(client),
-            8_KiB
-        );
+        auto socket =
+            minty::socket(std::forward<netcore::socket>(client), 8_KiB);
         co_await router->route(socket, timeout);
     }
 
@@ -41,10 +36,8 @@ namespace minty::server {
         TIMBER_INFO("Listening for connections on {}", address);
     }
 
-    auto listen(
-        router_type& router,
-        std::span<const endpoint> endpoints
-    ) -> ext::task<server_list> {
+    auto listen(router_type& router, std::span<const endpoint> endpoints)
+        -> ext::task<server_list> {
         using endpoint_ref =
             std::optional<std::reference_wrapper<const netcore::endpoint>>;
 

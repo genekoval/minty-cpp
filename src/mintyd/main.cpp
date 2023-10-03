@@ -1,15 +1,15 @@
-#include "repo/repo.hpp"
 #include "commands/commands.h"
 #include "commands/options/opts.h"
+#include "repo/repo.hpp"
 
 #include <internal/core/preview.hpp>
-#include <internal/server/server.hpp>
 #include <internal/server/http/server.hpp>
+#include <internal/server/server.hpp>
 
-#include <http/http>
 #include <dmon/dmon>
 #include <filesystem>
 #include <fmt/format.h>
+#include <http/http>
 
 namespace fs = std::filesystem;
 
@@ -18,7 +18,7 @@ using minty::server::server_list;
 namespace {
     namespace internal {
         constexpr auto crash_log_level = timber::level::critical;
-        constexpr auto signals = std::array { SIGINT, SIGTERM };
+        constexpr auto signals = std::array {SIGINT, SIGTERM};
 
         const auto default_config = fs::path(CONFDIR) / "minty.yml";
 
@@ -54,59 +54,56 @@ namespace {
             bool daemon,
             std::optional<fs::path> pidfile
         ) -> void {
-            auto startup_timer = timber::timer(
-                "Server started in",
-                timber::level::info
-            );
+            auto startup_timer =
+                timber::timer("Server started in", timber::level::info);
 
             const auto settings = minty::conf::initialize(confpath);
 
-            if (daemon && !dmon::daemonize({
-                .group = settings.daemon.group,
-                .identifier = app.name,
-                .pidfile = pidfile.value_or(default_pidfile(app.name)),
-                .user = settings.daemon.user
-            })) return;
+            if (daemon &&
+                !dmon::daemonize(
+                    {.group = settings.daemon.group,
+                     .identifier = app.name,
+                     .pidfile = pidfile.value_or(default_pidfile(app.name)),
+                     .user = settings.daemon.user}
+                ))
+                return;
 
             TIMBER_NOTICE("{} version {} starting up", app.name, app.version);
 
-            minty::cli::repo(settings, [&](
-                minty::core::repo& repo
-            ) -> ext::task<> {
-                const auto info = minty::server_info {
-                    .version = std::string(app.version),
-                    .object_source = {
-                        .location = settings.fstore.proxy,
-                        .bucket = repo.get_bucket_id()
-                    }
-                };
+            minty::cli::repo(
+                settings,
+                [&](minty::core::repo& repo) -> ext::task<> {
+                    const auto info = minty::server_info {
+                        .version = std::string(app.version),
+                        .object_source = {
+                            .location = settings.fstore.proxy,
+                            .bucket = repo.get_bucket_id()}};
 
-                auto routes = minty::server::http::router(info, repo);
-                auto http = co_await minty::server::http::listen(
-                    routes,
-                    settings.http.cert,
-                    settings.http.key,
-                    settings.http.listen
-                );
+                    auto routes = minty::server::http::router(info, repo);
+                    auto http = co_await minty::server::http::listen(
+                        routes,
+                        settings.http.cert,
+                        settings.http.key,
+                        settings.http.listen
+                    );
 
-                auto router = minty::server::make_router(repo, info);
-                auto servers = co_await minty::server::listen(
-                    router,
-                    settings.server
-                );
+                    auto router = minty::server::make_router(repo, info);
+                    auto servers =
+                        co_await minty::server::listen(router, settings.server);
 
-                startup_timer.stop();
-                auto uptime_timer = timber::timer(
-                    "Server shutting down. Up",
-                    timber::level::notice
-                );
+                    startup_timer.stop();
+                    auto uptime_timer = timber::timer(
+                        "Server shutting down. Up",
+                        timber::level::notice
+                    );
 
-                const auto sigtask = handle_signals(servers, http);
-                co_await servers.join();
-                co_await http.join();
+                    const auto sigtask = handle_signals(servers, http);
+                    co_await servers.join();
+                    co_await http.join();
 
-                uptime_timer.stop();
-            });
+                    uptime_timer.stop();
+                }
+            );
         }
 
         auto handle_error(std::exception_ptr eptr) -> void {
@@ -138,10 +135,7 @@ auto main(int argc, char** argv) -> int {
         DESCRIPTION,
         commline::options(
             minty::cli::opts::config(confpath),
-            commline::flag(
-                {"d", "daemon"},
-                "Run the program as a daemon."
-            ),
+            commline::flag({"d", "daemon"}, "Run the program as a daemon."),
             commline::option<std::optional<fs::path>>(
                 {"p", "pidfile"},
                 "Path to the pidfile",

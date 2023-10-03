@@ -7,6 +7,5 @@ namespace minty {
 
     data_size::data_size(uintmax_t bytes) :
         bytes(bytes),
-        formatted(ext::data_size::format(bytes).str(decimal_places))
-    {}
+        formatted(ext::data_size::format(bytes).str(decimal_places)) {}
 }

@@ -45,10 +45,7 @@ namespace YAML {
         c::required("key", &settings::s_http::key)
     );
 
-    DECODE(
-        settings::s_log,
-        c::optional("level", &settings::s_log::level)
-    );
+    DECODE(settings::s_log, c::optional("level", &settings::s_log::level));
 
     DECODE(
         settings::s_search,

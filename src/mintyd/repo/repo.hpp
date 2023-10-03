@@ -24,10 +24,7 @@ namespace minty::cli {
     requires requires(const F& f, core::repo& repo) {
         { f(repo) } -> std::same_as<ext::task<>>;
     }
-    auto repo(
-        const conf::settings& settings,
-        const F& action
-    ) -> void {
+    auto repo(const conf::settings& settings, const F& action) -> void {
         netcore::run([&]() -> ext::task<> {
             auto container = cli::container(settings);
 

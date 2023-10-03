@@ -15,8 +15,8 @@ class DatabasePostTest : public DatabaseTest {
 protected:
     auto create_draft() -> ext::task<UUID::uuid>;
 
-    auto read_related_posts() ->
-        ext::task<std::vector<minty::test::related_post>>;
+    auto read_related_posts()
+        -> ext::task<std::vector<minty::test::related_post>>;
 
     virtual auto tables() -> std::vector<std::string> override;
 };

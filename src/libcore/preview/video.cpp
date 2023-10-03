@@ -1,5 +1,5 @@
-#include "preview.hpp"
 #include "video/video.hpp"
+#include "preview.hpp"
 
 namespace {
     constexpr auto align = 1;
@@ -32,10 +32,7 @@ namespace {
             align
         );
 
-        auto sws = minty::core::video::sws_context(
-            codec,
-            pixel_format
-        );
+        auto sws = minty::core::video::sws_context(codec, pixel_format);
 
         sws.scale(frame, frame_rgb.data());
 
@@ -49,10 +46,8 @@ namespace {
 }
 
 namespace minty::core {
-    auto generate_video_preview(
-        bucket& bucket,
-        const fstore::object& object
-    ) -> ext::task<std::optional<UUID::uuid>> {
+    auto generate_video_preview(bucket& bucket, const fstore::object& object)
+        -> ext::task<std::optional<UUID::uuid>> {
         auto source = co_await bucket.get(object.id);
 
         auto io = video::io_context(source);

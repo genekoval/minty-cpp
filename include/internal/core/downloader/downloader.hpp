@@ -9,15 +9,11 @@ namespace minty::core {
     class downloader {
         http::session* session = nullptr;
 
-        auto fetch(
-            http::request& request,
-            bucket& bucket
-        ) -> ext::task<std::pair<http::status, fstore::object>>;
+        auto fetch(http::request& request, bucket& bucket)
+            -> ext::task<std::pair<http::status, fstore::object>>;
 
-        auto read(
-            http::request& request,
-            bucket& bucket
-        ) -> ext::jtask<fstore::object>;
+        auto read(http::request& request, bucket& bucket)
+            -> ext::jtask<fstore::object>;
     public:
         downloader() = default;
 
@@ -25,10 +21,8 @@ namespace minty::core {
 
         VIRTUAL_DESTRUCTOR(downloader)
 
-        VIRTUAL auto fetch(
-            std::string_view url,
-            bucket& bucket
-        ) -> ext::task<std::pair<http::status, fstore::object>>;
+        VIRTUAL auto fetch(std::string_view url, bucket& bucket)
+            -> ext::task<std::pair<http::status, fstore::object>>;
 
         VIRTUAL auto get_site_icon(
             std::string_view scheme,

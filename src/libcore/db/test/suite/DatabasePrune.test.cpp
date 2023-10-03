@@ -10,11 +10,5 @@ auto DatabasePruneTest::prune_objects() -> ext::task<std::size_t> {
 }
 
 auto DatabasePruneTest::tables() -> std::vector<std::string> {
-    return {
-        "object",
-        "object_ref",
-        "post",
-        "site",
-        "source"
-    };
+    return {"object", "object_ref", "post", "site", "source"};
 }

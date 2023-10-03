@@ -30,7 +30,8 @@ TEST_F(SearchTagAddTags, Add) {
             const auto end = hits.end();
             const auto contains = std::find(hits.begin(), end, id) != end;
 
-            EXPECT_TRUE(contains) << "result does not contain tag [" << id << "]";
+            EXPECT_TRUE(contains)
+                << "result does not contain tag [" << id << "]";
         }
     }());
 }
@@ -44,10 +45,9 @@ TEST_F(SearchTagAddTags, Errors) {
 
         constexpr auto duplicates = 3;
 
-        errors = co_await search.add_tags(std::span<const tag>(
-            tags.begin(),
-            tags.begin() + duplicates
-        ));
+        errors = co_await search.add_tags(
+            std::span<const tag>(tags.begin(), tags.begin() + duplicates)
+        );
 
         EXPECT_EQ(duplicates, errors.size());
     }());

@@ -17,17 +17,9 @@ namespace minty {
         object_source_type object_source;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        object_source_type,
-        location,
-        bucket
-    );
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(object_source_type, location, bucket);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        server_info,
-        version,
-        object_source
-    );
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(server_info, version, object_source);
 }
 
 namespace zipline {

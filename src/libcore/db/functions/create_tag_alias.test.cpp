@@ -1,11 +1,8 @@
 #include "database.test.hpp"
 
 TEST_F(DatabaseTagTest, CreateTagAliases) {
-    constexpr auto aliases = std::array<std::string_view, 3> {
-        "banana",
-        "citrus",
-        "apple"
-    };
+    constexpr auto aliases =
+        std::array<std::string_view, 3> {"banana", "citrus", "apple"};
 
     run([&]() -> ext::task<> {
         const auto id = co_await create_tag();

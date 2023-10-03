@@ -12,9 +12,5 @@ namespace minty {
 }
 
 namespace zipline {
-    ZIPLINE_OBJECT(
-        minty::range,
-        &minty::range::first,
-        &minty::range::last
-    );
+    ZIPLINE_OBJECT(minty::range, &minty::range::first, &minty::range::last);
 }

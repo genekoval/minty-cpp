@@ -1,7 +1,7 @@
 #include "database.test.hpp"
 
-using minty::core::db::object_preview;
 using minty::time_point;
+using minty::core::db::object_preview;
 
 TEST_F(DatabasePostObjectTest, AppendPostObject) {
     run([&]() -> ext::task<> {
@@ -42,10 +42,8 @@ TEST_F(DatabasePostObjectTest, InsertMultiplePostObjects) {
 
     run([&]() -> ext::task<> {
         co_await db->create_object(additional, {}, {});
-        results = co_await insert_objects(
-            {new_object, additional},
-            objects.at(0)
-        );
+        results =
+            co_await insert_objects({new_object, additional}, objects.at(0));
     }());
 
     ASSERT_EQ(5, results.size());
@@ -79,13 +77,11 @@ TEST_F(DatabasePostObjectTest, InsertDuplicates) {
 
     run([&]() -> ext::task<> {
         results = co_await insert_objects(
-            {
-                objects.at(0),
-                objects.at(2),
-                objects.at(0),
-                objects.at(0),
-                objects.at(2)
-            },
+            {objects.at(0),
+             objects.at(2),
+             objects.at(0),
+             objects.at(0),
+             objects.at(2)},
             std::nullopt
         );
     }());
@@ -100,11 +96,8 @@ TEST_F(DatabasePostObjectTest, InsertDuplicates) {
 TEST_F(DatabasePostObjectTest, AddPostObjectsDateModified) {
     run([&]() -> ext::task<> {
         const auto append_object = [this]() -> ext::task<time_point> {
-            co_return co_await db->create_post_objects(
-                post_id,
-                {new_object},
-                std::nullopt
-            );
+            co_return co_await db
+                ->create_post_objects(post_id, {new_object}, std::nullopt);
         };
 
         const auto post = (co_await db->read_post(post_id)).value();

@@ -2,9 +2,8 @@
 
 namespace minty::cli {
     container::container(const minty::conf::settings& settings) :
-        db_params(pg::parameters::parse(
-            settings.database.connection.parameters
-        )),
+        db_params(pg::parameters::parse(settings.database.connection.parameters)
+        ),
         database(db_params),
         objects(settings.fstore.connection),
         downloader(http),
@@ -14,8 +13,7 @@ namespace minty::cli {
             settings.search.node,
             settings.search.auth
         ),
-        repo(database, objects, downloader, search)
-    {}
+        repo(database, objects, downloader, search) {}
 
     auto container::init(const conf::settings& settings) -> ext::task<> {
         co_await objects.init(settings.fstore.bucket);

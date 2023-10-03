@@ -1,21 +1,17 @@
 #include "preview.hpp"
 
-#include <cstring>
 #include <GraphicsMagick/Magick++.h>
+#include <cstring>
 
 namespace {
     constexpr auto thumbnail_format = "JPEG";
     constexpr auto thumbnail_size = 250;
 
-    const auto thumbnail_geometry = Magick::Geometry(
-        thumbnail_size,
-        thumbnail_size
-    );
+    const auto thumbnail_geometry =
+        Magick::Geometry(thumbnail_size, thumbnail_size);
 
-    auto generate(
-        minty::core::bucket& bucket,
-        Magick::Image&& image
-    ) -> ext::task<UUID::uuid> {
+    auto generate(minty::core::bucket& bucket, Magick::Image&& image)
+        -> ext::task<UUID::uuid> {
         const auto width = image.size().width();
         const auto height = image.size().height();
 
@@ -42,7 +38,6 @@ namespace {
                 crop.xOff(),
                 crop.yOff()
             );
-
 
             image.crop(crop);
         }
@@ -75,19 +70,20 @@ namespace minty::core {
         unsigned int height,
         const void* pixels
     ) -> ext::task<UUID::uuid> {
-        co_return co_await generate(bucket, Magick::Image(
-            width,
-            height,
-            "RGB",
-            MagickLib::StorageType::CharPixel,
-            pixels
-        ));
+        co_return co_await generate(
+            bucket,
+            Magick::Image(
+                width,
+                height,
+                "RGB",
+                MagickLib::StorageType::CharPixel,
+                pixels
+            )
+        );
     }
 
-    auto generate_image_preview(
-        bucket& bucket,
-        const fstore::object& object
-    ) -> ext::task<std::optional<UUID::uuid>> {
+    auto generate_image_preview(bucket& bucket, const fstore::object& object)
+        -> ext::task<std::optional<UUID::uuid>> {
         auto* source = new std::byte[object.size];
         co_await bucket.get(object.id, source);
 

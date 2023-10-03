@@ -16,20 +16,16 @@ namespace minty::core {
     ) :
         config(config),
         search(search),
-        name(fmt::format("{}-{}", ns, name))
-    {}
+        name(fmt::format("{}-{}", ns, name)) {}
 
-    index::operator std::string_view() const noexcept {
-        return name;
-    }
+    index::operator std::string_view() const noexcept { return name; }
 
     auto index::clear() -> ext::task<> {
         co_await search->client
-            .delete_by_query({name}, json({
-                {"query", {
-                    {"match_all", json::object()}
-                }}
-            }).dump())
+            .delete_by_query(
+                {name},
+                json({{"query", {{"match_all", json::object()}}}}).dump()
+            )
             .send();
     }
 

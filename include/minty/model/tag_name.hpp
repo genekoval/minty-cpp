@@ -9,11 +9,7 @@ namespace minty {
         std::vector<std::string> aliases;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tag_name,
-        name,
-        aliases
-    );
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(tag_name, name, aliases);
 }
 
 namespace zipline {

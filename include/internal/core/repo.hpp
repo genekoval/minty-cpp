@@ -13,12 +13,10 @@
 
 namespace minty::core {
     template <typename F>
-    concept index_error_handler = requires(
-        const F& f,
-        std::span<const std::string> errors
-    ) {
-        { f(errors) };
-    };
+    concept index_error_handler =
+        requires(const F& f, std::span<const std::string> errors) {
+            { f(errors) };
+        };
 
     struct progress {
         std::size_t completed = 0;
@@ -49,17 +47,13 @@ namespace minty::core {
             std::string_view host
         ) -> ext::task<std::int64_t>;
 
-        auto add_source(
-            db::connection_type& db,
-            std::string_view url
-        ) -> ext::task<source>;
+        auto add_source(db::connection_type& db, std::string_view url)
+            -> ext::task<source>;
 
         auto download_file(std::string_view url) -> ext::task<object_preview>;
 
-        auto get_posts(
-            bucket& bucket,
-            std::vector<db::post_preview>&& posts
-        ) -> ext::task<std::vector<post_preview>>;
+        auto get_posts(bucket& bucket, std::vector<db::post_preview>&& posts)
+            -> ext::task<std::vector<post_preview>>;
 
         auto regenerate_preview(
             bucket& bucket,
@@ -80,10 +74,9 @@ namespace minty::core {
             unsigned int batch_size,
             const index_error_handler auto& on_error,
             index& index,
-            ext::task<pg::portal<T>> (db::connection_type::* read)(
-                int batch_size
+            ext::task<pg::portal<T>> (db::connection_type::*read)(int batch_size
             ),
-            ext::task<std::vector<std::string>> (search_engine::* write)(
+            ext::task<std::vector<std::string>> (search_engine::*write)(
                 std::span<const T> items
             )
         ) -> ext::task<bool> {
@@ -141,9 +134,8 @@ namespace minty::core {
             co_return co_await add_object(db, bucket, std::move(metadata), {});
         }
 
-        VIRTUAL auto add_objects_url(
-            std::string_view url
-        ) -> ext::task<std::vector<object_preview>>;
+        VIRTUAL auto add_objects_url(std::string_view url)
+            -> ext::task<std::vector<object_preview>>;
 
         VIRTUAL auto add_post_objects(
             const UUID::uuid& post_id,
@@ -215,42 +207,34 @@ namespace minty::core {
 
         VIRTUAL auto get_bucket_id() const noexcept -> const UUID::uuid&;
 
-        VIRTUAL auto get_comment(
-            const UUID::uuid& comment_id
-        ) -> ext::task<std::optional<comment>>;
+        VIRTUAL auto get_comment(const UUID::uuid& comment_id)
+            -> ext::task<std::optional<comment>>;
 
-        VIRTUAL auto get_comments(
-            const UUID::uuid& post_id
-        ) -> ext::task<comment_tree>;
+        VIRTUAL auto get_comments(const UUID::uuid& post_id)
+            -> ext::task<comment_tree>;
 
-        VIRTUAL auto get_object(
-            const UUID::uuid& object_id
-        ) -> ext::task<std::optional<object>>;
+        VIRTUAL auto get_object(const UUID::uuid& object_id)
+            -> ext::task<std::optional<object>>;
 
-        VIRTUAL auto get_object_preview_errors() ->
-            ext::task<std::vector<object_error>>;
+        VIRTUAL auto get_object_preview_errors()
+            -> ext::task<std::vector<object_error>>;
 
-        VIRTUAL auto get_post(
-            const UUID::uuid& id
-        ) -> ext::task<std::optional<post>>;
+        VIRTUAL auto get_post(const UUID::uuid& id)
+            -> ext::task<std::optional<post>>;
 
-        VIRTUAL auto get_posts(
-            const post_query& query
-        ) -> ext::task<search_result<post_preview>>;
+        VIRTUAL auto get_posts(const post_query& query)
+            -> ext::task<search_result<post_preview>>;
 
-        VIRTUAL auto get_tag(
-            const UUID::uuid& id
-        ) -> ext::task<std::optional<tag>>;
+        VIRTUAL auto get_tag(const UUID::uuid& id)
+            -> ext::task<std::optional<tag>>;
 
-        VIRTUAL auto get_tags(
-            const tag_query& query
-        ) -> ext::task<search_result<tag_preview>>;
+        VIRTUAL auto get_tags(const tag_query& query)
+            -> ext::task<search_result<tag_preview>>;
 
         VIRTUAL auto prune() -> ext::task<>;
 
-        VIRTUAL auto regenerate_preview(
-            const UUID::uuid& object_id
-        ) -> ext::task<std::optional<UUID::uuid>>;
+        VIRTUAL auto regenerate_preview(const UUID::uuid& object_id)
+            -> ext::task<std::optional<UUID::uuid>>;
 
         VIRTUAL auto regenerate_previews(
             unsigned int batch_size,

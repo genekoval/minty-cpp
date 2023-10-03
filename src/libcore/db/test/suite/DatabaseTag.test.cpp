@@ -5,8 +5,5 @@ auto DatabaseTagTest::create_tag() -> ext::task<UUID::uuid> {
 }
 
 auto DatabaseTagTest::tables() -> std::vector<std::string> {
-    return {
-        "tag",
-        "site"
-    };
+    return {"tag", "site"};
 }

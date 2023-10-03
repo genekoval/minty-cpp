@@ -7,10 +7,8 @@
 
 namespace minty::sync::detail {
     template <typename Repo>
-    auto add_objects(
-        std::span<const std::string_view> arguments,
-        Repo& repo
-    ) -> std::vector<object_preview> {
+    auto add_objects(std::span<const std::string_view> arguments, Repo& repo)
+        -> std::vector<object_preview> {
         auto result = std::vector<object_preview>();
 
         for (const auto& arg : arguments) {

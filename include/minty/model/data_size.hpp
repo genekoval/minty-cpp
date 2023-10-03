@@ -13,11 +13,7 @@ namespace minty {
         data_size(uintmax_t bytes);
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        data_size,
-        bytes,
-        formatted
-    );
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(data_size, bytes, formatted);
 }
 
 namespace zipline {

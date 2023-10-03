@@ -36,7 +36,6 @@ TEST_F(SearchTagAddAlias, Append) {
 
         auto res = co_await get_tag(tag.id);
         names = res["names"].get<std::vector<std::string>>();
-
     }());
 
     const auto& tag = tag_opt->get();

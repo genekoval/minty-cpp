@@ -5,10 +5,8 @@
 namespace minty::core {
     downloader::downloader(http::session& session) : session(&session) {}
 
-    auto downloader::fetch(
-        http::request& request,
-        bucket& bucket
-    ) -> ext::task<std::pair<http::status, fstore::object>> {
+    auto downloader::fetch(http::request& request, bucket& bucket)
+        -> ext::task<std::pair<http::status, fstore::object>> {
         auto task = read(request, bucket);
 
         const auto response = co_await request.perform(*session);
@@ -16,10 +14,8 @@ namespace minty::core {
         co_return std::make_pair(response.status(), co_await std::move(task));
     }
 
-    auto downloader::fetch(
-        std::string_view url,
-        bucket& bucket
-    ) -> ext::task<std::pair<http::status, fstore::object>> {
+    auto downloader::fetch(std::string_view url, bucket& bucket)
+        -> ext::task<std::pair<http::status, fstore::object>> {
         auto request = http::request();
         request.follow_redirects(true);
         request.url = url;
@@ -54,31 +50,27 @@ namespace minty::core {
                 host,
                 request.method,
                 request.url,
-                status.ok() ?
-                    fmt::format(
-                        "Expected image; received {}",
-                        icon.mime_type()
-                    ) :
-                    fmt::format("Response status {}", status.code)
+                status.ok() ? fmt::format(
+                                  "Expected image; received {}",
+                                  icon.mime_type()
+                              )
+                            : fmt::format("Response status {}", status.code)
             );
         }
 
         co_return std::nullopt;
     }
-    auto downloader::read(
-        http::request& request,
-        bucket& bucket
-    ) -> ext::jtask<fstore::object> {
+
+    auto downloader::read(http::request& request, bucket& bucket)
+        -> ext::jtask<fstore::object> {
         auto stream = request.pipe();
         auto chunk = co_await stream.read();
 
         const auto size = stream.expected_size();
         if (size < 0) throw minty_error("Content length is unknown");
 
-        co_return co_await bucket.add(
-            std::nullopt,
-            size,
-            [&](fstore::part& part) -> ext::task<> {
+        co_return co_await bucket
+            .add(std::nullopt, size, [&](fstore::part& part) -> ext::task<> {
                 auto offset = 0;
                 auto written = 0;
 
@@ -111,10 +103,10 @@ namespace minty::core {
                     chunk = co_await stream.read();
                 }
 
-                if (!chunk.empty()) throw std::runtime_error(
-                    "Response body larger than expected"
-                );
-            }
-        );
+                if (!chunk.empty())
+                    throw std::runtime_error(
+                        "Response body larger than expected"
+                    );
+            });
     }
 }

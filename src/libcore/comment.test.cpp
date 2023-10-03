@@ -14,10 +14,8 @@ protected:
 TEST_F(CoreCommentTest, AddRootComment) {
     constexpr auto content = "First comment.";
 
-    EXPECT_CALL(*db, create_comment(
-        post_id,
-        content)
-    ).WillOnce(Return(ext::make_task(comment { .content = content })));
+    EXPECT_CALL(*db, create_comment(post_id, content))
+        .WillOnce(Return(ext::make_task(comment {.content = content})));
 
     [&]() -> ext::detached_task {
         const auto comment = co_await repo.add_comment(post_id, content);
@@ -46,24 +44,18 @@ TEST_F(CoreCommentTest, ReadCommentChain) {
         c7
     */
 
-    const auto c1 = comment { .id = id1 };
-    const auto c2 = comment { .id = id2, .parent_id = id1 };
-    const auto c3 = comment { .id = id3, .parent_id = id2 };
-    const auto c4 = comment { .id = id4, .parent_id = id1 };
-    const auto c5 = comment { .id = id5 };
-    const auto c6 = comment { .id = id6, .parent_id = id5 };
-    const auto c7 = comment { .id = id7 };
+    const auto c1 = comment {.id = id1};
+    const auto c2 = comment {.id = id2, .parent_id = id1};
+    const auto c3 = comment {.id = id3, .parent_id = id2};
+    const auto c4 = comment {.id = id4, .parent_id = id1};
+    const auto c5 = comment {.id = id5};
+    const auto c6 = comment {.id = id6, .parent_id = id5};
+    const auto c7 = comment {.id = id7};
 
     EXPECT_CALL(*db, read_comments(_))
-        .WillOnce(Return(ext::make_task(std::vector<comment> {
-            c7,
-            c5,
-            c1,
-            c4,
-            c2,
-            c6,
-            c3
-        })));
+        .WillOnce(Return(
+            ext::make_task(std::vector<comment> {c7, c5, c1, c4, c2, c6, c3})
+        ));
 
     auto comments = minty::comment_tree();
 

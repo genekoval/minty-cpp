@@ -8,10 +8,7 @@ using namespace commline;
 
 namespace {
     namespace internal {
-        auto prune(
-            const app& app,
-            std::string_view confpath
-        ) -> void {
+        auto prune(const app& app, std::string_view confpath) -> void {
             const auto settings = minty::conf::initialize(confpath);
 
             minty::cli::repo(
@@ -25,15 +22,11 @@ namespace {
 }
 
 namespace minty::cli {
-    auto prune(
-        std::string_view confpath
-    ) -> std::unique_ptr<command_node> {
+    auto prune(std::string_view confpath) -> std::unique_ptr<command_node> {
         return command(
             "prune",
             "Delete unused data",
-            options(
-                opts::config(confpath)
-            ),
+            options(opts::config(confpath)),
             arguments(),
             internal::prune
         );

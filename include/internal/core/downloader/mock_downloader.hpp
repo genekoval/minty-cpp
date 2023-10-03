@@ -13,10 +13,13 @@ namespace minty::test {
             (override)
         );
 
-        MOCK_METHOD(ext::task<std::optional<UUID::uuid>>, get_site_icon, (
-            std::string_view scheme,
-            std::string_view host,
-            core::bucket& bucket
-        ), (override));
+        MOCK_METHOD(
+            ext::task<std::optional<UUID::uuid>>,
+            get_site_icon,
+            (std::string_view scheme,
+             std::string_view host,
+             core::bucket& bucket),
+            (override)
+        );
     };
 }

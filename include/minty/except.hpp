@@ -15,31 +15,23 @@ namespace minty {
         minty_error(const std::string& what);
 
         template <typename... Args>
-        minty_error(
-            fmt::format_string<Args...> format_string,
-            Args&&... args
-        ) :
-            runtime_error(fmt::format(
-                format_string,
-                std::forward<Args>(args)...
-            ))
-        {}
+        minty_error(fmt::format_string<Args...> format_string, Args&&... args) :
+            runtime_error(
+                fmt::format(format_string, std::forward<Args>(args)...)
+            ) {}
     };
 
     struct invalid_data : minty_error {
         invalid_data(const std::string& what);
-
 
         template <typename... Args>
         invalid_data(
             fmt::format_string<Args...> format_string,
             Args&&... args
         ) :
-            runtime_error(fmt::format(
-                format_string,
-                std::forward<Args>(args)...
-            ))
-        {}
+            runtime_error(
+                fmt::format(format_string, std::forward<Args>(args)...)
+            ) {}
     };
 
     struct not_found : minty_error, http::server::error {
@@ -47,11 +39,9 @@ namespace minty {
 
         template <typename... Args>
         not_found(fmt::format_string<Args...> format_string, Args&&... args) :
-            runtime_error(fmt::format(
-                format_string,
-                std::forward<Args>(args)...
-            ))
-        {}
+            runtime_error(
+                fmt::format(format_string, std::forward<Args>(args)...)
+            ) {}
 
         auto http_code() const noexcept -> int override;
     };
@@ -69,27 +59,22 @@ namespace minty {
 
         auto data() const noexcept -> const object_preview&;
 
-        auto encode(
-            zipline::io::abstract_writer& writer
-        ) const -> ext::task<> override;
+        auto encode(zipline::io::abstract_writer& writer) const
+            -> ext::task<> override;
 
         auto http_code() const noexcept -> int override;
 
         auto url() const noexcept -> std::string_view;
     };
 
-    using error_list = zipline::error_list<
-        invalid_data,
-        not_found,
-        download_error
-    >;
+    using error_list =
+        zipline::error_list<invalid_data, not_found, download_error>;
 }
 
 namespace zipline {
     template <>
     struct decoder<minty::download_error, io::abstract_reader> {
-        static auto decode(
-            io::abstract_reader& reader
-        ) -> ext::task<minty::download_error>;
+        static auto decode(io::abstract_reader& reader)
+            -> ext::task<minty::download_error>;
     };
 }

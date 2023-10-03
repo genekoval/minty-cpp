@@ -12,12 +12,10 @@ namespace {
 
 namespace minty::core::video {
     io_context::io_context(std::span<std::byte> data) :
-        bd {
-            .data = reinterpret_cast<uint8_t*>(data.data()),
+        bd {.data = reinterpret_cast<uint8_t*>(data.data()),
             .remaining = data.size(),
             .size = data.size(),
-            .start = reinterpret_cast<uint8_t*>(data.data())
-        },
+            .start = reinterpret_cast<uint8_t*>(data.data())},
         buffer(allocate_buffer(buffer_size)),
         ctx(avio_alloc_context(
             buffer,
@@ -27,8 +25,7 @@ namespace minty::core::video {
             &read_packet,
             nullptr,
             &seek
-        ))
-    {
+        )) {
         if (!ctx) {
             av_freep(buffer);
             throw std::runtime_error("Failed to allocate IO context");
@@ -40,20 +37,13 @@ namespace minty::core::video {
         avio_context_free(&ctx);
     }
 
-    auto io_context::data() -> AVIOContext* {
-        return ctx;
-    }
+    auto io_context::data() -> AVIOContext* { return ctx; }
 
-    auto io_context::read_packet(
-        void* opaque,
-        uint8_t* buffer,
-        int buffer_size
-    ) -> int {
+    auto io_context::read_packet(void* opaque, uint8_t* buffer, int buffer_size)
+        -> int {
         auto* bd = static_cast<buffer_data*>(opaque);
-        const auto size = std::min(
-            static_cast<std::size_t>(buffer_size),
-            bd->remaining
-        );
+        const auto size =
+            std::min(static_cast<std::size_t>(buffer_size), bd->remaining);
 
         if (!size) return AVERROR_EOF;
 
@@ -64,11 +54,7 @@ namespace minty::core::video {
         return size;
     }
 
-    auto io_context::seek(
-        void* opaque,
-        int64_t offset,
-        int whence
-    ) -> int64_t {
+    auto io_context::seek(void* opaque, int64_t offset, int whence) -> int64_t {
         auto* bd = static_cast<buffer_data*>(opaque);
 
         const auto size = whence & AVSEEK_SIZE;

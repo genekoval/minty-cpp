@@ -30,10 +30,8 @@ protected:
         ASSERT_TRUE(empty);
     }
 
-    auto find(
-        post_query&& query,
-        const std::vector<UUID::uuid>& expected
-    ) -> void {
+    auto find(post_query&& query, const std::vector<UUID::uuid>& expected)
+        -> void {
         find(std::move(query), expected, expected.size());
     }
 
@@ -62,147 +60,60 @@ protected:
 };
 
 TEST_F(SearchPostFind, LimitResults) {
-    find({
-        .size = 3,
-        .sort = {title, asc}
-    }, {
-        c,
-        cpp,
-        java
-    },
-        posts.size()
-    );
+    find({.size = 3, .sort = {title, asc}}, {c, cpp, java}, posts.size());
 }
 
 TEST_F(SearchPostFind, SortCreatedAscending) {
-    find({
-        .sort = {created, asc}
-    }, {
-        c,
-        cpp,
-        java,
-        js,
-        rust
-    });
+    find({.sort = {created, asc}}, {c, cpp, java, js, rust});
 }
 
 TEST_F(SearchPostFind, SortCreatedDescending) {
-    find({
-        .sort = {created, desc}
-    }, {
-        rust,
-        js,
-        java,
-        cpp,
-        c
-    });
+    find({.sort = {created, desc}}, {rust, js, java, cpp, c});
 }
 
 TEST_F(SearchPostFind, SortModifiedAscending) {
-    find({
-        .sort = {modified, asc}
-    }, {
-        c,
-        cpp,
-        js,
-        java,
-        rust
-    });
+    find({.sort = {modified, asc}}, {c, cpp, js, java, rust});
 }
 
 TEST_F(SearchPostFind, SortModifiedDescending) {
-    find({
-        .sort = {modified, desc}
-    }, {
-        rust,
-        java,
-        js,
-        cpp,
-        c
-    });
+    find({.sort = {modified, desc}}, {rust, java, js, cpp, c});
 }
 
-
 TEST_F(SearchPostFind, SortTitleAscending) {
-    find({
-        .sort = {title, asc},
-    }, {
-        c,
-        cpp,
-        java,
-        js,
-        rust
-    });
+    find(
+        {
+            .sort = {title, asc},
+        },
+        {c, cpp, java, js, rust}
+    );
 }
 
 TEST_F(SearchPostFind, SortTitleDescending) {
-    find({
-        .sort = {title, desc},
-    }, {
-        rust,
-        js,
-        java,
-        cpp,
-        c
-    });
+    find(
+        {
+            .sort = {title, desc},
+        },
+        {rust, js, java, cpp, c}
+    );
 }
 
 TEST_F(SearchPostFind, Tag) {
-    find({
-        .tags = {
-            language
-        },
-        .sort = {title, asc}
-    }, {
-        c,
-        cpp,
-        java,
-        js,
-        rust
-    });
+    find({.tags = {language}, .sort = {title, asc}}, {c, cpp, java, js, rust});
 
-    find({
-        .tags = {
-            native
-        },
-        .sort = {title, asc}
-    }, {
-        c,
-        cpp,
-        rust
-    });
+    find({.tags = {native}, .sort = {title, asc}}, {c, cpp, rust});
 }
 
 TEST_F(SearchPostFind, TextDescription) {
-    find({
-        .text = "programming language",
-        .sort = {title, asc}
-    }, {
-        c,
-        cpp,
-        java,
-        js
-    });
+    find(
+        {.text = "programming language", .sort = {title, asc}},
+        {c, cpp, java, js}
+    );
 
-    find({
-        .text = "html"
-    }, {
-        js
-    });
+    find({.text = "html"}, {js});
 }
 
 TEST_F(SearchPostFind, TextTitle) {
-    find({
-        .text = "java"
-    }, {
-        java
-    });
+    find({.text = "java"}, {java});
 
-    find({
-        .text = "c",
-        .sort = {title, asc}
-    }, {
-        c,
-        cpp
-    });
+    find({.text = "c", .sort = {title, asc}}, {c, cpp});
 }

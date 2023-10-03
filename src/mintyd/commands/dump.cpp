@@ -1,6 +1,6 @@
+#include "../db/db.hpp"
 #include "commands.h"
 #include "options/opts.h"
-#include "../db/db.hpp"
 
 using namespace commline;
 
@@ -13,19 +13,18 @@ namespace {
         ) -> void {
             const auto settings = minty::conf::initialize(confpath);
 
-            minty::cli::database(settings, [filename](
-                dbtools::postgresql& db
-            ) -> ext::task<> {
-                co_await db.dump(filename);
-            });
+            minty::cli::database(
+                settings,
+                [filename](dbtools::postgresql& db) -> ext::task<> {
+                    co_await db.dump(filename);
+                }
+            );
         }
     }
 }
 
 namespace minty::cli {
-    auto dump(
-        std::string_view confpath
-    ) -> std::unique_ptr<command_node> {
+    auto dump(std::string_view confpath) -> std::unique_ptr<command_node> {
         return command(
             __FUNCTION__,
             "Create a backup of the database",

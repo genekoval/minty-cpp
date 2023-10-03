@@ -1,8 +1,7 @@
 #include "search.test.hpp"
 
 TEST_F(SearchPostTest, AddPostTag) {
-    auto post_opt =
-        std::optional<std::reference_wrapper<const post>>();
+    auto post_opt = std::optional<std::reference_wrapper<const post>>();
     auto tags = std::vector<UUID::uuid>();
 
     netcore::run([&]() -> ext::task<> {
