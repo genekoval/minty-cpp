@@ -17,7 +17,7 @@
 
 namespace minty::sync::http {
     class repo {
-        const detail::http::repo client;
+        const minty::detail::http::repo client;
         std::variant<std::monostate, std::string, fstore::sync::http::bucket>
             bucket_storage;
 

@@ -15,7 +15,7 @@
 
 namespace minty::async::http {
     class repo {
-        const detail::http::repo client;
+        const minty::detail::http::repo client;
     public:
         repo(std::string_view base_url, ::http::session& session);
 
