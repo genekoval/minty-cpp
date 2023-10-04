@@ -13,6 +13,7 @@ namespace minty::core::db {
         std::optional<std::string> title;
         std::optional<std::string> description;
         std::vector<object_preview> objects;
+        std::int32_t comment_count;
         minty::visibility visibility;
         time_point date_created;
         time_point date_modified;

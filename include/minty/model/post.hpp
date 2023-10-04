@@ -21,6 +21,7 @@ namespace minty {
         std::vector<object_preview> objects;
         std::vector<post_preview> posts;
         std::vector<tag_preview> tags;
+        std::uint32_t comment_count;
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
@@ -33,7 +34,8 @@ namespace minty {
         date_modified,
         objects,
         posts,
-        tags
+        tags,
+        comment_count
     );
 }
 
@@ -48,6 +50,7 @@ namespace zipline {
         &minty::post::date_modified,
         &minty::post::objects,
         &minty::post::posts,
-        &minty::post::tags
+        &minty::post::tags,
+        &minty::post::comment_count
     );
 }

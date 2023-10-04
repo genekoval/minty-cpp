@@ -431,7 +431,8 @@ namespace minty::core {
             .visibility = post->visibility,
             .date_created = post->date_created,
             .date_modified = post->date_modified,
-            .posts = std::move(posts)};
+            .posts = std::move(posts),
+            .comment_count = static_cast<std::uint32_t>(post->comment_count)};
 
         result.tags = co_await db.read_post_tags(id);
 

@@ -88,10 +88,16 @@ SELECT
     title,
     description,
     read_object_previews(objects) AS objects,
+    coalesce(comment_count, 0)::int4 AS comment_count,
     visibility,
     date_created,
     date_modified
-FROM data.post;
+FROM data.post
+LEFT JOIN (
+    SELECT post_id, count(comment_id) AS comment_count
+    FROM data.post_comment
+    GROUP BY post_id
+) comments USING (post_id);
 
 CREATE VIEW post_comment AS
 SELECT
