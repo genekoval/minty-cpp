@@ -1,3 +1,4 @@
+.env
 .test.conf.yaml
 bin
 lib
