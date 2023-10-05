@@ -197,7 +197,7 @@ SELECT
 FROM data.tag_name
 GROUP BY tag_id;
 
-CREATE VIEW tag_view AS
+CREATE VIEW tag AS
 SELECT
     tag_id,
     name,
@@ -845,11 +845,11 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION read_tag(
     a_tag_id        uuid
-) RETURNS SETOF tag_view AS $$
+) RETURNS SETOF tag AS $$
 BEGIN
     RETURN QUERY
     SELECT *
-    FROM tag_view
+    FROM tag
     WHERE tag_id = a_tag_id;
 END;
 $$ LANGUAGE plpgsql;
