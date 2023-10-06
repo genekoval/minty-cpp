@@ -92,9 +92,13 @@ namespace minty::detail::http {
         return client.post("post");
     }
 
-    auto repo::delete_comment_tree(const UUID::uuid& comment_id) const
-        -> request {
-        return client.del("comment", comment_id);
+    auto repo::delete_comment(const UUID::uuid& comment_id, bool recursive)
+        const -> request {
+        auto request = client.del("comment", comment_id);
+
+        if (recursive) request.query("r", recursive);
+
+        return request;
     }
 
     auto repo::delete_post(const UUID::uuid& id) const -> request {

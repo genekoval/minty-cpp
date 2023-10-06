@@ -90,9 +90,10 @@ namespace minty::sync::http {
         return client.create_post_draft().json<UUID::uuid>();
     }
 
-    auto repo::delete_comment_tree(const UUID::uuid& comment_id) -> bool {
+    auto repo::delete_comment(const UUID::uuid& comment_id, bool recursive)
+        -> bool {
         try {
-            client.delete_comment_tree(comment_id).send();
+            client.delete_comment(comment_id, recursive).send();
             return true;
         }
         catch (const ::http::error_code& ex) {

@@ -44,9 +44,14 @@ namespace minty::server::http {
                     }
                 )
                 .del(
-                    [&repo](path<"id", UUID::uuid> comment_id
+                    [&repo](
+                        path<"id", UUID::uuid> comment_id,
+                        query<"r", std::optional<bool>> recursive
                     ) -> ext::task<int> {
-                        co_return co_await repo.delete_comment_tree(comment_id)
+                        co_return co_await repo.delete_comment(
+                            comment_id,
+                            recursive->value_or(false)
+                        )
                             ? 204
                             : 404;
                     }

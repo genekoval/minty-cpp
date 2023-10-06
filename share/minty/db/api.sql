@@ -96,6 +96,7 @@ FROM data.post
 LEFT JOIN (
     SELECT post_id, count(comment_id) AS comment_count
     FROM data.post_comment
+    WHERE content <> ''
     GROUP BY post_id
 ) comments USING (post_id);
 
@@ -234,6 +235,7 @@ LEFT JOIN (
         post_id,
         count(comment_id) comment_count
     FROM data.post_comment
+    WHERE content <> ''
     GROUP BY post_id
 ) comments USING (post_id)
 LEFT JOIN (
@@ -575,10 +577,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION delete_comment_tree(a_comment_id uuid) RETURNS boolean AS $$
+CREATE FUNCTION delete_comment(a_comment_id uuid, recursive boolean)
+RETURNS boolean AS $$
+DECLARE
+    l_parent_id uuid;
+    l_found bool;
 BEGIN
-    DELETE FROM data.post_comment WHERE comment_id = a_comment_id;
-    RETURN FOUND;
+    IF
+        NOT recursive AND
+        EXISTS (SELECT FROM data.post_comment WHERE parent_id = a_comment_id)
+    THEN
+        UPDATE data.post_comment SET content = ''
+        WHERE comment_id = a_comment_id;
+
+        RETURN FOUND;
+    ELSE
+        WITH deleted AS (
+            DELETE FROM data.post_comment WHERE comment_id = a_comment_id
+            RETURNING parent_id
+        ) SELECT INTO l_parent_id parent_id FROM deleted;
+
+        l_found := FOUND;
+
+        PERFORM prune_comments(l_parent_id);
+    END IF;
+
+    RETURN l_found;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -677,6 +701,28 @@ BEGIN
     PERFORM prune_post_objects();
     PERFORM prune_sources();
     PERFORM prune_sites();
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION prune_comments(a_comment_id uuid) RETURNS void AS $$
+BEGIN
+    WHILE
+        a_comment_id IS NOT NULL AND
+        (
+            SELECT length(content)
+            FROM data.post_comment
+            WHERE comment_id = a_comment_id
+        ) = 0 AND
+        NOT EXISTS (
+            SELECT FROM data.post_comment
+            WHERE parent_id = a_comment_id
+        ) LOOP
+        WITH deleted AS (
+            DELETE FROM data.post_comment WHERE comment_id = a_comment_id
+            RETURNING parent_id
+        )
+        SELECT INTO a_comment_id parent_id FROM deleted;
+    END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -176,8 +176,10 @@ namespace minty::core {
 
         VIRTUAL auto create_post_draft() -> ext::task<UUID::uuid>;
 
-        VIRTUAL auto delete_comment_tree(const UUID::uuid& comment_id)
-            -> ext::task<bool>;
+        VIRTUAL auto delete_comment(
+            const UUID::uuid& comment_id,
+            bool recursive
+        ) -> ext::task<bool>;
 
         VIRTUAL auto delete_post(const UUID::uuid& id) -> ext::task<>;
 

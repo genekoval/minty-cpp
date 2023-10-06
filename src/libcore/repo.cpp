@@ -239,13 +239,13 @@ namespace minty::core {
         co_return post.id;
     }
 
-    auto repo::delete_comment_tree(const UUID::uuid& comment_id)
+    auto repo::delete_comment(const UUID::uuid& comment_id, bool recursive)
         -> ext::task<bool> {
         TIMBER_FUNC();
 
         auto db = co_await database->connect();
 
-        co_return co_await db.delete_comment_tree(comment_id);
+        co_return co_await db.delete_comment(comment_id, recursive);
     }
 
     auto repo::delete_post(const UUID::uuid& id) -> ext::task<> {

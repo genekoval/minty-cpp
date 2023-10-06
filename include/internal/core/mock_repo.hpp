@@ -82,8 +82,8 @@ namespace minty::core {
 
         MOCK_METHOD(
             ext::task<bool>,
-            delete_comment_tree,
-            (const UUID::uuid& comment_id),
+            delete_comment,
+            (const UUID::uuid& comment_id, bool recursive),
             (override)
         );
 

@@ -47,7 +47,8 @@ namespace minty::server {
 
         auto create_post_draft() -> ext::task<UUID::uuid>;
 
-        auto delete_comment_tree(UUID::uuid comment_id) -> ext::task<bool>;
+        auto delete_comment(UUID::uuid comment_id, bool recursive)
+            -> ext::task<bool>;
 
         auto delete_post(UUID::uuid post_id) -> ext::task<>;
 

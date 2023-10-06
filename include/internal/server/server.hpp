@@ -36,7 +36,7 @@ namespace minty::server {
             &router_context::add_tag_source,
             &router_context::create_post,
             &router_context::create_post_draft,
-            &router_context::delete_comment_tree,
+            &router_context::delete_comment,
             &router_context::delete_post,
             &router_context::delete_post_objects,
             &router_context::delete_post_tag,
