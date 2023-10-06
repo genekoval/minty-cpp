@@ -93,6 +93,11 @@ namespace minty::core::db {
             return inner->create_tag_source(tag_id, source_id);
         }
 
+        auto delete_comment_tree(const UUID::uuid& comment_id)
+            -> ext::task<bool> {
+            return inner->delete_comment_tree(comment_id);
+        }
+
         auto delete_object_preview_error(const UUID::uuid& object_id)
             -> ext::task<> {
             return inner->delete_object_preview_error(object_id);

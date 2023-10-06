@@ -72,6 +72,18 @@ namespace minty::async::http {
         co_return co_await client.create_post_draft().json_task<UUID::uuid>();
     }
 
+    auto repo::delete_comment_tree(const UUID::uuid& comment_id)
+        -> ext::task<bool> {
+        try {
+            co_await client.delete_comment_tree(comment_id).send_task();
+            co_return true;
+        }
+        catch (const ::http::error_code& ex) {
+            if (ex.code() == 404) co_return false;
+            throw;
+        }
+    }
+
     auto repo::delete_post(const UUID::uuid& id) -> ext::task<> {
         co_await client.delete_post(id).send_task();
     }

@@ -575,6 +575,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION delete_comment_tree(a_comment_id uuid) RETURNS boolean AS $$
+BEGIN
+    DELETE FROM data.post_comment WHERE comment_id = a_comment_id;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION delete_object_preview_error(
     a_object_id     uuid
 ) RETURNS void AS $$

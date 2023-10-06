@@ -61,7 +61,7 @@ CREATE TABLE related_post (
 CREATE TABLE post_comment (
     comment_id      uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     post_id         uuid NOT NULL REFERENCES post ON DELETE CASCADE,
-    parent_id       uuid REFERENCES post_comment ON DELETE NO ACTION,
+    parent_id       uuid REFERENCES post_comment ON DELETE CASCADE,
     indent          smallint NOT NULL DEFAULT 0,
     content         text NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW()

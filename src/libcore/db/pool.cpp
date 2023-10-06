@@ -46,6 +46,10 @@ namespace minty::core::db {
             &connection::create_tag_source
         );
         co_await client.prepare_fn(
+            "delete_comment_tree",
+            &connection::delete_comment_tree
+        );
+        co_await client.prepare_fn(
             "delete_object_preview_error",
             &connection::delete_object_preview_error
         );

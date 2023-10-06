@@ -105,6 +105,9 @@ namespace minty::core::db {
             std::int64_t source_id
         ) -> ext::task<>;
 
+        VIRTUAL auto delete_comment_tree(const UUID::uuid& comment_id)
+            -> ext::task<bool>;
+
         VIRTUAL auto delete_object_preview_error(const UUID::uuid& object_id)
             -> ext::task<>;
 

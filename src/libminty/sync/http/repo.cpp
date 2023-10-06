@@ -90,6 +90,17 @@ namespace minty::sync::http {
         return client.create_post_draft().json<UUID::uuid>();
     }
 
+    auto repo::delete_comment_tree(const UUID::uuid& comment_id) -> bool {
+        try {
+            client.delete_comment_tree(comment_id).send();
+            return true;
+        }
+        catch (const ::http::error_code& ex) {
+            if (ex.code() == 404) return false;
+            throw;
+        }
+    }
+
     auto repo::delete_post(const UUID::uuid& id) -> void {
         client.delete_post(id).send();
     }

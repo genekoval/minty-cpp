@@ -81,6 +81,13 @@ namespace minty::core {
         MOCK_METHOD(ext::task<UUID::uuid>, create_post_draft, (), (override));
 
         MOCK_METHOD(
+            ext::task<bool>,
+            delete_comment_tree,
+            (const UUID::uuid& comment_id),
+            (override)
+        );
+
+        MOCK_METHOD(
             ext::task<>,
             delete_post,
             (const UUID::uuid& id),

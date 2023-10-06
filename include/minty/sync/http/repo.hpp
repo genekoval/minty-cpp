@@ -64,6 +64,8 @@ namespace minty::sync::http {
 
         auto create_post_draft() -> UUID::uuid;
 
+        auto delete_comment_tree(const UUID::uuid& comment_id) -> bool;
+
         auto delete_post(const UUID::uuid& id) -> void;
 
         auto delete_post_objects(

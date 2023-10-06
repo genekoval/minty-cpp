@@ -2,6 +2,7 @@
 
 #include "connection.hpp"
 
+#include "gmock/gmock.h"
 #include <gmock/gmock.h>
 
 namespace minty::core::db {
@@ -106,6 +107,13 @@ namespace minty::core::db {
             ext::task<>,
             create_tag_source,
             (const UUID::uuid& tag_id, std::int64_t source_id),
+            (override)
+        );
+
+        MOCK_METHOD(
+            ext::task<bool>,
+            delete_comment_tree,
+            (const UUID::uuid& comment_id),
             (override)
         );
 

@@ -43,6 +43,14 @@ namespace minty::server::http {
                         );
                     }
                 )
+                .del(
+                    [&repo](path<"id", UUID::uuid> comment_id
+                    ) -> ext::task<int> {
+                        co_return co_await repo.delete_comment_tree(comment_id)
+                            ? 204
+                            : 404;
+                    }
+                )
         );
 
         paths.insert(

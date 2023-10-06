@@ -79,6 +79,11 @@ namespace minty::server {
         co_return co_await repo->create_post_draft();
     }
 
+    auto router_context::delete_comment_tree(UUID::uuid comment_id)
+        -> ext::task<bool> {
+        co_return co_await repo->delete_comment_tree(comment_id);
+    }
+
     auto router_context::delete_post(UUID::uuid post_id) -> ext::task<> {
         co_await repo->delete_post(post_id);
     }

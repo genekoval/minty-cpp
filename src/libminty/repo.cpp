@@ -142,6 +142,14 @@ namespace minty {
         co_return co_await client->send<UUID::uuid>(event::create_post_draft);
     }
 
+    auto repo::delete_comment_tree(const UUID::uuid& comment_id)
+        -> ext::task<bool> {
+        co_return co_await client->send<bool>(
+            event::delete_comment_tree,
+            comment_id
+        );
+    }
+
     auto repo::delete_post(const UUID::uuid& id) -> ext::task<> {
         co_await client->send<void>(event::delete_post, id);
     }

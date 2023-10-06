@@ -48,6 +48,8 @@ namespace minty::detail::http {
 
         auto create_post_draft() const -> request;
 
+        auto delete_comment_tree(const UUID::uuid& comment_id) const -> request;
+
         auto delete_post(const UUID::uuid& id) const -> request;
 
         auto delete_post_objects(

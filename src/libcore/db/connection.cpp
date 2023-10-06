@@ -145,6 +145,14 @@ namespace minty::core::db {
         co_await client->query_prepared(__FUNCTION__, tag_id, source_id);
     }
 
+    auto connection::delete_comment_tree(const UUID::uuid& comment_id)
+        -> ext::task<bool> {
+        co_return co_await client->fetch_prepared<bool>(
+            __FUNCTION__,
+            comment_id
+        );
+    }
+
     auto connection::delete_object_preview_error(const UUID::uuid& object_id)
         -> ext::task<> {
         co_await client->query_prepared(__FUNCTION__, object_id);

@@ -16,6 +16,7 @@ namespace minty {
         add_tag_source,
         create_post,
         create_post_draft,
+        delete_comment_tree,
         delete_post,
         delete_post_objects,
         delete_post_tag,

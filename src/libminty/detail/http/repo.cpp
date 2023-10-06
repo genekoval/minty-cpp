@@ -92,6 +92,11 @@ namespace minty::detail::http {
         return client.post("post");
     }
 
+    auto repo::delete_comment_tree(const UUID::uuid& comment_id) const
+        -> request {
+        return client.del("comment", comment_id);
+    }
+
     auto repo::delete_post(const UUID::uuid& id) const -> request {
         return client.del("post", id);
     }

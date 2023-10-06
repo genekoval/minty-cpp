@@ -73,6 +73,9 @@ namespace minty {
 
         auto create_post_draft() -> ext::task<UUID::uuid>;
 
+        auto delete_comment_tree(const UUID::uuid& comment_id)
+            -> ext::task<bool>;
+
         auto delete_post(const UUID::uuid& id) -> ext::task<>;
 
         auto delete_post_objects(
