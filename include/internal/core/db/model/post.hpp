@@ -10,8 +10,8 @@
 namespace minty::core::db {
     struct post {
         UUID::uuid id;
-        std::optional<std::string> title;
-        std::optional<std::string> description;
+        std::string title;
+        std::string description;
         std::vector<object_preview> objects;
         std::int32_t comment_count;
         minty::visibility visibility;

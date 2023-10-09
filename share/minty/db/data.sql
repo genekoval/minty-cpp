@@ -35,8 +35,8 @@ CREATE TABLE object_preview_error (
 
 CREATE TABLE post (
     post_id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    title           text,
-    description     text,
+    title           text NOT NULL DEFAULT '',
+    description     text NOT NULL DEFAULT '',
     objects         uuid[] NOT NULL DEFAULT '{}',
     visibility      visibility NOT NULL,
     date_created    timestamptz NOT NULL DEFAULT NOW(),
@@ -69,7 +69,7 @@ CREATE TABLE post_comment (
 
 CREATE TABLE tag (
     tag_id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    description     text,
+    description     text NOT NULL DEFAULT '',
     avatar          uuid REFERENCES object_ref ON DELETE NO ACTION,
     banner          uuid REFERENCES object_ref ON DELETE NO ACTION,
     date_created    timestamptz NOT NULL DEFAULT NOW()

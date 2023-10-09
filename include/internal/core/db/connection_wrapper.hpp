@@ -249,21 +249,21 @@ namespace minty::core::db {
         auto update_post_description(
             const UUID::uuid& post_id,
             std::string_view description
-        ) -> ext::task<post_update> {
+        ) -> ext::task<std::optional<time_point>> {
             return inner->update_post_description(post_id, description);
         }
 
         auto update_post_title(
             const UUID::uuid& post_id,
             std::string_view title
-        ) -> ext::task<post_update> {
+        ) -> ext::task<std::optional<time_point>> {
             return inner->update_post_title(post_id, title);
         }
 
         auto update_tag_description(
             const UUID::uuid& tag_id,
             std::string_view description
-        ) -> ext::task<std::optional<std::string>> {
+        ) -> ext::task<bool> {
             return inner->update_tag_description(tag_id, description);
         }
 

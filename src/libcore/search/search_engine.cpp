@@ -311,29 +311,32 @@ namespace minty::core {
             .send();
     }
 
-    auto search_engine::update_post_description(const db::post_update& post)
-        -> ext::task<> {
+    auto search_engine::update_post_description(
+        const UUID::uuid& post_id,
+        std::string_view description,
+        time_point modified
+    ) -> ext::task<> {
         co_await client
             .update_doc(
                 post_index,
-                post.id,
+                post_id,
                 json({{"doc",
-                       {{"description", post.new_data},
-                        {"modified", post.date_modified}}}}
+                       {{"description", description}, {"modified", modified}}}}
                 ).dump()
             )
             .send();
     }
 
-    auto search_engine::update_post_title(const db::post_update& post)
-        -> ext::task<> {
+    auto search_engine::update_post_title(
+        const UUID::uuid& post_id,
+        std::string_view title,
+        time_point modified
+    ) -> ext::task<> {
         co_await client
             .update_doc(
                 post_index,
-                post.id,
-                json({{"doc",
-                       {{"title", post.new_data},
-                        {"modified", post.date_modified}}}}
+                post_id,
+                json({{"doc", {{"title", title}, {"modified", modified}}}}
                 ).dump()
             )
             .send();

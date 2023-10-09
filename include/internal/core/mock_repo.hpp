@@ -223,14 +223,14 @@ namespace minty::core {
         );
 
         MOCK_METHOD(
-            ext::task<modification<std::optional<std::string>>>,
+            ext::task<std::optional<modification<std::string>>>,
             set_post_description,
             (const UUID::uuid& post_id, std::string_view description),
             (override)
         );
 
         MOCK_METHOD(
-            ext::task<modification<std::optional<std::string>>>,
+            ext::task<std::optional<modification<std::string>>>,
             set_post_title,
             (const UUID::uuid& post_id, std::string_view title),
             (override)

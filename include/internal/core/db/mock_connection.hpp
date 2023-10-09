@@ -312,21 +312,21 @@ namespace minty::core::db {
         );
 
         MOCK_METHOD(
-            ext::task<post_update>,
+            ext::task<std::optional<time_point>>,
             update_post_description,
             (const UUID::uuid& post_id, std::string_view description),
             (override)
         );
 
         MOCK_METHOD(
-            ext::task<post_update>,
+            ext::task<std::optional<time_point>>,
             update_post_title,
             (const UUID::uuid& post_id, std::string_view title),
             (override)
         );
 
         MOCK_METHOD(
-            ext::task<std::optional<std::string>>,
+            ext::task<bool>,
             update_tag_description,
             (const UUID::uuid& tag_id, std::string_view description),
             (override)

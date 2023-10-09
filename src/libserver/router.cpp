@@ -172,12 +172,12 @@ namespace minty::server {
     auto router_context::set_post_description(
         UUID::uuid post_id,
         std::string description
-    ) -> ext::task<modification<std::optional<std::string>>> {
+    ) -> ext::task<std::optional<modification<std::string>>> {
         co_return co_await repo->set_post_description(post_id, description);
     }
 
     auto router_context::set_post_title(UUID::uuid post_id, std::string title)
-        -> ext::task<modification<std::optional<std::string>>> {
+        -> ext::task<std::optional<modification<std::string>>> {
         co_return co_await repo->set_post_title(post_id, title);
     }
 

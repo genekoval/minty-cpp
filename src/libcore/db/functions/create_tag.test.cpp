@@ -8,7 +8,7 @@ TEST_F(DatabaseTagTest, CreateTag) {
         EXPECT_EQ(id, tag.id);
         EXPECT_EQ(tag_name, tag.name);
         EXPECT_TRUE(tag.aliases.empty());
-        EXPECT_FALSE(tag.description);
+        EXPECT_TRUE(tag.description.empty());
         EXPECT_FALSE(tag.avatar);
         EXPECT_FALSE(tag.banner);
     }());

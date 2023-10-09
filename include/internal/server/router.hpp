@@ -94,10 +94,10 @@ namespace minty::server {
             -> ext::task<std::string>;
 
         auto set_post_description(UUID::uuid post_id, std::string description)
-            -> ext::task<modification<std::optional<std::string>>>;
+            -> ext::task<std::optional<modification<std::string>>>;
 
         auto set_post_title(UUID::uuid post_id, std::string title)
-            -> ext::task<modification<std::optional<std::string>>>;
+            -> ext::task<std::optional<modification<std::string>>>;
 
         auto set_tag_description(UUID::uuid tag_id, std::string description)
             -> ext::task<std::optional<std::string>>;

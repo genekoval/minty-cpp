@@ -5,12 +5,6 @@ CREATE TYPE object_preview AS (
     preview_id      uuid
 );
 
-CREATE TYPE post_update AS (
-    post_id         uuid,
-    new_data        text,
-    date_modified   timestamptz
-);
-
 CREATE TYPE tag_name AS (
     name            text,
     aliases         text[]
@@ -1003,55 +997,48 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION update_post_description(
-    a_post_id       uuid,
-    a_description   text
-) RETURNS SETOF post_update AS $$
-BEGIN
-    RETURN QUERY
-    UPDATE data.post
-    SET description = nullif(a_description, '')
-    WHERE post_id = a_post_id
-    RETURNING
-        post_id,
-        description as new_data,
-        date_modified;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION update_post_title(
-    a_post_id       uuid,
-    a_title         text
-) RETURNS SETOF post_update AS $$
-BEGIN
-    RETURN QUERY
-    UPDATE data.post
-    SET title = nullif(a_title, '')
-    WHERE post_id = a_post_id
-    RETURNING
-        post_id,
-        title as new_data,
-        date_modified;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE FUNCTION update_tag_description(
-    a_tag_id        uuid,
-    a_description   text
-) RETURNS text AS $$
-DECLARE
-    result          text;
+CREATE FUNCTION update_post_description(a_post_id uuid, a_description text)
+RETURNS timestamptz AS $$
+DECLARE result timestamptz;
 BEGIN
     WITH updated AS (
-        UPDATE data.tag
-        SET description = nullif(a_description, '')
-        WHERE tag_id = a_tag_id
-        RETURNING description
+        UPDATE data.post
+        SET description = a_description
+        WHERE post_id = a_post_id
+        RETURNING date_modified
     )
-    SELECT INTO result description
+    SELECT INTO result date_modified
     FROM updated;
 
     RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION update_post_title(a_post_id uuid, a_title text)
+RETURNS timestamptz AS $$
+DECLARE result timestamptz;
+BEGIN
+    WITH updated AS (
+        UPDATE data.post
+        SET title = a_title
+        WHERE post_id = a_post_id
+        RETURNING date_modified
+    )
+    SELECT INTO result date_modified
+    FROM updated;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION update_tag_description(a_tag_id uuid, a_description text)
+RETURNS boolean AS $$
+BEGIN
+    UPDATE data.tag
+    SET description = a_description
+    WHERE tag_id = a_tag_id;
+
+    RETURN FOUND;
 END;
 $$ LANGUAGE plpgsql;
 

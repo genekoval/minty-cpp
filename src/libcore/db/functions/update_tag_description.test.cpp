@@ -7,26 +7,16 @@ TEST_F(DatabaseTagTest, UpdateTagDescription) {
         const auto id = co_await create_tag();
         auto tag = (co_await db->read_tag(id)).value();
 
-        const auto desc = co_await db->update_tag_description(id, description);
-        EXPECT_TRUE(desc.has_value());
-        EXPECT_EQ(description, desc.value());
+        EXPECT_TRUE(co_await db->update_tag_description(id, description));
 
         tag = (co_await db->read_tag(id)).value();
-        EXPECT_TRUE(tag.description.has_value());
-        EXPECT_EQ(description, tag.description.value());
+        EXPECT_EQ(description, tag.description);
     }());
 }
 
-TEST_F(DatabaseTagTest, UpdateTagDescriptionEmpty) {
-    constexpr auto description = "";
-
+TEST_F(DatabaseTagTest, UpdateTagDescriptionNotFound) {
     run([&]() -> ext::task<> {
-        const auto id = co_await create_tag();
-
-        const auto desc = co_await db->update_tag_description(id, description);
-        EXPECT_FALSE(desc.has_value());
-
-        const auto tag = (co_await db->read_tag(id)).value();
-        EXPECT_FALSE(tag.description.has_value());
+        const auto id = UUID::generate();
+        EXPECT_FALSE(co_await db->update_tag_description(id, ""));
     }());
 }

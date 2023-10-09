@@ -355,28 +355,31 @@ namespace minty::core::db {
     auto connection::update_post_description(
         const UUID::uuid& post_id,
         std::string_view description
-    ) -> ext::task<post_update> {
-        co_return co_await client
-            ->fetch_prepared<post_update>(__FUNCTION__, post_id, description);
+    ) -> ext::task<std::optional<time_point>> {
+        co_return co_await client->fetch_prepared<std::optional<time_point>>(
+            __FUNCTION__,
+            post_id,
+            description
+        );
     }
 
     auto connection::update_post_title(
         const UUID::uuid& post_id,
         std::string_view title
-    ) -> ext::task<post_update> {
-        co_return co_await client
-            ->fetch_prepared<post_update>(__FUNCTION__, post_id, title);
+    ) -> ext::task<std::optional<time_point>> {
+        co_return co_await client->fetch_prepared<std::optional<time_point>>(
+            __FUNCTION__,
+            post_id,
+            title
+        );
     }
 
     auto connection::update_tag_description(
         const UUID::uuid& tag_id,
         std::string_view description
-    ) -> ext::task<std::optional<std::string>> {
-        co_return co_await client->fetch_prepared<std::optional<std::string>>(
-            __FUNCTION__,
-            tag_id,
-            description
-        );
+    ) -> ext::task<bool> {
+        co_return co_await client
+            ->fetch_prepared<bool>(__FUNCTION__, tag_id, description);
     }
 
     auto connection::update_tag_name(

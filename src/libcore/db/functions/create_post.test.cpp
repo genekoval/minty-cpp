@@ -9,22 +9,23 @@ TEST_F(DatabasePostTest, CreatePost) {
         const auto draft = co_await db->create_post_draft();
         const auto& id = draft.id;
 
-        const auto update = co_await db->update_post_title(id, title);
+        const auto modified =
+            (co_await db->update_post_title(id, title)).value();
         const auto published = co_await db->create_post(id);
 
         const auto post = (co_await db->read_post(id)).value();
 
         EXPECT_EQ(id, post.id);
 
-        EXPECT_EQ(title, post.title.value());
-        EXPECT_FALSE(post.description);
+        EXPECT_EQ(title, post.title);
+        EXPECT_TRUE(post.description.empty());
 
         EXPECT_EQ(minty::visibility::pub, post.visibility);
 
         EXPECT_EQ(post.date_created, post.date_modified);
         EXPECT_EQ(published, post.date_created);
         EXPECT_TRUE(draft.created < post.date_created);
-        EXPECT_TRUE(update.date_modified < post.date_modified);
+        EXPECT_TRUE(modified < post.date_modified);
     }());
 }
 

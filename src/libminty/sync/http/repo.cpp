@@ -222,15 +222,15 @@ namespace minty::sync::http {
     auto repo::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
-    ) -> modification<std::optional<std::string>> {
+    ) -> std::optional<modification<std::string>> {
         return client.set_post_description(post_id, description)
-            .json<modification<std::optional<std::string>>>();
+            .try_json<modification<std::string>>();
     }
 
     auto repo::set_post_title(const UUID::uuid& post_id, std::string_view title)
-        -> modification<std::optional<std::string>> {
+        -> std::optional<modification<std::string>> {
         return client.set_post_title(post_id, title)
-            .json<modification<std::optional<std::string>>>();
+            .try_json<modification<std::string>>();
     }
 
     auto repo::set_tag_description(
@@ -238,7 +238,7 @@ namespace minty::sync::http {
         std::string_view description
     ) -> std::optional<std::string> {
         return client.set_tag_description(tag_id, description)
-            .json<std::optional<std::string>>();
+            .try_json<std::string>();
     }
 
     auto repo::set_tag_name(const UUID::uuid& tag_id, std::string_view new_name)

@@ -13,8 +13,8 @@
 namespace minty {
     struct post {
         UUID::uuid id;
-        std::optional<std::string> title;
-        std::optional<std::string> description;
+        std::string title;
+        std::string description;
         minty::visibility visibility;
         time_point date_created;
         time_point date_modified;

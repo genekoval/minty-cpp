@@ -3,7 +3,6 @@
 #include "index.hpp"
 
 #include <internal/core/db/model/post_search.hpp>
-#include <internal/core/db/model/post_update.hpp>
 #include <internal/core/db/model/tag_search.hpp>
 #include <internal/test.hpp>
 #include <minty/model/post_query.hpp>
@@ -96,11 +95,17 @@ namespace minty::core {
             time_point date_modified
         ) -> ext::task<>;
 
-        VIRTUAL auto update_post_description(const db::post_update& post)
-            -> ext::task<>;
+        VIRTUAL auto update_post_description(
+            const UUID::uuid& post_id,
+            std::string_view description,
+            time_point modified
+        ) -> ext::task<>;
 
-        VIRTUAL auto update_post_title(const db::post_update& post)
-            -> ext::task<>;
+        VIRTUAL auto update_post_title(
+            const UUID::uuid& post_id,
+            std::string_view title,
+            time_point modified
+        ) -> ext::task<>;
 
         VIRTUAL auto update_tag_name(
             const UUID::uuid& tag_id,

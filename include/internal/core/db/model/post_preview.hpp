@@ -7,7 +7,7 @@
 namespace minty::core::db {
     struct post_preview {
         UUID::uuid id;
-        std::optional<std::string> title;
+        std::string title;
         std::optional<object_preview> preview;
         std::int32_t comment_count;
         std::int32_t object_count;

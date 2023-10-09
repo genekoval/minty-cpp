@@ -124,10 +124,10 @@ namespace minty::async::http {
         auto set_post_description(
             const UUID::uuid& post_id,
             std::string_view description
-        ) -> ext::task<modification<std::optional<std::string>>>;
+        ) -> ext::task<std::optional<modification<std::string>>>;
 
         auto set_post_title(const UUID::uuid& post_id, std::string_view title)
-            -> ext::task<modification<std::optional<std::string>>>;
+            -> ext::task<std::optional<modification<std::string>>>;
 
         auto set_tag_description(
             const UUID::uuid& tag_id,

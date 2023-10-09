@@ -9,7 +9,7 @@ namespace minty::core::db {
         UUID::uuid id;
         std::string name;
         std::vector<std::string> aliases;
-        std::optional<std::string> description;
+        std::string description;
         std::optional<UUID::uuid> avatar;
         std::optional<UUID::uuid> banner;
         std::int32_t post_count;

@@ -8,7 +8,6 @@
 #include <internal/core/db/model/post.hpp>
 #include <internal/core/db/model/post_preview.hpp>
 #include <internal/core/db/model/post_search.hpp>
-#include <internal/core/db/model/post_update.hpp>
 #include <internal/core/db/model/site.hpp>
 #include <internal/core/db/model/source.hpp>
 #include <internal/core/db/model/tag.hpp>
@@ -209,17 +208,17 @@ namespace minty::core::db {
         VIRTUAL auto update_post_description(
             const UUID::uuid& post_id,
             std::string_view description
-        ) -> ext::task<post_update>;
+        ) -> ext::task<std::optional<time_point>>;
 
         VIRTUAL auto update_post_title(
             const UUID::uuid& post_id,
             std::string_view title
-        ) -> ext::task<post_update>;
+        ) -> ext::task<std::optional<time_point>>;
 
         VIRTUAL auto update_tag_description(
             const UUID::uuid& tag_id,
             std::string_view description
-        ) -> ext::task<std::optional<std::string>>;
+        ) -> ext::task<bool>;
 
         VIRTUAL auto update_tag_name(
             const UUID::uuid& tag_id,

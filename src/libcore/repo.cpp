@@ -715,39 +715,44 @@ namespace minty::core {
     auto repo::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
-    ) -> ext::task<modification<std::optional<std::string>>> {
+    ) -> ext::task<std::optional<modification<std::string>>> {
         TIMBER_FUNC();
+
+        auto formatted = format_description(description);
 
         auto db = co_await database->connect();
         auto tx = co_await db.begin();
 
-        const auto update = co_await db.update_post_description(
-            post_id,
-            format_description(description)
-        );
-        co_await search->update_post_description(update);
+        const auto modified =
+            co_await db.update_post_description(post_id, formatted);
+        if (!modified) co_return std::nullopt;
+
+        co_await search->update_post_description(post_id, formatted, *modified);
 
         co_await tx.commit();
-        co_return modification<std::optional<std::string>> {
-            .date_modified = update.date_modified,
-            .new_value = update.new_data};
+        co_return modification<std::string> {
+            .date_modified = *modified,
+            .new_value = std::move(formatted)};
     }
 
     auto repo::set_post_title(const UUID::uuid& post_id, std::string_view title)
-        -> ext::task<modification<std::optional<std::string>>> {
+        -> ext::task<std::optional<modification<std::string>>> {
         TIMBER_FUNC();
+
+        auto formatted = format_title(title);
 
         auto db = co_await database->connect();
         auto tx = co_await db.begin();
 
-        const auto update =
-            co_await db.update_post_title(post_id, format_title(title));
-        co_await search->update_post_title(update);
+        const auto modified = co_await db.update_post_title(post_id, formatted);
+        if (!modified) co_return std::nullopt;
+
+        co_await search->update_post_title(post_id, formatted, *modified);
 
         co_await tx.commit();
-        co_return modification<std::optional<std::string>> {
-            .date_modified = update.date_modified,
-            .new_value = update.new_data};
+        co_return modification<std::string> {
+            .date_modified = *modified,
+            .new_value = std::move(formatted)};
     }
 
     auto repo::set_tag_description(
@@ -756,12 +761,14 @@ namespace minty::core {
     ) -> ext::task<std::optional<std::string>> {
         TIMBER_FUNC();
 
+        auto formatted = format_description(description);
+
         auto db = co_await database->connect();
 
-        co_return co_await db.update_tag_description(
-            tag_id,
-            format_description(description)
-        );
+        const auto found =
+            co_await db.update_tag_description(tag_id, formatted);
+
+        co_return found ? std::optional(std::move(formatted)) : std::nullopt;
     }
 
     auto repo::set_tag_name(const UUID::uuid& tag_id, std::string_view new_name)

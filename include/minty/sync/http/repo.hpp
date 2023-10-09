@@ -138,10 +138,10 @@ namespace minty::sync::http {
         auto set_post_description(
             const UUID::uuid& post_id,
             std::string_view description
-        ) -> modification<std::optional<std::string>>;
+        ) -> std::optional<modification<std::string>>;
 
         auto set_post_title(const UUID::uuid& post_id, std::string_view title)
-            -> modification<std::optional<std::string>>;
+            -> std::optional<modification<std::string>>;
 
         auto set_tag_description(
             const UUID::uuid& tag_id,

@@ -263,9 +263,9 @@ namespace minty {
     auto repo::set_post_description(
         const UUID::uuid& post_id,
         std::string_view description
-    ) -> ext::task<modification<std::optional<std::string>>> {
+    ) -> ext::task<std::optional<modification<std::string>>> {
         co_return co_await client
-            ->send<modification<std::optional<std::string>>>(
+            ->send<std::optional<modification<std::string>>>(
                 event::set_post_description,
                 post_id,
                 description
@@ -273,9 +273,9 @@ namespace minty {
     }
 
     auto repo::set_post_title(const UUID::uuid& post_id, std::string_view title)
-        -> ext::task<modification<std::optional<std::string>>> {
+        -> ext::task<std::optional<modification<std::string>>> {
         co_return co_await client
-            ->send<modification<std::optional<std::string>>>(
+            ->send<std::optional<modification<std::string>>>(
                 event::set_post_title,
                 post_id,
                 title

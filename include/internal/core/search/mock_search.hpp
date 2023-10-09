@@ -104,14 +104,18 @@ namespace minty::test {
         MOCK_METHOD(
             ext::task<>,
             update_post_description,
-            (const core::db::post_update& post),
+            (const UUID::uuid& post_id,
+             std::string_view description,
+             time_point modified),
             (override)
         );
 
         MOCK_METHOD(
             ext::task<>,
             update_post_title,
-            (const core::db::post_update& post),
+            (const UUID::uuid& post_id,
+             std::string_view title,
+             time_point modified),
             (override)
         );
 
