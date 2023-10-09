@@ -15,13 +15,11 @@ namespace minty::async::detail {
             if (const auto uuid = UUID::parse(arg)) {
                 const auto object = co_await repo.get_object(*uuid);
 
-                if (!object) throw not_found("Object '{}' not found", *uuid);
-
                 auto preview = object_preview();
-                preview.id = object->id;
-                preview.preview_id = object->preview_id;
-                preview.type = object->type;
-                preview.subtype = object->subtype;
+                preview.id = object.id;
+                preview.preview_id = object.preview_id;
+                preview.type = object.type;
+                preview.subtype = object.subtype;
 
                 result.push_back(std::move(preview));
                 continue;

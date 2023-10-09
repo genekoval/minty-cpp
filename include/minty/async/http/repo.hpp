@@ -59,7 +59,7 @@ namespace minty::async::http {
         auto delete_comment(
             const UUID::uuid& comment_id,
             bool recursive = false
-        ) -> ext::task<bool>;
+        ) -> ext::task<>;
 
         auto delete_post(const UUID::uuid& id) -> ext::task<>;
 
@@ -86,23 +86,21 @@ namespace minty::async::http {
         auto delete_tag_source(const UUID::uuid& tag_id, std::int64_t source_id)
             -> ext::task<>;
 
-        auto get_comment(const UUID::uuid& comment_id)
-            -> ext::task<std::optional<comment>>;
+        auto get_comment(const UUID::uuid& comment_id) -> ext::task<comment>;
 
         auto get_comments(const UUID::uuid& post_id)
             -> ext::task<std::vector<comment_data>>;
 
-        auto get_object(const UUID::uuid& object_id)
-            -> ext::task<std::optional<object>>;
+        auto get_object(const UUID::uuid& object_id) -> ext::task<object>;
 
-        auto get_post(const UUID::uuid& id) -> ext::task<std::optional<post>>;
+        auto get_post(const UUID::uuid& id) -> ext::task<post>;
 
         auto get_posts(const post_query& query)
             -> ext::task<search_result<post_preview>>;
 
         auto get_server_info() -> ext::task<server_info>;
 
-        auto get_tag(const UUID::uuid& id) -> ext::task<std::optional<tag>>;
+        auto get_tag(const UUID::uuid& id) -> ext::task<tag>;
 
         auto get_tags(const tag_query& query)
             -> ext::task<search_result<tag_preview>>;
@@ -124,15 +122,15 @@ namespace minty::async::http {
         auto set_post_description(
             const UUID::uuid& post_id,
             std::string_view description
-        ) -> ext::task<std::optional<modification<std::string>>>;
+        ) -> ext::task<modification<std::string>>;
 
         auto set_post_title(const UUID::uuid& post_id, std::string_view title)
-            -> ext::task<std::optional<modification<std::string>>>;
+            -> ext::task<modification<std::string>>;
 
         auto set_tag_description(
             const UUID::uuid& tag_id,
             std::string_view description
-        ) -> ext::task<std::optional<std::string>>;
+        ) -> ext::task<std::string>;
 
         auto set_tag_name(const UUID::uuid& tag_id, std::string_view new_name)
             -> ext::task<tag_name>;

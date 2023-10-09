@@ -1,3 +1,4 @@
+#include "minty/except.hpp"
 #include <internal/server/router.hpp>
 
 namespace minty::server {
@@ -80,8 +81,12 @@ namespace minty::server {
     }
 
     auto router_context::delete_comment(UUID::uuid comment_id, bool recursive)
-        -> ext::task<bool> {
-        co_return co_await repo->delete_comment(comment_id, recursive);
+        -> ext::task<> {
+        const auto deleted =
+            co_await repo->delete_comment(comment_id, recursive);
+
+        if (!deleted)
+            throw minty::not_found("Comment {} does not exist", comment_id);
     }
 
     auto router_context::delete_post(UUID::uuid post_id) -> ext::task<> {
@@ -124,8 +129,11 @@ namespace minty::server {
     }
 
     auto router_context::get_comment(UUID::uuid comment_id)
-        -> ext::task<std::optional<comment>> {
-        co_return co_await repo->get_comment(comment_id);
+        -> ext::task<comment> {
+        if (auto comment = co_await repo->get_comment(comment_id)) {
+            co_return *std::move(comment);
+        }
+        throw not_found("Comment {} does not exist");
     }
 
     auto router_context::get_comments(UUID::uuid post_id)
@@ -133,14 +141,18 @@ namespace minty::server {
         co_return co_await repo->get_comments(post_id);
     }
 
-    auto router_context::get_object(UUID::uuid object_id)
-        -> ext::task<std::optional<object>> {
-        co_return co_await repo->get_object(object_id);
+    auto router_context::get_object(UUID::uuid object_id) -> ext::task<object> {
+        if (auto object = co_await repo->get_object(object_id)) {
+            co_return *std::move(object);
+        }
+        throw not_found("Object {} does not exist", object_id);
     }
 
-    auto router_context::get_post(UUID::uuid post_id)
-        -> ext::task<std::optional<post>> {
-        co_return co_await repo->get_post(post_id);
+    auto router_context::get_post(UUID::uuid post_id) -> ext::task<post> {
+        if (auto post = co_await repo->get_post(post_id)) {
+            co_return *std::move(post);
+        }
+        throw not_found("Post {} does not exist", post_id);
     }
 
     auto router_context::get_posts(post_query query)
@@ -152,9 +164,11 @@ namespace minty::server {
         co_return *info;
     }
 
-    auto router_context::get_tag(UUID::uuid tag_id)
-        -> ext::task<std::optional<tag>> {
-        co_return co_await repo->get_tag(tag_id);
+    auto router_context::get_tag(UUID::uuid tag_id) -> ext::task<tag> {
+        if (auto tag = co_await repo->get_tag(tag_id)) {
+            co_return *std::move(tag);
+        }
+        throw not_found("Tag {} does not exist", tag_id);
     }
 
     auto router_context::get_tags(tag_query query)
@@ -172,20 +186,31 @@ namespace minty::server {
     auto router_context::set_post_description(
         UUID::uuid post_id,
         std::string description
-    ) -> ext::task<std::optional<modification<std::string>>> {
-        co_return co_await repo->set_post_description(post_id, description);
+    ) -> ext::task<modification<std::string>> {
+        if (auto modification =
+                co_await repo->set_post_description(post_id, description)) {
+            co_return *std::move(modification);
+        }
+        throw not_found("Post {} does not exist", post_id);
     }
 
     auto router_context::set_post_title(UUID::uuid post_id, std::string title)
-        -> ext::task<std::optional<modification<std::string>>> {
-        co_return co_await repo->set_post_title(post_id, title);
+        -> ext::task<modification<std::string>> {
+        if (auto modification = co_await repo->set_post_title(post_id, title)) {
+            co_return *std::move(modification);
+        }
+        throw not_found("Post {} does not exist", post_id);
     }
 
     auto router_context::set_tag_description(
         UUID::uuid tag_id,
         std::string description
-    ) -> ext::task<std::optional<std::string>> {
-        co_return co_await repo->set_tag_description(tag_id, description);
+    ) -> ext::task<std::string> {
+        if (auto formatted =
+                co_await repo->set_tag_description(tag_id, description)) {
+            co_return *std::move(formatted);
+        }
+        throw not_found("Tag {} does not exist", tag_id);
     }
 
     auto router_context::set_tag_name(UUID::uuid tag_id, std::string new_name)

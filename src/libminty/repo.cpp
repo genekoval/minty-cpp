@@ -143,9 +143,9 @@ namespace minty {
     }
 
     auto repo::delete_comment(const UUID::uuid& comment_id, bool recursive)
-        -> ext::task<bool> {
-        co_return co_await client
-            ->send<bool>(event::delete_comment, comment_id, recursive);
+        -> ext::task<> {
+        co_await client
+            ->send<void>(event::delete_comment, comment_id, recursive);
     }
 
     auto repo::delete_post(const UUID::uuid& id) -> ext::task<> {

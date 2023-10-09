@@ -48,7 +48,7 @@ namespace minty::server {
         auto create_post_draft() -> ext::task<UUID::uuid>;
 
         auto delete_comment(UUID::uuid comment_id, bool recursive)
-            -> ext::task<bool>;
+            -> ext::task<>;
 
         auto delete_post(UUID::uuid post_id) -> ext::task<>;
 
@@ -71,22 +71,20 @@ namespace minty::server {
         auto delete_tag_source(UUID::uuid tag_id, std::int64_t source_id)
             -> ext::task<>;
 
-        auto get_comment(UUID::uuid comment_id)
-            -> ext::task<std::optional<comment>>;
+        auto get_comment(UUID::uuid comment_id) -> ext::task<comment>;
 
         auto get_comments(UUID::uuid post_id) -> ext::task<comment_tree>;
 
-        auto get_object(UUID::uuid object_id)
-            -> ext::task<std::optional<object>>;
+        auto get_object(UUID::uuid object_id) -> ext::task<object>;
 
-        auto get_post(UUID::uuid post_id) -> ext::task<std::optional<post>>;
+        auto get_post(UUID::uuid post_id) -> ext::task<post>;
 
         auto get_posts(post_query query)
             -> ext::task<search_result<post_preview>>;
 
         auto get_server_info() -> ext::task<server_info>;
 
-        auto get_tag(UUID::uuid tag_id) -> ext::task<std::optional<tag>>;
+        auto get_tag(UUID::uuid tag_id) -> ext::task<tag>;
 
         auto get_tags(tag_query query) -> ext::task<search_result<tag_preview>>;
 
@@ -94,13 +92,13 @@ namespace minty::server {
             -> ext::task<std::string>;
 
         auto set_post_description(UUID::uuid post_id, std::string description)
-            -> ext::task<std::optional<modification<std::string>>>;
+            -> ext::task<modification<std::string>>;
 
         auto set_post_title(UUID::uuid post_id, std::string title)
-            -> ext::task<std::optional<modification<std::string>>>;
+            -> ext::task<modification<std::string>>;
 
         auto set_tag_description(UUID::uuid tag_id, std::string description)
-            -> ext::task<std::optional<std::string>>;
+            -> ext::task<std::string>;
 
         auto set_tag_name(UUID::uuid tag_id, std::string new_name)
             -> ext::task<tag_name>;

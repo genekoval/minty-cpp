@@ -67,7 +67,7 @@ namespace minty::sync::http {
         auto delete_comment(
             const UUID::uuid& comment_id,
             bool recursive = false
-        ) -> bool;
+        ) -> void;
 
         auto delete_post(const UUID::uuid& id) -> void;
 
@@ -99,25 +99,24 @@ namespace minty::sync::http {
             const std::filesystem::path& location
         ) -> void;
 
-        auto get_comment(const UUID::uuid& comment_id)
-            -> std::optional<comment>;
+        auto get_comment(const UUID::uuid& comment_id) -> comment;
 
         auto get_comments(const UUID::uuid& post_id)
             -> std::vector<comment_data>;
 
-        auto get_object(const UUID::uuid& object_id) -> std::optional<object>;
+        auto get_object(const UUID::uuid& object_id) -> object;
 
         auto get_object_data(const UUID::uuid& object_id) -> std::string;
 
         auto get_object_data(const UUID::uuid& object_id, FILE* file) -> void;
 
-        auto get_post(const UUID::uuid& id) -> std::optional<post>;
+        auto get_post(const UUID::uuid& id) -> post;
 
         auto get_posts(const post_query& query) -> search_result<post_preview>;
 
         auto get_server_info() -> server_info;
 
-        auto get_tag(const UUID::uuid& id) -> std::optional<tag>;
+        auto get_tag(const UUID::uuid& id) -> tag;
 
         auto get_tags(const tag_query& query) -> search_result<tag_preview>;
 
@@ -138,15 +137,15 @@ namespace minty::sync::http {
         auto set_post_description(
             const UUID::uuid& post_id,
             std::string_view description
-        ) -> std::optional<modification<std::string>>;
+        ) -> modification<std::string>;
 
         auto set_post_title(const UUID::uuid& post_id, std::string_view title)
-            -> std::optional<modification<std::string>>;
+            -> modification<std::string>;
 
         auto set_tag_description(
             const UUID::uuid& tag_id,
             std::string_view description
-        ) -> std::optional<std::string>;
+        ) -> std::string;
 
         auto set_tag_name(const UUID::uuid& tag_id, std::string_view new_name)
             -> tag_name;
